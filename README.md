@@ -55,7 +55,9 @@ Project | Description
 [**tinyChessServer**](https://github.com/MoritzWillig/tinyChessServer) | An xboard server for playing bughouse games via websockets
 [**lichess.org/analysis**](https://lichess.org/analysis) | The forever free, adless and open source chess server
 [**vue-chessboard**](https://github.com/vitogit/vue-chessboard) | Chessboard vue component to load positions, create positions and see threats
-[**Nibbler**](https://github.com/fohristiwhirl/nibbler) | Leela Chess Zero (Lc0) interface
+[**cutechess**](https://github.com/cutechess/cutechess) | A graphical user interface, command-line interface and a library for playing chess.
+[**XBoard**](https://www.gnu.org/software/xboard/) / [**WinBoard**](http://hgm.nubati.net/) | A graphical user interface for chess in all its major forms.
+[**Nibbler**](https://github.com/fohristiwhirl/nibbler) | Leela Chess Zero (Lc0) interface.
 [**chess.js**](https://github.com/jhlywa/chess.js) |  A Javascript chess library for chess move generation/validation, piece placement/movement, and check/checkmate/draw detection
 
 ---
