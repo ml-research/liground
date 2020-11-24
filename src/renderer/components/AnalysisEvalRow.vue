@@ -16,22 +16,6 @@ export default {
   name: 'AnalysisEvalRow',
   data () {
     return {
-      dropdownSelection: {},
-      arrayOfObjects: [{
-        id: 1,
-        name: '🐟 Multi-Variant Stockfish 10'
-      },
-      {
-        id: 2,
-        name: '🐠 Fairy Stockfish 10'
-      },
-      {
-        id: 3,
-        name: '🦜 CrazyAra 0.8.1'
-      }],
-      object: {
-        name: '🐟 Multi-Variant Stockfish 10'
-      },
       engines:
       {chess: [
         'Multi-Variant Stockfish 10',
@@ -46,10 +30,6 @@ export default {
         'CrazyAra 0.8.1'
       ],
       selected: 'Multi-Variant Stockfish 10',
-      selected_obj: {
-        id: 1,
-        name: '🐟 Multi-Variant Stockfish 10'
-      },
       engineBinaries: {
         'Multi-Variant Stockfish 10': 'stockfish',
         'CrazyAra 0.8.1': 'CrazyAra',

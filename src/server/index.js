@@ -8,6 +8,7 @@ ffish['onRuntimeInitialized'] = () => {
   console.log(`ffish.info(): ${ffish.info()}`)
 }
 
+// TODO: Maybe get rid of WebSocket server all together and communicate with vuex-store directly
 const wss = new WebSocket.Server({
   port: 8082
 })
@@ -55,8 +56,8 @@ Converts a string given uci pv line into a string of san move notation.
 */
 function extractPV (gameFEN, rawPV) {
   let movesStr = rawPV.split(' ')
+  // TODO: Make this variant specific
   let board = new ffish.Board('crazyhouse', gameFEN)
-  // let board = new ffish.Board('chess', gameFEN);
   let sanPV = board.variationSan(rawPV)
   board.delete()
 
@@ -70,7 +71,6 @@ class CLICreator {
     this.idAuthor = null
     this.stdIO = []
     this.child = null
-    // this.ourWs = null
     this.multipv = [{
       depth: 0,
       seldepth: 0,
@@ -155,31 +155,42 @@ class CLICreator {
     }
   }
   /*
-  Sends the move destinations via WebSocket
+  Sends the move destinations via WebSocket.
   */
   sendMoveDestinations () {
     ourWs.send(JSON.stringify({
       destinations: this.destinations
     }))
   }
+  /*
+  Sends 'isready', 'go infinite' commands to the engine.
+  */
   goEngine () {
     let message
     message = 'isready' + os.EOL
     this.child.stdin.write(message)
-    // message = 'go movetime 1000' + os.EOL;
     message = 'go infinite' + os.EOL
 
     this.child.stdin.write(message)
     this.stdIO.push('>' + message)
   }
+  /*
+  Resets the current member variables.
+  */
   reset () {
     this.update = false
     this.curPVLines = 0
     this.stdIO = []
   }
+  /*
+  Closes the active engine.
+  */
   closeEngine () {
     this.child.stdin.write('close')
   }
+  /*
+  Starts the engine binrary and parses the UCI replies.
+  */
   startEngine () {
     console.log(`this.engineBinary: ${this.engineBinary}`)
     this.child = childProcess.exec('./' + this.engineBinary, {
@@ -203,11 +214,10 @@ class CLICreator {
       output: this.child.stdin
     })
 
+    // parse a PV-line e.g.:
+    // info depth 17 seldepth 27 multipv 1 score cp 60 nodes 1008782 nps 1007774 hashfull 468 tbhits 0 time 1001 pv e2e4 e7e5
     this.rl.on('line', (line) => {
       line = line.trim()
-      // console.log(line)
-      // let re = /cp (\d+)/;
-      // <info depth 17 seldepth 27 multipv 1 score cp 60 nodes 1008782 nps 1007774 hashfull 468 tbhits 0 time 1001 pv e2e4 e7e5
 
       if (line.startsWith('info ')) {
         let re = new RegExp('multipv (\\d+)')
