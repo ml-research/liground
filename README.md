@@ -1,6 +1,6 @@
 # LiGround
 
-> A mordern Chess Variant Analysis GUI for the 21st century
+> A free, open-source and modern Chess Variant Analysis GUI for the 21st century
 
 <img src="./media/screenshots/liground-0.0.1.png" alt="LiGround screenshot" title="LiGround screenshot." />
 
@@ -22,6 +22,41 @@ npm run build
 npm run lint
 
 ```
+
+### Post-Installation Actions
+
+* Move `ffish.wasm` of package `ml-research/liground/node_modules/ffish-es6` to the main directory `ml-research/liground`.
+
+* [Download](https://github.com/ddugovic/Stockfish/releases) a binary of _Multi-Variant-Stockfish_ or build it from scratch.
+
+* Rename the _Multi-Variant-Stockfish_ binary to `stockfish` and move it to `ml-research/liground/src/server/engines`.
+
+
+### Libraries
+
+The following libraries or assets are used in **LiGround**:
+
+Library | Description | Usage
+--- | --- | ---
+[**ffish.js**](https://www.npmjs.com/package/ffish) | A high performance WebAssembly chess variant library based on [_Fairy-Stockfish_](https://github.com/ianfab/Fairy-Stockfish) as a standard module. | Used in the back-end to parse the UCI replies of the active engine.
+[**ffish-es6.js**](https://www.npmjs.com/package/ffish-es6) | A high performance WebAssembly chess variant library based on [_Fairy-Stockfish_](https://github.com/ianfab/Fairy-Stockfish) as an ES6 module. | Used in the GUI for legal move generation, FEN parsing & validation, pocket pieces, ...
+[**ChessgroundX**](https://github.com/gbtami/chessgroundx) | A free/libre open source chess UI developed for [lichess.org](https://lichess.org/) and [pychess.org](https://www.pychess.org/). | Used as the main UI board element.
+[**ornicar/lila**](https://github.com/ornicar/lila) | The forever free, adless and open source chess server | Many high quality assets from [lichess.org](https://lichess.org/) (e.g. piece styles, board styles, chess fonts, ...) are used within this GUI.
+[**Vue.js**](https://vuejs.org/) | The Progressive JavaScript Framework | Used as the main JavaScript Framework.
+[**Electron**](https://www.electronjs.org/) | Build cross-platform desktop apps with JavaScript, HTML, and CSS | Used for exporting the GUI to the desktop.
+[**electron-vue**](https://github.com/SimulatedGREG/electron-vue) | An Electron & Vue.js quick start boilerplate | Used for the boilerplate code.
+
+### Related
+
+Projects that influenced the creation of **LiGround**:
+
+Project | Description
+--- | ---
+[**tinyChessServer**](https://github.com/MoritzWillig/tinyChessServer) | An xboard server for playing bughouse games via websockets
+[**lichess.org/analysis**](https://lichess.org/analysis) | The forever free, adless and open source chess server
+[**vue-chessboard**](https://github.com/vitogit/vue-chessboard) | Chessboard vue component to load positions, create positions and see threats
+[**Nibbler**](https://github.com/fohristiwhirl/nibbler) | Leela Chess Zero (Lc0) interface
+[**chess.js**](https://github.com/jhlywa/chess.js) |  A Javascript chess library for chess move generation/validation, piece placement/movement, and check/checkmate/draw detection
 
 ---
 
