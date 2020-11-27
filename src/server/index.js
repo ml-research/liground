@@ -3,6 +3,7 @@ const WebSocket = require('ws')
 const childProcess = require('child_process')
 const readline = require('readline')
 const ffish = require('ffish')
+const path = require('path')
 
 ffish['onRuntimeInitialized'] = () => {
   console.log(`ffish.info(): ${ffish.info()}`)
@@ -189,12 +190,12 @@ class CLICreator {
     this.child.stdin.write('close')
   }
   /*
-  Starts the engine binrary and parses the UCI replies.
+  Starts the engine binary and parses the UCI replies.
   */
   startEngine () {
     console.log(`this.engineBinary: ${this.engineBinary}`)
-    this.child = childProcess.exec('./' + this.engineBinary, {
-      cwd: './src/server/engines',
+    this.child = childProcess.exec(path.join('.', this.engineBinary), {
+      cwd: path.resolve('./src/server/engines'),
       encoding: 'utf8'
     }, (error, stdout, stderr) => {
       console.error(`error: ${error}`)
