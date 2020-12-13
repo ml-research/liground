@@ -6,7 +6,8 @@ const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
-const MinifyPlugin = require("babel-minify-webpack-plugin")
+const MinifyPlugin = require('babel-minify-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
 
 let mainConfig = {
   entry: {
@@ -17,17 +18,6 @@ let mainConfig = {
   ],
   module: {
     rules: [
-      {
-        test: /\.(js)$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
-        }
-      },
       {
         test: /\.js$/,
         use: 'babel-loader',
@@ -74,6 +64,10 @@ if (process.env.NODE_ENV !== 'production') {
 if (process.env.NODE_ENV === 'production') {
   mainConfig.plugins.push(
     new MinifyPlugin(),
+    new ESLintPlugin({
+      extensions: 'js',
+      formatter: require('eslint-friendly-formatter')
+    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     })
