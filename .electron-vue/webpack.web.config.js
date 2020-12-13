@@ -26,7 +26,7 @@ let webConfig = {
             extractCSS: true
           }
         }
-      }
+      },
       {
         test: /\.css$/,
         use: ['vue-style-loader', {
@@ -35,10 +35,6 @@ let webConfig = {
             esModule: false
           }
         }]
-      },
-      {
-        test: /\.html$/,
-        use: 'vue-html-loader'
       },
       {
         test: /\.js$/,
