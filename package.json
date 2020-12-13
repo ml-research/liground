@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "Johannes Czech (johannes.czech@cs.tu-darmstadt.de)",
   "description": "A mordern Chess Variant Analysis GUI for the 21st century",
-  "license": "apgl-3.0",
+  "license": "AGPL-3.0",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
