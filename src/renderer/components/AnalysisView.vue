@@ -108,7 +108,6 @@ export default {
 }
 </script>
 
-
 <style scoped>
 input {
   font-size: 11pt;

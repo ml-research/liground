@@ -4,7 +4,6 @@
   </div>
 </template>
 
-
 <script>
 import VueApexCharts from 'vue-apexcharts'
 
