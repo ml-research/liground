@@ -96,6 +96,9 @@ export default {
     },
     pieceStyle () {
       return this.$store.getters.pieceStyle
+    },
+    fen () {
+      return this.$store.getters.fen
     }
   },
   watch: {
@@ -142,11 +145,13 @@ export default {
         this.board.setShapes(shapes)
       }
     },
-    fen: function (newFen) {
-      this.fen = newFen
+    fen: function (fen) {
+      console.log('got called')
+      this.loadPosition()
     },
     orientation: function (orientation) {
       this.orientation = orientation
+      console.log('got called')
       this.loadPosition()
     }
   },
@@ -271,12 +276,12 @@ export default {
       this.$emit('onMove', events)
     },
     loadPosition () { // set a default value for the configuration object itself to allow call to loadPosition()
-      console.log(`load position: ${this.ffishBoard.fen()}`)
+      console.log(`load position: ${this.fen}`)
       console.log(`this.variant: ${this.variant}`)
 
       this.board = Chessground(this.$refs.board, {
         coordinates: false,
-        fen: this.ffishBoard.fen(),
+        fen: this.fen,
         turnColor: this.toColor(),
         highlight: {
           lastMove: true, // add last-move class to squares
