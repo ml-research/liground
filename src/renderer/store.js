@@ -2,14 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import electron from 'electron'
 import fs from 'fs'
-import Module from 'ffish-es6'
-let ffish = null
-
-new Module().then(loadedModule => {
-    ffish = loadedModule;
-    console.log(`initialized ${ffish} ${loadedModule}`);
-    }
-);
+import ffish from 'ffish'
 
 Vue.use(Vuex)
 
@@ -17,33 +10,37 @@ export const store = new Vuex.Store({
   state: {
     active: false,
     started: false,
-    fen: '',
     destinations: {},
-    variant: 'crazyhouse',
+    variant: 'chess',
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
     idName: 'idName',
     idAuthor: 'idAuthor',
-    multipv: [{
-      'depth': 0,
-      'seldepth': 0,
-      'cp': 0,
-      'nodes': 0,
-      'nps': 0,
-      'hashfull': 0,
-      'tbhits': 0,
-      'time': 0,
-      'pv': '',
-      'ucimove': ''
-    },
-    {'pv': ''},
-    {},
-    {},
-    {}],
+    multipv: [
+      {
+        depth: 0,
+        seldepth: 0,
+        cp: 0,
+        nodes: 0,
+        nps: 0,
+        hashfull: 0,
+        tbhits: 0,
+        time: 0,
+        pv: '',
+        ucimove: ''
+      },
+      {
+        pv: ''
+      },
+      {},
+      {},
+      {}
+    ],
     sideToMove: 'w',
     counter: 0,
-    pieceStyle: 'tatiana'
+    pieceStyle: 'tatiana',
+    board: null
   },
   mutations: { // sync
     active (state, payload) {
@@ -53,7 +50,7 @@ export const store = new Vuex.Store({
       state.started = payload
     },
     fen (state, payload) {
-      state.fen = payload
+      state.board.setFen(payload)
     },
     destinations (state, payload) {
       state.destinations = payload
@@ -81,13 +78,13 @@ export const store = new Vuex.Store({
       for (let idx = 0; idx < state.multipv.length; ++idx) {
         if (state.multipv[idx].mate) {
           if (state.sideToMove === 'b') {
-            state.multipv[idx]['cpDisplay'] = '#' + String(-state.multipv[idx].mate)
+            state.multipv[idx].cpDisplay = '#' + String(-state.multipv[idx].mate)
           } else {
-            state.multipv[idx]['cpDisplay'] = '#' + state.multipv[idx].mate
+            state.multipv[idx].cpDisplay = '#' + state.multipv[idx].mate
           }
         } else {
           const cpWhite = cpForWhite(state.multipv[idx].cp, state.sideToMove)
-          state.multipv[idx]['cpDisplay'] = cpforWhiteStr(cpWhite)
+          state.multipv[idx].cpDisplay = cpforWhiteStr(cpWhite)
         }
       }
     },
@@ -96,18 +93,20 @@ export const store = new Vuex.Store({
     },
     resetMultiPV (state) {
       state.multipv = [{
-        'depth': 0,
-        'seldepth': 0,
-        'cp': 0,
-        'nodes': 0,
-        'nps': 0,
-        'hashfull': 0,
-        'tbhits': 0,
-        'time': 0,
-        'pv': '',
-        'ucimove': ''
+        depth: 0,
+        seldepth: 0,
+        cp: 0,
+        nodes: 0,
+        nps: 0,
+        hashfull: 0,
+        tbhits: 0,
+        time: 0,
+        pv: '',
+        ucimove: ''
       },
-      {'pv': ''},
+      {
+        pv: ''
+      },
       {},
       {},
       {}
@@ -115,69 +114,83 @@ export const store = new Vuex.Store({
     },
     pieceStyle (state, payload) {
       state.pieceStyle = payload
+    },
+    updateBoard (state, payload) {
+      state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
+    },
+    push (state, payload) {
+      state.board.push(payload)
     }
   },
   actions: { // async
-    startEngine (state) {
-      ws.send('startEngine~' + state.getters.engineBinary + '~' + state.getters.variant)
+    startEngine (context) {
+      ws.send('startEngine~' + context.getters.engineBinary + '~' + context.getters.variant)
       console.log('startEngine')
-      state.commit('started', true)
+      context.commit('started', true)
     },
-    goEngine (state) {
+    goEngine (context) {
       ws.send('goEngine')
       console.log('goEngine')
-      state.commit('active', true)
+      context.commit('active', true)
     },
-    stopEngine (state) {
+    stopEngine (context) {
       ws.send('stopEngine')
       console.log('stopEngine')
-      state.commit('active', false)
+      context.commit('active', false)
     },
-    resetMultiPV (state) {
-      state.commit('resetMultiPV')
+    resetMultiPV (context) {
+      context.commit('resetMultiPV')
     },
-    position (state) {
-      ws.send(`position~fen~${state.getters.fen}`)
-      state.commit('sideToMove', state.getters.fen.split(' ')[1])
-      console.log(`state.sideToMove: ${state.sideToMove}`)
+    position (context) {
+      ws.send(`position~fen~${context.getters.fen}`)
+      context.commit('sideToMove', context.getters.fen.split(' ')[1])
+      console.log(`state.sideToMove: ${context.sideToMove}`)
     },
-    fen (state, payload) {
-      state.commit('fen', payload)
+    fen (context, payload) {
+      context.commit('fen', payload)
     },
-    destinations (state, payload) {
-      state.commit('destinations', payload)
+    destinations (context, payload) {
+      context.commit('destinations', payload)
     },
-    started (state, payload) {
-      state.commit('started', payload)
+    started (context, payload) {
+      context.commit('started', payload)
     },
-    active (state, payload) {
-      state.commit('active', payload)
+    active (context, payload) {
+      context.commit('active', payload)
     },
-    variant (state, payload) {
-      state.commit('variant', payload)
+    variant (context, payload) {
+      if (context.getters.variant !== payload) {
+        context.commit('variant', payload)
+        context.commit('updateBoard', {
+          fen: context.getters.fen,
+          is960: context.getters.is960
+        })
+      }
     },
-    engineBinary (state, payload) {
-      state.commit('engineBinary', payload)
+    set960 (context, payload) {
+      if (context.getters.is960 !== payload) {
+        context.commit('updateBoard', {
+          fen: context.getters.fen,
+          is960: payload
+        })
+      }
     },
-    stdIO (state, payload) {
-      state.commit('stdIO', payload)
+    engineBinary (context, payload) {
+      context.commit('engineBinary', payload)
     },
-    idName (state, payload) {
-      state.commit('idName', payload)
+    stdIO (context, payload) {
+      context.commit('stdIO', payload)
     },
-    idAuthor (state, payload) {
-      state.commit('idAuthor', payload)
+    idName (context, payload) {
+      context.commit('idName', payload)
     },
-    multipv (state, payload) {
-      state.commit('multipv', payload)
+    idAuthor (context, payload) {
+      context.commit('idAuthor', payload)
     },
-    increment (state, payload) {
-      state.commit('increment', payload)
+    multipv (context, payload) {
+      context.commit('multipv', payload)
     },
-    pieceStyle (state, payload) {
-      state.commit('pieceStyle', payload)
-    },
-    async openPgnFile (state, payload) {
+    async openPgnFile (context, payload) {
       const result = await electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
         properties: ['openFile'], 
@@ -197,7 +210,13 @@ export const store = new Vuex.Store({
           const variant = game.headers("Variant").toLowerCase();
         })
       }
+    },
 
+    increment (context, payload) {
+      context.commit('increment', payload)
+    },
+    pieceStyle (context, payload) {
+      context.commit('pieceStyle', payload)
     }
   },
   getters: {
@@ -211,7 +230,7 @@ export const store = new Vuex.Store({
       return state.redraw
     },
     fen (state) {
-      return state.fen
+      return state.board.fen()
     },
     destinations (state) {
       return state.destinations
@@ -236,39 +255,39 @@ export const store = new Vuex.Store({
     },
     bestmove (state) {
       return [
-        state.multipv[0]['ucimove'],
-        state.multipv[1]['ucimove'],
-        state.multipv[2]['ucimove'],
-        state.multipv[3]['ucimove'],
-        state.multipv[4]['ucimove']
+        state.multipv[0].ucimove,
+        state.multipv[1].ucimove,
+        state.multipv[2].ucimove,
+        state.multipv[3].ucimove,
+        state.multipv[4].ucimove
       ]
     },
     cp (state) {
-      return state.multipv[0]['cp']
+      return state.multipv[0].cp
     },
     depth (state) {
-      return state.multipv[0]['depth']
+      return state.multipv[0].depth
     },
     nps (state) {
-      return state.multipv[0]['nps']
+      return state.multipv[0].nps
     },
     seldepth (state) {
-      return state.multipv[0]['seldepth']
+      return state.multipv[0].seldepth
     },
     nodes (state) {
-      return state.multipv[0]['nodes']
+      return state.multipv[0].nodes
     },
     hashfull (state) {
-      return state.multipv[0]['hashfull']
+      return state.multipv[0].hashfull
     },
     tbhits (state) {
-      return state.multipv[0]['tbhits']
+      return state.multipv[0].tbhits
     },
     time (state) {
-      return state.multipv[0]['time']
+      return state.multipv[0].time
     },
     pv (state) {
-      return state.multipv[0]['pv']
+      return state.multipv[0].pv
     },
     cpForWhite (state) {
       return cpForWhite(state.multipv[0].cp, state.sideToMove)
@@ -303,9 +322,37 @@ export const store = new Vuex.Store({
     },
     pieceStyle (state) {
       return state.pieceStyle
+    },
+    turn (state) {
+      return state.board.turn()
+    },
+    legalMoves (state) {
+      return state.board.legalMoves()
+    },
+    pocket (state) {
+      return (turn) => state.board.pocket(turn)
+    },
+    moveStack (state) {
+      return state.board.moveStack()
+    },
+    isGameOver (state) {
+      return state.board.isGameOver()
+    },
+    sanMove (state) {
+      return (uciMove) => state.board.sanMove(uciMove)
+    },
+    is960 (state) {
+      return state.board.is960()
     }
   }
 })
+
+ffish.onRuntimeInitialized = () => {
+  store.commit('updateBoard', {
+    fen: '',
+    is960: false
+  })
+}
 
 function cpForWhite (cp, sideToMove) {
   if (sideToMove === 'b') {
@@ -348,7 +395,7 @@ ws.addEventListener('open', () => {
 ws.addEventListener('message', ({
   data
 }) => {
-  var json = JSON.parse(data)
+  const json = JSON.parse(data)
 
   const items = ['idAuthor', 'idName', 'stdIO', 'multipv', 'destinations']
   dispatchToStore(items, json, store)
