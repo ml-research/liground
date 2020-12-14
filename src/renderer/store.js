@@ -1,6 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import electron from 'electron'
+import fs from 'fs'
+import Module from 'ffish-es6'
+let ffish = null
+
+new Module().then(loadedModule => {
+    ffish = loadedModule;
+    console.log(`initialized ${ffish} ${loadedModule}`);
+    }
+);
+
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -168,7 +178,7 @@ export const store = new Vuex.Store({
       state.commit('pieceStyle', payload)
     },
     async openPgnFile (state, payload) {
-      var result = await electron.remote.dialog.showOpenDialog({
+      const result = await electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
         properties: ['openFile'], 
         filters: [
@@ -179,6 +189,13 @@ export const store = new Vuex.Store({
 
       if (!result.canceled) {
         console.log(result.filePaths[0])
+        fs.readFile(result.filePaths[0], 'utf8', function (err,data) {
+          if (err) {
+            return console.log(err);
+          }
+          let game = ffish.readGamePGN(data);
+          const variant = game.headers("Variant").toLowerCase();
+        })
       }
 
     }
