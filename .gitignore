@@ -10,3 +10,6 @@ thumbs.db
 !.gitkeep
 *.wasm
 engines/*
+src/server/engines/*
+
+run.bat
