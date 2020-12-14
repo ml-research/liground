@@ -26,7 +26,8 @@ function createWindow () {
     // fullscreen: true,
     webPreferences: {
       nodeIntegration: true,
-      nodeIntegrationInWorker: true
+      nodeIntegrationInWorker: true,
+      enableRemoteModule: true
     }
   })
 

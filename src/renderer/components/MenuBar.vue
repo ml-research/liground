@@ -1,7 +1,7 @@
 <template>
   <div>
   <nav>
-    <a href="#"><i slot="extra" class="icon mdi mdi-checkerboard"/> Game</a>
+    <a href="#" @click="openPgn"><i slot="extra" class="icon mdi mdi-checkerboard"/> Open PGN</a>
     <a href="#"><i slot="extra" class="icon mdi mdi-robot"/> Engines</a>
     <a href="#"><i slot="extra" class="icon mdi mdi-hammer-screwdriver"/> Settings </a>
     <a href="#"><i slot="extra" class="icon mdi mdi-information-outline"/> About <i slot="extra" class="icon mdi mdi-github"/></a>
@@ -14,6 +14,12 @@
 export default {
   name: 'MenuBar',
   components: {
+  },
+  methods: {
+    openPgn () {
+      console.log('load PGN')
+      this.$store.dispatch('openPgnFile', 0)
+    }
   }
 }
 </script>

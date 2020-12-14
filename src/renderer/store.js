@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import electron from 'electron'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -166,6 +166,21 @@ export const store = new Vuex.Store({
     },
     pieceStyle (state, payload) {
       state.commit('pieceStyle', payload)
+    },
+    async openPgnFile (state, payload) {
+      var result = await electron.remote.dialog.showOpenDialog({
+        title: 'Open PGN file',
+        properties: ['openFile'], 
+        filters: [
+          { name: 'PGN Files', extensions: ['pgn'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      })
+
+      if (!result.canceled) {
+        console.log(result.filePaths[0])
+      }
+
     }
   },
   getters: {
