@@ -54,13 +54,7 @@ export const store = new Vuex.Store({
       state.destinations = payload
     },
     variant (state, payload) {
-      if (state.variant !== payload) {
-        state.variant = payload
-        state.commit('updateBoard', {
-          fen: state.board.fen(),
-          is960: state.board.is960()
-        })
-      }
+      state.variant = payload
     },
     engineBinary (state, payload) {
       state.engineBinary = payload
@@ -124,75 +118,81 @@ export const store = new Vuex.Store({
     },
     push (state, payload) {
       state.board.push(payload)
-    },
-    set960 (state, payload) {
-      if (state.board.is960() !== payload) {
-        state.commit('updateBoard', {
-          fen: state.board.fen(),
-          is960: payload
-        })
-      }
     }
   },
   actions: { // async
-    startEngine (state) {
-      ws.send('startEngine~' + state.getters.engineBinary + '~' + state.getters.variant)
+    startEngine (context) {
+      ws.send('startEngine~' + context.getters.engineBinary + '~' + context.getters.variant)
       console.log('startEngine')
-      state.commit('started', true)
+      context.commit('started', true)
     },
-    goEngine (state) {
+    goEngine (context) {
       ws.send('goEngine')
       console.log('goEngine')
-      state.commit('active', true)
+      context.commit('active', true)
     },
-    stopEngine (state) {
+    stopEngine (context) {
       ws.send('stopEngine')
       console.log('stopEngine')
-      state.commit('active', false)
+      context.commit('active', false)
     },
-    resetMultiPV (state) {
-      state.commit('resetMultiPV')
+    resetMultiPV (context) {
+      context.commit('resetMultiPV')
     },
-    position (state) {
-      ws.send(`position~fen~${state.getters.fen}`)
-      state.commit('sideToMove', state.getters.fen.split(' ')[1])
-      console.log(`state.sideToMove: ${state.sideToMove}`)
+    position (context) {
+      ws.send(`position~fen~${context.getters.fen}`)
+      context.commit('sideToMove', context.getters.fen.split(' ')[1])
+      console.log(`state.sideToMove: ${context.sideToMove}`)
     },
-    fen (state, payload) {
-      state.commit('fen', payload)
+    fen (context, payload) {
+      context.commit('fen', payload)
     },
-    destinations (state, payload) {
-      state.commit('destinations', payload)
+    destinations (context, payload) {
+      context.commit('destinations', payload)
     },
-    started (state, payload) {
-      state.commit('started', payload)
+    started (context, payload) {
+      context.commit('started', payload)
     },
-    active (state, payload) {
-      state.commit('active', payload)
+    active (context, payload) {
+      context.commit('active', payload)
     },
-    variant (state, payload) {
-      state.commit('variant', payload)
+    variant (context, payload) {
+      if (context.getters.variant !== payload) {
+        context.commit('variant', payload)
+        context.commit('updateBoard', {
+          fen: context.getters.fen,
+          is960: context.getters.is960
+        })
+      }
     },
-    engineBinary (state, payload) {
-      state.commit('engineBinary', payload)
+    set960 (context, payload) {
+      if (context.getters.is960 !== payload) {
+        context.commit('updateBoard', {
+          fen: context.getters.fen,
+          is960: payload
+        })
+      }
     },
-    stdIO (state, payload) {
-      state.commit('stdIO', payload)
+    engineBinary (context, payload) {
+      context.commit('engineBinary', payload)
     },
-    idName (state, payload) {
-      state.commit('idName', payload)
+    stdIO (context, payload) {
+      context.commit('stdIO', payload)
     },
-    idAuthor (state, payload) {
-      state.commit('idAuthor', payload)
+    idName (context, payload) {
+      context.commit('idName', payload)
     },
-    multipv (state, payload) {
-      state.commit('multipv', payload)
+    idAuthor (context, payload) {
+      context.commit('idAuthor', payload)
     },
-    increment (state, payload) {
-      state.commit('increment', payload)
+    multipv (context, payload) {
+      context.commit('multipv', payload)
     },
-    pieceStyle (state, payload) {
-      state.commit('pieceStyle', payload)
+    increment (context, payload) {
+      context.commit('increment', payload)
+    },
+    pieceStyle (context, payload) {
+      context.commit('pieceStyle', payload)
     }
   },
   getters: {
