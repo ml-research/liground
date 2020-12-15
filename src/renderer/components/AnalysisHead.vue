@@ -31,7 +31,7 @@ export default {
       variants: [
         '♟️ Standard', '🏠 Crazyhouse'
       ],
-      selected: '🏠 Crazyhouse'
+      selected: '♟️ Standard'
     }
   },
   methods: {

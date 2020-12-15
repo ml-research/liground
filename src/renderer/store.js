@@ -118,6 +118,7 @@ export const store = new Vuex.Store({
     },
     push (state, payload) {
       state.board.push(payload)
+      console.log('pushed new move: '+payload)
     }
   },
   actions: { // async
@@ -206,7 +207,13 @@ export const store = new Vuex.Store({
       return state.redraw
     },
     fen (state) {
-      return state.board.fen()
+      //return state.board.fen()
+      if(state.board !== null){
+        console.log('fen_store:'+state.board.fen())
+        return state.board.fen()
+      } else {
+        return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+      }
     },
     destinations (state) {
       return state.destinations
@@ -300,7 +307,11 @@ export const store = new Vuex.Store({
       return state.pieceStyle
     },
     turn (state) {
+      if(state.board !== null){
       return state.board.turn()
+      } else{
+        return 'white'
+      }
     },
     legalMoves (state) {
       return state.board.legalMoves()

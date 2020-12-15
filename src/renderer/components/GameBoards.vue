@@ -93,7 +93,7 @@ export default {
     showInfo (event) {
       this.fen = event['fen']
       console.log(`showInfo: ${this.fen}`)
-      this.$store.dispatch('fen', this.fen)
+      //this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
       let newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
@@ -119,9 +119,7 @@ export default {
       }
       this.resetAnalysis = !this.resetAnalysis
     },
-    mounted () {
-      this.board = new ffish.Board(this.variant())
-    }
+    
   }
 }
 </script>
