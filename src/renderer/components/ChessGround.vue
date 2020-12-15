@@ -100,7 +100,7 @@ export default {
     initialized () {
       this.updateBoard()
     },
-    turn () {
+    fen () {
       this.updateBoard()
     },
     pieceStyle (pieceStyle) {
@@ -146,9 +146,6 @@ export default {
       if (this.board !== null) {
         this.board.setShapes(shapes)
       }
-    },
-    fen () {
-      this.updateBoard()
     }
   },
   methods: {
