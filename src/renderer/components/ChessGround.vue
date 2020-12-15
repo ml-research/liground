@@ -94,6 +94,9 @@ export default {
     }
   },
   computed: {
+    initialized () {
+      return this.$store.getters.initialized
+    },
     turn () {
       return this.$store.getters.turn
     },
@@ -117,7 +120,10 @@ export default {
     }
   },
   watch: {
-    turn: function(turn) {
+    initialized: function () {
+      this.loadPosition()
+    }, 
+    turn: function (turn) {
       this.board.set({
         turnColor: this.toColor(),
         movable: {
@@ -195,7 +201,7 @@ export default {
         const dstSquare = letters[x] + String(7 - y + 1)
         const move = pieces[this.selectedPiece] + '@' + dstSquare
         console.log(`move: ${move}`)
-        this.$store.commit('push', move)
+        //this.$store.commit('push', move)
         //this.ffishBoard.push(move)
         /*this.board.set({
           fen: this.fen, //this.ffishBoard.fen(),
@@ -253,7 +259,7 @@ export default {
         }
         const uciMove = orig + dest
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)//this.ffishBoard.sanMove(uciMove)
-        this.$store.commit('push', uciMove)//this.ffishBoard.push(uciMove)
+        this.$store.dispatch('push', uciMove)//this.ffishBoard.push(uciMove)
         console.log('colorAfterPush:' + this.toColor())
         this.updateHand()
 

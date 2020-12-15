@@ -6,6 +6,9 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    turn: 'white',
+    fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    initialized: false,
     active: false,
     started: false,
     destinations: {},
@@ -41,6 +44,15 @@ export const store = new Vuex.Store({
     board: null
   },
   mutations: { // sync
+    fen (state, payload){
+      state.fen = payload
+    },
+    turn (state, payload){
+      state.turn = payload
+    },
+    initialized (state, payload){
+      state.initialized = payload
+    },
     active (state, payload) {
       state.active = payload
     },
@@ -115,13 +127,14 @@ export const store = new Vuex.Store({
     },
     updateBoard (state, payload) {
       state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
-    },
-    push (state, payload) {
-      state.board.push(payload)
-      console.log('pushed new move: '+payload)
     }
   },
   actions: { // async
+    push (context, payload) {
+      this.state.board.push(payload)
+      context.commit('turn', this.state.board.turn())
+      context.commit('fen', this.state.board.fen())
+    },
     startEngine (context) {
       ws.send('startEngine~' + context.getters.engineBinary + '~' + context.getters.variant)
       console.log('startEngine')
@@ -197,6 +210,12 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    board (state) {
+      return state.board
+    },
+    initialized (state) {
+      return state.initialized
+    },
     active (state) {
       return state.active
     },
@@ -208,12 +227,7 @@ export const store = new Vuex.Store({
     },
     fen (state) {
       //return state.board.fen()
-      if(state.board !== null){
-        console.log('fen_store:'+state.board.fen())
-        return state.board.fen()
-      } else {
-        return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-      }
+      return state.fen
     },
     destinations (state) {
       return state.destinations
@@ -307,11 +321,7 @@ export const store = new Vuex.Store({
       return state.pieceStyle
     },
     turn (state) {
-      if(state.board !== null){
-      return state.board.turn()
-      } else{
-        return 'white'
-      }
+      return state.turn
     },
     legalMoves (state) {
       return state.board.legalMoves()
@@ -338,7 +348,8 @@ ffish.onRuntimeInitialized = () => {
   store.commit('updateBoard', {
     fen: '',
     is960: false
-  })
+  }),
+  store.commit('initialized', true)
 }
 
 function cpForWhite (cp, sideToMove) {
