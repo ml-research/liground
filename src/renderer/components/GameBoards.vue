@@ -3,7 +3,7 @@
     <div>
       <div class='grid-parent'>
         <div>
-          <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation" :fen="fen"/>
+          <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
           <EvalBar class="float-right-child" id="evalbar"/>
           <br/>
           <div id="fen-field">FEN <input type="text" id="lname" name="lname" placeholder="fen position" v-on:change="checkValidFEN" :value="fen" size="60"></div>
