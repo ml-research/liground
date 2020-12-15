@@ -208,6 +208,16 @@ export const store = new Vuex.Store({
           }
           let game = ffish.readGamePGN(data);
           const variant = game.headers("Variant").toLowerCase();
+
+          let board = new ffish.Board(variant);
+          const mainlineMoves = game.mainlineMoves().split(" ");
+
+          for (let i = 0; i < mainlineMoves.length; ++i) {
+            board.push(mainlineMoves[i]);          
+          }
+          console.log(board.fen() + ' ' + board.is960())
+          context.commit('variant', variant)
+          context.commit('updateBoard', {fen: board.fen(), is960: board.is960()})
         })
       }
     },
