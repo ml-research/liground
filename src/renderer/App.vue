@@ -5,9 +5,9 @@
 </template>
 
 <script>
-  export default {
-    name: 'liground'
-  }
+export default {
+  name: 'liground'
+}
 </script>
 
 <style>

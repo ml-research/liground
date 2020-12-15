@@ -45,7 +45,8 @@ export default {
       console.log(`selected. ${variants[this.selected]}`)
       this.$store.dispatch('variant', variants[this.selected])
       this.$store.dispatch('started', false)
-      this.$store.dispatch('selected', false)
+      // there is no 'selected' action
+      //this.$store.dispatch('selected', false)
     }
   },
   computed: {

@@ -194,8 +194,8 @@ class CLICreator {
   */
   startEngine () {
     console.log(`this.engineBinary: ${this.engineBinary}`)
-    this.child = childProcess.exec(path.join('.', this.engineBinary), {
-      cwd: path.resolve('./src/server/engines'),
+    this.child = childProcess.exec(path.resolve(__dirname, 'engines', this.engineBinary), {
+      cwd: path.resolve(__dirname, 'engines'),
       encoding: 'utf8'
     }, (error, stdout, stderr) => {
       console.error(`error: ${error}`)
