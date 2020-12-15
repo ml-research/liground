@@ -40,10 +40,6 @@ export default {
     }
   },
   props: {
-    fen: {
-      type: String,
-      default: ''
-    },
     free: {
       type: Boolean,
       default: false
@@ -96,13 +92,12 @@ export default {
     },
     pieceStyle () {
       return this.$store.getters.pieceStyle
+    },
+    fen () {
+      return this.$store.getters.fen
     }
   },
   watch: {
-    variant: function (variant) {
-      console.log(`variant: ${variant}`)
-      this.options = this.engines[variant]
-    },
     pieceStyle: function (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
     },
@@ -141,9 +136,6 @@ export default {
       if (this.board !== null) {
         this.board.setShapes(shapes)
       }
-    },
-    fen: function (newFen) {
-      this.fen = newFen
     },
     orientation: function (orientation) {
       this.orientation = orientation
@@ -305,7 +297,7 @@ export default {
       console.log(`info: ${ffish.info()}`)
 
       this.ffishBoard = new ffish.Board(this.variant)
-      this.fen = this.ffishBoard.fen()
+      this.$store.dispatch('fen',this.ffishBoard.fen())
       this.loadPosition()
       this.afterMove()
     })

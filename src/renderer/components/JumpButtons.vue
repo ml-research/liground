@@ -14,9 +14,9 @@ import HookIcon from 'mdi-vue/Hook.vue' // raw vue component
 
 export default {
   name: 'JumpButtons',
-  components: [
+  components: {
     HookIcon
-  ]
+  }
 }
 </script>
 
