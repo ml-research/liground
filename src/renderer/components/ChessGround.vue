@@ -151,6 +151,7 @@ export default {
       this.board.set({
         variant: this.variant
       })
+      this.updateBoard()
     }
   },
   methods: {

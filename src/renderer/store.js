@@ -136,6 +136,9 @@ export const store = new Vuex.Store({
       } else {
         state.board = new ffish.Board(state.variant)
       }
+      this.commit('fen', state.board.fen())
+      this.commit('turn', state.board.turn())
+      this.commit('legalMoves', state.board.legalMoves())
     }
   },
   actions: { // async
@@ -195,7 +198,6 @@ export const store = new Vuex.Store({
       if (context.getters.variant !== payload) {
         context.commit('variant', payload)
         context.commit('newBoard', {
-          is960: context.getters.is960
         })
       }
     },
