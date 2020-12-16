@@ -12,8 +12,8 @@
         </div>
         <AnalysisView id="analysisview" :moves="moves" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
       </div>
-    <!--</div>
-  </div> -->
+    </div>
+  </div>
 </template>
 
 <script>

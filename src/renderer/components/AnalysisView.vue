@@ -22,7 +22,7 @@
       <div v-for='move in moves' :key='move.type'>
         <div class='move-field'>
         <div v-if='move.ply % 2 == 1' class='float-left-child move-number'>{{(move.ply+1) / 2}}.</div>
-        <div class='float-left-child move-name' @click="updateBoard(move)">{{move.name}}</div>
+        <div class='float-left-child move-name' v-bind:class='{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}' @click="updateBoard(move)">{{move.name}}</div>
 
         </div>
       </div>
@@ -48,8 +48,7 @@ export default {
   },
   methods: {
     updateBoard (move) {
-      console.log(`move: ${move.fen}`)
-      //this.$store.dispatch('fen', move.fen)
+      this.$store.dispatch('fen', move.fen)   
     }
   },
   props: {
@@ -200,13 +199,13 @@ p {
   border-radius: 0px 4px 4px 0px;
   color: #fff;
 }
-.move-field:hover .move-name-active {
+.move-field:hover .active {
   background-color: #2196F3;
   cursor: pointer;
   border-radius: 0px 4px 4px 0px;
   color: #fff;
 }
-.move-field .move-name-active{
+.move-field .active{
   background-color:#444;
   border-radius: 0px 4px 4px 0px;
   color: #fff;

@@ -11,6 +11,7 @@ export const store = new Vuex.Store({
     active: false,
     turn: 'white',
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
     legalMoves: '',
     destinations: {},
     variant: 'chess',
@@ -47,6 +48,9 @@ export const store = new Vuex.Store({
   mutations: { // sync
     fen (state, payload) {
       state.fen = payload
+    },
+    lastFen (state, payload) {
+      state.lastFen = payload
     },
     turn (state, payload) {
       state.turn = payload
@@ -174,6 +178,9 @@ export const store = new Vuex.Store({
     fen (context, payload) {
       context.commit('fen', payload)
     },
+    lastFen (context, payload) {
+      context.commit('lastFen', payload)
+    },
     destinations (context, payload) {
       context.commit('destinations', payload)
     },
@@ -240,6 +247,9 @@ export const store = new Vuex.Store({
     },
     fen (state) {
       return state.fen
+    },
+    lastFen (state) {
+      return state.lastFen
     },
     destinations (state) {
       return state.destinations
