@@ -22,8 +22,7 @@
       <div v-for='move in moves' :key='move.type'>
         <div class='move-field'>
         <div v-if='move.ply % 2 == 1' class='float-left-child move-number'>{{(move.ply+1) / 2}}.</div>
-        <div v-if='click' class='float-left-child move-name-active' @click="updateBoard(move)">{{move.name}}</div>
-        <div v-else class='float-left-child move-name' @click="updateBoard(move)">{{move.name}}</div>
+        <div class='float-left-child move-name' @click="updateBoard(move)">{{move.name}}</div>
 
         </div>
       </div>
@@ -50,7 +49,7 @@ export default {
   methods: {
     updateBoard (move) {
       console.log(`move: ${move.fen}`)
-      this.$store.dispatch('fen', move.fen)
+      //this.$store.dispatch('fen', move.fen)
     }
   },
   props: {
