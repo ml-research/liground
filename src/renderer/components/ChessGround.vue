@@ -15,12 +15,10 @@
 </template>
 
 <script>
-import {Chessground} from 'chessgroundx'
+import { mapGetters } from 'vuex'
+import { Chessground } from 'chessgroundx'
 import ChessPocket from './ChessPocket'
 
-import Module from 'ffish-es6'
-
-let ffish = null
 const WHITE = true
 const BLACK = false
 
@@ -29,21 +27,29 @@ export default {
   components: {
     ChessPocket
   },
-  beforeCreate () {
-    console.log(`beforeCreate`)
-  },
   data () {
     return {
       ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-      selectedPiece: null
+      selectedPiece: null,
+      piecesToIdx: {
+        P: 4,
+        N: 3,
+        B: 2,
+        R: 1,
+        Q: 0,
+        p: 0,
+        n: 1,
+        b: 2,
+        r: 3,
+        q: 4
+      },
+      board: null,
+      promotions: [],
+      promoteTo: 'q'
     }
   },
   props: {
-    fen: {
-      type: String,
-      default: ''
-    },
     free: {
       type: Boolean,
       default: false
@@ -63,55 +69,46 @@ export default {
     piecesW: {
       type: Array,
       default: () => ([
-        {'count': 0, 'type': 'queen'},
-        {'count': 0, 'type': 'rook'},
-        {'count': 0, 'type': 'bishop'},
-        {'count': 0, 'type': 'knight'},
-        {'count': 0, 'type': 'pawn'}
+        { count: 0, type: 'queen' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'pawn' }
       ])
     },
     piecesB: {
       type: Array,
       default: () => ([
-        {'count': 0, 'type': 'pawn'},
-        {'count': 0, 'type': 'knight'},
-        {'count': 0, 'type': 'bishop'},
-        {'count': 0, 'type': 'rook'},
-        {'count': 0, 'type': 'queen'}
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
       ])
     }
   },
   computed: {
-    variant () {
-      return this.$store.getters.variant
+    turn () {
+      return this.$store.getters.turn ? 'white' : 'black'
     },
-    multipv () {
-      return this.$store.getters.multipv
+    legalMoves () {
+      return this.$store.getters.legalMoves.split(' ')
     },
-    bestmove () {
-      return this.$store.getters.bestmove
-    },
-    redraw () {
-      return this.$store.getters.redraw
-    },
-    pieceStyle () {
-      return this.$store.getters.pieceStyle
-    },
-    fen () {
-      return this.$store.getters.fen
-    }
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen'])
   },
   watch: {
-    variant: function (variant) {
-      console.log(`variant: ${variant}`)
-      this.options = this.engines[variant]
+    initialized () {
+      this.updateBoard()
     },
-    pieceStyle: function (pieceStyle) {
+    fen () {
+      this.updateBoard()
+    },
+    pieceStyle (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
     },
-    bestmove: function () {
-      let shapes = []
-      const multipv = this.$store.getters.multipv
+    bestmove () {
+      const shapes = []
+      const multipv = this.multipv
 
       if (this.$store.getters.started) {
         let lineWidth = 10
@@ -123,13 +120,18 @@ export default {
             let drawShape
 
             if (move.indexOf('@') !== -1) {
-              const colorConv = ['black', 'white']
               const pieceType = move[0].toLowerCase()
-              const pieceConv = {'p': 'pawn', 'n': 'knight', 'b': 'bishop', 'r': 'rook', 'q': 'queen', 'k': 'king'}
-              shapes.unshift({ orig: dest, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth }, piece: { role: pieceConv[pieceType], color: colorConv[+this.ffishBoard.turn()] } })
+              const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
+              shapes.unshift({
+                orig: dest,
+                dest: dest,
+                brush: 'blue',
+                modifiers: { lineWidth: lineWidth },
+                piece: { role: pieceConv[pieceType], color: this.turn }
+              })
               drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
             } else {
-              drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: {lineWidth: lineWidth} }
+              drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
             }
             if (idx === 0) {
               drawShape.brush = 'yellow'
@@ -144,69 +146,60 @@ export default {
       if (this.board !== null) {
         this.board.setShapes(shapes)
       }
-    },
-    fen: function (fen) {
-      console.log('got called')
-      this.loadPosition()
-    },
-    orientation: function (orientation) {
-      this.orientation = orientation
-      console.log('got called')
-      this.loadPosition()
     }
   },
   methods: {
     updatePieceCSS (pieceStyle) {
-      let file = document.createElement('link')
+      const file = document.createElement('link')
       file.rel = 'stylesheet'
       file.href = 'src/renderer/assets/images/piece-css/' + pieceStyle + '.css'
       document.head.appendChild(file)
     },
     getBoardPos (event) {
+      // TODO: fix placing of pocket pieces in crazyhouse
       if (this.selectedPiece !== null) {
         // get click field
         const squareHeight = 75
         const squareWidth = 75
-        let x = Math.floor(event.layerX / squareWidth)
-        let y = Math.floor(event.layerY / squareHeight)
+        const x = Math.floor(event.layerX / squareWidth)
+        const y = Math.floor(event.layerY / squareHeight)
         console.log(`x, y: ${x} ${y}`)
 
-        let pieces = {'pawn': 'P', 'knight': 'N', 'bishop': 'B', 'rook': 'R', 'queen': 'Q'}
+        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
 
-        let letters = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h'}
+        const letters = { 0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h' }
         const dstSquare = letters[x] + String(7 - y + 1)
         const move = pieces[this.selectedPiece] + '@' + dstSquare
         console.log(`move: ${move}`)
-
-        this.ffishBoard.push(move)
-        this.board.set({
-          fen: this.ffishBoard.fen(),
+        // this.$store.commit('push', move)
+        // this.ffishBoard.push(move)
+        /* this.board.set({
+          fen: this.fen, //this.ffishBoard.fen(),
           turnColor: this.toColor(),
           movable: {
             color: this.toColor(),
             dests: this.possibleMoves()
           }
-        })
+        }) */
         this.selectedPiece = null
       }
     },
     dropPiece (event, pieceType, color) {
-      this.board.dragNewPiece({role: pieceType, color: color, promoted: false}, event)
+      this.board.dragNewPiece({ role: pieceType, color: color, promoted: false }, event)
       this.selectedPiece = pieceType
       console.log(`dropPiece: ${event} ${pieceType} ${color}`)
       console.log(`dropPiece: ${this.board.getFen()}`)
     },
     possibleMoves () {
-      let dests = {}
-      let legalMoves = this.ffishBoard.legalMoves().split(' ')
+      const dests = {}
 
       let fromSq
       let toSq
-      for (var i = 0; i < legalMoves.length; i++) {
+      for (let i = 0; i < this.legalMoves.length; i++) {
         // don't include dropping moves
-        if (legalMoves[i].length !== 3) {
-          fromSq = legalMoves[i].substring(0, 2)
-          toSq = legalMoves[i].substring(2, 4)
+        if (this.legalMoves[i].length !== 3) {
+          fromSq = this.legalMoves[i].substring(0, 2)
+          toSq = this.legalMoves[i].substring(2, 4)
         }
         if (fromSq in dests) {
           dests[fromSq].push(toSq)
@@ -216,16 +209,13 @@ export default {
       }
       return dests
     },
-    toColor () {
-      return this.ffishBoard.turn() ? 'white' : 'black'
-    },
     isPromotion (orig, dest) {
-      let filteredPromotions = this.promotions.filter(move => move.from === orig && move.to === dest)
+      const filteredPromotions = this.promotions.filter(move => move.from === orig && move.to === dest)
       return filteredPromotions.length > 0 // The current movement is a promotion
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
-        pieces[idx]['count'] = 0
+        pieces[idx].count = 0
       }
     },
     changeTurn () {
@@ -234,18 +224,19 @@ export default {
           this.promoteTo = this.onPromotion()
         }
         const uciMove = orig + dest
-        this.lastMoveSan = this.ffishBoard.sanMove(uciMove)
-        this.ffishBoard.push(uciMove)
+        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+        this.$store.dispatch('push', uciMove)
+        console.log('colorAfterPush:' + this.turn)
         this.updateHand()
 
-        this.board.set({
-          fen: this.ffishBoard.fen(),
+        /* this.board.set({
+          fen: this.fen, //this.ffishBoard.fen(),
           turnColor: this.toColor(),
           movable: {
             color: this.toColor(),
             dests: this.possibleMoves()
           }
-        })
+        }) */
         this.afterMove()
       }
     },
@@ -257,78 +248,57 @@ export default {
         } else {
           pieceIdx = this.piecesToIdx[pocketPieces[idx]]
         }
-        pocket[pieceIdx]['count'] += 1
+        pocket[pieceIdx].count += 1
       }
     },
     updateHand () {
       // Crazyhouse pocket pieces
       this.resetPockets(this.piecesW)
       this.resetPockets(this.piecesB)
-      this.updatePocket(this.piecesW, this.ffishBoard.pocket(WHITE), WHITE)
-      this.updatePocket(this.piecesB, this.ffishBoard.pocket(BLACK), BLACK)
+      this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)// this.ffishBoard.pocket(WHITE), WHITE)
+      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) // this.ffishBoard.pocket(BLACK), BLACK)
     },
     afterMove () {
-      let events = {}
-      events['fen'] = this.ffishBoard.fen()
+      const events = {}
+      events.fen = this.fen // this.ffishBoard.fen()
 
-      events['history'] = [this.lastMoveSan]
-      console.log(`this.ffishBoard.moveStack(): ${this.ffishBoard.moveStack()}`)
+      events.history = [this.lastMoveSan]
+      // console.log(`this.ffishBoard.moveStack(): ${this.ffishBoard.moveStack()}`)
       this.$emit('onMove', events)
     },
-    loadPosition () { // set a default value for the configuration object itself to allow call to loadPosition()
-      console.log(`load position: ${this.fen}`)
-      console.log(`this.variant: ${this.variant}`)
-
-      this.board = Chessground(this.$refs.board, {
-        coordinates: false,
+    updateBoard () {
+      this.board.set({
         fen: this.fen,
-        turnColor: this.toColor(),
-        highlight: {
-          lastMove: true, // add last-move class to squares
-          check: false // add check class to squares
-        },
-        drawable: {
-          enabled: true, // can draw
-          visible: true, // can view
-          eraseOnClick: false
-        },
+        turnColor: this.turn,
         movable: {
-          color: this.toColor(),
-          free: this.free,
-          dests: this.possibleMoves()
+          dests: this.possibleMoves(),
+          color: this.turn
         },
         orientation: this.orientation
       })
-      this.board.set({
-        movable: { events: { after: this.changeTurn() } }
-      })
     }
   },
-  async created () {
-    new Module().then(loadedModule => {
-      ffish = loadedModule
-      console.log(`info: ${ffish.info()}`)
-
-      this.ffishBoard = new ffish.Board(this.variant)
-      this.fen = this.ffishBoard.fen()
-      this.loadPosition()
-      this.afterMove()
+  mounted () {
+    this.board = Chessground(this.$refs.board, {
+      coordinates: false,
+      fen: this.fen,
+      turnColor: 'white',
+      highlight: {
+        lastMove: true, // add last-move class to squares
+        check: false // add check class to squares
+      },
+      drawable: {
+        enabled: true, // can draw
+        visible: true, // can view
+        eraseOnClick: false
+      },
+      movable: {
+        events: { after: this.changeTurn() },
+        color: 'white',
+        free: false
+      },
+      orientation: this.orientation
     })
-    this.piecesToIdx = {
-      'P': 4,
-      'N': 3,
-      'B': 2,
-      'R': 1,
-      'Q': 0,
-      'p': 0,
-      'n': 1,
-      'b': 2,
-      'r': 3,
-      'q': 4
-    }
-    this.board = null
-    this.promotions = []
-    this.promoteTo = 'q'
   }
 }
 </script>
