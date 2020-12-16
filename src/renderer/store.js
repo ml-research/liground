@@ -127,7 +127,15 @@ export const store = new Vuex.Store({
       state.pieceStyle = payload
     },
     newBoard (state, payload) {
-      state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
+      if (typeof payload.fen === 'string') {
+        if (payload.is960) {
+          state.board = new ffish.Board(state.variant, payload.fen, true)
+        } else {
+          state.board = new ffish.Board(state.variant, payload.fen)
+        }
+      } else {
+        state.board = new ffish.Board(state.variant)
+      }
     }
   },
   actions: { // async
@@ -187,7 +195,6 @@ export const store = new Vuex.Store({
       if (context.getters.variant !== payload) {
         context.commit('variant', payload)
         context.commit('newBoard', {
-          fen: context.getters.fen,
           is960: context.getters.is960
         })
       }

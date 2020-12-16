@@ -146,6 +146,11 @@ export default {
       if (this.board !== null) {
         this.board.setShapes(shapes)
       }
+    },
+    variant () {
+      this.board.set({
+        variant: this.variant
+      })
     }
   },
   methods: {
