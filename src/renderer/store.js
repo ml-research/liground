@@ -6,8 +6,13 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    active: false,
+    initialized: false,
     started: false,
+    active: false,
+    turn: 'white',
+    fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
+    legalMoves: '',
     destinations: {},
     variant: 'chess',
     engineBinary: 'stockfish',
@@ -41,14 +46,26 @@ export const store = new Vuex.Store({
     board: null
   },
   mutations: { // sync
+    fen (state, payload) {
+      state.fen = payload
+    },
+    lastFen (state, payload) {
+      state.lastFen = payload
+    },
+    turn (state, payload) {
+      state.turn = payload
+    },
+    legalMoves (state, payload) {
+      state.legalMoves = payload
+    },
+    initialized (state, payload) {
+      state.initialized = payload
+    },
     active (state, payload) {
       state.active = payload
     },
     started (state, payload) {
       state.started = payload
-    },
-    fen (state, payload) {
-      state.board.setFen(payload)
     },
     destinations (state, payload) {
       state.destinations = payload
@@ -113,14 +130,28 @@ export const store = new Vuex.Store({
     pieceStyle (state, payload) {
       state.pieceStyle = payload
     },
-    updateBoard (state, payload) {
+    newBoard (state, payload) {
       state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
-    },
-    push (state, payload) {
-      state.board.push(payload)
     }
   },
   actions: { // async
+    initialize (context) {
+      context.commit('newBoard', {
+        fen: '',
+        is960: false
+      })
+      context.dispatch('updateBoard')
+      context.commit('initialized', true)
+    },
+    updateBoard (context) {
+      context.commit('turn', context.state.board.turn())
+      context.commit('fen', context.state.board.fen())
+      context.commit('legalMoves', context.state.board.legalMoves())
+    },
+    push (context, payload) {
+      context.state.board.push(payload)
+      context.dispatch('updateBoard')
+    },
     startEngine (context) {
       ws.send('startEngine~' + context.getters.engineBinary + '~' + context.getters.variant)
       console.log('startEngine')
@@ -147,6 +178,9 @@ export const store = new Vuex.Store({
     fen (context, payload) {
       context.commit('fen', payload)
     },
+    lastFen (context, payload) {
+      context.commit('lastFen', payload)
+    },
     destinations (context, payload) {
       context.commit('destinations', payload)
     },
@@ -159,7 +193,7 @@ export const store = new Vuex.Store({
     variant (context, payload) {
       if (context.getters.variant !== payload) {
         context.commit('variant', payload)
-        context.commit('updateBoard', {
+        context.commit('newBoard', {
           fen: context.getters.fen,
           is960: context.getters.is960
         })
@@ -167,7 +201,7 @@ export const store = new Vuex.Store({
     },
     set960 (context, payload) {
       if (context.getters.is960 !== payload) {
-        context.commit('updateBoard', {
+        context.commit('newBoard', {
           fen: context.getters.fen,
           is960: payload
         })
@@ -196,6 +230,12 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    board (state) {
+      return state.board
+    },
+    initialized (state) {
+      return state.initialized
+    },
     active (state) {
       return state.active
     },
@@ -206,7 +246,10 @@ export const store = new Vuex.Store({
       return state.redraw
     },
     fen (state) {
-      return state.board.fen()
+      return state.fen
+    },
+    lastFen (state) {
+      return state.lastFen
     },
     destinations (state) {
       return state.destinations
@@ -300,14 +343,16 @@ export const store = new Vuex.Store({
       return state.pieceStyle
     },
     turn (state) {
-      return state.board.turn()
+      return state.turn
     },
     legalMoves (state) {
-      return state.board.legalMoves()
+      return state.legalMoves
     },
     pocket (state) {
       return (turn) => state.board.pocket(turn)
     },
+
+    // TODO: integrate getters into store state?
     moveStack (state) {
       return state.board.moveStack()
     },
@@ -324,10 +369,7 @@ export const store = new Vuex.Store({
 })
 
 ffish.onRuntimeInitialized = () => {
-  store.commit('updateBoard', {
-    fen: '',
-    is960: false
-  })
+  store.dispatch('initialize')
 }
 
 function cpForWhite (cp, sideToMove) {

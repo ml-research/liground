@@ -22,7 +22,7 @@
       <div v-for='move in moves' :key='move.type'>
         <div class='move-field'>
         <div v-if='move.ply % 2 == 1' class='float-left-child move-number'>{{(move.ply+1) / 2}}.</div>
-        <div class='float-left-child move-name'>{{move.name}}</div>
+        <div class='float-left-child move-name' v-bind:class='{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}' @click="updateBoard(move)">{{move.name}}</div>
         </div>
       </div>
     </div>
@@ -44,6 +44,11 @@ export default {
   name: 'AnalysisView',
   components: {
     AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats
+  },
+  methods: {
+    updateBoard (move) {
+      this.$store.dispatch('fen', move.fen)   
+    }
   },
   props: {
     fen: {
@@ -187,9 +192,20 @@ p {
   main-max-width: auto;
   gauge-gap: 17px;
 }
-.move-field:hover .move-name{
+.move-field:hover .move-name {
   background-color: #2196F3;
   cursor: pointer;
+  border-radius: 0px 4px 4px 0px;
+  color: #fff;
+}
+.move-field:hover .active {
+  background-color: #2196F3;
+  cursor: pointer;
+  border-radius: 0px 4px 4px 0px;
+  color: #fff;
+}
+.move-field .active{
+  background-color:#444;
   border-radius: 0px 4px 4px 0px;
   color: #fff;
 }
