@@ -350,8 +350,6 @@ export const store = new Vuex.Store({
     pocket (state) {
       return (turn) => state.board.pocket(turn)
     },
-
-    // TODO: integrate getters into store state?
     moveStack (state) {
       return state.board.moveStack()
     },
