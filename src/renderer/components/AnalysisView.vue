@@ -19,7 +19,7 @@
     </div>
     </div>
     <div class='analysis game-window noselect'>
-      <div v-for='move in moves' :key='move.type'>
+      <div v-for='move in moves' :key='move.ply'>
         <div class='move-field'>
         <div v-if='move.ply % 2 == 1' class='float-left-child move-number'>{{(move.ply+1) / 2}}.</div>
         <div class='float-left-child move-name'>{{move.name}}</div>
@@ -49,10 +49,6 @@ export default {
     fen: {
       type: String,
       default: ''
-    },
-    moves: {
-      type: Array,
-      default: () => ([])
     },
     reset: {
       type: Boolean,
@@ -89,11 +85,13 @@ export default {
     },
     cp2 () {
       return this.$store.getters.cpforWhiteStr
+    },
+    moves () {
+      return this.$store.getters.moves
     }
   },
   watch: {
     reset: function () {
-      this.moves = []
       this.$store.dispatch('resetMultiPV')
     }
   }

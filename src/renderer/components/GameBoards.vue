@@ -10,7 +10,7 @@
           <PieceStyleSelector id="piece-style"/>
           <EvalPlot/>
         </div>
-        <AnalysisView id="analysisview" :moves="moves" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
+        <AnalysisView id="analysisview" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
       </div>
     </div>
   </div>
@@ -98,8 +98,11 @@ export default {
       let newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
       if (newMove !== undefined) {
-        this.moves.push({'ply': this.moves.length + 1, 'name': newMove, 'fen': this.fen})
+        //this.moves.push({'ply': this.moves.length + 1, 'name': newMove})
+        console.log(`newMove ${newMove}`)
+        this.$store.dispatch('push', newMove)
       }
+      console.log(`after newMove ${newMove}`)
       console.log(newMove)
 
       if (this.$store.getters.active) {

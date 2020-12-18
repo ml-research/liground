@@ -13,6 +13,7 @@ export const store = new Vuex.Store({
     active: false,
     turn: 'white',
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    moves: [],
     legalMoves: '',
     destinations: {},
     variant: 'chess',
@@ -129,14 +130,31 @@ export const store = new Vuex.Store({
       state.pieceStyle = payload
     },
     newBoard (state, payload) {
+      state.board = new ffish.Board(payload.variant, payload.fen, payload.is960)
+      if(payload.variant === '') {
+        state.variant = 'chess'
+      } else {
+        state.variant = payload.variant
+      }
+      state.moves = []
+    },
+    resetBoard (state, payload) {
       state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
+      state.moves = []
+    },
+    appendMoves (state, payload) {
+      console.log(typeof(payload))
+      state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
+        return {ply: state.moves.length + idx + 1, name: curVal}
+      }))
     }
   },
   actions: { // async
     initialize (context) {
       context.commit('newBoard', {
-        fen: '',
-        is960: false
+        variant: context.state.variant,
+        fen: context.state.fen,
+        is960: context.state.is960
       })
       context.dispatch('updateBoard')
       context.commit('initialized', true)
@@ -148,6 +166,14 @@ export const store = new Vuex.Store({
     },
     push (context, payload) {
       context.state.board.push(payload)
+      console.log('appendMoves: ' + payload)
+      
+      context.commit('appendMoves',[payload])
+      context.dispatch('updateBoard')
+    },
+    pushMoves (context, payload) {
+      context.state.board.pushMoves(payload.moves)
+      context.commit('appendMoves', payload.moves.split(" "))
       context.dispatch('updateBoard')
     },
     startEngine (context) {
@@ -238,13 +264,11 @@ export const store = new Vuex.Store({
 
           let board = new ffish.Board(variant);
           const mainlineMoves = game.mainlineMoves().split(" ");
+          console.log(board)
+          context.commit('newBoard', {variant: variant, fen: board.fen(), is960: board.is960()})
+          context.dispatch('pushMoves', {moves: game.mainlineMoves()})
+          context.dispatch('updateBoard')
 
-          for (let i = 0; i < mainlineMoves.length; ++i) {
-            board.push(mainlineMoves[i]);          
-          }
-          console.log(board.fen() + ' ' + board.is960())
-          context.commit('variant', variant)
-          context.commit('updateBoard', {fen: board.fen(), is960: board.is960()})
         })
       }
     },
@@ -374,6 +398,9 @@ export const store = new Vuex.Store({
     },
     pocket (state) {
       return (turn) => state.board.pocket(turn)
+    },
+    moves (state) {
+      return state.moves
     },
 
     // TODO: integrate getters into store state?
