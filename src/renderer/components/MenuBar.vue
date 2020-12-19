@@ -11,15 +11,37 @@
 </template>
 
 <script>
+import fs from 'fs'
+import ffish from 'ffish'
+
 export default {
   name: 'MenuBar',
   components: {
   },
   methods: {
     openPgn () {
-      console.log('load PGN')
-      this.$store.dispatch('openPgnFile', 0)
-    }
+      this.$electron.remote.dialog.showOpenDialog({
+        title: 'Open PGN file',
+        properties: ['openFile'], 
+        filters: [
+          { name: 'PGN Files', extensions: ['pgn'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      }).then(result => {
+        if (!result.canceled) {
+          fs.readFile(result.filePaths[0], 'utf8', (err, data) => {
+            if (err) {
+              return console.log(err);
+            }
+            
+            let game = ffish.readGamePGN(data)
+            this.$store.dispatch('loadGame', {game: game})    
+          })
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    }  
   }
 }
 </script>

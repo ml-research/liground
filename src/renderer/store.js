@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import electron from 'electron'
-import fs from 'fs'
 import ffish from 'ffish'
 
 Vue.use(Vuex)
@@ -147,14 +145,11 @@ export const store = new Vuex.Store({
       state.moves = []
     },
     appendMoves (state, payload) {
-      console.log('appendMoves')
       state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
-        console.log('pushing: ' + curVal)
         state.board.push(curVal)
         return {ply: state.moves.length + idx + 1, name: curVal, fen: state.board.fen()}
       }))
       state.lastFen = state.board.fen()
-      console.log(state.lastFen)
     }
   },
   actions: { // async
@@ -252,34 +247,13 @@ export const store = new Vuex.Store({
     multipv (context, payload) {
       context.commit('multipv', payload)
     },
-    async openPgnFile (context, payload) {
-      const result = await electron.remote.dialog.showOpenDialog({
-        title: 'Open PGN file',
-        properties: ['openFile'], 
-        filters: [
-          { name: 'PGN Files', extensions: ['pgn'] },
-          { name: 'All Files', extensions: ['*'] }
-        ]
-      })
-
-      if (!result.canceled) {
-        console.log(result.filePaths[0])
-        fs.readFile(result.filePaths[0], 'utf8', function (err,data) {
-          if (err) {
-            return console.log(err);
-          }
-          let game = ffish.readGamePGN(data);
-          const variant = game.headers("Variant").toLowerCase();
-          console.log(game)
-          let board = new ffish.Board(variant);
-          const mainlineMoves = game.mainlineMoves().split(" ");
-          console.log(board)
-          context.commit('newBoard', {variant: variant, fen: board.fen(), is960: board.is960()})
-          context.dispatch('pushMoves', {moves: game.mainlineMoves()})
-          context.dispatch('updateBoard')
-
-        })
-      }
+    loadGame (context, payload) {
+      const variant = payload.game.headers("Variant").toLowerCase();
+      const board = new ffish.Board(variant);
+      
+      context.commit('newBoard', {variant: variant, fen: board.fen(), is960: board.is960()})
+      context.dispatch('pushMoves', {moves: payload.game.mainlineMoves()})
+      context.dispatch('updateBoard')
     },
 
     increment (context, payload) {
