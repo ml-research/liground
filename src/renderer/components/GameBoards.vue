@@ -47,7 +47,6 @@ export default {
   },
   data () {
     return {
-      fen: '',
       positionInfo: '',
       orientation: 'white',
       game: null,
@@ -58,6 +57,9 @@ export default {
   computed: {
     variant () {
       return this.$store.state.variant
+    },
+    fen () {
+      return this.$store.state.fen
     }
   },
   methods: {
@@ -91,7 +93,6 @@ export default {
       }
     },
     showInfo (event) {
-      this.fen = event['fen']
       console.log(`showInfo: ${this.fen}`)
       //this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
@@ -116,7 +117,7 @@ export default {
     },
     checkValidFEN (event) {
       if (ffish.validateFen(event.target.value, this.variant) === 1) {
-        this.fen = event.target.value
+        this.$store.dispatch('fen', event.target.value) 
       } else {
         console.log(`invalid fen: ${event.target.value}`)
       }

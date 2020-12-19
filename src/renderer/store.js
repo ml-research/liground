@@ -13,6 +13,7 @@ export const store = new Vuex.Store({
     active: false,
     turn: 'white',
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
     moves: [],
     legalMoves: '',
     destinations: {},
@@ -50,6 +51,9 @@ export const store = new Vuex.Store({
   mutations: { // sync
     fen (state, payload) {
       state.fen = payload
+    },
+    lastFen (state, payload) {
+      state.lastFen = payload
     },
     turn (state, payload) {
       state.turn = payload
@@ -143,10 +147,14 @@ export const store = new Vuex.Store({
       state.moves = []
     },
     appendMoves (state, payload) {
-      console.log(typeof(payload))
+      console.log('appendMoves')
       state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
-        return {ply: state.moves.length + idx + 1, name: curVal}
+        console.log('pushing: ' + curVal)
+        state.board.push(curVal)
+        return {ply: state.moves.length + idx + 1, name: curVal, fen: state.board.fen()}
       }))
+      state.lastFen = state.board.fen()
+      console.log(state.lastFen)
     }
   },
   actions: { // async
@@ -165,14 +173,12 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.state.board.push(payload)
       console.log('appendMoves: ' + payload)
       
       context.commit('appendMoves',[payload])
       context.dispatch('updateBoard')
     },
     pushMoves (context, payload) {
-      context.state.board.pushMoves(payload.moves)
       context.commit('appendMoves', payload.moves.split(" "))
       context.dispatch('updateBoard')
     },
@@ -201,6 +207,9 @@ export const store = new Vuex.Store({
     },
     fen (context, payload) {
       context.commit('fen', payload)
+    },
+    lastFen (context, payload) {
+      context.commit('lastFen', payload)
     },
     destinations (context, payload) {
       context.commit('destinations', payload)
@@ -261,7 +270,7 @@ export const store = new Vuex.Store({
           }
           let game = ffish.readGamePGN(data);
           const variant = game.headers("Variant").toLowerCase();
-
+          console.log(game)
           let board = new ffish.Board(variant);
           const mainlineMoves = game.mainlineMoves().split(" ");
           console.log(board)
@@ -298,6 +307,9 @@ export const store = new Vuex.Store({
     },
     fen (state) {
       return state.fen
+    },
+    lastFen (state) {
+      return state.lastFen
     },
     destinations (state) {
       return state.destinations
@@ -393,14 +405,14 @@ export const store = new Vuex.Store({
     turn (state) {
       return state.turn
     },
+    moves (state) {
+      return state.moves
+    },
     legalMoves (state) {
       return state.legalMoves
     },
     pocket (state) {
       return (turn) => state.board.pocket(turn)
-    },
-    moves (state) {
-      return state.moves
     },
 
     // TODO: integrate getters into store state?
