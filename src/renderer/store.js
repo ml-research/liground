@@ -132,11 +132,14 @@ export const store = new Vuex.Store({
       state.pieceStyle = payload
     },
     newBoard (state, payload) {
-      state.board = new ffish.Board(payload.variant, payload.fen, payload.is960)
-      if(payload.variant === '') {
-        state.variant = 'chess'
+      if (typeof payload.fen === 'string') {
+        if (payload.is960) {
+          state.board = new ffish.Board(state.variant, payload.fen, true)
+        } else {
+          state.board = new ffish.Board(state.variant, payload.fen)
+        }
       } else {
-        state.variant = payload.variant
+        state.board = new ffish.Board(state.variant)
       }
       state.moves = []
     },
@@ -156,9 +159,8 @@ export const store = new Vuex.Store({
   actions: { // async
     initialize (context) {
       context.commit('newBoard', {
-        variant: context.state.variant,
-        fen: context.state.fen,
-        is960: context.state.is960
+        fen: '',
+        is960: false
       })
       context.dispatch('updateBoard')
       context.commit('initialized', true)
@@ -214,8 +216,6 @@ export const store = new Vuex.Store({
       if (context.getters.variant !== payload) {
         context.commit('variant', payload)
         context.commit('newBoard', {
-          fen: context.getters.fen,
-          is960: context.getters.is960
         })
       }
     },
@@ -246,7 +246,8 @@ export const store = new Vuex.Store({
       const variant = payload.game.headers("Variant").toLowerCase();
       const board = new ffish.Board(variant);
 
-      context.commit('newBoard', {variant: variant, fen: board.fen(), is960: board.is960()})
+      context.commit('variant', variant)
+      context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.dispatch('push', payload.game.mainlineMoves())
       context.dispatch('updateBoard')
     },

@@ -84,10 +84,10 @@ export default {
     }
   },
   watch: {
-    variant: function (variant) {
+   /* variant: function (variant) {
       console.log(`variant: ${variant}`)
       this.options = this.engines[variant]
-    },
+    },*/
     selected: function () {
       this.$store.dispatch('started', false)
       this.$store.dispatch('selected', false)
