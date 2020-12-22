@@ -143,6 +143,7 @@ export const store = new Vuex.Store({
       this.commit('fen', state.board.fen())
       this.commit('turn', state.board.turn())
       this.commit('legalMoves', state.board.legalMoves())
+      this.commit('lastFen', state.board.fen())
     }
   },
   actions: { // async
