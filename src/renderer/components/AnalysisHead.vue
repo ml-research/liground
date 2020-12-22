@@ -41,7 +41,7 @@ export default {
   },
   watch: {
     selected: function () {
-      const variants = {'♟️ Standard': 'chess', '🏠 Crazyhouse': 'crazyhouse', '⛰️ King of the Hill': 'kingofthehill', 'Three-Check': '3check', 'Antichess': 'antichess', 'Horde': 'horde', '🏇 Racing Kings': 'racingkings'}
+      const variants = {'♟️ Standard': 'chess', '🏠 Crazyhouse': 'crazyhouse', '⛰️ King of the Hill': 'kingofthehill', '️Three-Check': '3check', 'Antichess': 'antichess', 'Horde': 'horde', '🏇 Racing Kings': 'racingkings'}
       console.log(`selected. ${variants[this.selected]}`)
       this.$store.dispatch('variant', variants[this.selected])
       this.$store.dispatch('started', false)

@@ -7,11 +7,12 @@
           <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
         </div>
       </div>
-      <div @mouseup='getBoardPos'>
-        <div ref='board' class='cg-board-wrap' ></div>
+      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
+        <div ref='board' class='cg-board-wrap' >
+        </div>
       </div>
-</div>
-</div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -146,6 +147,13 @@ export default {
       if (this.board !== null) {
         this.board.setShapes(shapes)
       }
+    },
+    variant () {
+      this.board.set({
+        variant: this.variant,
+        lastMove: false
+      })
+      this.updateBoard()
     }
   },
   methods: {
@@ -171,16 +179,6 @@ export default {
         const dstSquare = letters[x] + String(7 - y + 1)
         const move = pieces[this.selectedPiece] + '@' + dstSquare
         console.log(`move: ${move}`)
-        // this.$store.commit('push', move)
-        // this.ffishBoard.push(move)
-        /* this.board.set({
-          fen: this.fen, //this.ffishBoard.fen(),
-          turnColor: this.toColor(),
-          movable: {
-            color: this.toColor(),
-            dests: this.possibleMoves()
-          }
-        }) */
         this.selectedPiece = null
       }
     },
@@ -228,15 +226,6 @@ export default {
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
         this.updateHand()
-
-        /* this.board.set({
-          fen: this.fen, //this.ffishBoard.fen(),
-          turnColor: this.toColor(),
-          movable: {
-            color: this.toColor(),
-            dests: this.possibleMoves()
-          }
-        }) */
         this.afterMove()
       }
     },
@@ -255,15 +244,14 @@ export default {
       // Crazyhouse pocket pieces
       this.resetPockets(this.piecesW)
       this.resetPockets(this.piecesB)
-      this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)// this.ffishBoard.pocket(WHITE), WHITE)
-      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) // this.ffishBoard.pocket(BLACK), BLACK)
+      this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
+      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) 
     },
     afterMove () {
       const events = {}
-      events.fen = this.fen // this.ffishBoard.fen()
+      events.fen = this.fen
 
       events.history = [this.lastMoveSan]
-      // console.log(`this.ffishBoard.moveStack(): ${this.ffishBoard.moveStack()}`)
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
       
@@ -281,7 +269,7 @@ export default {
         },
         orientation: this.orientation
       })
-      }
+    }
   },
   mounted () {
     this.board = Chessground(this.$refs.board, {
@@ -357,7 +345,33 @@ coords {
 .cg-wrap {
   width: 600px;
   height: 600px;
-  position: relative;
-  display: block;
+  position: sticky;
+  display: table;
+}
+
+.koth cg-container::before {
+  width: 25%;
+  height: 25%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.7);
+  background: rgba(230,230,230,0.2);
+  content: '';
+  position: absolute;
+  top: 37.5%;
+  left: 37.5%;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 0px 0px 0px 0px;
+}
+.rk cg-container::before{
+    background: rgba(230,230,230,0.2);
+    width: 100%;
+    height: 12.5%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.7);
+    content: '';
+    position: absolute;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 4px 4px 0px 0px;
 }
 </style>
