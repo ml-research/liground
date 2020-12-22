@@ -98,10 +98,6 @@ export default {
       console.log(`fen: ${this.$store.getters.fen}`)
       let newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
-      if (newMove !== undefined) {
-        this.$store.dispatch('push', newMove)
-      }
-      console.log(newMove)
 
       if (this.$store.getters.active) {
         this.$store.dispatch('stopEngine')

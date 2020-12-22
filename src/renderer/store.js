@@ -146,8 +146,9 @@ export const store = new Vuex.Store({
     },
     appendMoves (state, payload) {
       state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
-        state.board.push(curVal)
-        return {ply: state.moves.length + idx + 1, name: curVal, fen: state.board.fen()}
+        let sanMove = state.board.sanMove(curVal)
+        state.board.push(curVal);
+        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
       }))
       state.lastFen = state.board.fen()
     }
@@ -168,8 +169,6 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      console.log('appendMoves: ' + payload)
-      
       context.commit('appendMoves',[payload])
       context.dispatch('updateBoard')
     },
@@ -250,7 +249,7 @@ export const store = new Vuex.Store({
     loadGame (context, payload) {
       const variant = payload.game.headers("Variant").toLowerCase();
       const board = new ffish.Board(variant);
-      
+
       context.commit('newBoard', {variant: variant, fen: board.fen(), is960: board.is960()})
       context.dispatch('pushMoves', {moves: payload.game.mainlineMoves()})
       context.dispatch('updateBoard')

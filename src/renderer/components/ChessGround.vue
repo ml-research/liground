@@ -261,9 +261,9 @@ export default {
     afterMove () {
       const events = {}
       events.fen = this.fen // this.ffishBoard.fen()
-
+      
       events.history = [this.lastMoveSan]
-      // console.log(`this.ffishBoard.moveStack(): ${this.ffishBoard.moveStack()}`)
+      
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
       
