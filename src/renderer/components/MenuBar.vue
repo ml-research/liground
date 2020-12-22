@@ -1,7 +1,7 @@
 <template>
   <div>
   <nav>
-    <a href="#"><i slot="extra" class="icon mdi mdi-checkerboard"/> Game</a>
+    <a href="#"><i slot="extra" class="icon mdi mdi-checkerboard" /> Game</a>
     <a href="#"><i slot="extra" class="icon mdi mdi-robot"/> Engines</a>
     <a href="#"><i slot="extra" class="icon mdi mdi-hammer-screwdriver"/> Settings </a>
     <a href="#"><i slot="extra" class="icon mdi mdi-information-outline"/> About <i slot="extra" class="icon mdi mdi-github"/></a>

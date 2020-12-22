@@ -95,7 +95,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen'])
   },
   watch: {
     initialized () {
@@ -253,13 +253,18 @@ export default {
 
       events.history = [this.lastMoveSan]
       this.$emit('onMove', events)
+      this.$store.dispatch('lastFen', this.fen)
+      
     },
     updateBoard () {
-      this.board.set({
+    this.board.set({
         fen: this.fen,
         turnColor: this.turn,
-        movable: {
+        movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
           dests: this.possibleMoves(),
+          color: this.turn
+        } : {
+          dests: {},
           color: this.turn
         },
         orientation: this.orientation
