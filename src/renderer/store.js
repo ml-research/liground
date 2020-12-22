@@ -169,11 +169,7 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves',[payload])
-      context.dispatch('updateBoard')
-    },
-    pushMoves (context, payload) {
-      context.commit('appendMoves', payload.moves.split(" "))
+      context.commit('appendMoves',payload.split(" "))
       context.dispatch('updateBoard')
     },
     startEngine (context) {
@@ -251,7 +247,7 @@ export const store = new Vuex.Store({
       const board = new ffish.Board(variant);
 
       context.commit('newBoard', {variant: variant, fen: board.fen(), is960: board.is960()})
-      context.dispatch('pushMoves', {moves: payload.game.mainlineMoves()})
+      context.dispatch('push', payload.game.mainlineMoves())
       context.dispatch('updateBoard')
     },
 
