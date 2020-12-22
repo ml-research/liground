@@ -212,15 +212,8 @@ p {
 .grid-parent {
   align-items: center;
 }
-/*.move-field:hover .move-number {
-  background-color: #2196F3;
-  cursor: pointer;
-  border-radius: 4px 0px 0px 4px;
-  color: #fff;
-}*/
 .move-number {
   color: #777;
-  pointer-events: auto;
 }
 .move-name {
   margin-right: 4px;
