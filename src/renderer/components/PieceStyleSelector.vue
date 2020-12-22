@@ -43,7 +43,7 @@ export default {
         'staunty',
         'tatiana'
       ],
-      selected: 'alpha'
+      selected: 'merida'
     }
   },
   watch: {
