@@ -19,14 +19,14 @@
     </div>
     </div>
     <div class='analysis game-window noselect'>
-      <div v-for='move in moves' :key='move.ply'>
+      <div v-for='move in moves' :key='move.type'>
         <div class='move-field'>
         <div v-if='move.ply % 2 == 1' class='float-left-child move-number'>{{(move.ply+1) / 2}}.</div>
         <div class='float-left-child move-name' v-bind:class='{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}' @click="updateBoard(move)">{{move.name}}</div>
         </div>
       </div>
     </div>
-    <JumpButtons v-on:flip-board="$emit('flip-board', 0)"/>
+    <JumpButtons v-on:flip-board="$emit('flip-board', 0)" v-on:move-to-start="$emit('move-to-start',0)" v-on:move-back-one="$emit('move-back-one',0)" v-on:move-forward-one="$emit('move-forward-one',0)" v-on:move-to-end="$emit('move-to-end',0)"/>
      <div class='console-log' id='textarea'>
        <p v-for='line in stdIO' :key='line.type'>{{line}}</p>
      </div>
@@ -54,6 +54,10 @@ export default {
     fen: {
       type: String,
       default: ''
+    },
+    moves: {
+      type: Array,
+      default: () => ([])
     },
     reset: {
       type: Boolean,
@@ -90,13 +94,11 @@ export default {
     },
     cp2 () {
       return this.$store.getters.cpforWhiteStr
-    },
-    moves () {
-      return this.$store.getters.moves
     }
   },
   watch: {
     reset: function () {
+      this.moves = []
       this.$store.dispatch('resetMultiPV')
     }
   }

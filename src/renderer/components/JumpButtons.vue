@@ -1,10 +1,10 @@
 <template>
   <div class="jump-buttons">
 <a href="#" class="jump previous" @click="$emit('flip-board', 0)"><i slot="extra" class="icon mdi mdi-rotate-3d-variant"/></a>
-<a href="#" class="jump previous"><i slot="extra" class="icon mdi mdi-skip-backward"/></a>
-<a href="#" class="jump previous"><i slot="extra" class="icon mdi mdi-skip-previous"/></a>
-<a href="#" class="jump next"    ><i slot="extra" class="icon mdi mdi-skip-next"/></a>
-<a href="#" class="jump next"    ><i slot="extra" class="icon mdi mdi-skip-forward"/></a>
+<a href="#" class="jump previous" v-bind:class='{grey : currentMove == 0}' @click="$emit('move-to-start', 0)"><i slot="extra" class="icon mdi mdi-skip-backward"/></a>
+<a href="#" class="jump previous" v-bind:class='{grey : currentMove == 0}' @click="$emit('move-back-one', 0)"><i slot="extra" class="icon mdi mdi-skip-previous"/></a>
+<a href="#" class="jump next"     v-bind:class='{grey : currentMove == $store.getters.moves.length-1}' @click="$emit('move-forward-one', 0)"><i slot="extra" class="icon mdi mdi-skip-next"/></a>
+<a href="#" class="jump next"     v-bind:class='{grey : currentMove == $store.getters.moves.length-1}' @click="$emit('move-to-end', 0)"><i slot="extra" class="icon mdi mdi-skip-forward"/></a>
   </div>
 
 </template>
@@ -16,6 +16,22 @@ export default {
   name: 'JumpButtons',
   components: {
     HookIcon
+  },
+  computed: {
+    moves () {
+      return this.$store.getters.moves
+    },
+    currentMove () {
+      let fen = this.$store.getters.fen
+      for ( const move of this.moves) {
+        console.log(move.fen)
+        if(move.fen == fen) {
+          console.log('success: ' + move.fen)
+          return move.ply
+        }
+      }
+      return 0;
+    }
   }
 }
 </script>
@@ -50,5 +66,8 @@ i {
 }
 .round {
   border-radius: 90%;
+}
+.grey {
+  color:gray
 }
 </style>

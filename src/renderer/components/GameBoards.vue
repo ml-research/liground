@@ -10,7 +10,7 @@
           <PieceStyleSelector id="piece-style"/>
           <EvalPlot/>
         </div>
-        <AnalysisView id="analysisview" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
+        <AnalysisView id="analysisview" :moves="moves" v-on:move-to-start="moveToStart" v-on:move-to-end="moveToEnd" v-on:move-back-one="moveBackOne" v-on:move-forward-one="moveForwardOne" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
       </div>
     </div>
   </div>
@@ -47,8 +47,8 @@ export default {
   },
   data () {
     return {
+      fen: '',
       positionInfo: '',
-      orientation: 'white',
       game: null,
       resetAnalysis: false,
       moves: []
@@ -56,19 +56,61 @@ export default {
   },
   computed: {
     variant () {
-      return this.$store.state.variant
+      return this.$store.getters.variant
     },
-    fen () {
-      return this.$store.state.fen
+    orientation () {
+      return this.$store.getters.orientation
+    },
+    moves () {
+      return this.$store.getters.moves
+    },
+    currentMove () {
+      let fen = this.$store.getters.fen
+      for ( const move of this.moves) {
+        console.log(move.fen)
+        if(move.fen == fen) {
+          console.log('success: ' + move.fen)
+          return move.ply
+        }
+      }
+      return 0;
     }
   },
   methods: {
+    moveToStart () { //this method returns to the starting point of the current variation
+      //this.$store.dispatch('fen', this.moves[0].fen)
+      console.log('moveToStart')
+    },
+    moveToEnd () {
+      console.log('moveToEnd')
+      //this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
+    },
+    moveBackOne () {
+      console.log('moveBackone')
+      /*let num = this.currentMove
+      if (num == 0){
+        return
+      }
+      this.$store.dispatch('fen', this.moves[num-1].fen)*/
+    },
+    moveForwardOne () {
+      console.log('moveForwardOne')/*
+      let num = this.currentMove
+      if (num == this.moves.length-1){
+        return
+      }
+      this.$store.dispatch('fen', this.moves[num+1].fen)
+*/
+    },
     flipBoard () {
       if (this.orientation === 'white') {
-        this.orientation = 'black'
+        console.log('orientation change to black')
+        this.$store.dispatch('orientation', 'black')
+        console.log('orientation in store: ' + this.orientation)
       } else {
-        this.orientation = 'white'
+        this.$store.dispatch('orientation', 'white')
       }
+      console.log('flipBoard currentMove: ' + this.currentMove)
     },
     selectPocketPiece (piece) {
       this.$store.commit('selectPocketPiece', ['boardA', piece.type])
@@ -93,11 +135,17 @@ export default {
       }
     },
     showInfo (event) {
+      this.fen = event['fen']
       console.log(`showInfo: ${this.fen}`)
       //this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
       let newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
+      if (newMove !== undefined) {
+        this.moves.push({'ply': this.moves.length + 1, 'name': newMove, 'fen': this.fen})
+        console.log('showInfo: ' + this.moves[this.moves.length-1].ply)
+      }
+      console.log(newMove)
 
       if (this.$store.getters.active) {
         this.$store.dispatch('stopEngine')
@@ -110,7 +158,7 @@ export default {
     },
     checkValidFEN (event) {
       if (ffish.validateFen(event.target.value, this.variant) === 1) {
-        this.$store.dispatch('fen', event.target.value) 
+        this.fen = event.target.value
       } else {
         console.log(`invalid fen: ${event.target.value}`)
       }

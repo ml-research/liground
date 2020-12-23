@@ -12,7 +12,6 @@ export const store = new Vuex.Store({
     turn: 'white',
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
-    moves: [],
     legalMoves: '',
     destinations: {},
     variant: 'chess',
@@ -21,6 +20,7 @@ export const store = new Vuex.Store({
     message: 'hello from Vuex',
     idName: 'idName',
     idAuthor: 'idAuthor',
+    orientation: 'white',
     multipv: [
       {
         depth: 0,
@@ -43,7 +43,7 @@ export const store = new Vuex.Store({
     ],
     sideToMove: 'w',
     counter: 0,
-    pieceStyle: 'tatiana',
+    pieceStyle: 'merida',
     board: null
   },
   mutations: { // sync
@@ -61,6 +61,9 @@ export const store = new Vuex.Store({
     },
     initialized (state, payload) {
       state.initialized = payload
+    },
+    orientation (state, payload) {
+      state.orientation = payload
     },
     active (state, payload) {
       state.active = payload
@@ -141,23 +144,10 @@ export const store = new Vuex.Store({
       } else {
         state.board = new ffish.Board(state.variant)
       }
-      state.moves = []
       this.commit('fen', state.board.fen())
       this.commit('turn', state.board.turn())
       this.commit('legalMoves', state.board.legalMoves())
       this.commit('lastFen', state.board.fen())
-    },
-    resetBoard (state, payload) {
-      state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
-      state.moves = []
-    },
-    appendMoves (state, payload) {
-      state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
-        let sanMove = state.board.sanMove(curVal)
-        state.board.push(curVal);
-        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
-      }))
-      state.lastFen = state.board.fen()
     }
   },
   actions: { // async
@@ -175,7 +165,7 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves',payload.split(" "))
+      context.state.board.push(payload)
       context.dispatch('updateBoard')
     },
     startEngine (context) {
@@ -213,6 +203,9 @@ export const store = new Vuex.Store({
     started (context, payload) {
       context.commit('started', payload)
     },
+    orientation (context, payload) {
+      context.commit('orientation', payload)
+    },
     active (context, payload) {
       context.commit('active', payload)
     },
@@ -246,16 +239,6 @@ export const store = new Vuex.Store({
     multipv (context, payload) {
       context.commit('multipv', payload)
     },
-    loadGame (context, payload) {
-      const variant = payload.game.headers("Variant").toLowerCase();
-      const board = new ffish.Board(variant);
-
-      context.commit('variant', variant)
-      context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
-      context.dispatch('push', payload.game.mainlineMoves())
-      context.dispatch('updateBoard')
-    },
-
     increment (context, payload) {
       context.commit('increment', payload)
     },
@@ -287,6 +270,9 @@ export const store = new Vuex.Store({
     },
     destinations (state) {
       return state.destinations
+    },
+    orientation (state) {
+      return state.orientation
     },
     variant (state) {
       return state.variant
@@ -378,9 +364,6 @@ export const store = new Vuex.Store({
     },
     turn (state) {
       return state.turn
-    },
-    moves (state) {
-      return state.moves
     },
     legalMoves (state) {
       return state.legalMoves
