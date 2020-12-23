@@ -193,32 +193,25 @@ p {
 .move-field:hover .move-name {
   background-color: #2196F3;
   cursor: pointer;
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 4px 4px 4px 4px;
   color: #fff;
 }
 .move-field:hover .active {
   background-color: #2196F3;
   cursor: pointer;
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 4px 4px 4px 4px;
   color: #fff;
 }
 .move-field .active{
   background-color:#444;
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 4px 4px 4px 4px;
   color: #fff;
 }
 .grid-parent {
   align-items: center;
 }
-.move-field:hover .move-number {
-  background-color: #2196F3;
-  cursor: pointer;
-  border-radius: 4px 0px 0px 4px;
-  color: #fff;
-}
 .move-number {
   color: #777;
-  pointer-events: auto;
 }
 .move-name {
   margin-right: 4px;

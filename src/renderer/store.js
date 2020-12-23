@@ -142,6 +142,10 @@ export const store = new Vuex.Store({
         state.board = new ffish.Board(state.variant)
       }
       state.moves = []
+      this.commit('fen', state.board.fen())
+      this.commit('turn', state.board.turn())
+      this.commit('legalMoves', state.board.legalMoves())
+      this.commit('lastFen', state.board.fen())
     },
     resetBoard (state, payload) {
       state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
