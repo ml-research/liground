@@ -10,7 +10,7 @@
           <PieceStyleSelector id="piece-style"/>
           <EvalPlot/>
         </div>
-        <AnalysisView id="analysisview" :moves="moves" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
+        <AnalysisView id="analysisview" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
       </div>
     </div>
   </div>
@@ -47,7 +47,6 @@ export default {
   },
   data () {
     return {
-      fen: '',
       positionInfo: '',
       orientation: 'white',
       game: null,
@@ -58,6 +57,9 @@ export default {
   computed: {
     variant () {
       return this.$store.state.variant
+    },
+    fen () {
+      return this.$store.state.fen
     }
   },
   methods: {
@@ -91,16 +93,11 @@ export default {
       }
     },
     showInfo (event) {
-      this.fen = event['fen']
       console.log(`showInfo: ${this.fen}`)
       //this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
       let newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
-      if (newMove !== undefined) {
-        this.moves.push({'ply': this.moves.length + 1, 'name': newMove, 'fen': this.fen})
-      }
-      console.log(newMove)
 
       if (this.$store.getters.active) {
         this.$store.dispatch('stopEngine')
@@ -113,7 +110,7 @@ export default {
     },
     checkValidFEN (event) {
       if (ffish.validateFen(event.target.value, this.variant) === 1) {
-        this.fen = event.target.value
+        this.$store.dispatch('fen', event.target.value) 
       } else {
         console.log(`invalid fen: ${event.target.value}`)
       }

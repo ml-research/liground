@@ -1,7 +1,7 @@
 <template>
   <div>
   <nav>
-    <a href="#"><i slot="extra" class="icon mdi mdi-checkerboard" /> Game</a>
+    <a href="#" @click="openPgn"><i slot="extra" class="icon mdi mdi-checkerboard"/> Open PGN</a>
     <a href="#"><i slot="extra" class="icon mdi mdi-robot"/> Engines</a>
     <a href="#"><i slot="extra" class="icon mdi mdi-hammer-screwdriver"/> Settings </a>
     <a href="#"><i slot="extra" class="icon mdi mdi-information-outline"/> About <i slot="extra" class="icon mdi mdi-github"/></a>
@@ -11,9 +11,37 @@
 </template>
 
 <script>
+import fs from 'fs'
+import ffish from 'ffish'
+
 export default {
   name: 'MenuBar',
   components: {
+  },
+  methods: {
+    openPgn () {
+      this.$electron.remote.dialog.showOpenDialog({
+        title: 'Open PGN file',
+        properties: ['openFile'], 
+        filters: [
+          { name: 'PGN Files', extensions: ['pgn'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      }).then(result => {
+        if (!result.canceled) {
+          fs.readFile(result.filePaths[0], 'utf8', (err, data) => {
+            if (err) {
+              return console.log(err);
+            }
+            
+            let game = ffish.readGamePGN(data)
+            this.$store.dispatch('loadGame', {game: game})    
+          })
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    }  
   }
 }
 </script>
