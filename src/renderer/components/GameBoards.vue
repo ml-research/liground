@@ -65,7 +65,7 @@ export default {
     fen () {
       return this.$store.getters.fen
     },
-    currentMove () {
+    currentMove () {//this returns the current half-move or -1 at the start of the game
       let fen = this.$store.getters.fen
       for ( const move of this.moves) {
         if(move.fen == fen) {
@@ -76,18 +76,18 @@ export default {
     }
   },
   methods: {
-    moveToStart () { //this method returns to the starting point of the current variation
+    moveToStart () { //this method returns to the starting point of the current line
       this.$store.dispatch('fen', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
       console.log('moveToStart')
     },
-    moveToEnd () {
+    moveToEnd () {//this method moves to the last move of the current line
       console.log('moveToEnd')
       if(this.currentMove >= this.moves.length-1){
         return
       }
       this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
     },
-    moveBackOne () {
+    moveBackOne () {//this method moves back one move in the current line
       console.log('moveBackone')
       let num = this.currentMove
       if (num == -1) {
@@ -99,7 +99,7 @@ export default {
       }
       this.$store.dispatch('fen', this.moves[num-1].fen)
     },
-    moveForwardOne () {
+    moveForwardOne () {//this method moves forward one move in the current line
       console.log('moveForwardOne')
       let num = this.currentMove
       if (num >= this.moves.length-1 ){
@@ -173,6 +173,23 @@ export default {
       this.resetAnalysis = !this.resetAnalysis
     },
     
+  }, 
+  mounted () {  //EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
+    window.addEventListener('keydown', (event) => {
+    const keyName = event.key
+    if (keyName == 'ArrowUp') {
+      this.moveToStart()
+    }
+    if (keyName == 'ArrowDown') {
+      this.moveToEnd()
+    }
+    if (keyName == 'ArrowLeft') {
+      this.moveBackOne()
+    }
+    if (keyName == 'ArrowRight'){  
+      this.moveForwardOne()
+    }
+    }, false)
   }
 }
 </script>

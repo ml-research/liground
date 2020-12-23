@@ -3,8 +3,8 @@
 <a href="#" class="jump previous" @click="$emit('flip-board', 0)"><i slot="extra" class="icon mdi mdi-rotate-3d-variant"/></a>
 <a href="#" class="jump previous" v-bind:class='{grey : currentMove == -1}' @click="$emit('move-to-start', 0)"><i slot="extra" class="icon mdi mdi-skip-backward"/></a>
 <a href="#" class="jump previous" v-bind:class='{grey : currentMove == -1}' @click="$emit('move-back-one', 0)"><i slot="extra" class="icon mdi mdi-skip-previous"/></a>
-<a href="#" class="jump next"     v-bind:class='{grey : currentMove == $store.getters.moves.length}' @click="$emit('move-forward-one', 0)"><i slot="extra" class="icon mdi mdi-skip-next"/></a>
-<a href="#" class="jump next"     v-bind:class='{grey : currentMove == $store.getters.moves.length}' @click="$emit('move-to-end', 0)"><i slot="extra" class="icon mdi mdi-skip-forward"/></a>
+<a href="#" class="jump next"     v-bind:class='{grey : currentMove == $store.getters.moves.length-1}' @click="$emit('move-forward-one', 0)"><i slot="extra" class="icon mdi mdi-skip-next"/></a>
+<a href="#" class="jump next"     v-bind:class='{grey : currentMove == $store.getters.moves.length-1}' @click="$emit('move-to-end', 0)"><i slot="extra" class="icon mdi mdi-skip-forward"/></a>
   </div>
 
 </template>
@@ -18,7 +18,7 @@ export default {
     HookIcon
   },
   computed: {
-    currentMove () {
+    currentMove () {//this returns the current half-move or -1 at the start of the game
       let fen = this.$store.getters.fen
       let moves = this.$store.getters.moves
       if(moves === undefined){
@@ -26,7 +26,7 @@ export default {
       }
       for ( const move of moves ) {
         if(move.fen == fen) {
-          return move.ply
+          return move.ply-1
         }
       }
       return -1
@@ -70,7 +70,7 @@ i {
   color:gray
 }
 .grey:hover {
-  background-color: white;
+  background-color: #f9f9f9;
   color: gray;
   cursor: default;
 }
