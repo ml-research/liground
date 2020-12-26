@@ -61,9 +61,9 @@ export default {
       this.$emit('selection', event, pieceType, color)
     },
     updatePieceCSS (pieceStyle) {
-      let file = document.createElement('link')
+      const file = document.createElement('link')
       file.rel = 'stylesheet'
-      file.href = 'assets/images/piece-css/' + pieceStyle + '.css'
+      file.href = 'src/renderer/assets/images/piece-css/' + pieceStyle + '.css'
       document.head.appendChild(file)
     }
   }
