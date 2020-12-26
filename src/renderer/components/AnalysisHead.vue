@@ -29,9 +29,10 @@ export default {
   data () {
     return {
       variants: [
-        '♟️ Standard', '🏠 Crazyhouse', '⛰️ King of the Hill', '️Three-Check', 'Antichess', 'Horde', '🏇 Racing Kings'
+         'Antichess', '🏠 Crazyhouse', 'Horde', 'Janggi', '⛰️ King of the Hill', 'Makruk', '🏇 Racing Kings', 'Shogi', 'Shogun', '♟️ Standard', '️Three-Check', 'Xiangqi'
       ],
-      selected: '♟️ Standard'
+      selected: '♟️ Standard',
+      variantsTransformation: {'♟️ Standard': 'chess', '🏠 Crazyhouse': 'crazyhouse', '⛰️ King of the Hill': 'kingofthehill', '️Three-Check': '3check', 'Antichess': 'antichess', 'Horde': 'horde', '🏇 Racing Kings': 'racingkings', 'Shogi': 'shogi', 'Janggi': 'janggi', 'Xiangqi': 'xiangqi', 'Makruk': 'makruk'}
     }
   },
   methods: {
@@ -41,9 +42,8 @@ export default {
   },
   watch: {
     selected: function () {
-      const variants = {'♟️ Standard': 'chess', '🏠 Crazyhouse': 'crazyhouse', '⛰️ King of the Hill': 'kingofthehill', '️Three-Check': '3check', 'Antichess': 'antichess', 'Horde': 'horde', '🏇 Racing Kings': 'racingkings'}
-      console.log(`selected. ${variants[this.selected]}`)
-      this.$store.dispatch('variant', variants[this.selected])
+      console.log(`selected. ${this.variantsTransformation[this.selected]}`)
+      this.$store.dispatch('variant', this.variantsTransformation[this.selected])
       this.$store.dispatch('started', false)
       // there is no 'selected' action
       //this.$store.dispatch('selected', false)
