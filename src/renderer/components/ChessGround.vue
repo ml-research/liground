@@ -46,6 +46,7 @@ export default {
         q: 4
       },
       board: null,
+      shapes: [],
       promotions: [],
       promoteTo: 'q'
     }
@@ -95,7 +96,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen'])
   },
   watch: {
     initialized () {
@@ -108,8 +109,8 @@ export default {
       this.updatePieceCSS(pieceStyle)
     },
     bestmove () {
-      const shapes = []
       const multipv = this.multipv
+      const shapes = []
 
       if (this.$store.getters.started) {
         let lineWidth = 10
@@ -134,9 +135,6 @@ export default {
             } else {
               drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
             }
-            if (idx === 0) {
-              drawShape.brush = 'yellow'
-            }
             // put item in front of list, so that the bestmove is drawn last
             shapes.unshift(drawShape)
 
@@ -144,9 +142,15 @@ export default {
           }
         }
       }
-      if (this.board !== null) {
-        this.board.setShapes(shapes)
+      this.shapes = shapes
+      this.drawShapes()
+    },
+    hoveredpv () {
+      const index = this.shapes.length - this.hoveredpv - 1
+      for (const [i, shape] of this.shapes.entries()) {
+        shape.brush = i === index ? 'yellow' : 'blue'
       }
+      this.drawShapes()
     },
     variant () {
       this.board.set({
@@ -245,7 +249,7 @@ export default {
       this.resetPockets(this.piecesW)
       this.resetPockets(this.piecesB)
       this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
-      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) 
+      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK)
     },
     afterMove () {
       const events = {}
@@ -254,7 +258,7 @@ export default {
       events.history = [this.lastMoveSan]
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
-      
+
     },
     updateBoard () {
     this.board.set({
@@ -269,6 +273,11 @@ export default {
         },
         orientation: this.orientation
       })
+    },
+    drawShapes () {
+      if (this.board !== null) {
+        this.board.setShapes(this.shapes)
+      }
     }
   },
   mounted () {

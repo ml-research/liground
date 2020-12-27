@@ -19,8 +19,8 @@ export const store = new Vuex.Store({
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
-    idName: 'idName',
-    idAuthor: 'idAuthor',
+    idName: '',
+    idAuthor: '',
     multipv: [
       {
         depth: 0,
@@ -34,13 +34,12 @@ export const store = new Vuex.Store({
         pv: '',
         ucimove: ''
       },
-      {
-        pv: ''
-      },
+      {},
       {},
       {},
       {}
     ],
+    hoveredpv: -1,
     sideToMove: 'w',
     counter: 0,
     pieceStyle: 'tatiana',
@@ -103,6 +102,9 @@ export const store = new Vuex.Store({
           state.multipv[idx].cpDisplay = cpforWhiteStr(cpWhite)
         }
       }
+    },
+    hoveredpv (state, payload) {
+      state.hoveredpv = payload
     },
     increment (state, payload) {
       state.counter += payload
@@ -305,6 +307,9 @@ export const store = new Vuex.Store({
     },
     multipv (state) {
       return state.multipv
+    },
+    hoveredpv (state) {
+      return state.hoveredpv
     },
     bestmove (state) {
       return [

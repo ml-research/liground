@@ -3,9 +3,11 @@
     <div class="scroller">
       <div class="table">
         <div
-          v-for="line in lines"
+          v-for="(line, id) in lines"
           :key="line.type"
           class="item"
+          @mouseenter="mouseEnter(id)"
+          @mouseleave="mouseLeave(id)"
         >
           <span class="left">{{ line.cpDisplay }}</span>
           <span class="right">{{ line.pv }}</span>
@@ -38,6 +40,14 @@ export default {
         details.push(idAuthor)
       }
       return details.join(' ')
+    }
+  },
+  methods: {
+    mouseEnter (id) {
+      this.$store.commit('hoveredpv', id)
+    },
+    mouseLeave (id) {
+      this.$store.commit('hoveredpv', -1)
     }
   }
 }
