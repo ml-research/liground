@@ -63,9 +63,20 @@ export default {
     updatePieceCSS (pieceStyle) {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
-      file.href = 'src/renderer/assets/images/piece-css/' + pieceStyle + '.css'
+      if (this.$store.getters.isInternational) {
+        file.href = 'src/renderer/assets/images/piece-css/international/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isSEA) {
+        file.href = 'src/renderer/assets/images/piece-css/sea/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isXiangqi) {
+        file.href = 'src/renderer/assets/images/piece-css/xiangqi/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isShogi) {
+        file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
+      }
       document.head.appendChild(file)
-    }
+    },
   }
 }
 </script>

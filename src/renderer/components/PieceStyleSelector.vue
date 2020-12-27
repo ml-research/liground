@@ -131,7 +131,7 @@ export default {
     },
     variant () {
       if (this.internationalVariants.includes(this.variant)) {
-        this.selected = this.internationalPieces[0]
+        this.selected = this.internationalPieces[18]
         this.pieceStyles = []
         this.internationalPieces.forEach(element => {
           this.pieceStyles.push(element)
