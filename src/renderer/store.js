@@ -425,6 +425,16 @@ export const store = new Vuex.Store({
     },
     isShogi (state) {
       return state.shogiVariants.includes(state.variant)
+    },
+    dimensionNumber (state) {
+      if (state.internationalVariants.includes(state.variant)){
+        return 0
+      }else {
+        const var2Dim = {
+          'shogi': 1 , 'xiangqi': 3 , 'janggi': 3 , 'makruk': 0
+        }
+        return var2Dim[state.variant]
+      }
     }
   }
 })

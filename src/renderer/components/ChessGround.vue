@@ -149,9 +149,11 @@ export default {
       }
     },
     variant () {
+      console.log(this.$store.getters.dimensionNumber)
       this.board.set({
         variant: this.variant,
-        lastMove: false
+        lastMove: false,
+        geometry: this.$store.getters.dimensionNumber
       })
       this.updateBoard()
     }
