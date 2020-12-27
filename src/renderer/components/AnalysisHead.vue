@@ -29,7 +29,7 @@ export default {
   data () {
     return {
       variants: [
-         'Antichess', '🏠 Crazyhouse', 'Horde', 'Janggi', '⛰️ King of the Hill', 'Makruk', '🏇 Racing Kings', 'Shogi', 'Shogun', '♟️ Standard', '️Three-Check', 'Xiangqi'
+         'Antichess', '🏠 Crazyhouse', 'Horde', 'Janggi', '⛰️ King of the Hill', 'Makruk', '🏇 Racing Kings', 'Shogi', '♟️ Standard', '️Three-Check', 'Xiangqi'
       ],
       selected: '♟️ Standard',
       variantsTransformation: {'♟️ Standard': 'chess', '🏠 Crazyhouse': 'crazyhouse', '⛰️ King of the Hill': 'kingofthehill', '️Three-Check': '3check', 'Antichess': 'antichess', 'Horde': 'horde', '🏇 Racing Kings': 'racingkings', 'Shogi': 'shogi', 'Janggi': 'janggi', 'Xiangqi': 'xiangqi', 'Makruk': 'makruk'}
@@ -45,8 +45,6 @@ export default {
       console.log(`selected. ${this.variantsTransformation[this.selected]}`)
       this.$store.dispatch('variant', this.variantsTransformation[this.selected])
       this.$store.dispatch('started', false)
-      // there is no 'selected' action
-      //this.$store.dispatch('selected', false)
     }
   },
   computed: {
