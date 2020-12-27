@@ -44,7 +44,19 @@ export const store = new Vuex.Store({
     sideToMove: 'w',
     counter: 0,
     pieceStyle: 'tatiana',
-    board: null
+    board: null,
+    internationalVariants: [
+      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+    ],
+    seaVariants: [
+      'makruk'
+    ],
+    xiangqiVariants: [
+      'janggi', 'xiangqi'
+    ],
+    shogiVariants: [
+      'shogi',
+    ]
   },
   mutations: { // sync
     fen (state, payload) {
@@ -401,6 +413,18 @@ export const store = new Vuex.Store({
     },
     is960 (state) {
       return state.board.is960()
+    },
+    isInternational (state) {
+      return this.internationalVariants.includes(state.variant)
+    },
+    isSEA (state) {
+      return this.seaVariants.includes(state.variant)
+    },
+    isXiangqi (state) {
+      return this.xiangqiVariants.includes(state.variant)
+    },
+    isShogi (state) {
+      return this.shogiVariants.includes(state.variant)
     }
   }
 })
