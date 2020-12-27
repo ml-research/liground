@@ -1,13 +1,13 @@
 .is2d .pawn.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wP.svg')}
 .is2d .knight.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wN.svg')}
-.is2d .silver.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wS.svg')}
+.is2d .silver.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wB.svg')}
 .is2d .rook.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wR.svg')}
 .is2d .met.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wM.svg')}
 .is2d .king.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wK.svg')}
 .is2d .ferz.white {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/wF.svg')}
 .is2d .pawn.black {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/bP.svg')}
 .is2d .knight.black {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/bN.svg')}
-.is2d .silver.black {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/bS.svg')}
+.is2d .silver.black {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/bB.svg')}
 .is2d .rook.black {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/bR.svg')}
 .is2d .met.black {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/bM.svg')}
 .is2d .king.black {background-image:url('/src/renderer/assets/piece/SouthEastAsian/ada/wr/bK.svg')}
