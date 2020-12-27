@@ -1,4 +1,4 @@
-.is2d .pawn.white {background-image:url('/src/renderer/assets/piece/Shogi/ctw/wP.svg')}
+.is2d .pawn.white {background-image:url('/src/renderer/assets/piece/Shogi/ctw/0FU.svg')}
 .is2d .ppawn.white {background-image:url('/src/renderer/assets/piece/Shogi/ctw/0TO.svg')}
 .is2d .knight.white {background-image:url('/src/renderer/assets/piece/Shogi/ctw/0KE.svg')}
 .is2d .pknight.white {background-image:url('/src/renderer/assets/piece/Shogi/ctw/0NK.svg')}
@@ -13,7 +13,7 @@
 .is2d .gold.white {background-image:url('/src/renderer/assets/piece/Shogi/ctw/0KI.svg')}
 .is2d .king.white {background-image:url('/src/renderer/assets/piece/Shogi/ctw/0GY.svg')}
 
-.is2d .pawn.black {background-image:url('/src/renderer/assets/piece/Shogi/ctw/bP.svg')}
+.is2d .pawn.black {background-image:url('/src/renderer/assets/piece/Shogi/ctw/1FU.svg')}
 .is2d .ppawn.black {background-image:url('/src/renderer/assets/piece/Shogi/ctw/1TO.svg')}
 .is2d .knight.black {background-image:url('/src/renderer/assets/piece/Shogi/ctw/1KE.svg')}
 .is2d .pknight.black {background-image:url('/src/renderer/assets/piece/Shogi/ctw/1NK.svg')}
