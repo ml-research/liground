@@ -415,16 +415,16 @@ export const store = new Vuex.Store({
       return state.board.is960()
     },
     isInternational (state) {
-      return this.internationalVariants.includes(state.variant)
+      return state.internationalVariants.includes(state.variant)
     },
     isSEA (state) {
-      return this.seaVariants.includes(state.variant)
+      return state.seaVariants.includes(state.variant)
     },
     isXiangqi (state) {
-      return this.xiangqiVariants.includes(state.variant)
+      return state.xiangqiVariants.includes(state.variant)
     },
     isShogi (state) {
-      return this.shogiVariants.includes(state.variant)
+      return state.shogiVariants.includes(state.variant)
     }
   }
 })
