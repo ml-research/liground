@@ -26,18 +26,17 @@ export default {
         'CrazyAra 0.8.1'
       ]},
       options: [
-        'Multi-Variant Stockfish 10',
-        'CrazyAra 0.8.1'
+        'Fairy-Stockfish'
       ],
-      selected: 'Multi-Variant Stockfish 10',
+      selected: 'Fairy-Stockfish',
       engineBinaries: {
-        'Multi-Variant Stockfish 10': 'stockfish',
+        'Fairy-Stockfish': 'stockfish',
         'CrazyAra 0.8.1': 'CrazyAra',
         'ClassicAra 0.8.1': 'ClassicAra'
       },
       imageUrl: 'Stockfish.png',
       engineBanners: {
-        'Multi-Variant Stockfish 10': 'stockfish_transp.png',
+        'Fairy-Stockfish': 'stockfish_transp.png',
         'CrazyAra 0.8.1': 'crazyara_logo_small_artwork.png',
         'ClassicAra 0.8.1': 'crazyara_logo_small_artwork.png'
       }
@@ -84,10 +83,6 @@ export default {
     }
   },
   watch: {
-   /* variant: function (variant) {
-      console.log(`variant: ${variant}`)
-      this.options = this.engines[variant]
-    },*/
     selected: function () {
       this.$store.dispatch('started', false)
       this.$store.dispatch('selected', false)
