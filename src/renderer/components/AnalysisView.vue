@@ -1,24 +1,11 @@
 <template>
-  <div>
+  <div class='analysis'>
     <AnalysisHead/>
     <AnalysisEvalRow id='game_clock'/>
     <EngineStats/>
     <div v-if='active' class='processing-bar'/>
-    <div class='analysis pv-window'>
-      <div class='multipv-line grid-parent' v-for='pv in multipv' :key='pv.type'>
-        <div class='multipv-eval float-left-child'>
-          {{ pv.cpDisplay }}
-
-        </div>
-        <div class='multipv float-left-child'>
-         {{ pv.pv }}
-       </div>
-     </div>
-    <div id='engine_details'>
-      {{engineDetails}}
-    </div>
-    </div>
-    <div class='analysis game-window noselect'>
+    <PVLines class='panel'/>
+    <div class='game-window panel noselect'>
       <div v-for='move in moves' :key='move.ply'>
         <div class='move-field'>
         <div v-if='move.ply % 2 == 1' class='float-left-child move-number'>{{(move.ply+1) / 2}}.</div>
@@ -39,15 +26,16 @@ import AnalysisHead from './AnalysisHead'
 import AnalysisEvalRow from './AnalysisEvalRow'
 import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
+import PVLines from './PVLines'
 
 export default {
   name: 'AnalysisView',
   components: {
-    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats
+    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines
   },
   methods: {
     updateBoard (move) {
-      this.$store.dispatch('fen', move.fen)   
+      this.$store.dispatch('fen', move.fen)
     }
   },
   props: {
@@ -111,29 +99,19 @@ input {
   margin-top: -10px;
   margin-bottom: -20px;
 }
-.pv-window {
-  background-color: white;
-  font-weight: 100;
-  white-space: nowrap;
-}
 .game-window {
   height: 270px;
-}
-.analysis {
-  border-radius: 3px 3px 3px 3px;
-  font-family: 'Noto Chess';
-  font-weight: 100;
-  border-color: #888;
-  border-width: 1px;
-  border-style: solid;
-  font-weight: 200;
-  width: 600px;
   overflow-y: scroll;
 }
-#engine_details {
-  font-size: 8pt;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  font-style: oblique;
+.panel {
+  border-radius: 3px 3px 3px 3px;
+  border: 1px solid #888;
+  font-family: 'Noto Chess';
+  font-weight: 200;
+  width: 600px;
+}
+.panel + .panel {
+  margin-top: 7px;
 }
 .console-log {
   border-radius: 3px 3px 3px 3px;
@@ -164,8 +142,6 @@ p {
   border-left: 0;
   border-style: solid;
   text-align: left;
-}
-.multipv {
 }
 .multipv-eval {
   padding: 5px;
