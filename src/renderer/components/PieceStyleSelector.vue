@@ -96,7 +96,9 @@ export default {
         'tatiana'
       ],
       seaPieces: [
-        'ada',
+        'adarb',
+        'adawb',
+        'adawr',
         'cambodian',
         'intl'
       ],
