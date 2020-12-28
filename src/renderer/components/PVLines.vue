@@ -1,13 +1,15 @@
 <template>
   <div class="pv-lines">
     <div class="scroller">
-      <div class="table">
+      <div class="list">
         <div
           v-for="(line, id) in lines"
           :key="line.type"
           class="item"
-          @mouseenter="mouseEnter(id)"
-          @mouseleave="mouseLeave(id)"
+          :class="{ clickable: canMove }"
+          @mouseenter="canMove ? onMouseEnter(id) : null"
+          @mouseleave="canMove ? onMouseLeave(id) : null"
+          @click="canMove ? onClick(line) : null"
         >
           <span class="left">{{ line.cpDisplay }}</span>
           <span class="right">{{ line.pv }}</span>
@@ -24,8 +26,14 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
+  data () {
+    return {
+      canMove: true
+    }
+  },
   computed: {
     lines () {
       return this.$store.getters.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
@@ -40,14 +48,24 @@ export default {
         details.push(idAuthor)
       }
       return details.join(' ')
+    },
+    ...mapGetters(['turn'])
+  },
+  watch: {
+    turn () {
+      this.canMove = true
     }
   },
   methods: {
-    mouseEnter (id) {
+    onMouseEnter (id) {
       this.$store.commit('hoveredpv', id)
     },
-    mouseLeave (id) {
+    onMouseLeave (id) {
       this.$store.commit('hoveredpv', -1)
+    },
+    onClick (line) {
+      this.canMove = false
+      this.$store.dispatch('push', line.ucimove)
     }
   }
 }
@@ -63,20 +81,23 @@ export default {
   max-width: 600px;
   overflow-x: scroll;
 }
-.table {
+.list {
   display: table;
 }
 .item {
   display: flex;
   flex-direction: row;
   align-items: center;
+  cursor: default;
 }
-.item:not(:last-child) {
-  border-bottom: 1px solid #333;
+.item + .item {
+  border-top: 1px solid #333;
 }
-.item:hover {
-  background-color: #d3e1eb;
+.item.clickable {
   cursor: pointer;
+}
+.item.clickable:hover {
+  background-color: #d3e1eb;
 }
 .item .left {
   padding: 5px;
