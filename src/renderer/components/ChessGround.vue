@@ -95,7 +95,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'moves'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'moves', 'check'])
   },
   watch: {
     initialized () {
@@ -223,6 +223,13 @@ export default {
         }
         const uciMove = orig + dest
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+        let isCheck = false
+        console.log(this.lastMoveSan)
+        if(this.lastMoveSan.includes('+')){
+          console.log('check')
+          isCheck = true
+        }
+        this.$store.dispatch('check', isCheck)
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
         this.updateHand()
@@ -257,25 +264,26 @@ export default {
       
     },
     updateBoard () {
-    this.board.set({
-        fen: this.fen,
-        turnColor: this.turn,
-        highlight: this.fen==this.lastFen ? {
-          lastMove: true,
-          check: true
-        } : {
-          lastMove: false,
-          check: false
-        },
-        movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
-          dests: this.possibleMoves(),
-          color: this.turn
-        } : {
-          dests: {},
-          color: this.turn
-        },
-        orientation: this.orientation
-      })
+      this.board.set({
+          check: this.check,
+          fen: this.fen,
+          turnColor: this.turn,
+          highlight: this.fen==this.lastFen ? {
+            lastMove: true,
+            check: true
+          } : {
+            lastMove: false,
+            check: true
+          },
+          movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
+            dests: this.possibleMoves(),
+            color: this.turn
+          } : {
+            dests: {},
+            color: this.turn
+          },
+          orientation: this.orientation
+        })
     }
   },
   mounted () {
@@ -285,7 +293,7 @@ export default {
       turnColor: 'white',
       highlight: {
         lastMove: true, // add last-move class to squares
-        check: false // add check class to squares
+        check: true // add check class to squares
       },
       drawable: {
         enabled: true, // can draw
