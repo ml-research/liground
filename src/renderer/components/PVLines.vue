@@ -53,6 +53,9 @@ export default {
   },
   watch: {
     turn () {
+      this.canMove = false
+    },
+    lines () {
       this.canMove = true
     }
   },
@@ -64,7 +67,6 @@ export default {
       this.$store.commit('hoveredpv', -1)
     },
     onClick (line) {
-      this.canMove = false
       this.$store.dispatch('push', line.ucimove)
     }
   }
