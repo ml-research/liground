@@ -110,7 +110,7 @@ export default {
     },
     checkValidFEN (event) {
       if (ffish.validateFen(event.target.value, this.variant) === 1) {
-        this.$store.dispatch('fen', event.target.value) 
+        this.$store.dispatch('checkValidfen', event.target.value) 
       } else {
         console.log(`invalid fen: ${event.target.value}`)
       }
