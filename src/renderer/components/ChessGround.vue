@@ -258,6 +258,9 @@ export default {
         },
         orientation: this.orientation
       })
+      if (this.variant === 'crazyhouse') {
+        this.updateHand()
+      }
     }
   },
   mounted () {
