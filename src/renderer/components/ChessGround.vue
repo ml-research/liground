@@ -7,7 +7,7 @@
           <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
         </div>
       </div>
-      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
+      <div :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
         <div ref='board' class='cg-board-wrap' >
         </div>
       </div>
@@ -162,25 +162,6 @@ export default {
       file.href = 'src/renderer/assets/images/piece-css/' + pieceStyle + '.css'
       document.head.appendChild(file)
     },
-    getBoardPos (event) {
-      // TODO: fix placing of pocket pieces in crazyhouse
-      if (this.selectedPiece !== null) {
-        // get click field
-        const squareHeight = 75
-        const squareWidth = 75
-        const x = Math.floor(event.layerX / squareWidth)
-        const y = Math.floor(event.layerY / squareHeight)
-        console.log(`x, y: ${x} ${y}`)
-
-        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
-
-        const letters = { 0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h' }
-        const dstSquare = letters[x] + String(7 - y + 1)
-        const move = pieces[this.selectedPiece] + '@' + dstSquare
-        console.log(`move: ${move}`)
-        this.selectedPiece = null
-      }
-    },
     dropPiece (event, pieceType, color) {
       this.board.dragNewPiece({ role: pieceType, color: color, promoted: false }, event)
       this.selectedPiece = pieceType
@@ -213,6 +194,14 @@ export default {
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
         pieces[idx].count = 0
+      }
+    },
+    afterDrag () {
+      return (role, key) => {
+        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
+        const move = pieces[role] + '@' + key
+        this.$store.dispatch('push', move)
+        this.updateHand()
       }
     },
     changeTurn () {
@@ -268,6 +257,9 @@ export default {
         },
         orientation: this.orientation
       })
+      if (this.variant === 'crazyhouse') {
+        this.updateHand()
+      }
     }
   },
   mounted () {
@@ -285,7 +277,7 @@ export default {
         eraseOnClick: false
       },
       movable: {
-        events: { after: this.changeTurn() },
+        events: { after: this.changeTurn() , afterNewPiece: this.afterDrag()},
         color: 'white',
         free: false
       },
