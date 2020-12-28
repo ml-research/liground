@@ -213,7 +213,7 @@ export default {
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
-        //this.updateHand()
+        this.updateHand()
         this.afterMove()
       }
     },
@@ -229,7 +229,7 @@ export default {
       }
     },
     updateHand () {
-      // Crazyhouse pocket pieces      
+      // Crazyhouse pocket pieces
       this.resetPockets(this.piecesW)
       this.resetPockets(this.piecesB)
       if(this.fen == this.lastFen){
