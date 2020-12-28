@@ -7,7 +7,7 @@
           <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
         </div>
       </div>
-      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
+      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings' , dim9x10: dimensionNumber === 3 }">
         <div ref='board' class='cg-board-wrap' >
         </div>
       </div>
@@ -95,7 +95,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen',])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'dimensionNumber'])
   },
   watch: {
     initialized () {
@@ -149,11 +149,37 @@ export default {
       }
     },
     variant () {
-      console.log(this.$store.getters.dimensionNumber)
+      
+      if(this.board.state.geometry != this.$store.getters.dimensionNumber){
+        this.board = Chessground(this.$refs.board, {
+      coordinates: false,
+      fen: this.fen,
+      turnColor: 'white',
+      resizable:true,
+      highlight: {
+        lastMove: true, // add last-move class to squares
+        check: false // add check class to squares
+      },
+      drawable: {
+        enabled: true, // can draw
+        visible: true, // can view
+        eraseOnClick: false
+      },
+      movable: {
+        events: { after: this.changeTurn() },
+        color: 'white',
+        free: false
+      },
+      orientation: this.orientation,
+      geometry: this.$store.getters.dimensionNumber
+
+    })
+    this.board.redrawAll()
+      }
+
       this.board.set({
         variant: this.variant,
         lastMove: false,
-        geometry: this.$store.getters.dimensionNumber
       })
       this.updateBoard()
     }
@@ -289,6 +315,7 @@ export default {
       coordinates: false,
       fen: this.fen,
       turnColor: 'white',
+      resizable:true,
       highlight: {
         lastMove: true, // add last-move class to squares
         check: false // add check class to squares
@@ -303,7 +330,8 @@ export default {
         color: 'white',
         free: false
       },
-      orientation: this.orientation
+      orientation: this.orientation,
+
     })
   }
 }
@@ -358,7 +386,7 @@ coords {
 .cg-wrap {
   width: 600px;
   height: 600px;
-  position: sticky;
+  position: relative;
   display: table;
 }
 
@@ -387,4 +415,44 @@ coords {
     pointer-events: none;
     border-radius: 4px 4px 0px 0px;
 }
+.dim9x10 .cg-wrap{
+  background-image: url('/src/renderer/assets/images/board/xiangqi.svg');
+  width: 600px;
+  height: 666px;
+}
+.dim9x10 cg-helper {
+  position: absolute;
+  width: 11.11%;
+  height: 10%;
+  padding-bottom: 10%;
+
+  bottom: 0;
+}
+.dim9x10 cg-container {
+  position: absolute;
+  width: 900%;
+  height: 1000%;
+  display: table; /* hack: round to full pixel size in chrome */
+  bottom: 0;
+}
+.dim9x10 .cg-wrap piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11.11%;
+  height: 10%;
+  background-size: cover;
+  z-index: 2;
+  
+  pointer-events: none;
+}
+.dim9x10 cg-board square {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11.11%;
+  height: 10%;
+  pointer-events: none;
+}
+
 </style>
