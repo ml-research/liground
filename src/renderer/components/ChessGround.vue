@@ -8,7 +8,7 @@
         </div>
       </div>
       <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
-        <div ref='board' class='cg-board-wrap' >
+        <div ref='board' class='cg-board-wrap'>
         </div>
       </div>
     </div>
@@ -95,7 +95,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'moves'])
   },
   watch: {
     initialized () {
@@ -260,6 +260,13 @@ export default {
     this.board.set({
         fen: this.fen,
         turnColor: this.turn,
+        highlight: this.fen==this.lastFen ? {
+          lastMove: true,
+          check: true
+        } : {
+          lastMove: false,
+          check: false
+        },
         movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
           dests: this.possibleMoves(),
           color: this.turn
@@ -348,7 +355,6 @@ coords {
   position: sticky;
   display: table;
 }
-
 .koth cg-container::before {
   width: 25%;
   height: 25%;
