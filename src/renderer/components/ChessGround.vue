@@ -8,7 +8,7 @@
         </div>
       </div>
       <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
-        <div ref='board' class='cg-board-wrap'>
+        <div ref='board' class='cg-board-wrap' >
         </div>
       </div>
     </div>
@@ -374,6 +374,7 @@ coords {
   pointer-events: none;
   border-radius: 0px 0px 0px 0px;
 }
+
 .rk cg-container::before{
     background: rgba(230,230,230,0.2);
     width: 100%;
