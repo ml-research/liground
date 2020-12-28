@@ -2,7 +2,7 @@
   <div class='blue merida is2d'>
     <div class='grid-parent'>
       <div class='pockets'>
-        <div v-if="variant==='crazyhouse'">
+        <div v-if="variant==='crazyhouse'" v-bind:class='{ black : $store.getters.orientation == "black"}'>
           <ChessPocket id='chesspocket_top' color='black' :pieces='piecesB' @selection='dropPiece'/>
           <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
         </div>
@@ -59,10 +59,6 @@ export default {
       type: Function,
       default: () => 'q'
     },
-    orientation: {
-      type: String,
-      default: 'white'
-    },
     colors: {
       type: Array,
       default: () => (['w', 'b'])
@@ -95,13 +91,16 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation'])
   },
   watch: {
     initialized () {
       this.updateBoard()
     },
     fen () {
+      this.updateBoard()
+    },
+    orientation () {
       this.updateBoard()
     },
     pieceStyle (pieceStyle) {
@@ -260,7 +259,7 @@ export default {
     this.board.set({
         fen: this.fen,
         turnColor: this.turn,
-        movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
+        movable: this.fen==this.lastFen ? { //moving is only possible at the end of the line
           dests: this.possibleMoves(),
           color: this.turn
         } : {
@@ -300,6 +299,9 @@ export default {
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
 
+.black {
+  transform: scaleY(-1);
+}
 .chess-pocket {
   float: left;
   background-color: #000;

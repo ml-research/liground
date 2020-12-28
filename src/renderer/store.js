@@ -21,6 +21,7 @@ export const store = new Vuex.Store({
     message: 'hello from Vuex',
     idName: 'idName',
     idAuthor: 'idAuthor',
+    orientation: 'white',
     multipv: [
       {
         depth: 0,
@@ -43,7 +44,7 @@ export const store = new Vuex.Store({
     ],
     sideToMove: 'w',
     counter: 0,
-    pieceStyle: 'tatiana',
+    pieceStyle: 'merida',
     board: null
   },
   mutations: { // sync
@@ -61,6 +62,9 @@ export const store = new Vuex.Store({
     },
     initialized (state, payload) {
       state.initialized = payload
+    },
+    orientation (state, payload) {
+      state.orientation = payload
     },
     active (state, payload) {
       state.active = payload
@@ -175,7 +179,7 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves',payload.split(" "))
+      context.commit('appendMoves', payload.split(" "))
       context.dispatch('updateBoard')
     },
     startEngine (context) {
@@ -212,6 +216,9 @@ export const store = new Vuex.Store({
     },
     started (context, payload) {
       context.commit('started', payload)
+    },
+    orientation (context, payload) {
+      context.commit('orientation', payload)
     },
     active (context, payload) {
       context.commit('active', payload)
@@ -255,7 +262,6 @@ export const store = new Vuex.Store({
       context.dispatch('push', payload.game.mainlineMoves())
       context.dispatch('updateBoard')
     },
-
     increment (context, payload) {
       context.commit('increment', payload)
     },
@@ -287,6 +293,9 @@ export const store = new Vuex.Store({
     },
     destinations (state) {
       return state.destinations
+    },
+    orientation (state) {
+      return state.orientation
     },
     variant (state) {
       return state.variant
