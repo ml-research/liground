@@ -1,6 +1,6 @@
 <template>
     <div class="playerinfo">
-    {{ rank }} {{ name }} {{ elo }}
+    <i slot="extra" class="icon mdi" :class="[isWhite ? 'mdi-checkbox-blank-circle-outline' : 'mdi-checkbox-blank-circle']"/> {{ rank }} {{ name }} {{ elo }}
     </div>
 </template>
 
@@ -20,19 +20,14 @@ export default {
       type: String,
       default: 'No name'
       },
-    color: String
-  },
-  computed: {
-    colorCode: function () {
-      return this.color
+    isWhite: {
+      type: Boolean,
+      default: true
     }
-  }
-    
+  },  
 
 }
 </script>
 <style scoped>
-.playerinfo {
-  background-color: white;
-}
+
 </style>

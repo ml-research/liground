@@ -3,7 +3,6 @@
     <div>
       <div class='grid-parent'>
         <div>
-          <game-info id="gameinfo"/>
           <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
           <EvalBar class="float-right-child" id="evalbar"/>
           <br/>
@@ -129,12 +128,6 @@ export default {
 input {
   font-size: 12pt;
   width: 600px;
-}
-#gameinfo {
-  height: auto;
-  margin: 1em 3em;
-  border: 1px solid black;
-  border-radius: 5px;
 }
 #fen-field {
   margin-left: 48px;

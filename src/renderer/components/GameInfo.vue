@@ -3,7 +3,7 @@
     <div id="players">
       <player-info name="Maxi Mustermensch" class="player" style="text-align: left"/>
       vs.
-      <player-info class="player" style="text-align: right"/>
+      <player-info class="player" :isWhite="false" style="text-align: right"/>
     </div>
     <div class="metaInfo">
       played on 
@@ -31,7 +31,6 @@ export default {
 }
 
 #gameinfo {
-  background-color: white;
   padding: 0.3em;
 }
 </style>
