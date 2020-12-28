@@ -259,8 +259,11 @@ export default {
     this.board.set({
         fen: this.fen,
         turnColor: this.turn,
-        movable: { //moving is only possible at the end of the line
+        movable: this.fen==this.lastFen ? { //moving is only possible at the end of the line
           dests: this.possibleMoves(),
+          color: this.turn
+        } : {
+          dests: {},
           color: this.turn
         },
         orientation: this.orientation

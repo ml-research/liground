@@ -77,7 +77,9 @@ export default {
   },
   methods: {
     moveToStart () { //this method returns to the starting point of the current line
-      this.$store.dispatch('fen', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+      let board = new ffish.Board(this.variant)
+      let startFen = board.fen()
+      this.$store.dispatch('fen', startFen)
       console.log('moveToStart')
     },
     moveToEnd () {//this method moves to the last move of the current line
@@ -94,7 +96,9 @@ export default {
         return
       }
       if (num == 0){
-        this.$store.dispatch('fen', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        let board = new ffish.Board(this.variant)
+        let startFen = board.fen()
+        this.$store.dispatch('fen', startFen)
         return
       }
       this.$store.dispatch('fen', this.moves[num-1].fen)
