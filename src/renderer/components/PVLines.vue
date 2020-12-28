@@ -4,7 +4,7 @@
       <div class="list">
         <div
           v-for="(line, id) in lines"
-          :key="line.type"
+          :key="id"
           class="item"
           :class="{ clickable: canMove }"
           @mouseenter="canMove ? onMouseEnter(id) : null"
