@@ -1,9 +1,9 @@
 <template>
   <div id="gameinfo">
     <div id="players">
-      <player-info name="Maxi Mustermensch" class="player" style="text-align: left"/>
+      <player-info :name="whiteName" :elo="whiteElo" :playerTitle="whiteTitle" :isWhite="true" class="player" style="text-align: left"/>
       vs.
-      <player-info class="player" :isWhite="false" style="text-align: right"/>
+      <player-info :name="blackName" :elo="blackElo" :playerTitle="blackTitle" :isWhite="false" class="player" style="text-align: right"/>
     </div>
     <div class="metaInfo">
       played on 
@@ -16,7 +16,29 @@ import PlayerInfo from './PlayerInfo.vue'
 export default {
   components: { PlayerInfo },
   name: 'GameInfo',
-    
+  computed: {
+    gameInfo () {
+      return this.$store.getters.gameInfo
+    },
+    whiteName () {
+      return this.gameInfo.White
+    },
+    blackName () {
+      return this.gameInfo.Black
+    },
+    whiteElo () {
+      return this.gameInfo.WhiteElo
+    },
+    blackElo () {
+      return this.gameInfo.BlackElo
+    },
+    whiteTitle () {
+      return this.gameInfo.WhiteTitle
+    },
+    blackTitle () {
+      return this.gameInfo.BlackTitle
+    }
+  }
 
 }
 </script>

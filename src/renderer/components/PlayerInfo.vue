@@ -1,6 +1,7 @@
 <template>
     <div class="playerinfo">
-    <i slot="extra" class="icon mdi" :class="[isWhite ? 'mdi-checkbox-blank-circle-outline' : 'mdi-checkbox-blank-circle']"/> {{ rank }} {{ name }} {{ elo }}
+    <i slot="extra" class="icon mdi" :class="[isWhite ? 'mdi-checkbox-blank-circle-outline' : 'mdi-checkbox-blank-circle']"/> 
+    [{{ playerTitle }}] {{ name }} ({{ elo }})
     </div>
 </template>
 
@@ -8,9 +9,9 @@
 export default {
   name: 'PlayerInfo',
   props: {
-    rank: {
+    playerTitle: {
       type: String,
-      default: ''
+      default: '?'
       },
     elo: {
       type: [String, Number],

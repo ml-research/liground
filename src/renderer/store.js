@@ -44,7 +44,8 @@ export const store = new Vuex.Store({
     sideToMove: 'w',
     counter: 0,
     pieceStyle: 'tatiana',
-    board: null
+    board: null,
+    gameInfo: {}
   },
   mutations: { // sync
     fen (state, payload) {
@@ -142,6 +143,7 @@ export const store = new Vuex.Store({
         state.board = new ffish.Board(state.variant)
       }
       state.moves = []
+      state.gameInfo = {}
       this.commit('fen', state.board.fen())
       this.commit('turn', state.board.turn())
       this.commit('legalMoves', state.board.legalMoves())
@@ -158,6 +160,9 @@ export const store = new Vuex.Store({
         return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
       }))
       state.lastFen = state.board.fen()
+    },
+    gameInfo (state, payload) {
+      state.gameInfo = payload
     }
   },
   actions: { // async
@@ -249,9 +254,17 @@ export const store = new Vuex.Store({
     loadGame (context, payload) {
       const variant = payload.game.headers("Variant").toLowerCase();
       const board = new ffish.Board(variant);
+      let gameInfo = {}
+      payload.game.headerKeys().split(" ").map(
+        (curVal, idx, arr) => {
+          gameInfo[curVal] = payload.game.headers(curVal)
+        }
+
+      )
 
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
+      context.commit('gameInfo', gameInfo)
       context.dispatch('push', payload.game.mainlineMoves())
       context.dispatch('updateBoard')
     },
@@ -387,6 +400,9 @@ export const store = new Vuex.Store({
     },
     pocket (state) {
       return (turn) => state.board.pocket(turn)
+    },
+    gameInfo (state) {
+      return state.gameInfo
     },
 
     // TODO: integrate getters into store state?
