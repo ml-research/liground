@@ -224,9 +224,7 @@ export default {
         const uciMove = orig + dest
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
         let isCheck = false
-        console.log(this.lastMoveSan)
-        if(this.lastMoveSan.includes('+')){
-          console.log('check')
+        if(this.lastMoveSan.includes('+')){ //the last move was check iff the san notation of the last move contained a '+'
           isCheck = true
         }
         this.$store.dispatch('check', isCheck)
