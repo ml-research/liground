@@ -191,9 +191,6 @@ export const store = new Vuex.Store({
         return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
       }))
       state.lastFen = state.board.fen()
-    },
-    updateVariant(state, payload) {
-      state.variant = payload
     }
   },
   actions: { // async
