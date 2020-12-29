@@ -9,7 +9,7 @@
 </div>
 
 <i class="logo icon mdi mdi-feature-search-outline"/>LiGround
-<multiselect class="multiselect" v-model="selected" :options="variants" :allow-empty="false" :show-labels="false" :placeholder="selected"></multiselect>
+<multiselect class="multiselect" :value="displayVariant" :options="options" :allow-empty="false" :placeholder="selected" :show-labels="false" @input="updateVariant"></multiselect>
    <PrettyCheck class="p-icon p-curve p-smooth" color="primary-o">
     <i slot="extra" class="icon mdi mdi-check"></i>
     960 Mode
@@ -20,6 +20,9 @@
 <script>
 import PrettyCheck from 'pretty-checkbox-vue/check'
 import Multiselect from 'vue-multiselect'
+import Vuex from 'vuex'
+
+const { mapActions, mapState } = Vuex
 
 export default {
   name: 'AnalysisView',
@@ -28,30 +31,29 @@ export default {
   },
   data () {
     return {
-      variants: [
-        '♟️ Standard', '🏠 Crazyhouse', '⛰️ King of the Hill', '️Three-Check', 'Antichess', 'Horde', '🏇 Racing Kings'
-      ],
-      selected: '♟️ Standard'
+      selected: '♟️ Standard',
     }
   },
   methods: {
-    methodToRunOnSelect (payload) {
-      console.log(payload)
-    }
-  },
-  watch: {
-    selected: function () {
-      const variants = {'♟️ Standard': 'chess', '🏠 Crazyhouse': 'crazyhouse', '⛰️ King of the Hill': 'kingofthehill', '️Three-Check': '3check', 'Antichess': 'antichess', 'Horde': 'horde', '🏇 Racing Kings': 'racingkings'}
-      console.log(`selected. ${variants[this.selected]}`)
-      this.$store.dispatch('variant', variants[this.selected])
-      this.$store.dispatch('started', false)
-      // there is no 'selected' action
-      //this.$store.dispatch('selected', false)
+    updateVariant(payload) {
+      this.$store.dispatch('started', false) //from the previously used method, not sure why this was here, it seemed to work without this line
+      this.$store.dispatch('variant', this.variantOptions.get(payload))
     }
   },
   computed: {
+    options(){
+      let varop = Object.keys(this.$store.getters.variantOptions.getAll()) //returns all keys in variantOptions, those are then listed in the dropdown menu
+      return varop
+    },
+    displayVariant() { //retuns the "nice" name of the current variant
+        return this.variantOptions.revGet(this.variant)
+    },
     active () {
       return this.$store.getters.active
+    },
+    ...mapState(['variant']),
+    variantOptions () {
+      return this.$store.getters.variantOptions
     }
   }
 }

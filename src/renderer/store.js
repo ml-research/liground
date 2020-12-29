@@ -2,6 +2,22 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
 
+class TwoWayMap {
+  constructor(map) {
+    this.map = map
+    this.reverseMap = {}
+    this.keys = []
+    for (let key in map) {
+      const value = map[key]
+      this.reverseMap[value] = key
+      this.keys.concat(key)
+    }
+  }
+  getAll() { return this.map }
+  get(key) { return this.map[key] }
+  revGet(key) { return this.reverseMap[key] }
+}
+
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -17,6 +33,15 @@ export const store = new Vuex.Store({
     check: false,
     destinations: {},
     variant: 'chess',
+    variantOptions: new TwoWayMap({ //all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
+      '♟️ Standard': '',
+      '♟️ Standard': 'chess', 
+      '🏠 Crazyhouse': 'crazyhouse', 
+      '⛰️ King of the Hill': 'kingofthehill', 
+      '️Three-Check': '3check', 
+      'Antichess': 'antichess', 
+      'Horde': 'horde',
+      '🏇 Racing Kings': 'racingkings'}),
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
@@ -166,6 +191,9 @@ export const store = new Vuex.Store({
         return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
       }))
       state.lastFen = state.board.fen()
+    },
+    updateVariant(state, payload) {
+      state.variant = payload
     }
   },
   actions: { // async
@@ -261,9 +289,11 @@ export const store = new Vuex.Store({
       context.commit('multipv', payload)
     },
     loadGame (context, payload) {
-      const variant = payload.game.headers("Variant").toLowerCase();
+      let variant = payload.game.headers("Variant").toLowerCase();
       const board = new ffish.Board(variant);
-
+      if ( variant == '') { //if no variant is given we assume it to be standard chess
+        variant = 'chess'
+      }
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.dispatch('push', payload.game.mainlineMoves())
@@ -309,6 +339,9 @@ export const store = new Vuex.Store({
     },
     variant (state) {
       return state.variant
+    },
+    variantOptions (state) {
+      return state.variantOptions
     },
     engineBinary (state) {
       return state.engineBinary
