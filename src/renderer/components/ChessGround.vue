@@ -91,7 +91,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'check', 'moves'])
   },
   watch: {
     initialized () {
@@ -211,6 +211,11 @@ export default {
         }
         const uciMove = orig + dest
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+        let isCheck = false
+        if(this.lastMoveSan.includes('+')){ //the last move was check iff the san notation of the last move contained a '+'
+          isCheck = true
+        }
+        this.$store.dispatch('check', isCheck)
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
         this.updateHand()
@@ -257,21 +262,29 @@ export default {
       
     },
     updateBoard () {
-    this.board.set({
-        fen: this.fen,
-        turnColor: this.turn,
-        movable: this.fen==this.lastFen ? { //moving is only possible at the end of the line
-          dests: this.possibleMoves(),
-          color: this.turn
-        } : {
-          dests: {},
-          color: this.turn
-        },
-        orientation: this.orientation
-      })
-      if (this.variant === 'crazyhouse') {
-        this.updateHand()
-      }
+      this.board.set({
+          check: this.check,
+          fen: this.fen,
+          turnColor: this.turn,
+          highlight: this.fen==this.lastFen ? {
+            lastMove: true,
+            check: true
+          } : {
+            lastMove: false,
+            check: true
+          },
+          movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
+            dests: this.possibleMoves(),
+            color: this.turn
+          } : {
+            dests: {},
+            color: this.turn
+          },
+          orientation: this.orientation
+        })
+        if(this.variant === 'crazyhouse') {
+          this.updateHand()
+        }
     }
   },
   mounted () {
@@ -281,7 +294,7 @@ export default {
       turnColor: 'white',
       highlight: {
         lastMove: true, // add last-move class to squares
-        check: false // add check class to squares
+        check: true // add check class to squares
       },
       drawable: {
         enabled: true, // can draw
@@ -354,7 +367,6 @@ coords {
   position: sticky;
   display: table;
 }
-
 .koth cg-container::before {
   width: 25%;
   height: 25%;
@@ -368,6 +380,7 @@ coords {
   pointer-events: none;
   border-radius: 0px 0px 0px 0px;
 }
+
 .rk cg-container::before{
     background: rgba(230,230,230,0.2);
     width: 100%;
