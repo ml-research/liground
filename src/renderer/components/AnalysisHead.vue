@@ -12,8 +12,8 @@
 <multiselect class="multiselect" v-model="selected" :options="variants" :allow-empty="false" :show-labels="false" :placeholder="selected"></multiselect>
    <PrettyCheck class="p-icon p-curve p-smooth" color="primary-o">
     <i slot="extra" class="icon mdi mdi-check"></i>
-    960 Mode
 </PrettyCheck>
+<input type='button' value='Reset' @click='resetBoard'>
 </div>
 </template>
 
@@ -37,6 +37,9 @@ export default {
   methods: {
     methodToRunOnSelect (payload) {
       console.log(payload)
+    },
+    resetBoard() {
+      this.$store.dispatch('resetBoard', false)
     }
   },
   watch: {

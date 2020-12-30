@@ -156,7 +156,7 @@ export const store = new Vuex.Store({
       this.commit('lastFen', state.board.fen())
     },
     resetBoard (state, payload) {
-      state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
+      this.commit('newBoard', payload)
       state.moves = []
     },
     appendMoves (state, payload) {
@@ -169,6 +169,9 @@ export const store = new Vuex.Store({
     }
   },
   actions: { // async
+    resetBoard (context, payload) {
+      context.commit('resetBoard', payload)
+    },
     initialize (context) {
       context.commit('newBoard', {
         fen: '',
