@@ -12,8 +12,9 @@
 <multiselect class="multiselect" v-model="selected" :options="variants" :allow-empty="false" :show-labels="false" :placeholder="selected"></multiselect>
    <PrettyCheck class="p-icon p-curve p-smooth" color="primary-o">
     <i slot="extra" class="icon mdi mdi-check"></i>
+    960 Mode
 </PrettyCheck>
-<input type='button' value='Reset' @click='resetBoard'>
+<input type='button' value='Reset' class='reset' @click='resetBoard'>
 </div>
 </template>
 
@@ -61,6 +62,11 @@ export default {
 </script>
 
 <style scoped>
+.reset {
+  background-color:lightgray ;
+  border: black;
+  outline: none;
+}
 .ceval {
   /* display: table */
   font-size: 15pt;
