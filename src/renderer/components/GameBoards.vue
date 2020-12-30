@@ -2,9 +2,13 @@
   <div id="inner">
     <div>
       <div class='grid-parent'>
+        
         <div>
-          <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
-          <EvalBar class="float-right-child" id="evalbar"/>
+          <div class="grid-parent">
+            <pgn-browser id="pgnbrowser"/>
+            <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
+            <EvalBar id="evalbar"/>
+          </div>
           <br/>
           <div id="fen-field">FEN <input type="text" id="lname" name="lname" placeholder="fen position" v-on:change="checkValidFEN" :value="fen" size="60"></div>
           <PieceStyleSelector id="piece-style"/>
@@ -24,6 +28,7 @@ import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
+import PgnBrowser from './PgnBrowser.vue'
 
 let ffish = null
 
@@ -34,7 +39,8 @@ export default {
     EvalBar,
     ChessGround,
     PieceStyleSelector,
-    EvalPlot
+    EvalPlot,
+    PgnBrowser
   },
   beforeCreate () {
     console.log(`beforeCreate()`)
@@ -139,6 +145,12 @@ input {
   display: grid;
   grid-template-columns: auto auto auto auto
 }
+#pgnbrowser {
+  min-width: 8em;
+  margin: 0em 1em;
+  border: 1px solid black;
+  border-radius: 4px;
+}
 #chessboard {
   display: inline-block;
   margin: 0em 0em 1em 0em;
@@ -156,8 +168,7 @@ input {
 }
 
 #evalbar {
-  margin-right: 20px;
-  margin-left: -20px;
+  margin: 0em 1em;
 }
 
 </style>
