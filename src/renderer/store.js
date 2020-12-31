@@ -1,6 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
+import ipc from './ipc'
+
+(async () => {
+  ipc.on('option', option => console.log('Received option:', option))
+  await ipc.runEngine()
+  console.log('Engine online')
+  ipc.send('uci')
+  setTimeout(() => {
+    ipc.send('quit')
+  }, 5000)
+})()
 
 Vue.use(Vuex)
 
