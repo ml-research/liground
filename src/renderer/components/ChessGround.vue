@@ -85,13 +85,21 @@ export default {
     }
   },
   computed: {
+    currentMove () { //returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
+      for( let num = 0; num < this.moves.length; num++) {
+        if(this.moves[num].fen == this.fen){ 
+          return this.moves[num]
+        }
+      }
+      return undefined
+    },
     turn () {
       return this.$store.getters.turn ? 'white' : 'black'
     },
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'check'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
   },
   watch: {
     initialized () {
@@ -211,11 +219,6 @@ export default {
         }
         const uciMove = orig + dest
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-        let isCheck = false
-        if(this.lastMoveSan.includes('+')){ //the last move was check iff the san notation of the last move contained a '+'
-          isCheck = true
-        }
-        this.$store.dispatch('check', isCheck)
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
         this.updateHand()
@@ -250,15 +253,27 @@ export default {
       
     },
     updateBoard () {
+      //logic to find out if a check should be displayed:
+      let isCheck = false //ensures that no check is displayed when the current move was not a check
+      if(this.currentMove != undefined && this.currentMove.name.includes('+')){ //the last move was check iff the san notation of the last move contained a '+'
+        this.moves[this.moves.length-1].check = this.turn //the check property of the board accepts a color or a boolean
+        isCheck = this.currentMove.check
+      } 
+      //logic to find out which move was last and should thus be highlighted:
+      if(this.currentMove == undefined || this.moves.length == 0) {
+        this.board.state.lastMove = undefined
+      } else {
+          let string = String(this.currentMove.uci)
+          let first = string.substring(0,2)
+          let second = string.substring(2,4)
+          this.board.state.lastMove = [first, second]
+      }
       this.board.set({
-          check: this.check,
+          check: isCheck,
           fen: this.fen,
           turnColor: this.turn,
-          highlight: this.fen==this.lastFen ? {
+          highlight: {
             lastMove: true,
-            check: true
-          } : {
-            lastMove: false,
             check: true
           },
           movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
