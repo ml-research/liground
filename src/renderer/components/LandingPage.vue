@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <MenuBar id="menubar"/>
+    <MenuBar id="menubar" />
     <GameBoards id="gameboards"/>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
   methods: {
     open (link) {
       this.$electron.shell.openExternal(link)
-    }
+    },
   }
 }
 </script>
