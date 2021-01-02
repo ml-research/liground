@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <JumpButtons v-on:flip-board="$emit('flip-board', 0)"/>
+    <JumpButtons v-on:flip-board="$emit('flip-board', 0)" v-on:move-to-start="$emit('move-to-start',0)" v-on:move-back-one="$emit('move-back-one',0)" v-on:move-forward-one="$emit('move-forward-one',0)" v-on:move-to-end="$emit('move-to-end',0)"/>
     <game-info id="gameinfo"/>
      <div class='console-log' id='textarea'>
        <p v-for='line in stdIO' :key='line.type'>{{line}}</p>
