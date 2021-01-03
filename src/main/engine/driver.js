@@ -110,9 +110,9 @@ export default class EngineDriver {
       case 'quit':
         return await this.quit()
       default:
-        await this.waitForReady()
         this.ready = false
         this._write(cmd)
+        await this.waitForReady()
     }
   }
 
