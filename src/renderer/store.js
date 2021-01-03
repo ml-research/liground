@@ -3,16 +3,6 @@ import Vuex from 'vuex'
 import ffish from 'ffish'
 import ipc from './ipc'
 
-(async () => {
-  ipc.on('option', option => console.log('Received option:', option))
-  await ipc.runEngine()
-  console.log('Engine online')
-  ipc.send('uci')
-  setTimeout(() => {
-    ipc.send('quit')
-  }, 5000)
-})()
-
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -451,27 +441,9 @@ function cpforWhiteStr (cpForWhite) {
   return '-' + String(-normalizedEval)
 }
 
-function dispatchToStore (items, json, store) {
-  for (let idx = 0; idx < items.length; ++idx) {
-    const item = items[idx]
-    if (item in json) {
-      store.dispatch(item, json[item])
-    }
-  }
-}
-
-const ws = new WebSocket('ws://localhost:8082')
-
-ws.addEventListener('open', () => {
-  console.log('We are connected')
-  ws.send('Hello!')
-})
-
-ws.addEventListener('message', ({
-  data
-}) => {
-  const json = JSON.parse(data)
-
-  const items = ['idAuthor', 'idName', 'stdIO', 'multipv', 'destinations']
-  dispatchToStore(items, json, store)
-})
+(async () => {
+  ipc.on('output', line => store.dispatch('stdIO', line))
+  ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
+  const engine = await ipc.runEngine()
+  console.log('Engine Infos:', engine)
+})()
