@@ -445,5 +445,6 @@ function cpforWhiteStr (cpForWhite) {
   ipc.on('output', line => store.dispatch('stdIO', line))
   ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
   const engine = await ipc.runEngine()
-  console.log('Engine Infos:', engine)
+  console.log(`Engine active: "${engine.name}" by ${engine.author}`)
+  console.log('Engine Options:', engine.options)
 })()

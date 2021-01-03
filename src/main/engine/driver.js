@@ -122,19 +122,28 @@ export default class EngineDriver {
   async initialize () {
     // add listeners
     const onId = line => {
-      // TODO: id parsing
-      switch (line.split(/\s/)[1].trim()) {
+      const [, type, value] = line.match(/^id\s+(.+?)\s(.+)$/)
+      switch (type) {
         case 'name':
-          this.info.name = line
-          break
         case 'author':
-          this.info.author = line
+          this.info[type] = value
           break
       }
     }
     const onOption = line => {
-      // TODO: option parsing
-      this.info.options.push(line)
+      const option = {}
+      const regexp = /\s+(name|type|default|var|min|max)\s+(.+?)(?=\s+(?:name|type|default|var|min|max)|$)/g
+      for (const [, name, value] of line.matchAll(regexp)) {
+        if (name === 'var') {
+          if (!option.var) {
+            option.var = []
+          }
+          option.var.push(value)
+        } else {
+          option[name] = value
+        }
+      }
+      this.info.options.push(option)
     }
     this.events.on('id', onId)
     this.events.on('option', onOption)
