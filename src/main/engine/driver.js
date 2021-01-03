@@ -1,18 +1,33 @@
 import readline from 'readline'
-import EventEmitter from 'events'
+import { EventEmitter } from 'events'
+
+/**
+   * Helper function to wait for an event.
+   * @param {EventEmitter} emitter event emitter
+   * @param {string} event event name
+   * @returns {Promise<any[]>}
+   */
+function waitFor (emitter, event) {
+  return new Promise(resolve => emitter.once(event, (...args) => resolve(args)))
+}
 
 /**
  * Class to control engine process.
  */
-export default class EngineDriver extends EventEmitter {
+export default class EngineDriver {
   /**
    * Create a new EngineDriver for a running child process.
    * @param {import('child_process').ChildProcess} child Engine child process
    */
   constructor (child) {
-    super()
+    this.events = new EventEmitter()
     this.ready = false
     this.pendingReady = false
+    this.info = {
+      name: 'Unknown',
+      author: 'Unknown',
+      options: []
+    }
     this.process = child
     this.rl = readline.createInterface({
       input: child.stdout,
@@ -20,36 +35,45 @@ export default class EngineDriver extends EventEmitter {
     })
 
     // update state on ready
-    this.on('ready', () => {
+    this.events.on('ready', () => {
       this.ready = true
       this.pendingReady = false
     })
 
     // parse output lines
     this.rl.on('line', line => this._parseLine(line))
-
-    // initial ready check
-    this._write('isready')
   }
 
   /**
-   * Internally used to write a command directly to the engine.
+   * Used internally to write a command directly to the engine.
    * @param {string} cmd Command to send to the engine
    */
   _write (cmd) {
-    this.process.stdin.write(`${cmd}\n`)
+    const input = `${cmd}\n`
+    this.events.emit('input', input)
+    this.process.stdin.write(input)
   }
 
   /**
-   * Internally used to parse UCI lines and emit events.
+   * Used internally to parse UCI lines and emit events.
    * @param {string} line UCI line
    */
   _parseLine (line) {
+    this.events.emit('line', line)
     line = line.trim()
-    if (line === 'readyok') {
-      this.emit('ready')
-    } else if (line.startsWith('option')) {
-      this.emit('option', line)
+    switch (line.split(/\s/)[0].trim()) {
+      case 'uciok':
+        this.events.emit('initialized')
+        break
+      case 'readyok':
+        this.events.emit('ready')
+        break
+      case 'id':
+        this.events.emit('id', line)
+        break
+      case 'option':
+        this.events.emit('option', line)
+        break
     }
   }
 
@@ -63,7 +87,7 @@ export default class EngineDriver extends EventEmitter {
       if (this.ready) {
         resolve()
       } else {
-        this.once('ready', resolve)
+        this.events.once('ready', () => resolve())
         if (!this.pendingReady) {
           this.pendingReady = true
           this._write('isready')
@@ -73,12 +97,68 @@ export default class EngineDriver extends EventEmitter {
   }
 
   /**
-   * Queue a new UCI command to be executed once the engine is ready.
+   * Execute a UCI command.
+   * If the command is not known it will be executed after a ready check.
    * @param {string} cmd UCI command
+   * @returns {Promise<void>}
    */
-  async queue (cmd) {
+  async exec (cmd) {
+    cmd = cmd.trim()
+    switch (cmd.split(/\s/)[0].trim()) {
+      case 'uci':
+        return await this.initialize()
+      case 'quit':
+        return await this.quit()
+      default:
+        await this.waitForReady()
+        this.ready = false
+        this._write(cmd)
+    }
+  }
+
+  /**
+   * Initialize the UCI communication with the engine process.
+   */
+  async initialize () {
+    // add listeners
+    const onId = line => {
+      // TODO: id parsing
+      switch (line.split(/\s/)[1].trim()) {
+        case 'name':
+          this.info.name = line
+          break
+        case 'author':
+          this.info.author = line
+          break
+      }
+    }
+    const onOption = line => {
+      // TODO: option parsing
+      this.info.options.push(line)
+    }
+    this.events.on('id', onId)
+    this.events.on('option', onOption)
+
+    // send "uci" to engine
+    this._write('uci')
+
+    // wait until done
+    await waitFor(this.events, 'initialized')
+
+    // remove listeners
+    this.events.off('id', onId)
+    this.events.off('option', onOption)
+
+    // peform ready check
     await this.waitForReady()
-    this.ready = false
-    this._write(cmd)
+  }
+
+  /**
+   * Tell the engine process to quit.
+   */
+  async quit () {
+    await this.waitForReady()
+    this._write('quit')
+    await waitFor(this.process, 'close')
   }
 }

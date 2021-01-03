@@ -4,36 +4,37 @@ import Engines from './engines'
 import EngineDriver from './driver'
 
 /** @type {EngineDriver} */
-let engine
+let engine = null
 
 // eslint-disable-next-line prefer-const
 let binary = Engines.stockfish
 
-const events = ['option']
-
-function setupEngine (child, reply) {
-  engine = new EngineDriver(child)
-  for (const event of events) {
-    engine.on(event, (...args) => reply(`engine-${event}`, ...args))
-  }
-  reply('active')
-}
-
-ipcMain.on('run', event => {
+ipcMain.on('run', async event => {
   event.reply('debug', 'Running engine')
-  const child = spawn(binary, []).on('error', err => {
-    event.reply('error', err)
-  })
+
+  // spawn engine process
+  const child = spawn(binary, []).on('error', err => event.reply('error', err))
+
+  // success
   if (typeof child.pid === 'number') {
-    setupEngine(child, event.reply)
+    // create engine
+    engine = new EngineDriver(child)
+    engine.events.on('input', line => event.reply('engine-input', line))
+    engine.events.on('line', line => event.reply('engine-output', line))
+
+    // initialize
+    await engine.initialize()
+
+    // reply with engine infos
+    event.reply('active', engine.info)
   }
 })
 
 ipcMain.on('cmd', (event, cmd) => {
   cmd = cmd.trim()
-  event.reply('debug', `Queueing command "${cmd}"`)
+  event.reply('debug', `Received command "${cmd}"`)
   if (engine) {
-    engine.queue(cmd)
+    engine.exec(cmd)
   } else {
     event.reply('error', 'Engine not running')
   }
