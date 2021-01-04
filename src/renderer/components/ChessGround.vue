@@ -135,6 +135,12 @@ export default {
             } else {
               drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
             }
+
+            // adjust color if pv line is hovered
+            if (idx === this.hoveredpv) {
+              drawShape.brush = 'yellow'
+            }
+
             // put item in front of list, so that the bestmove is drawn last
             shapes.unshift(drawShape)
 
