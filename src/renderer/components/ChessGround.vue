@@ -2,12 +2,12 @@
   <div class='blue merida is2d'>
     <div class='grid-parent'>
       <div class='pockets'>
-        <div v-if="variant==='crazyhouse'">
+        <div v-if="variant==='crazyhouse'" v-bind:class='{ black : $store.getters.orientation == "black"}'>
           <ChessPocket id='chesspocket_top' color='black' :pieces='piecesB' @selection='dropPiece'/>
           <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
         </div>
       </div>
-      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
+      <div :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
         <div ref='board' class='cg-board-wrap' >
         </div>
       </div>
@@ -60,10 +60,6 @@ export default {
       type: Function,
       default: () => 'q'
     },
-    orientation: {
-      type: String,
-      default: 'white'
-    },
     colors: {
       type: Array,
       default: () => (['w', 'b'])
@@ -96,13 +92,16 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'check'])
   },
   watch: {
     initialized () {
       this.updateBoard()
     },
     fen () {
+      this.updateBoard()
+    },
+    orientation () {
       this.updateBoard()
     },
     pieceStyle (pieceStyle) {
@@ -173,25 +172,6 @@ export default {
       file.href = 'src/renderer/assets/images/piece-css/' + pieceStyle + '.css'
       document.head.appendChild(file)
     },
-    getBoardPos (event) {
-      // TODO: fix placing of pocket pieces in crazyhouse
-      if (this.selectedPiece !== null) {
-        // get click field
-        const squareHeight = 75
-        const squareWidth = 75
-        const x = Math.floor(event.layerX / squareWidth)
-        const y = Math.floor(event.layerY / squareHeight)
-        console.log(`x, y: ${x} ${y}`)
-
-        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
-
-        const letters = { 0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h' }
-        const dstSquare = letters[x] + String(7 - y + 1)
-        const move = pieces[this.selectedPiece] + '@' + dstSquare
-        console.log(`move: ${move}`)
-        this.selectedPiece = null
-      }
-    },
     dropPiece (event, pieceType, color) {
       this.board.dragNewPiece({ role: pieceType, color: color, promoted: false }, event)
       this.selectedPiece = pieceType
@@ -226,6 +206,14 @@ export default {
         pieces[idx].count = 0
       }
     },
+    afterDrag () {
+      return (role, key) => {
+        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
+        const move = pieces[role] + '@' + key
+        this.$store.dispatch('push', move)
+        this.updateHand()
+      }
+    },
     changeTurn () {
       return (orig, dest) => {
         if (this.isPromotion(orig, dest)) {
@@ -233,6 +221,11 @@ export default {
         }
         const uciMove = orig + dest
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+        let isCheck = false
+        if(this.lastMoveSan.includes('+')){ //the last move was check iff the san notation of the last move contained a '+'
+          isCheck = true
+        }
+        this.$store.dispatch('check', isCheck)
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
         this.updateHand()
@@ -267,18 +260,29 @@ export default {
 
     },
     updateBoard () {
-    this.board.set({
-        fen: this.fen,
-        turnColor: this.turn,
-        movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
-          dests: this.possibleMoves(),
-          color: this.turn
-        } : {
-          dests: {},
-          color: this.turn
-        },
-        orientation: this.orientation
-      })
+      this.board.set({
+          check: this.check,
+          fen: this.fen,
+          turnColor: this.turn,
+          highlight: this.fen==this.lastFen ? {
+            lastMove: true,
+            check: true
+          } : {
+            lastMove: false,
+            check: true
+          },
+          movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
+            dests: this.possibleMoves(),
+            color: this.turn
+          } : {
+            dests: {},
+            color: this.turn
+          },
+          orientation: this.orientation
+        })
+        if(this.variant === 'crazyhouse') {
+          this.updateHand()
+        }
     },
     drawShapes () {
       if (this.board !== null) {
@@ -293,7 +297,7 @@ export default {
       turnColor: 'white',
       highlight: {
         lastMove: true, // add last-move class to squares
-        check: false // add check class to squares
+        check: true // add check class to squares
       },
       drawable: {
         enabled: true, // can draw
@@ -301,7 +305,7 @@ export default {
         eraseOnClick: false
       },
       movable: {
-        events: { after: this.changeTurn() },
+        events: { after: this.changeTurn() , afterNewPiece: this.afterDrag()},
         color: 'white',
         free: false
       },
@@ -315,6 +319,9 @@ export default {
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
 
+.black {
+  transform: scaleY(-1);
+}
 .chess-pocket {
   float: left;
   background-color: #000;
@@ -363,7 +370,6 @@ coords {
   position: sticky;
   display: table;
 }
-
 .koth cg-container::before {
   width: 25%;
   height: 25%;
@@ -377,6 +383,7 @@ coords {
   pointer-events: none;
   border-radius: 0px 0px 0px 0px;
 }
+
 .rk cg-container::before{
     background: rgba(230,230,230,0.2);
     width: 100%;

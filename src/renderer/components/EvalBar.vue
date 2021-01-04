@@ -1,5 +1,5 @@
 <template>
-  <div class="progress">
+  <div class="progress" v-bind:class='{ black : $store.getters.orientation == "black" }'>
     <div class="progress-value" v-bind:style="{ height: filterSectionHeight }"/>
   </div>
 </template>
@@ -29,6 +29,9 @@ export default {
   display: flex;
   height: 600px;
   width: 17px;
+}
+.black {
+  transform: scaleY(-1);
 }
 
 .progress-value {

@@ -14,13 +14,15 @@ export const store = new Vuex.Store({
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
     moves: [],
     legalMoves: '',
+    check: false,
     destinations: {},
     variant: 'chess',
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
-    idName: '',
-    idAuthor: '',
+    idName: 'idName',
+    idAuthor: 'idAuthor',
+    orientation: 'white',
     multipv: [
       {
         depth: 0,
@@ -42,12 +44,15 @@ export const store = new Vuex.Store({
     hoveredpv: -1,
     sideToMove: 'w',
     counter: 0,
-    pieceStyle: 'tatiana',
+    pieceStyle: 'merida',
     board: null
   },
   mutations: { // sync
     fen (state, payload) {
       state.fen = payload
+    },
+    check (state, payload) {
+      state.check = payload
     },
     lastFen (state, payload) {
       state.lastFen = payload
@@ -60,6 +65,9 @@ export const store = new Vuex.Store({
     },
     initialized (state, payload) {
       state.initialized = payload
+    },
+    orientation (state, payload) {
+      state.orientation = payload
     },
     active (state, payload) {
       state.active = payload
@@ -177,7 +185,7 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves',payload.split(" "))
+      context.commit('appendMoves', payload.split(" "))
       context.dispatch('updateBoard')
     },
     startEngine (context) {
@@ -203,6 +211,9 @@ export const store = new Vuex.Store({
       context.commit('sideToMove', context.getters.fen.split(' ')[1])
       console.log(`state.sideToMove: ${context.sideToMove}`)
     },
+    check (context, payload) {
+      context.commit('check', payload)
+    },
     fen (context, payload) {
       context.commit('fen', payload)
     },
@@ -214,6 +225,9 @@ export const store = new Vuex.Store({
     },
     started (context, payload) {
       context.commit('started', payload)
+    },
+    orientation (context, payload) {
+      context.commit('orientation', payload)
     },
     active (context, payload) {
       context.commit('active', payload)
@@ -257,7 +271,6 @@ export const store = new Vuex.Store({
       context.dispatch('push', payload.game.mainlineMoves())
       context.dispatch('updateBoard')
     },
-
     increment (context, payload) {
       context.commit('increment', payload)
     },
@@ -266,6 +279,9 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    check (state) {
+      return state.check
+    },
     board (state) {
       return state.board
     },
@@ -289,6 +305,9 @@ export const store = new Vuex.Store({
     },
     destinations (state) {
       return state.destinations
+    },
+    orientation (state) {
+      return state.orientation
     },
     variant (state) {
       return state.variant
