@@ -3,8 +3,8 @@
     <div class='grid-parent'>
       <div class='pockets'>
         <div v-if="variant==='crazyhouse'" v-bind:class='{ black : $store.getters.orientation == "black"}'>
-          <ChessPocket id='chesspocket_top' color='black' :pieces='piecesB' @selection='dropPiece'/>
-          <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
+          <ChessPocket id='chesspocket_top' color='black' :pieces='piecesB' @selection='dropPiece' v-bind:class='{ black : $store.getters.orientation == "white" }'/>
+          <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece' v-bind:class='{ black : $store.getters.orientation == "black" }' />
         </div>
       </div>
       <div :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
@@ -99,7 +99,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'check', 'moves'])
   },
   watch: {
     initialized () {
@@ -240,8 +240,20 @@ export default {
       // Crazyhouse pocket pieces
       this.resetPockets(this.piecesW)
       this.resetPockets(this.piecesB)
-      this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
-      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) 
+      if(this.fen == this.lastFen){
+        this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
+        this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) 
+      } else {
+        let i = 0;
+        for( let num = 0; num < this.moves.length; num++) { // i will have the index of the currently displayed move
+          if(this.moves[num].fen == this.fen){ 
+            i = num
+            break
+          }
+        }
+        this.updatePocket(this.piecesW, this.moves[i].whitePocket, WHITE) //load the pocketpieces from the currently displayed move
+        this.updatePocket(this.piecesB, this.moves[i].blackPocket, BLACK) 
+      }
     },
     afterMove () {
       const events = {}
