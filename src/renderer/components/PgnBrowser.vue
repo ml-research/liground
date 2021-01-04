@@ -1,8 +1,11 @@
 <template>
   <div>
-    <select size="10" name="gameselector" id="gameselector">
-      <option>A vs B</option>
-      <option>A vs C</option>
+    <select v-model="selectedGame" size="10" name="gameselector" id="gameselector">
+      <option
+        v-for="game in loadedGames"
+        :value="game"
+        :key="game.id"
+      >{{game.headers('White')}} vs. <br/> {{game.headers('Black')}}</option>
     </select>
   
   </div>
@@ -11,6 +14,21 @@
 <script>
 export default {
   name: 'PgnBrowser',
+  computed: {
+    selectedGame: {
+      get: function () {
+        return this.$store.getters.selectedGame
+      },
+      set: function(newVal) {
+        this.$store.dispatch('loadGame', {game: newVal})
+      }
+    },
+    loadedGames: {
+      get: function() {
+        return this.$store.getters.loadedGames
+      }
+    }
+  }
     
 }
 </script>

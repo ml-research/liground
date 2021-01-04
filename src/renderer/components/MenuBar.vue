@@ -21,7 +21,7 @@ export default {
   methods: {
     openPgn () {
       let regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
-
+      let games = []
       this.$electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
         properties: ['openFile'], 
@@ -44,12 +44,21 @@ export default {
               
               m.forEach((match, groupIndex) => {
                   console.log(`Found match, group ${groupIndex}: ${match}`);
+                  games.push(ffish.readGamePGN(match))
+
               });
             }
-
+            
             //console.log(data)
-            let game = ffish.readGamePGN(data)
-            this.$store.dispatch('loadGame', {game: game})    
+            games = games.map((curVal, idx, arr) => {
+              curVal.id = idx
+              return curVal
+            })
+            this.$store.dispatch('loadedGames', games)
+            if(games[0]){
+              this.$store.dispatch('loadGame', {game: games[0]})
+            }
+                
           })
         }
       }).catch(err => {

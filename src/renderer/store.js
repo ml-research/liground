@@ -47,7 +47,9 @@ export const store = new Vuex.Store({
     counter: 0,
     pieceStyle: 'merida',
     board: null,
-    gameInfo: {}
+    gameInfo: {},
+    loadedGames: [],
+    selectedGame: null
   },
   mutations: { // sync
     fen (state, payload) {
@@ -171,6 +173,12 @@ export const store = new Vuex.Store({
     },
     gameInfo (state, payload) {
       state.gameInfo = payload
+    },
+    loadedGames (state, payload) {
+      state.loadedGames = payload
+    },
+    selectedGame (state, payload) {
+      state.selectedGame = payload
     }
   },
   actions: { // async
@@ -265,6 +273,10 @@ export const store = new Vuex.Store({
     multipv (context, payload) {
       context.commit('multipv', payload)
     },
+    loadedGames (context, payload) {
+      context.commit('loadedGames', payload)
+    },
+
     loadGame (context, payload) {
       const variant = payload.game.headers("Variant").toLowerCase();
       const board = new ffish.Board(variant);
@@ -275,7 +287,7 @@ export const store = new Vuex.Store({
         }
 
       )
-
+      context.commit('selectedGame', payload.game)
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
@@ -422,6 +434,12 @@ export const store = new Vuex.Store({
     },
     gameInfo (state) {
       return state.gameInfo
+    },
+    loadedGames (state) {
+      return state.loadedGames
+    },
+    selectedGame (state) {
+      return state.selectedGame
     },
 
     // TODO: integrate getters into store state?
