@@ -2,6 +2,22 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
 
+class TwoWayMap {
+  constructor(map) {
+    this.map = map
+    this.reverseMap = {}
+    this.keys = []
+    for (let key in map) {
+      const value = map[key]
+      this.reverseMap[value] = key
+      this.keys.concat(key)
+    }
+  }
+  getAll() { return this.map }
+  get(key) { return this.map[key] }
+  revGet(key) { return this.reverseMap[key] }
+}
+
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -14,9 +30,17 @@ export const store = new Vuex.Store({
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
     moves: [],
     legalMoves: '',
-    check: false,
     destinations: {},
     variant: 'chess',
+    variantOptions: new TwoWayMap({ //all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
+      '♟️ Standard': '',
+      '♟️ Standard': 'chess', 
+      '🏠 Crazyhouse': 'crazyhouse', 
+      '⛰️ King of the Hill': 'kingofthehill', 
+      '️Three-Check': '3check', 
+      'Antichess': 'antichess', 
+      'Horde': 'horde',
+      '🏇 Racing Kings': 'racingkings'}),
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
@@ -52,9 +76,6 @@ export const store = new Vuex.Store({
   mutations: { // sync
     fen (state, payload) {
       state.fen = payload
-    },
-    check (state, payload) {
-      state.check = payload
     },
     lastFen (state, payload) {
       state.lastFen = payload
@@ -158,14 +179,14 @@ export const store = new Vuex.Store({
       this.commit('lastFen', state.board.fen())
     },
     resetBoard (state, payload) {
-      state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
+      this.commit('newBoard', payload)
       state.moves = []
     },
     appendMoves (state, payload) {
       state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
         let sanMove = state.board.sanMove(curVal)
         state.board.push(curVal);
-        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
+        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false)};
       }))
       state.lastFen = state.board.fen()
     },
@@ -174,6 +195,9 @@ export const store = new Vuex.Store({
     }
   },
   actions: { // async
+    resetBoard (context, payload) {
+      context.commit('resetBoard', payload)
+    },
     initialize (context) {
       context.commit('newBoard', {
         fen: '',
@@ -213,9 +237,6 @@ export const store = new Vuex.Store({
       ws.send(`position~fen~${context.getters.fen}`)
       context.commit('sideToMove', context.getters.fen.split(' ')[1])
       console.log(`state.sideToMove: ${context.sideToMove}`)
-    },
-    check (context, payload) {
-      context.commit('check', payload)
     },
     fen (context, payload) {
       context.commit('fen', payload)
@@ -266,7 +287,7 @@ export const store = new Vuex.Store({
       context.commit('multipv', payload)
     },
     loadGame (context, payload) {
-      const variant = payload.game.headers("Variant").toLowerCase();
+      let variant = payload.game.headers("Variant").toLowerCase();
       const board = new ffish.Board(variant);
       let gameInfo = {}
       payload.game.headerKeys().split(" ").map(
@@ -276,6 +297,9 @@ export const store = new Vuex.Store({
 
       )
 
+      if ( variant == '') { //if no variant is given we assume it to be standard chess
+        variant = 'chess'
+      }
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
@@ -290,9 +314,6 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
-    check (state) {
-      return state.check
-    },
     board (state) {
       return state.board
     },
@@ -322,6 +343,9 @@ export const store = new Vuex.Store({
     },
     variant (state) {
       return state.variant
+    },
+    variantOptions (state) {
+      return state.variantOptions
     },
     engineBinary (state) {
       return state.engineBinary
