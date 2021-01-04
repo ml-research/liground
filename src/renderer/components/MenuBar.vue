@@ -33,8 +33,14 @@ export default {
             if (err) {
               return console.log(err);
             }
+            let game
+            try {
+              game = ffish.readGamePGN(data)
+            } catch (error) {
+              alert('Could not parse PGN.')
+              return
+            }
             
-            let game = ffish.readGamePGN(data)
             this.$store.dispatch('loadGame', {game: game})    
           })
         }
