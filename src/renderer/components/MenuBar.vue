@@ -35,7 +35,12 @@ export default {
             }
             
             let game = ffish.readGamePGN(data)
-            this.$store.dispatch('loadGame', {game: game})    
+            //if no variant is given we assume it to be standard chess, this will be managed in the store, if the given variant is not yet supported we alert the user
+            if(this.$store.getters.variantOptions.revGet(game.headers("Variant").toLowerCase()) || game.headers("Variant").toLowerCase() == ''){
+              this.$store.dispatch('loadGame', {game: game})    
+            } else {
+              alert('This variant is currently not supported.')
+            }
           })
         }
       }).catch(err => {

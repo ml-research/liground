@@ -3,8 +3,8 @@
     <div class='grid-parent'>
       <div class='pockets'>
         <div v-if="variant==='crazyhouse'" v-bind:class='{ black : $store.getters.orientation == "black"}'>
-          <ChessPocket id='chesspocket_top' color='black' :pieces='piecesB' @selection='dropPiece'/>
-          <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
+          <ChessPocket id='chesspocket_top' color='black' :pieces='piecesB' @selection='dropPiece' v-bind:class='{ black : $store.getters.orientation == "white" }'/>
+          <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece' v-bind:class='{ black : $store.getters.orientation == "black" }' />
         </div>
       </div>
       <div :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
