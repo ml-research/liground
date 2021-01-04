@@ -163,7 +163,7 @@ export const store = new Vuex.Store({
       state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
         let sanMove = state.board.sanMove(curVal)
         state.board.push(curVal);
-        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
+        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false)};
       }))
       state.lastFen = state.board.fen()
     }

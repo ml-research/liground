@@ -91,7 +91,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'check'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'check', 'moves'])
   },
   watch: {
     initialized () {
@@ -237,8 +237,20 @@ export default {
       // Crazyhouse pocket pieces
       this.resetPockets(this.piecesW)
       this.resetPockets(this.piecesB)
-      this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
-      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) 
+      if(this.fen == this.lastFen){
+        this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
+        this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) 
+      } else {
+        let i = 0;
+        for( let num = 0; num < this.moves.length; num++) { // i will have the index of the currently displayed move
+          if(this.moves[num].fen == this.fen){ 
+            i = num
+            break
+          }
+        }
+        this.updatePocket(this.piecesW, this.moves[i].whitePocket, WHITE) //load the pocketpieces from the currently displayed move
+        this.updatePocket(this.piecesB, this.moves[i].blackPocket, BLACK) 
+      }
     },
     afterMove () {
       const events = {}
