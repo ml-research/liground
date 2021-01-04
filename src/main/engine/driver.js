@@ -16,10 +16,15 @@ function waitFor (emitter, event) {
  */
 export default class EngineDriver {
   /**
-   * Create a new EngineDriver for a running child process.
-   * @param {import('child_process').ChildProcess} child Engine child process
+   * Create a new EngineDriver for two existing input & output streams.
+   * @param {NodeJS.WritableStream} input Writable engine input stream
+   * @param {NodeJS.ReadableStream} output Readable engine output stream
+   * @example <caption>Creating new EngineDriver for a child process.</caption>
+   * const child = spawn('./engine', [])
+   * const engine = new EngineDriver(child.stdin, child.stdout)
+   * engine.initialize().then(() => console.log('Engine online!'))
    */
-  constructor (child) {
+  constructor (input, output) {
     this.events = new EventEmitter()
     this.ready = false
     this.pendingReady = false
@@ -28,10 +33,10 @@ export default class EngineDriver {
       author: 'Unknown',
       options: []
     }
-    this.process = child
+    this.input = input
     this.rl = readline.createInterface({
-      input: child.stdout,
-      output: child.stdin
+      input: output,
+      output: input
     })
 
     // update state on ready
@@ -51,7 +56,7 @@ export default class EngineDriver {
   _write (cmd) {
     const input = `${cmd}\n`
     this.events.emit('input', input)
-    this.process.stdin.write(input)
+    this.input.write(input)
   }
 
   /**

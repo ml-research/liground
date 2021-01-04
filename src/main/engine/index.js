@@ -18,7 +18,7 @@ ipcMain.on('run', async event => {
   // success
   if (typeof child.pid === 'number') {
     // create engine
-    engine = new EngineDriver(child)
+    engine = new EngineDriver(child.stdin, child.stdout)
     engine.events.on('input', line => event.reply('engine-input', line))
     engine.events.on('line', line => event.reply('engine-output', line))
 
