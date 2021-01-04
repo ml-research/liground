@@ -14,6 +14,7 @@
     <i slot="extra" class="icon mdi mdi-check"></i>
     960 Mode
 </PrettyCheck>
+<input type='button' value='Reset' class='reset' @click='resetBoard'>
 </div>
 </template>
 
@@ -31,13 +32,18 @@ export default {
   },
   data () {
     return {
-      selected: '♟️ Standard',
+      selected: '♟️ Standard'
     }
   },
   methods: {
     updateVariant(payload) {
       this.$store.dispatch('started', false) //from the previously used method, not sure why this was here, it seemed to work without this line
       this.$store.dispatch('variant', this.variantOptions.get(payload))
+    },
+    resetBoard() {
+      if(confirm('Do you really want to reset the board?')){
+        this.$store.dispatch('resetBoard', false) //TODO when implementing 960 Mode false should probably be changed to some other value and changes to the store method will be necessary 
+      }
     }
   },
   computed: {
@@ -45,21 +51,29 @@ export default {
       let varop = Object.keys(this.$store.getters.variantOptions.getAll()) //returns all keys in variantOptions, those are then listed in the dropdown menu
       return varop
     },
-    displayVariant() { //retuns the "nice" name of the current variant
-        return this.variantOptions.revGet(this.variant)
-    },
     active () {
       return this.$store.getters.active
     },
     ...mapState(['variant']),
     variantOptions () {
       return this.$store.getters.variantOptions
+    },
+    displayVariant() { //retuns the "nice" name of the current variant
+      return this.variantOptions.revGet(this.variant)
     }
   }
 }
 </script>
 
 <style scoped>
+.reset {
+  background-color:lightgray ;
+  border: black;
+  outline: none;
+}
+.reset:hover {
+  cursor:pointer;
+}
 .ceval {
   /* display: table */
   font-size: 15pt;
