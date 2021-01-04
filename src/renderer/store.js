@@ -20,8 +20,8 @@ export const store = new Vuex.Store({
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
-    idName: 'idName',
-    idAuthor: 'idAuthor',
+    idName: '',
+    idAuthor: '',
     orientation: 'white',
     multipv: [
       {
