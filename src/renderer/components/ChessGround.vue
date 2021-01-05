@@ -7,8 +7,8 @@
           <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
         </div>
       </div>
-      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings' , dim9x10: dimensionNumber === 3 }">
-        <div ref='board' class='cg-board-wrap' >
+      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings' , dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
+        <div ref='board' class='cg-board' >
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@ export default {
     },
     variant () {
       
-      if(this.board.state.geometry != this.$store.getters.dimensionNumber){
+      if(this.board.state.geometry != this.dimensionNumber){
         this.board = Chessground(this.$refs.board, {
       coordinates: false,
       fen: this.fen,
@@ -340,6 +340,7 @@ export default {
 <style>
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
+@import '../assets/dim9x9.css';
 
 .chess-pocket {
   float: left;
@@ -380,17 +381,12 @@ coords {
   padding: 0px 0px 0px 0px;
   color: black;
 }
-.cg-board-wrap {
-  border-radius: 4px 4px 4px 4px;
-}
-.cg-wrap {
-  width: 600px;
-  height: 600px;
-  position: relative;
-  display: table;
+cg-board {
+  background-image: url('/src/renderer/assets/images/board/blue.svg');
+
 }
 
-.koth cg-container::before {
+.koth cg-board::before {
   width: 25%;
   height: 25%;
   box-shadow: 0 0 10px rgba(0,0,0,0.7);
@@ -403,7 +399,7 @@ coords {
   pointer-events: none;
   border-radius: 0px 0px 0px 0px;
 }
-.rk cg-container::before{
+.rk cg-board::before{
     background: rgba(230,230,230,0.2);
     width: 100%;
     height: 12.5%;
@@ -415,24 +411,27 @@ coords {
     pointer-events: none;
     border-radius: 4px 4px 0px 0px;
 }
+/*
+  CSS for 9x10 board e.g. xiangqi/janggi etc. 
+*/
+.dim9x10 cg-board {
+    background-image: url('/src/renderer/assets/images/board/xiangqi.svg');
+
+}
 .dim9x10 .cg-wrap{
-  background-image: url('/src/renderer/assets/images/board/xiangqi.svg');
-  width: 600px;
-  height: 666px;
+  width: 540px;
+  height: 600px;
 }
 .dim9x10 cg-helper {
   position: absolute;
   width: 11.11%;
   height: 10%;
-  padding-bottom: 10%;
-
   bottom: 0;
 }
 .dim9x10 cg-container {
   position: absolute;
   width: 900%;
   height: 1000%;
-  display: table; /* hack: round to full pixel size in chrome */
   bottom: 0;
 }
 .dim9x10 .cg-wrap piece {
