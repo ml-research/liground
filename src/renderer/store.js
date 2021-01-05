@@ -70,7 +70,9 @@ export const store = new Vuex.Store({
     counter: 0,
     pieceStyle: 'merida',
     board: null,
-    gameInfo: {}
+    gameInfo: {},
+    loadedGames: [],
+    selectedGame: null
   },
   mutations: { // sync
     fen (state, payload) {
@@ -194,6 +196,12 @@ export const store = new Vuex.Store({
     },
     gameInfo (state, payload) {
       state.gameInfo = payload
+    },
+    loadedGames (state, payload) {
+      state.loadedGames = payload
+    },
+    selectedGame (state, payload) {
+      state.selectedGame = payload
     }
   },
   actions: { // async
@@ -289,20 +297,32 @@ export const store = new Vuex.Store({
     multipv (context, payload) {
       context.commit('multipv', payload)
     },
+    loadedGames (context, payload) {
+      context.commit('loadedGames', payload)
+    },
+
     loadGame (context, payload) {
-      let variant = payload.game.headers("Variant").toLowerCase();
+      let variant = payload.game.headers("Variant").toLowerCase()
+      
+      if ( variant == '') { //if no variant is given we assume it to be standard chess
+        variant = 'chess'
+      } 
+      
+      if(!context.getters.variantOptions.revGet(variant)) {
+        alert('This variant is currently not supported.')
+        return
+      }
+
       const board = new ffish.Board(variant);
       let gameInfo = {}
       payload.game.headerKeys().split(" ").map(
         (curVal, idx, arr) => {
           gameInfo[curVal] = payload.game.headers(curVal)
         }
-
       )
-
-      if ( variant == '') { //if no variant is given we assume it to be standard chess
-        variant = 'chess'
-      }
+      
+      
+      context.commit('selectedGame', payload.game)
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
@@ -452,6 +472,12 @@ export const store = new Vuex.Store({
     },
     gameInfo (state) {
       return state.gameInfo
+    },
+    loadedGames (state) {
+      return state.loadedGames
+    },
+    selectedGame (state) {
+      return state.selectedGame
     },
 
     // TODO: integrate getters into store state?

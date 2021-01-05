@@ -20,6 +20,8 @@ export default {
   },
   methods: {
     openPgn () {
+      let regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
+      let games = []
       this.$electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
         properties: ['openFile'], 
@@ -33,20 +35,35 @@ export default {
             if (err) {
               return console.log(err);
             }
-            let game
-            try {
-              game = ffish.readGamePGN(data)
-            } catch (error) {
-              alert('Could not parse PGN.')
-              return
+
+            let m
+            while ((m = regex.exec(data)) !== null) {
+              if (m.index === regex.lastIndex) {
+                  regex.lastIndex++;
+              }
+              
+              m.forEach((match, groupIndex) => {
+                let game
+                try {
+                  game = ffish.readGamePGN(match)
+                } catch (error) {
+                  alert('Could not parse PGN.')
+                  return
+                }
+                games.push(game)
+
+              });
             }
             
-            //if no variant is given we assume it to be standard chess, this will be managed in the store, if the given variant is not yet supported we alert the user
-            if(this.$store.getters.variantOptions.revGet(game.headers("Variant").toLowerCase()) || game.headers("Variant").toLowerCase() == ''){
-              this.$store.dispatch('loadGame', {game: game})   
-            } else {
-              alert('This variant is currently not supported.')
+            games = games.map((curVal, idx, arr) => {
+              curVal.id = idx
+              return curVal
+            })
+            this.$store.dispatch('loadedGames', games)
+            if(games[0]){
+              this.$store.dispatch('loadGame', {game: games[0]})
             }
+                
           })
         }
       }).catch(err => {
