@@ -14,6 +14,7 @@
       </div>
     </div>
     <JumpButtons v-on:flip-board="$emit('flip-board', 0)" v-on:move-to-start="$emit('move-to-start',0)" v-on:move-back-one="$emit('move-back-one',0)" v-on:move-forward-one="$emit('move-forward-one',0)" v-on:move-to-end="$emit('move-to-end',0)"/>
+    <game-info id="gameinfo"/>
      <div class='console-log' id='textarea'>
        <p v-for='line in stdIO' :key='line.type'>{{line}}</p>
      </div>
@@ -27,11 +28,12 @@ import AnalysisEvalRow from './AnalysisEvalRow'
 import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
+import GameInfo from './GameInfo.vue'
 
 export default {
   name: 'AnalysisView',
   components: {
-    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines
+    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo
   },
   methods: {
     updateBoard (move) {
@@ -209,6 +211,12 @@ p {
   100% {
       background-position: 100000px 0;
   }
+}
+#gameinfo {
+  height: auto;
+  margin: 1em 0em;
+  border: 1px solid black;
+  border-radius: 5px;
 }
 
 </style>
