@@ -34,11 +34,11 @@ export const store = new Vuex.Store({
     variant: 'chess',
     variantOptions: new TwoWayMap({ //all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
       '♟️ Standard': '',
-      '♟️ Standard': 'chess', 
-      '🏠 Crazyhouse': 'crazyhouse', 
-      '⛰️ King of the Hill': 'kingofthehill', 
-      '️Three-Check': '3check', 
-      'Antichess': 'antichess', 
+      '♟️ Standard': 'chess',
+      '🏠 Crazyhouse': 'crazyhouse',
+      '⛰️ King of the Hill': 'kingofthehill',
+      '️Three-Check': '3check',
+      'Antichess': 'antichess',
       'Horde': 'horde',
       '🏇 Racing Kings': 'racingkings'}),
     engineBinary: 'stockfish',
@@ -198,6 +198,7 @@ export const store = new Vuex.Store({
   },
   actions: { // async
     resetBoard (context, payload) {
+      context.commit('resetMultiPV')
       context.commit('resetBoard', payload)
     },
     initialize (context) {

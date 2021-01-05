@@ -124,7 +124,7 @@ export default {
       if (this.$store.getters.started) {
         let lineWidth = 10
         for (let idx = 0; idx < multipv.length; ++idx) {
-          if ('ucimove' in multipv[idx]) {
+          if ('ucimove' in multipv[idx] && multipv[idx].ucimove.length > 0) {
             const move = multipv[idx].ucimove
             const orig = move.substring(0, 2)
             const dest = move.substring(2, 4)
