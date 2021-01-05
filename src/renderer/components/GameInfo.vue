@@ -6,7 +6,7 @@
       <player-info :name="blackName" :elo="blackElo" :playerTitle="blackTitle" :isWhite="false" class="player" style="text-align: right"/>
     </div>
     <div id="metainfo">
-      <p>Event: {{ eventName ? eventName : 'unknown'}} <span v-if="eventSite"> (@ {{ eventSite }})</span> <span v-if="round">round {{ round }} </span> <span v-if="date">on {{ date }}</span></p>
+      <p>Event: {{ eventName ? eventName : 'unknown'}} <span v-if="eventSite"> (@ {{ eventSite }})</span> <span v-if="round && /\d+/gm.test(round)">round {{ round }} </span> <span v-if="date">on {{ date }}</span></p>
       <p>Result: {{ result ? result : 'unknown' }}</p>
       <p>Annotator: {{ annotator ? annotator : 'unknown' }}</p>
     </div>

@@ -43,13 +43,18 @@ export default {
               }
               
               m.forEach((match, groupIndex) => {
-                  console.log(`Found match, group ${groupIndex}: ${match}`);
-                  games.push(ffish.readGamePGN(match))
+                let game
+                try {
+                  game = ffish.readGamePGN(match)
+                } catch (error) {
+                  alert('Could not parse PGN.')
+                  return
+                }
+                games.push(game)
 
               });
             }
             
-            //console.log(data)
             games = games.map((curVal, idx, arr) => {
               curVal.id = idx
               return curVal
