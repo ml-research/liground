@@ -47,6 +47,7 @@ export default {
       },
       board: null,
       shapes: [],
+      pieceShapes: [],
       promotions: [],
       promoteTo: 'q'
     }
@@ -118,6 +119,7 @@ export default {
     bestmove () {
       const multipv = this.multipv
       const shapes = []
+      const pieceShapes = []
 
       if (this.$store.getters.started) {
         let lineWidth = 10
@@ -131,7 +133,7 @@ export default {
             if (move.indexOf('@') !== -1) {
               const pieceType = move[0].toLowerCase()
               const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
-              shapes.unshift({
+              pieceShapes.unshift({
                 orig: dest,
                 dest: dest,
                 brush: 'blue',
@@ -155,6 +157,7 @@ export default {
           }
         }
       }
+      this.pieceShapes = pieceShapes
       this.shapes = shapes
       this.drawShapes()
     },
@@ -313,7 +316,7 @@ export default {
     },
     drawShapes () {
       if (this.board !== null) {
-        this.board.setShapes(this.shapes)
+        this.board.setShapes([...this.shapes, ...this.pieceShapes])
       }
     }
   },
