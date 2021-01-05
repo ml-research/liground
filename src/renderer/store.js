@@ -302,7 +302,17 @@ export const store = new Vuex.Store({
     },
 
     loadGame (context, payload) {
-      let variant = payload.game.headers("Variant").toLowerCase();
+      let variant = payload.game.headers("Variant").toLowerCase()
+      
+      if ( variant == '') { //if no variant is given we assume it to be standard chess
+        variant = 'chess'
+      } 
+      
+      if(!context.getters.variantOptions.revGet(variant)) {
+        alert('This variant is currently not supported.')
+        return
+      }
+
       const board = new ffish.Board(variant);
       let gameInfo = {}
       payload.game.headerKeys().split(" ").map(
@@ -311,12 +321,7 @@ export const store = new Vuex.Store({
         }
       )
       
-      if ( variant == '' || context.variantOptions.revGet(variant)) { //if no variant is given we assume it to be standard chess
-        variant = 'chess'
-      } else {
-        alert('This variant is currently not supported.')
-        return
-      }
+      
       context.commit('selectedGame', payload.game)
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
