@@ -226,7 +226,7 @@ input {
 }
 .chessboard-grid {
   display: grid;
-  grid-template-columns: 25% auto auto;
+  grid-template-columns: 20% auto auto;
 }
 #pgnbrowser {
   min-width: 8em;
