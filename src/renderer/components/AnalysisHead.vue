@@ -9,17 +9,21 @@
 </div>
 
 <i class="logo icon mdi mdi-feature-search-outline"/>LiGround
-<multiselect class="multiselect" v-model="selected" :options="variants" :allow-empty="false" :show-labels="false" :placeholder="selected"></multiselect>
+<multiselect class="multiselect" :value="displayVariant" :options="options" :allow-empty="false" :placeholder="selected" :show-labels="false" @input="updateVariant"></multiselect>
    <PrettyCheck class="p-icon p-curve p-smooth" color="primary-o">
     <i slot="extra" class="icon mdi mdi-check"></i>
     960 Mode
 </PrettyCheck>
+<input type='button' value='Reset' class='reset' @click='resetBoard'>
 </div>
 </template>
 
 <script>
 import PrettyCheck from 'pretty-checkbox-vue/check'
 import Multiselect from 'vue-multiselect'
+import Vuex from 'vuex'
+
+const { mapActions, mapState } = Vuex
 
 export default {
   name: 'AnalysisView',
@@ -28,36 +32,48 @@ export default {
   },
   data () {
     return {
-      variants: [
-        '♟️ Standard', '🏠 Crazyhouse', '⛰️ King of the Hill', '️Three-Check', 'Antichess', 'Horde', '🏇 Racing Kings'
-      ],
       selected: '♟️ Standard'
     }
   },
   methods: {
-    methodToRunOnSelect (payload) {
-      console.log(payload)
-    }
-  },
-  watch: {
-    selected: function () {
-      const variants = {'♟️ Standard': 'chess', '🏠 Crazyhouse': 'crazyhouse', '⛰️ King of the Hill': 'kingofthehill', '️Three-Check': '3check', 'Antichess': 'antichess', 'Horde': 'horde', '🏇 Racing Kings': 'racingkings'}
-      console.log(`selected. ${variants[this.selected]}`)
-      this.$store.dispatch('variant', variants[this.selected])
-      this.$store.dispatch('started', false)
-      // there is no 'selected' action
-      //this.$store.dispatch('selected', false)
+    updateVariant(payload) {
+      this.$store.dispatch('started', false) //from the previously used method, not sure why this was here, it seemed to work without this line
+      this.$store.dispatch('variant', this.variantOptions.get(payload))
+    },
+    resetBoard() {
+      if(confirm('Do you really want to reset the board?')){
+        this.$store.dispatch('resetBoard', false) //TODO when implementing 960 Mode false should probably be changed to some other value and changes to the store method will be necessary 
+      }
     }
   },
   computed: {
+    options(){
+      let varop = Object.keys(this.$store.getters.variantOptions.getAll()) //returns all keys in variantOptions, those are then listed in the dropdown menu
+      return varop
+    },
     active () {
       return this.$store.getters.active
+    },
+    ...mapState(['variant']),
+    variantOptions () {
+      return this.$store.getters.variantOptions
+    },
+    displayVariant() { //retuns the "nice" name of the current variant
+      return this.variantOptions.revGet(this.variant)
     }
   }
 }
 </script>
 
 <style scoped>
+.reset {
+  background-color:lightgray ;
+  border: black;
+  outline: none;
+}
+.reset:hover {
+  cursor:pointer;
+}
 .ceval {
   /* display: table */
   font-size: 15pt;

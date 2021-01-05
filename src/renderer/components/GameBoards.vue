@@ -1,16 +1,20 @@
 <template>
   <div id="inner">
     <div>
-      <div class='grid-parent'>
+      <div class='main-grid'>
+        
         <div>
-          <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
-          <EvalBar class="float-right-child" id="evalbar"/>
+          <div class="chessboard-grid">
+            <pgn-browser id="pgnbrowser"/>
+            <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
+            <EvalBar id="evalbar" />
+          </div>
           <br/>
           <div id="fen-field">FEN <input type="text" id="lname" name="lname" placeholder="fen position" v-on:change="checkValidFEN" :value="fen" size="60"></div>
           <PieceStyleSelector id="piece-style"/>
           <EvalPlot/>
         </div>
-        <AnalysisView id="analysisview" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
+        <AnalysisView id="analysisview" v-on:move-to-start="moveToStart" v-on:move-to-end="moveToEnd" v-on:move-back-one="moveBackOne" v-on:move-forward-one="moveForwardOne" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
       </div>
     </div>
   </div>
@@ -24,6 +28,8 @@ import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
+import PgnBrowser from './PgnBrowser.vue'
+import GameInfo from './GameInfo.vue'
 
 let ffish = null
 
@@ -34,7 +40,9 @@ export default {
     EvalBar,
     ChessGround,
     PieceStyleSelector,
-    EvalPlot
+    EvalPlot,
+    PgnBrowser,
+    GameInfo
   },
   beforeCreate () {
     console.log(`beforeCreate()`)
@@ -48,27 +56,87 @@ export default {
   data () {
     return {
       positionInfo: '',
-      orientation: 'white',
       game: null,
       resetAnalysis: false,
-      moves: []
     }
   },
   computed: {
     variant () {
-      return this.$store.state.variant
+      return this.$store.getters.variant
+    },
+    orientation () {
+      return this.$store.getters.orientation
+    },
+    moves () {
+      return this.$store.getters.moves
     },
     fen () {
-      return this.$store.state.fen
+      return this.$store.getters.fen
+    },
+    currentMove () {//this returns the current half-move or -1 at the start of the game
+      let fen = this.$store.getters.fen
+      for ( const move of this.moves) {
+        if(move.fen == fen) {
+          return move.ply-1
+        }
+      }
+      return -1;
     }
   },
   methods: {
+    moveToStart () { //this method returns to the starting point of the current line
+      let board = new ffish.Board(this.variant)
+      let startFen = board.fen()
+      this.$store.dispatch('fen', startFen)
+      console.log('moveToStart')
+    },
+    moveToEnd () {//this method moves to the last move of the current line
+      console.log('moveToEnd')
+      if(this.currentMove >= this.moves.length-1){
+        return
+      }
+      this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
+    },
+    moveBackOne () {//this method moves back one move in the current line
+      console.log('moveBackone')
+      let num = this.currentMove
+      if (num == -1) {
+        return
+      }
+      if (num == 0){
+        let board = new ffish.Board(this.variant)
+        let startFen = board.fen()
+        this.$store.dispatch('fen', startFen)
+        return
+      }
+      this.$store.dispatch('fen', this.moves[num-1].fen)
+    },
+    moveForwardOne () {//this method moves forward one move in the current line
+      console.log('moveForwardOne')
+      let num = this.currentMove
+      if (num >= this.moves.length-1 ){
+        return
+      }
+      if (num == -1) {
+        this.$store.dispatch('fen', this.moves[0].fen)
+        return
+      }
+      if(num == 0) {
+        this.$store.dispatch('fen', this.moves[1].fen)
+        return
+      }
+      this.$store.dispatch('fen', this.moves[num+1].fen)
+
+    },
     flipBoard () {
       if (this.orientation === 'white') {
-        this.orientation = 'black'
+        console.log('orientation change to black')
+        this.$store.dispatch('orientation', 'black')
+        console.log('orientation in store: ' + this.orientation)
       } else {
-        this.orientation = 'white'
+        this.$store.dispatch('orientation', 'white')
       }
+      console.log('flipBoard currentMove: ' + this.currentMove)
     },
     selectPocketPiece (piece) {
       this.$store.commit('selectPocketPiece', ['boardA', piece.type])
@@ -110,13 +178,30 @@ export default {
     },
     checkValidFEN (event) {
       if (ffish.validateFen(event.target.value, this.variant) === 1) {
-        this.$store.dispatch('fen', event.target.value) 
+        this.$store.dispatch('fen', event.target.value)
       } else {
         console.log(`invalid fen: ${event.target.value}`)
       }
       this.resetAnalysis = !this.resetAnalysis
     },
     
+  }, 
+  mounted () {  //EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
+    window.addEventListener('keydown', (event) => {
+    const keyName = event.key
+    if (keyName == 'ArrowUp') {
+      this.moveToStart()
+    }
+    if (keyName == 'ArrowDown') {
+      this.moveToEnd()
+    }
+    if (keyName == 'ArrowLeft') {
+      this.moveBackOne()
+    }
+    if (keyName == 'ArrowRight'){  
+      this.moveForwardOne()
+    }
+    }, false)
   }
 }
 </script>
@@ -135,9 +220,19 @@ input {
   width: 300px;
   margin-left: 142px;
 }
-.grid-parent {
+.main-grid {
   display: grid;
-  grid-template-columns: auto auto auto auto
+  grid-template-columns: auto auto;
+}
+.chessboard-grid {
+  display: grid;
+  grid-template-columns: 20% auto auto;
+}
+#pgnbrowser {
+  min-width: 8em;
+  margin: 0em 1em;
+  border: 1px solid black;
+  border-radius: 4px;
 }
 #chessboard {
   display: inline-block;
@@ -156,8 +251,8 @@ input {
 }
 
 #evalbar {
-  margin-right: 20px;
-  margin-left: -20px;
+  margin: 0em 1em;
+  float: center;
 }
 
 </style>

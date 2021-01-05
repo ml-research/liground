@@ -20,6 +20,8 @@ export default {
   },
   methods: {
     openPgn () {
+      let regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
+      let games = []
       this.$electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
         properties: ['openFile'], 
@@ -33,9 +35,35 @@ export default {
             if (err) {
               return console.log(err);
             }
+
+            let m
+            while ((m = regex.exec(data)) !== null) {
+              if (m.index === regex.lastIndex) {
+                  regex.lastIndex++;
+              }
+              
+              m.forEach((match, groupIndex) => {
+                let game
+                try {
+                  game = ffish.readGamePGN(match)
+                } catch (error) {
+                  alert('Could not parse PGN.')
+                  return
+                }
+                games.push(game)
+
+              });
+            }
             
-            let game = ffish.readGamePGN(data)
-            this.$store.dispatch('loadGame', {game: game})    
+            games = games.map((curVal, idx, arr) => {
+              curVal.id = idx
+              return curVal
+            })
+            this.$store.dispatch('loadedGames', games)
+            if(games[0]){
+              this.$store.dispatch('loadGame', {game: games[0]})
+            }
+                
           })
         }
       }).catch(err => {
