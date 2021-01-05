@@ -1,13 +1,13 @@
 <template>
   <div id="inner">
     <div>
-      <div class='grid-parent'>
+      <div class='main-grid'>
         
         <div>
-          <div class="grid-parent">
+          <div class="chessboard-grid">
             <pgn-browser id="pgnbrowser"/>
             <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
-            <EvalBar id="evalbar"/>
+            <EvalBar id="evalbar" />
           </div>
           <br/>
           <div id="fen-field">FEN <input type="text" id="lname" name="lname" placeholder="fen position" v-on:change="checkValidFEN" :value="fen" size="60"></div>
@@ -220,9 +220,13 @@ input {
   width: 300px;
   margin-left: 142px;
 }
-.grid-parent {
+.main-grid {
   display: grid;
-  grid-template-columns: auto auto auto auto
+  grid-template-columns: auto auto;
+}
+.chessboard-grid {
+  display: grid;
+  grid-template-columns: 25% auto auto;
 }
 #pgnbrowser {
   min-width: 8em;
@@ -248,6 +252,7 @@ input {
 
 #evalbar {
   margin: 0em 1em;
+  float: center;
 }
 
 </style>
