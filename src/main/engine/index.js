@@ -12,6 +12,11 @@ let binary = Engines.stockfish
 ipcMain.on('run', async event => {
   event.reply('debug', 'Running engine')
 
+  // kill old engine
+  if (engine) {
+    await engine.quit()
+  }
+
   // spawn engine process
   const child = spawn(binary, []).on('error', err => event.reply('error', err))
 

@@ -122,7 +122,7 @@ export default class EngineDriver {
   }
 
   /**
-   * Initialize the UCI communication with the engine process.
+   * Initialize the UCI communication with the engine.
    */
   async initialize () {
     // add listeners
@@ -168,11 +168,10 @@ export default class EngineDriver {
   }
 
   /**
-   * Tell the engine process to quit.
+   * Tell the engine to quit.
    */
   async quit () {
     await this.waitForReady()
     this._write('quit')
-    await waitFor(this.process, 'close')
   }
 }
