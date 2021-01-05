@@ -69,8 +69,8 @@ export default {
       const g = this.$store.getters
       return {
         data: [
-          ['Depth', 'node/s', 'Nodes', 'Time', 'Ponder', 'Hash', 'TB'],
-          [g.depth + '/' + g.seldepth, this.parse(g.nps) + 'nps', this.parse(g.nodes), this.parseTime(g.time), '-', g.hashfull, this.parse(g.tbhits)]
+          ['Depth', 'node/s', 'Nodes', 'Time', 'Hash', 'TB'],
+          [g.depth + '/' + g.seldepth, this.parse(g.nps) + 'nps', this.parse(g.nodes), this.parseTime(g.time), g.hashfull, this.parse(g.tbhits)]
         ],
         header: 'row',
         border: true,
