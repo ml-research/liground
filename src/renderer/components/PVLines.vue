@@ -6,10 +6,9 @@
           v-for="(line, id) in lines"
           :key="id"
           class="item"
-          :class="{ clickable: canMove }"
-          @mouseenter="canMove ? onMouseEnter(id) : null"
-          @mouseleave="canMove ? onMouseLeave(id) : null"
-          @click="canMove ? onClick(line) : null"
+          @mouseenter="onMouseEnter(id)"
+          @mouseleave="onMouseLeave(id)"
+          @click="onClick(line)"
         >
           <span class="left">{{ line.cpDisplay }}</span>
           <span class="right">{{ line.pv }}</span>
@@ -26,14 +25,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 export default {
-  data () {
-    return {
-      canMove: true
-    }
-  },
   computed: {
     lines () {
       return this.$store.getters.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
@@ -48,15 +40,6 @@ export default {
         details.push(idAuthor)
       }
       return details.join(' ')
-    },
-    ...mapGetters(['turn'])
-  },
-  watch: {
-    turn () {
-      this.canMove = false
-    },
-    lines () {
-      this.canMove = true
     }
   },
   methods: {
@@ -84,22 +67,20 @@ export default {
   overflow-x: scroll;
 }
 .list {
+  min-width: 100%;
   display: table;
 }
 .item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  cursor: default;
+  cursor: pointer;
+}
+.item:hover {
+  background-color: #d3e1eb;
 }
 .item + .item {
   border-top: 1px solid #333;
-}
-.item.clickable {
-  cursor: pointer;
-}
-.item.clickable:hover {
-  background-color: #d3e1eb;
 }
 .item .left {
   padding: 5px;
