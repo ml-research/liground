@@ -24,6 +24,7 @@ import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
+import GameInfo from './GameInfo.vue'
 
 let ffish = null
 
@@ -34,7 +35,8 @@ export default {
     EvalBar,
     ChessGround,
     PieceStyleSelector,
-    EvalPlot
+    EvalPlot,
+    GameInfo
   },
   beforeCreate () {
     console.log(`beforeCreate()`)
