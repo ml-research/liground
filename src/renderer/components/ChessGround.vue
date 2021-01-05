@@ -7,8 +7,8 @@
           <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece'/>
         </div>
       </div>
-      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings' , dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
-        <div ref='board' class='cg-board' >
+      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
+        <div ref='board' class='cg-board-wrap' >
         </div>
       </div>
     </div>
@@ -174,14 +174,13 @@ export default {
       geometry: this.$store.getters.dimensionNumber
 
     })
-    this.board.redrawAll()
-      }
-
-      this.board.set({
-        variant: this.variant,
-        lastMove: false,
-      })
+    }
+    this.board.set({
+      variant: this.variant,
+      lastMove: false,
+    })
       this.updateBoard()
+      document.body.dispatchEvent(new Event('chessground.resize'))
     }
   },
   methods: {
@@ -341,6 +340,7 @@ export default {
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
 @import '../assets/dim9x9.css';
+@import '../assets/dim8x8.css';
 
 .chess-pocket {
   float: left;
@@ -381,7 +381,7 @@ coords {
   padding: 0px 0px 0px 0px;
   color: black;
 }
-cg-board {
+.cg-board-wrap {
   background-image: url('/src/renderer/assets/images/board/blue.svg');
 
 }
@@ -414,7 +414,7 @@ cg-board {
 /*
   CSS for 9x10 board e.g. xiangqi/janggi etc. 
 */
-.dim9x10 cg-board {
+.dim9x10 .cg-board-wrap {
     background-image: url('/src/renderer/assets/images/board/xiangqi.svg');
 
 }

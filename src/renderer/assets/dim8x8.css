@@ -1,0 +1,31 @@
+/*
+*   CSS for Chessground with  8x8 board dimension
+*/
+
+
+.dim8x8 .cg-wrap {
+    width: 600px;
+    height: 600px;
+}
+
+.dim8x8 .cg-board-wrap {
+    background-image: url('/src/renderer/assets/images/board/blue.svg');
+}
+
+.dim8x8 cg-helper {
+    width: 12.5%;
+    height: 12.5%;
+}
+
+.dim8x8 cg-container {
+    width: 800%;
+    height: 800%;
+}
+.dim8x8 .cg-wrap piece {
+    width: 12.5%;
+    height: 12.5%; 
+}
+.dim8x8 cg-board square {
+    width: 12.5%;
+    height: 12.5%;
+}

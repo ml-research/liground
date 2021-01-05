@@ -7,13 +7,13 @@
     height: 600px;
 }
 
-.dim9x9 cg-board {
+.dim9x9 .cg-board-wrap {
     background-image: url('/src/renderer/assets/images/board/shogi.svg');
 }
 
 .dim9x9 cg-helper {
-    width: 11.11%;
-    height: 11.11%;
+    width: calc( 100% / 9);
+    height: calc( 100% / 9);
 }
 
 .dim9x9 cg-container {
@@ -21,10 +21,10 @@
     height: 900%;
 }
 .dim9x9 .cg-wrap piece {
-    width: 11.11%;
-    height: 11.11%; 
+    width: calc( 100% / 9);
+    height: calc( 100% / 9); 
 }
 .dim9x9 cg-board square {
-    width: 11.11%;
-    height: 11.11%;
+    width: calc( 100% / 9);
+    height: calc( 100% / 9);
 }
