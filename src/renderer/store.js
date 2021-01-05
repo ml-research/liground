@@ -34,18 +34,18 @@ export const store = new Vuex.Store({
     variant: 'chess',
     variantOptions: new TwoWayMap({ //all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
       '♟️ Standard': '',
-      '♟️ Standard': 'chess', 
-      '🏠 Crazyhouse': 'crazyhouse', 
-      '⛰️ King of the Hill': 'kingofthehill', 
-      '️Three-Check': '3check', 
-      'Antichess': 'antichess', 
+      '♟️ Standard': 'chess',
+      '🏠 Crazyhouse': 'crazyhouse',
+      '⛰️ King of the Hill': 'kingofthehill',
+      '️Three-Check': '3check',
+      'Antichess': 'antichess',
       'Horde': 'horde',
       '🏇 Racing Kings': 'racingkings'}),
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
-    idName: 'idName',
-    idAuthor: 'idAuthor',
+    idName: '',
+    idAuthor: '',
     orientation: 'white',
     multipv: [
       {
@@ -60,13 +60,12 @@ export const store = new Vuex.Store({
         pv: '',
         ucimove: ''
       },
-      {
-        pv: ''
-      },
+      {},
       {},
       {},
       {}
     ],
+    hoveredpv: -1,
     sideToMove: 'w',
     counter: 0,
     pieceStyle: 'merida',
@@ -136,6 +135,9 @@ export const store = new Vuex.Store({
         }
       }
     },
+    hoveredpv (state, payload) {
+      state.hoveredpv = payload
+    },
     increment (state, payload) {
       state.counter += payload
     },
@@ -204,6 +206,7 @@ export const store = new Vuex.Store({
   },
   actions: { // async
     resetBoard (context, payload) {
+      context.commit('resetMultiPV')
       context.commit('resetBoard', payload)
     },
     initialize (context) {
@@ -376,6 +379,9 @@ export const store = new Vuex.Store({
     },
     multipv (state) {
       return state.multipv
+    },
+    hoveredpv (state) {
+      return state.hoveredpv
     },
     bestmove (state) {
       return [

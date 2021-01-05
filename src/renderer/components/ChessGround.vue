@@ -46,6 +46,8 @@ export default {
         q: 4
       },
       board: null,
+      shapes: [],
+      pieceShapes: [],
       promotions: [],
       promoteTo: 'q'
     }
@@ -87,7 +89,7 @@ export default {
   computed: {
     currentMove () { //returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
       for( let num = 0; num < this.moves.length; num++) {
-        if(this.moves[num].fen == this.fen){ 
+        if(this.moves[num].fen == this.fen){
           return this.moves[num]
         }
       }
@@ -99,7 +101,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
   },
   watch: {
     initialized () {
@@ -115,13 +117,14 @@ export default {
       this.updatePieceCSS(pieceStyle)
     },
     bestmove () {
-      const shapes = []
       const multipv = this.multipv
+      const shapes = []
+      const pieceShapes = []
 
       if (this.$store.getters.started) {
         let lineWidth = 10
         for (let idx = 0; idx < multipv.length; ++idx) {
-          if ('ucimove' in multipv[idx]) {
+          if ('ucimove' in multipv[idx] && multipv[idx].ucimove.length > 0) {
             const move = multipv[idx].ucimove
             const orig = move.substring(0, 2)
             const dest = move.substring(2, 4)
@@ -130,7 +133,7 @@ export default {
             if (move.indexOf('@') !== -1) {
               const pieceType = move[0].toLowerCase()
               const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
-              shapes.unshift({
+              pieceShapes.unshift({
                 orig: dest,
                 dest: dest,
                 brush: 'blue',
@@ -141,9 +144,12 @@ export default {
             } else {
               drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
             }
-            if (idx === 0) {
+
+            // adjust color if pv line is hovered
+            if (idx === this.hoveredpv) {
               drawShape.brush = 'yellow'
             }
+
             // put item in front of list, so that the bestmove is drawn last
             shapes.unshift(drawShape)
 
@@ -151,9 +157,16 @@ export default {
           }
         }
       }
-      if (this.board !== null) {
-        this.board.setShapes(shapes)
+      this.pieceShapes = pieceShapes
+      this.shapes = shapes
+      this.drawShapes()
+    },
+    hoveredpv () {
+      const index = this.shapes.length - this.hoveredpv - 1
+      for (const [i, shape] of this.shapes.entries()) {
+        shape.brush = i === index ? 'yellow' : 'blue'
       }
+      this.drawShapes()
     },
     variant () {
       this.board.set({
@@ -242,17 +255,17 @@ export default {
       this.resetPockets(this.piecesB)
       if(this.fen == this.lastFen){
       this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
-      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK) 
+      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK)
       } else {
         let i = 0;
         for( let num = 0; num < this.moves.length; num++) { // i will have the index of the currently displayed move
-          if(this.moves[num].fen == this.fen){ 
+          if(this.moves[num].fen == this.fen){
             i = num
             break
           }
         }
         this.updatePocket(this.piecesW, this.moves[i].whitePocket, WHITE) //load the pocketpieces from the currently displayed move
-        this.updatePocket(this.piecesB, this.moves[i].blackPocket, BLACK) 
+        this.updatePocket(this.piecesB, this.moves[i].blackPocket, BLACK)
       }
     },
     afterMove () {
@@ -262,7 +275,7 @@ export default {
       events.history = [this.lastMoveSan]
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
-      
+
     },
     updateBoard () {
       //logic to find out if a check should be displayed:
@@ -270,7 +283,7 @@ export default {
       if(this.currentMove != undefined && this.currentMove.name.includes('+')){ //the last move was check iff the san notation of the last move contained a '+'
         this.moves[this.moves.length-1].check = this.turn //the check property of the board accepts a color or a boolean
         isCheck = this.currentMove.check
-      } 
+      }
       //logic to find out which move was last and should thus be highlighted:
       if(this.currentMove == undefined || this.moves.length == 0) {
         this.board.state.lastMove = undefined
@@ -300,6 +313,11 @@ export default {
         if(this.variant === 'crazyhouse') {
           this.updateHand()
         }
+    },
+    drawShapes () {
+      if (this.board !== null) {
+        this.board.setShapes([...this.shapes, ...this.pieceShapes])
+      }
     }
   },
   mounted () {
