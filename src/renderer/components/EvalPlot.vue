@@ -32,7 +32,7 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: [10, 23, 102, -12, -24, +34, -200, -320]
+        data: []
       }]
     }
   }
