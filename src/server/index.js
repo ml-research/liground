@@ -231,7 +231,7 @@ class CLICreator {
       line = line.trim()
 
       if (line.startsWith('info ')) {
-        let re = /multipv (\\d+)/
+        let re = /multipv (\d+)/
         const match = re.exec(line)
         if (match) {
           this.curPVLines = Math.max(match[1], this.curPVLines)
