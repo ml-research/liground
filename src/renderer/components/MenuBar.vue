@@ -8,10 +8,11 @@
         slot="extra"
         class="icon mdi mdi-checkerboard"
       /> Open PGN</a>
-      <a href="#"><em
+      <a
+        @click="goToEngines"><em
         slot="extra"
-        class="icon mdi mdi-robot"
-      /> Engines</a>
+        class="icon mdi mdi-hammer-screwdriver"
+      /> Engines </a> />
       <a href="#"><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
@@ -40,7 +41,10 @@ export default {
   components: {
   },
   methods: {
-    openExternalBrowser (event) {
+    goToEngines () {
+      this.$router.push('@/MenuEngines.vue')
+    },
+    openExternalBrowser () {
       const shell = require('electron').shell
       event.preventDefault()
       shell.openExternal('https://github.com/ml-research/liground')
