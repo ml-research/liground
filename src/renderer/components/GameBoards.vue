@@ -3,9 +3,9 @@
     <div>
       <div class="main-grid">
         <div>
-          <div 
-          class="chessboard-grid"
-          @mousewheel="scroll($event)"
+          <div
+            class="chessboard-grid"
+            @mousewheel="scroll($event)"
           >
             <pgn-browser id="pgnbrowser" />
             <ChessGround
@@ -173,7 +173,7 @@ export default {
       this.$store.dispatch('fen', this.moves[num + 1].fen)
     },
     flipBoard () {
-      if(this.variant === 'racingkings') {
+      if (this.variant === 'racingkings') {
         return
       }
       if (this.orientation === 'white') {
