@@ -4,22 +4,25 @@
       <a
         href="#"
         @click="openPgn"
-      ><i
+      ><em
         slot="extra"
         class="icon mdi mdi-checkerboard"
       /> Open PGN</a>
-      <a href="#"><i
+      <a href="#"><em
         slot="extra"
         class="icon mdi mdi-robot"
       /> Engines</a>
-      <a href="#"><i
+      <a href="#"><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
       /> Settings </a>
-      <a href="#"><i
+      <a
+        href="#"
+        @click="openExternalBrowser"
+      ><em
         slot="extra"
         class="icon mdi mdi-information-outline"
-      /> About <i
+      /> About <em
         slot="extra"
         class="icon mdi mdi-github"
       /></a>
@@ -37,6 +40,11 @@ export default {
   components: {
   },
   methods: {
+    openExternalBrowser (event) {
+      const shell = require('electron').shell
+      event.preventDefault()
+      shell.openExternal('https://github.com/ml-research/liground')
+    },
     openPgn () {
       const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
       let games = []
