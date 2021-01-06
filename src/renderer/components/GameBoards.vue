@@ -167,6 +167,9 @@ export default {
       this.$store.dispatch('fen', this.moves[num + 1].fen)
     },
     flipBoard () {
+      if(this.variant === 'racingkings') {
+        return
+      }
       if (this.orientation === 'white') {
         console.log('orientation change to black')
         this.$store.dispatch('orientation', 'black')
