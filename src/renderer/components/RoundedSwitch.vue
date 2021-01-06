@@ -1,9 +1,12 @@
 <!-- https://www.w3schools.com/howto/howto_css_switch.asp -->
 <template>
-<label class='switch'>
-  <input type='checkbox' @click='pressed'>
-  <span class='slider round'></span>
-</label>
+  <label class="switch">
+    <input
+      type="checkbox"
+      @click="pressed"
+    >
+    <span class="slider round" />
+  </label>
 </template>
 
 <script>

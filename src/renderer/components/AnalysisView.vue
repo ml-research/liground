@@ -1,24 +1,61 @@
 <template>
-  <div class='analysis'>
-    <AnalysisHead/>
-    <AnalysisEvalRow id='game_clock'/>
-    <EngineStats/>
-    <div v-if='active' class='processing-bar'/>
-    <PVLines class='panel'/>
-    <div class='game-window panel noselect'>
-      <div v-for='move in moves' :key='move.ply'>
-        <div class='move-field'>
-        <div v-if='move.ply % 2 == 1' class='float-left-child move-number'>{{(move.ply+1) / 2}}.</div>
-        <div class='float-left-child move-name' v-bind:class='{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}' @click="updateBoard(move)">{{move.name}}</div>
+  <div class="analysis">
+    <AnalysisHead />
+    <AnalysisEvalRow id="game_clock" />
+    <EngineStats />
+    <div
+      v-if="active"
+      class="processing-bar"
+    />
+    <PVLines class="panel" />
+    <div class="game-window panel noselect">
+      <div
+        v-for="move in moves"
+        :key="move.ply"
+      >
+        <div class="move-field">
+          <div
+            v-if="move.ply % 2 == 1"
+            class="float-left-child move-number"
+          >
+            {{ (move.ply+1) / 2 }}.
+          </div>
+          <div
+            class="float-left-child move-name"
+            :class="{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}"
+            @click="updateBoard(move)"
+          >
+            {{ move.name }}
+          </div>
         </div>
       </div>
     </div>
-    <JumpButtons v-on:flip-board="$emit('flip-board', 0)" v-on:move-to-start="$emit('move-to-start',0)" v-on:move-back-one="$emit('move-back-one',0)" v-on:move-forward-one="$emit('move-forward-one',0)" v-on:move-to-end="$emit('move-to-end',0)"/>
-    <game-info id="gameinfo"/>
-     <div class='console-log' id='textarea'>
-       <p v-for='line in stdIO' :key='line.type'>{{line}}</p>
-     </div>
-     <input type='text' id='lname' name='lname' :value='fen' size='60'>
+    <JumpButtons
+      @flip-board="$emit('flip-board', 0)"
+      @move-to-start="$emit('move-to-start',0)"
+      @move-back-one="$emit('move-back-one',0)"
+      @move-forward-one="$emit('move-forward-one',0)"
+      @move-to-end="$emit('move-to-end',0)"
+    />
+    <game-info id="gameinfo" />
+    <div
+      id="textarea"
+      class="console-log"
+    >
+      <p
+        v-for="line in stdIO"
+        :key="line.type"
+      >
+        {{ line }}
+      </p>
+    </div>
+    <input
+      id="lname"
+      type="text"
+      name="lname"
+      :value="fen"
+      size="60"
+    >
   </div>
 </template>
 
@@ -34,11 +71,6 @@ export default {
   name: 'AnalysisView',
   components: {
     AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo
-  },
-  methods: {
-    updateBoard (move) {
-      this.$store.dispatch('fen', move.fen)
-    }
   },
   props: {
     fen: {
@@ -88,6 +120,11 @@ export default {
   watch: {
     reset: function () {
       this.$store.dispatch('resetMultiPV')
+    }
+  },
+  methods: {
+    updateBoard (move) {
+      this.$store.dispatch('fen', move.fen)
     }
   }
 }

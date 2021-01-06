@@ -1,15 +1,32 @@
 <template>
-  <div class='blue merida is2d'>
-    <div class='grid-parent'>
-      <div class='pockets'>
-        <div v-if="variant==='crazyhouse'" v-bind:class='{ black : $store.getters.orientation == "black"}'>
-          <ChessPocket id='chesspocket_top' color='black' :pieces='piecesB' @selection='dropPiece' v-bind:class='{ black : $store.getters.orientation == "white" }'/>
-          <ChessPocket id='chesspocket_bottom' color='white' :pieces='piecesW' @selection='dropPiece' v-bind:class='{ black : $store.getters.orientation == "black" }' />
+  <div class="blue merida is2d">
+    <div class="grid-parent">
+      <div class="pockets">
+        <div
+          v-if="variant==='crazyhouse'"
+          :class="{ black : $store.getters.orientation == &quot;black&quot;}"
+        >
+          <ChessPocket
+            id="chesspocket_top"
+            color="black"
+            :pieces="piecesB"
+            :class="{ black : $store.getters.orientation == &quot;white&quot; }"
+            @selection="dropPiece"
+          />
+          <ChessPocket
+            id="chesspocket_bottom"
+            color="white"
+            :pieces="piecesW"
+            :class="{ black : $store.getters.orientation == &quot;black&quot; }"
+            @selection="dropPiece"
+          />
         </div>
       </div>
-      <div :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
-        <div ref='board' class='cg-board-wrap' >
-        </div>
+      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
+        <div
+          ref="board"
+          class="cg-board-wrap"
+        />
       </div>
     </div>
   </div>
@@ -27,30 +44,6 @@ export default {
   name: 'ChessGround',
   components: {
     ChessPocket
-  },
-  data () {
-    return {
-      ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
-      files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-      selectedPiece: null,
-      piecesToIdx: {
-        P: 4,
-        N: 3,
-        B: 2,
-        R: 1,
-        Q: 0,
-        p: 0,
-        n: 1,
-        b: 2,
-        r: 3,
-        q: 4
-      },
-      board: null,
-      shapes: [],
-      pieceShapes: [],
-      promotions: [],
-      promoteTo: 'q'
-    }
   },
   props: {
     free: {
@@ -86,10 +79,34 @@ export default {
       ])
     }
   },
+  data () {
+    return {
+      ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
+      files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+      selectedPiece: null,
+      piecesToIdx: {
+        P: 4,
+        N: 3,
+        B: 2,
+        R: 1,
+        Q: 0,
+        p: 0,
+        n: 1,
+        b: 2,
+        r: 3,
+        q: 4
+      },
+      board: null,
+      shapes: [],
+      pieceShapes: [],
+      promotions: [],
+      promoteTo: 'q'
+    }
+  },
   computed: {
-    currentMove () { //returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
-      for( let num = 0; num < this.moves.length; num++) {
-        if(this.moves[num].fen == this.fen){
+    currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
           return this.moves[num]
         }
       }
@@ -176,6 +193,28 @@ export default {
       this.updateBoard()
     }
   },
+  mounted () {
+    this.board = Chessground(this.$refs.board, {
+      coordinates: false,
+      fen: this.fen,
+      turnColor: 'white',
+      highlight: {
+        lastMove: true, // add last-move class to squares
+        check: true // add check class to squares
+      },
+      drawable: {
+        enabled: true, // can draw
+        visible: true, // can view
+        eraseOnClick: false
+      },
+      movable: {
+        events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
+        color: 'white',
+        free: false
+      },
+      orientation: this.orientation
+    })
+  },
   methods: {
     updatePieceCSS (pieceStyle) {
       const file = document.createElement('link')
@@ -253,18 +292,18 @@ export default {
       // Crazyhouse pocket pieces
       this.resetPockets(this.piecesW)
       this.resetPockets(this.piecesB)
-      if(this.fen == this.lastFen){
-      this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
-      this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK)
+      if (this.fen === this.lastFen) {
+        this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
+        this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK)
       } else {
-        let i = 0;
-        for( let num = 0; num < this.moves.length; num++) { // i will have the index of the currently displayed move
-          if(this.moves[num].fen == this.fen){
+        let i = 0
+        for (let num = 0; num < this.moves.length; num++) { // i will have the index of the currently displayed move
+          if (this.moves[num].fen === this.fen) {
             i = num
             break
           }
         }
-        this.updatePocket(this.piecesW, this.moves[i].whitePocket, WHITE) //load the pocketpieces from the currently displayed move
+        this.updatePocket(this.piecesW, this.moves[i].whitePocket, WHITE) // load the pocketpieces from the currently displayed move
         this.updatePocket(this.piecesB, this.moves[i].blackPocket, BLACK)
       }
     },
@@ -275,72 +314,51 @@ export default {
       events.history = [this.lastMoveSan]
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
-
     },
     updateBoard () {
-      //logic to find out if a check should be displayed:
-      let isCheck = false //ensures that no check is displayed when the current move was not a check
-      if(this.currentMove != undefined && this.currentMove.name.includes('+')){ //the last move was check iff the san notation of the last move contained a '+'
-        this.moves[this.moves.length-1].check = this.turn //the check property of the board accepts a color or a boolean
+      // logic to find out if a check should be displayed:
+      let isCheck = false // ensures that no check is displayed when the current move was not a check
+      if (this.currentMove !== undefined && this.currentMove.name.includes('+')) { // the last move was check iff the san notation of the last move contained a '+'
+        this.moves[this.moves.length - 1].check = this.turn // the check property of the board accepts a color or a boolean
         isCheck = this.currentMove.check
       }
-      //logic to find out which move was last and should thus be highlighted:
-      if(this.currentMove == undefined || this.moves.length == 0) {
+      // logic to find out which move was last and should thus be highlighted:
+      if (this.currentMove === undefined || this.moves.length === 0) {
         this.board.state.lastMove = undefined
       } else {
-          let string = String(this.currentMove.uci)
-          let first = string.substring(0,2)
-          let second = string.substring(2,4)
-          this.board.state.lastMove = [first, second]
+        const string = String(this.currentMove.uci)
+        const first = string.substring(0, 2)
+        const second = string.substring(2, 4)
+        this.board.state.lastMove = [first, second]
       }
       this.board.set({
-          check: isCheck,
-          fen: this.fen,
-          turnColor: this.turn,
-          highlight: {
-            lastMove: true,
-            check: true
-          },
-          movable:  this.fen==this.lastFen ? { //moving is only possible at the end of the line
-            dests: this.possibleMoves(),
-            color: this.turn
-          } : {
-            dests: {},
-            color: this.turn
-          },
-          orientation: this.orientation
-        })
-        if(this.variant === 'crazyhouse') {
-          this.updateHand()
-        }
+        check: isCheck,
+        fen: this.fen,
+        turnColor: this.turn,
+        highlight: {
+          lastMove: true,
+          check: true
+        },
+        movable: this.fen === this.lastFen
+          ? { // moving is only possible at the end of the line
+              dests: this.possibleMoves(),
+              color: this.turn
+            }
+          : {
+              dests: {},
+              color: this.turn
+            },
+        orientation: this.orientation
+      })
+      if (this.variant === 'crazyhouse') {
+        this.updateHand()
+      }
     },
     drawShapes () {
       if (this.board !== null) {
         this.board.setShapes([...this.shapes, ...this.pieceShapes])
       }
     }
-  },
-  mounted () {
-    this.board = Chessground(this.$refs.board, {
-      coordinates: false,
-      fen: this.fen,
-      turnColor: 'white',
-      highlight: {
-        lastMove: true, // add last-move class to squares
-        check: true // add check class to squares
-      },
-      drawable: {
-        enabled: true, // can draw
-        visible: true, // can view
-        eraseOnClick: false
-      },
-      movable: {
-        events: { after: this.changeTurn() , afterNewPiece: this.afterDrag()},
-        color: 'white',
-        free: false
-      },
-      orientation: this.orientation
-    })
   }
 }
 </script>

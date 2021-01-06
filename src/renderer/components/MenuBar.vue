@@ -1,13 +1,31 @@
 <template>
   <div>
-  <nav>
-    <a href="#" @click="openPgn"><i slot="extra" class="icon mdi mdi-checkerboard"/> Open PGN</a>
-    <a href="#"><i slot="extra" class="icon mdi mdi-robot"/> Engines</a>
-    <a href="#"><i slot="extra" class="icon mdi mdi-hammer-screwdriver"/> Settings </a>
-    <a href="#"><i slot="extra" class="icon mdi mdi-information-outline"/> About <i slot="extra" class="icon mdi mdi-github"/></a>
-    <div class="animation start-home"></div>
-  </nav>
-</div>
+    <nav>
+      <a
+        href="#"
+        @click="openPgn"
+      ><i
+        slot="extra"
+        class="icon mdi mdi-checkerboard"
+      /> Open PGN</a>
+      <a href="#"><i
+        slot="extra"
+        class="icon mdi mdi-robot"
+      /> Engines</a>
+      <a href="#"><i
+        slot="extra"
+        class="icon mdi mdi-hammer-screwdriver"
+      /> Settings </a>
+      <a href="#"><i
+        slot="extra"
+        class="icon mdi mdi-information-outline"
+      /> About <i
+        slot="extra"
+        class="icon mdi mdi-github"
+      /></a>
+      <div class="animation start-home" />
+    </nav>
+  </div>
 </template>
 
 <script>
@@ -20,11 +38,11 @@ export default {
   },
   methods: {
     openPgn () {
-      let regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
+      const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
       let games = []
       this.$electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
-        properties: ['openFile'], 
+        properties: ['openFile'],
         filters: [
           { name: 'PGN Files', extensions: ['pgn'] },
           { name: 'All Files', extensions: ['*'] }
@@ -33,15 +51,15 @@ export default {
         if (!result.canceled) {
           fs.readFile(result.filePaths[0], 'utf8', (err, data) => {
             if (err) {
-              return console.log(err);
+              return console.log(err)
             }
 
             let m
             while ((m = regex.exec(data)) !== null) {
               if (m.index === regex.lastIndex) {
-                  regex.lastIndex++;
+                regex.lastIndex++
               }
-              
+
               m.forEach((match, groupIndex) => {
                 let game
                 try {
@@ -51,25 +69,23 @@ export default {
                   return
                 }
                 games.push(game)
-
-              });
+              })
             }
-            
+
             games = games.map((curVal, idx, arr) => {
               curVal.id = idx
               return curVal
             })
             this.$store.dispatch('loadedGames', games)
-            if(games[0]){
-              this.$store.dispatch('loadGame', {game: games[0]})
+            if (games[0]) {
+              this.$store.dispatch('loadGame', { game: games[0] })
             }
-                
           })
         }
       }).catch(err => {
         console.log(err)
       })
-    }  
+    }
   }
 }
 </script>

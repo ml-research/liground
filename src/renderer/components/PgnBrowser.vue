@@ -1,13 +1,19 @@
 <template>
   <div>
-    <select v-model="selectedGame" size="10" name="gameselector" id="gameselector">
+    <select
+      id="gameselector"
+      v-model="selectedGame"
+      size="10"
+      name="gameselector"
+    >
       <option
         v-for="game in loadedGames"
-        :value="game"
         :key="game.id"
-      >{{game.headers('White')}} vs. <br/> {{game.headers('Black')}}</option>
+        :value="game"
+      >
+        {{ game.headers('White') }} vs. <br> {{ game.headers('Black') }}
+      </option>
     </select>
-  
   </div>
 </template>
 
@@ -19,17 +25,17 @@ export default {
       get: function () {
         return this.$store.getters.selectedGame
       },
-      set: function(newVal) {
-        this.$store.dispatch('loadGame', {game: newVal})
+      set: function (newVal) {
+        this.$store.dispatch('loadGame', { game: newVal })
       }
     },
     loadedGames: {
-      get: function() {
+      get: function () {
         return this.$store.getters.loadedGames
       }
     }
   }
-    
+
 }
 </script>
 

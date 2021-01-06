@@ -1,6 +1,12 @@
 <template>
   <div>
-    <VueApexCharts width="710" height="260" type="area" :options="options" :series="series"></VueApexCharts>
+    <VueApexCharts
+      width="710"
+      height="260"
+      type="area"
+      :options="options"
+      :series="series"
+    />
   </div>
 </template>
 
@@ -11,9 +17,6 @@ export default {
   name: 'EvalPlot',
   components: {
     VueApexCharts
-  },
-  props: {
-    msg: String
   },
   data: function () {
     return {

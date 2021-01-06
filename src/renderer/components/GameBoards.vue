@@ -1,20 +1,41 @@
 <template>
   <div id="inner">
     <div>
-      <div class='main-grid'>
-        
+      <div class="main-grid">
         <div>
           <div class="chessboard-grid">
-            <pgn-browser id="pgnbrowser"/>
-            <ChessGround id="chessboard" @onMove="showInfo" :orientation="orientation"/>
+            <pgn-browser id="pgnbrowser" />
+            <ChessGround
+              id="chessboard"
+              :orientation="orientation"
+              @onMove="showInfo"
+            />
             <EvalBar id="evalbar" />
           </div>
-          <br/>
-          <div id="fen-field">FEN <input type="text" id="lname" name="lname" placeholder="fen position" v-on:change="checkValidFEN" :value="fen" size="60"></div>
-          <PieceStyleSelector id="piece-style"/>
-          <EvalPlot/>
+          <br>
+          <div id="fen-field">
+            FEN <input
+              id="lname"
+              type="text"
+              name="lname"
+              placeholder="fen position"
+              :value="fen"
+              size="60"
+              @change="checkValidFEN"
+            >
+          </div>
+          <PieceStyleSelector id="piece-style" />
+          <EvalPlot />
         </div>
-        <AnalysisView id="analysisview" v-on:move-to-start="moveToStart" v-on:move-to-end="moveToEnd" v-on:move-back-one="moveBackOne" v-on:move-forward-one="moveForwardOne" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
+        <AnalysisView
+          id="analysisview"
+          :reset="resetAnalysis"
+          @move-to-start="moveToStart"
+          @move-to-end="moveToEnd"
+          @move-back-one="moveBackOne"
+          @move-forward-one="moveForwardOne"
+          @flip-board="flipBoard"
+        />
       </div>
     </div>
   </div>
@@ -29,7 +50,8 @@ import PieceStyleSelector from './PieceStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
 import PgnBrowser from './PgnBrowser.vue'
-import GameInfo from './GameInfo.vue'
+// TODO: use GameInfo component?
+// import GameInfo from './GameInfo.vue'
 
 let ffish = null
 
@@ -41,23 +63,14 @@ export default {
     ChessGround,
     PieceStyleSelector,
     EvalPlot,
-    PgnBrowser,
-    GameInfo
-  },
-  beforeCreate () {
-    console.log(`beforeCreate()`)
-    new Module().then(loadedModule => {
-      ffish = loadedModule
-      console.log(`initialized ${ffish} ${loadedModule}`)
-      let game = new ffish.Board()
-      console.log(game.fen())
-    })
+    // GameInfo,
+    PgnBrowser
   },
   data () {
     return {
       positionInfo: '',
       game: null,
-      resetAnalysis: false,
+      resetAnalysis: false
     }
   },
   computed: {
@@ -73,60 +86,85 @@ export default {
     fen () {
       return this.$store.getters.fen
     },
-    currentMove () {//this returns the current half-move or -1 at the start of the game
-      let fen = this.$store.getters.fen
-      for ( const move of this.moves) {
-        if(move.fen == fen) {
-          return move.ply-1
+    currentMove () { // this returns the current half-move or -1 at the start of the game
+      const fen = this.$store.getters.fen
+      for (const move of this.moves) {
+        if (move.fen === fen) {
+          return move.ply - 1
         }
       }
-      return -1;
+      return -1
     }
   },
+  beforeCreate () {
+    console.log('beforeCreate()')
+    new Module().then(loadedModule => {
+      ffish = loadedModule
+      console.log(`initialized ${ffish} ${loadedModule}`)
+      const game = new ffish.Board()
+      console.log(game.fen())
+    })
+  },
+  mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
+    window.addEventListener('keydown', (event) => {
+      const keyName = event.key
+      if (keyName === 'ArrowUp') {
+        this.moveToStart()
+      }
+      if (keyName === 'ArrowDown') {
+        this.moveToEnd()
+      }
+      if (keyName === 'ArrowLeft') {
+        this.moveBackOne()
+      }
+      if (keyName === 'ArrowRight') {
+        this.moveForwardOne()
+      }
+    }, false)
+  },
   methods: {
-    moveToStart () { //this method returns to the starting point of the current line
-      let board = new ffish.Board(this.variant)
-      let startFen = board.fen()
+    moveToStart () { // this method returns to the starting point of the current line
+      const board = new ffish.Board(this.variant)
+      const startFen = board.fen()
       this.$store.dispatch('fen', startFen)
       console.log('moveToStart')
     },
-    moveToEnd () {//this method moves to the last move of the current line
+    moveToEnd () { // this method moves to the last move of the current line
       console.log('moveToEnd')
-      if(this.currentMove >= this.moves.length-1){
+      if (this.currentMove >= this.moves.length - 1) {
         return
       }
       this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
     },
-    moveBackOne () {//this method moves back one move in the current line
+    moveBackOne () { // this method moves back one move in the current line
       console.log('moveBackone')
-      let num = this.currentMove
-      if (num == -1) {
+      const num = this.currentMove
+      if (num === -1) {
         return
       }
-      if (num == 0){
-        let board = new ffish.Board(this.variant)
-        let startFen = board.fen()
+      if (num === 0) {
+        const board = new ffish.Board(this.variant)
+        const startFen = board.fen()
         this.$store.dispatch('fen', startFen)
         return
       }
-      this.$store.dispatch('fen', this.moves[num-1].fen)
+      this.$store.dispatch('fen', this.moves[num - 1].fen)
     },
-    moveForwardOne () {//this method moves forward one move in the current line
+    moveForwardOne () { // this method moves forward one move in the current line
       console.log('moveForwardOne')
-      let num = this.currentMove
-      if (num >= this.moves.length-1 ){
+      const num = this.currentMove
+      if (num >= this.moves.length - 1) {
         return
       }
-      if (num == -1) {
+      if (num === -1) {
         this.$store.dispatch('fen', this.moves[0].fen)
         return
       }
-      if(num == 0) {
+      if (num === 0) {
         this.$store.dispatch('fen', this.moves[1].fen)
         return
       }
-      this.$store.dispatch('fen', this.moves[num+1].fen)
-
+      this.$store.dispatch('fen', this.moves[num + 1].fen)
     },
     flipBoard () {
       if (this.orientation === 'white') {
@@ -145,16 +183,16 @@ export default {
       this.$store.commit('selectPocketPiece', ['boardA', ''])
     },
     getBoardPos (event) {
-      if (event.explicitOriginalTarget.className === 'cg-board' && this.selectedPockedPiece['boardA'] !== '') {
+      if (event.explicitOriginalTarget.className === 'cg-board' && this.selectedPockedPiece.boardA !== '') {
         // get click field
-        var x = Math.floor(event.layerX / 40)
-        var y = Math.floor(event.layerY / 40)
+        const x = Math.floor(event.layerX / 40)
+        const y = Math.floor(event.layerY / 40)
         // var stringPos = y * 9 + x
 
-        var letters = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h'}
-        var pieceCode = Vue.methds.pieceTypeToShort(this.selectedPockedPiece['boardA'])
+        const letters = { 0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h' }
+        let pieceCode = Vue.methds.pieceTypeToShort(this.selectedPockedPiece.boardA)
 
-        pieceCode = {'type': pieceCode, 'color': this.turnColor.charAt(0)}
+        pieceCode = { type: pieceCode, color: this.turnColor.charAt(0) }
         this.$store.dispatch('insertPieceAtPosition', ['boardA', pieceCode, letters[x] + (8 - y)])
       } else {
         this.deselectPocketPieces()
@@ -162,9 +200,9 @@ export default {
     },
     showInfo (event) {
       console.log(`showInfo: ${this.fen}`)
-      //this.$store.dispatch('fen', event['fen'])
+      // this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
-      let newMove = event.history[event.history.length - 1]
+      // const newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
 
       if (this.$store.getters.active) {
@@ -183,25 +221,8 @@ export default {
         console.log(`invalid fen: ${event.target.value}`)
       }
       this.resetAnalysis = !this.resetAnalysis
-    },
-    
-  }, 
-  mounted () {  //EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
-    window.addEventListener('keydown', (event) => {
-    const keyName = event.key
-    if (keyName == 'ArrowUp') {
-      this.moveToStart()
     }
-    if (keyName == 'ArrowDown') {
-      this.moveToEnd()
-    }
-    if (keyName == 'ArrowLeft') {
-      this.moveBackOne()
-    }
-    if (keyName == 'ArrowRight'){  
-      this.moveForwardOne()
-    }
-    }, false)
+
   }
 }
 </script>
