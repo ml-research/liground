@@ -5,7 +5,7 @@
         <div>
           <div
             class="chessboard-grid"
-            @mousewheel="scroll($event)"
+            @mousewheel.prevent="scroll($event)"
           >
             <pgn-browser id="pgnbrowser" />
             <ChessGround
