@@ -1,12 +1,26 @@
 <template>
   <div id="gameinfo">
     <div id="players">
-      <player-info :name="whiteName" :elo="whiteElo" :playerTitle="whiteTitle" :isWhite="true" class="player" style="text-align: left"/>
+      <player-info
+        :name="whiteName"
+        :elo="whiteElo"
+        :player-title="whiteTitle"
+        :is-white="true"
+        class="player"
+        style="text-align: left"
+      />
       vs.
-      <player-info :name="blackName" :elo="blackElo" :playerTitle="blackTitle" :isWhite="false" class="player" style="text-align: right"/>
+      <player-info
+        :name="blackName"
+        :elo="blackElo"
+        :player-title="blackTitle"
+        :is-white="false"
+        class="player"
+        style="text-align: right"
+      />
     </div>
     <div id="metainfo">
-      <p>Event: {{ eventName ? eventName : 'unknown'}} <span v-if="eventSite"> (@ {{ eventSite }})</span> <span v-if="round && /\d+/gm.test(round)">round {{ round }} </span> <span v-if="date">on {{ date }}</span></p>
+      <p>Event: {{ eventName ? eventName : 'unknown' }} <span v-if="eventSite"> (@ {{ eventSite }})</span> <span v-if="round && /\d+/gm.test(round)">round {{ round }} </span> <span v-if="date">on {{ date }}</span></p>
       <p>Result: {{ result ? result : 'unknown' }}</p>
       <p>Annotator: {{ annotator ? annotator : 'unknown' }}</p>
     </div>
@@ -16,8 +30,8 @@
 <script>
 import PlayerInfo from './PlayerInfo.vue'
 export default {
-  components: { PlayerInfo },
   name: 'GameInfo',
+  components: { PlayerInfo },
   computed: {
     gameInfo () {
       return this.$store.getters.gameInfo
@@ -48,15 +62,16 @@ export default {
     },
     date () {
       if (this.gameInfo.Date) {
-        let parts = this.gameInfo.Date.split('.').map((curVal) => { return parseInt(curVal) })
-        
+        const parts = this.gameInfo.Date.split('.').map((curVal) => { return parseInt(curVal) })
+
         if (parts.length === 3 && !parts.includes(NaN)) {
-          let d = new Date(Date.UTC(parts[0], parts[1] -1, parts[2]))
-      
-          let options = {timezone: 'UTC'}
+          const d = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]))
+
+          // const options = { timezone: 'UTC' }
           return d.toLocaleDateString()
         }
       }
+      return null
     },
     annotator () {
       return this.gameInfo.Annotator

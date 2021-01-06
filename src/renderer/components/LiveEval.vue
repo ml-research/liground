@@ -1,6 +1,6 @@
 <template>
   <div class="ceval float-left-child">
-      {{eval}}
+    {{ eval }}
   </div>
 </template>
 

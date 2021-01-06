@@ -5,7 +5,7 @@ const readline = require('readline')
 const ffish = require('ffish')
 const path = require('path')
 
-ffish['onRuntimeInitialized'] = () => {
+ffish.onRuntimeInitialized = () => {
   console.log(`ffish.info(): ${ffish.info()}`)
 }
 
@@ -56,10 +56,10 @@ Converts a string given uci pv line into a string of san move notation.
  -> [movesStr[0], sanPV]
 */
 function extractPV (gameFEN, rawPV) {
-  let movesStr = rawPV.split(' ')
+  const movesStr = rawPV.split(' ')
   // TODO: Make this variant specific
-  let board = new ffish.Board('crazyhouse', gameFEN)
-  let sanPV = board.variationSan(rawPV)
+  const board = new ffish.Board('crazyhouse', gameFEN)
+  const sanPV = board.variationSan(rawPV)
   board.delete()
 
   return [movesStr[0], sanPV]
@@ -101,15 +101,19 @@ class CLICreator {
     this.rl = null
     this.ready = true
   }
+
   wait () {
     this.ready = false
   }
+
   isready () {
     this.child.stdin.write('isready' + os.EOL)
   }
+
   stopEngine () {
     this.child.stdin.write('stop' + os.EOL)
   }
+
   setFEN (fen) {
     // this.game.load(fen);
     this.game.setFen(fen)
@@ -135,6 +139,7 @@ class CLICreator {
     this.child.stdin.write('position fen ' + fen + os.EOL)
     this.multipvIdx = -1 // current MultiPV idx
   }
+
   /*
   Build the move destinations which will be used in the GUI for legal moves.
   */
@@ -155,6 +160,7 @@ class CLICreator {
       }
     }
   }
+
   /*
   Sends the move destinations via WebSocket.
   */
@@ -163,6 +169,7 @@ class CLICreator {
       destinations: this.destinations
     }))
   }
+
   /*
   Sends 'isready', 'go infinite' commands to the engine.
   */
@@ -175,6 +182,7 @@ class CLICreator {
     this.child.stdin.write(message)
     this.stdIO.push('>' + message)
   }
+
   /*
   Resets the current member variables.
   */
@@ -183,12 +191,14 @@ class CLICreator {
     this.curPVLines = 0
     this.stdIO = []
   }
+
   /*
   Closes the active engine.
   */
   closeEngine () {
     this.child.stdin.write('close')
   }
+
   /*
   Starts the engine binary and parses the UCI replies.
   */
@@ -221,13 +231,13 @@ class CLICreator {
       line = line.trim()
 
       if (line.startsWith('info ')) {
-        let re = new RegExp('multipv (\\d+)')
+        let re = /multipv (\\d+)/
         const match = re.exec(line)
         if (match) {
           this.curPVLines = Math.max(match[1], this.curPVLines)
           this.multipvIdx = match[1] - 1
 
-          for (let key in this.multipv[0]) {
+          for (const key in this.multipv[0]) {
             re = new RegExp(key + ' (-?\\d+)')
             const match = re.exec(line)
 

@@ -1,11 +1,26 @@
 <template>
-  <div class="wrapper" :class="[enabled ? 'enabled' : '']">
-    <div class="slot"
-         :style="{ color: color }" v-for="piece in pieces" :key="piece.type"
-         :class="[piece.count > 0 ? 'show' : 'hide']">
-      <div class="piece" @mousedown="clicked($event, piece.type, color, piece.count)"
-          :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' ]"></div>
-      <div class="piece-count noselect" :class="[piece.count > 1 ? 'show' : 'invisible']">{{piece.count}}</div>
+  <div
+    class="wrapper"
+    :class="[enabled ? 'enabled' : '']"
+  >
+    <div
+      v-for="piece in pieces"
+      :key="piece.type"
+      class="slot"
+      :style="{ color: color }"
+      :class="[piece.count > 0 ? 'show' : 'hide']"
+    >
+      <div
+        class="piece"
+        :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' ]"
+        @mousedown="clicked($event, piece.type, color, piece.count)"
+      />
+      <div
+        class="piece-count noselect"
+        :class="[piece.count > 1 ? 'show' : 'invisible']"
+      >
+        {{ piece.count }}
+      </div>
     </div>
   </div>
 </template>
@@ -14,6 +29,30 @@
 
 export default {
   name: 'ChessPocket',
+  props: {
+    color: {
+      type: String,
+      default: 'white'
+    },
+    pieces: {
+      type: Array,
+      default: () => ([
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ])
+    },
+    enabled: {
+      type: Boolean,
+      default: true
+    },
+    selectedPiece: {
+      type: String,
+      default: ''
+    }
+  },
   computed: {
     emptySlots: function () {
       return Math.max(8 - this.pieces.length, 0)
@@ -27,30 +66,6 @@ export default {
       this.updatePieceCSS(pieceStyle)
     }
   },
-  props: {
-    color: {
-      type: String,
-      default: 'white'
-    },
-    pieces: {
-      type: Array,
-      default: () => ([
-        {'count': 0, 'type': 'pawn'},
-        {'count': 0, 'type': 'knight'},
-        {'count': 0, 'type': 'bishop'},
-        {'count': 0, 'type': 'rook'},
-        {'count': 0, 'type': 'queen'}
-      ])
-    },
-    enabled: {
-      type: Boolean,
-      default: true
-    },
-    selectedPiece: {
-      type: String,
-      default: ''
-    }
-  },
   methods: {
     clicked (event, pieceType, color, pieceCount) {
       if (pieceCount === 0) {
@@ -61,7 +76,7 @@ export default {
       this.$emit('selection', event, pieceType, color)
     },
     updatePieceCSS (pieceStyle) {
-      let file = document.createElement('link')
+      const file = document.createElement('link')
       file.rel = 'stylesheet'
       file.href = 'assets/images/piece-css/' + pieceStyle + '.css'
       document.head.appendChild(file)

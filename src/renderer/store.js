@@ -3,19 +3,20 @@ import Vuex from 'vuex'
 import ffish from 'ffish'
 
 class TwoWayMap {
-  constructor(map) {
+  constructor (map) {
     this.map = map
     this.reverseMap = {}
     this.keys = []
-    for (let key in map) {
+    for (const key in map) {
       const value = map[key]
       this.reverseMap[value] = key
       this.keys.concat(key)
     }
   }
-  getAll() { return this.map }
-  get(key) { return this.map[key] }
-  revGet(key) { return this.reverseMap[key] }
+
+  getAll () { return this.map }
+  get (key) { return this.map[key] }
+  revGet (key) { return this.reverseMap[key] }
 }
 
 Vue.use(Vuex)
@@ -27,20 +28,20 @@ export const store = new Vuex.Store({
     active: false,
     turn: 'white',
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
+    lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     moves: [],
     legalMoves: '',
     destinations: {},
     variant: 'chess',
-    variantOptions: new TwoWayMap({ //all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
-      '♟️ Standard': '',
+    variantOptions: new TwoWayMap({ // all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
       '♟️ Standard': 'chess',
       '🏠 Crazyhouse': 'crazyhouse',
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
-      'Antichess': 'antichess',
-      'Horde': 'horde',
-      '🏇 Racing Kings': 'racingkings'}),
+      Antichess: 'antichess',
+      Horde: 'horde',
+      '🏇 Racing Kings': 'racingkings'
+    }),
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
@@ -187,10 +188,10 @@ export const store = new Vuex.Store({
       state.moves = []
     },
     appendMoves (state, payload) {
-      state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
-        let sanMove = state.board.sanMove(curVal)
-        state.board.push(curVal);
-        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false)};
+      state.moves = state.moves.concat(payload.map((curVal, idx, arr) => {
+        const sanMove = state.board.sanMove(curVal)
+        state.board.push(curVal)
+        return { ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false) }
       }))
       state.lastFen = state.board.fen()
     },
@@ -223,7 +224,7 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves', payload.split(" "))
+      context.commit('appendMoves', payload.split(' '))
       context.dispatch('updateBoard')
     },
     startEngine (context) {
@@ -302,26 +303,23 @@ export const store = new Vuex.Store({
     },
 
     loadGame (context, payload) {
-      let variant = payload.game.headers("Variant").toLowerCase()
-      
-      if ( variant == '') { //if no variant is given we assume it to be standard chess
+      let variant = payload.game.headers('Variant').toLowerCase()
+
+      if (variant === '') { // if no variant is given we assume it to be standard chess
         variant = 'chess'
-      } 
-      
-      if(!context.getters.variantOptions.revGet(variant)) {
+      }
+
+      if (!context.getters.variantOptions.revGet(variant)) {
         alert('This variant is currently not supported.')
         return
       }
 
-      const board = new ffish.Board(variant);
-      let gameInfo = {}
-      payload.game.headerKeys().split(" ").map(
-        (curVal, idx, arr) => {
-          gameInfo[curVal] = payload.game.headers(curVal)
-        }
-      )
-      
-      
+      const board = new ffish.Board(variant)
+      const gameInfo = {}
+      for (const curVal of payload.game.headerKeys().split(' ')) {
+        gameInfo[curVal] = payload.game.headers(curVal)
+      }
+
       context.commit('selectedGame', payload.game)
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
