@@ -3,10 +3,7 @@
     <div>
       <div class="main-grid">
         <div>
-          <div
-            class="chessboard-grid"
-            @mousewheel="scroll($event)"
-          >
+          <div class="chessboard-grid">
             <pgn-browser id="pgnbrowser" />
             <ChessGround
               id="chessboard"
@@ -126,25 +123,21 @@ export default {
     }, false)
   },
   methods: {
-    scroll (event) { // also moves back and forth when being slightly next to the board and for example over the pockets
-      if (event.deltaY < 0) {
-        this.moveBackOne()
-      } else {
-        this.moveForwardOne()
-      }
-    },
     moveToStart () { // this method returns to the starting point of the current line
       const board = new ffish.Board(this.variant)
       const startFen = board.fen()
       this.$store.dispatch('fen', startFen)
+      console.log('moveToStart')
     },
     moveToEnd () { // this method moves to the last move of the current line
+      console.log('moveToEnd')
       if (this.currentMove >= this.moves.length - 1) {
         return
       }
       this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
     },
     moveBackOne () { // this method moves back one move in the current line
+      console.log('moveBackone')
       const num = this.currentMove
       if (num === -1) {
         return
@@ -158,6 +151,7 @@ export default {
       this.$store.dispatch('fen', this.moves[num - 1].fen)
     },
     moveForwardOne () { // this method moves forward one move in the current line
+      console.log('moveForwardOne')
       const num = this.currentMove
       if (num >= this.moves.length - 1) {
         return
@@ -173,14 +167,14 @@ export default {
       this.$store.dispatch('fen', this.moves[num + 1].fen)
     },
     flipBoard () {
-      if (this.variant === 'racingkings') {
-        return
-      }
       if (this.orientation === 'white') {
+        console.log('orientation change to black')
         this.$store.dispatch('orientation', 'black')
+        console.log('orientation in store: ' + this.orientation)
       } else {
         this.$store.dispatch('orientation', 'white')
       }
+      console.log('flipBoard currentMove: ' + this.currentMove)
     },
     selectPocketPiece (piece) {
       this.$store.commit('selectPocketPiece', ['boardA', piece.type])

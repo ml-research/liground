@@ -258,9 +258,6 @@ export default {
     },
     afterDrag () {
       return (role, key) => {
-        for (let attr in this.board.pieceKey) {
-          console.log('board: ' + attr)
-        }
         const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
         const move = pieces[role] + '@' + key
         this.$store.dispatch('push', move)
@@ -270,13 +267,10 @@ export default {
     changeTurn () {
       return (orig, dest) => {
         if (this.isPromotion(orig, dest)) {
-          console.log('triggered')
           this.promoteTo = this.onPromotion()
         }
         const uciMove = orig + dest
-        console.log(uciMove)
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-        console.log(this.lastMoveSan)
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
         this.updateHand()

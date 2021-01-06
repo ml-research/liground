@@ -3,7 +3,6 @@
     <a
       href="#"
       class="jump previous"
-      :class="{grey : variant == 'racingkings'}"
       @click="$emit('flip-board', 0)"
     ><i
       slot="extra"
@@ -71,9 +70,6 @@ export default {
         }
       }
       return -1
-    },
-    variant () {
-      return this.$store.getters.variant
     }
   }
 }
