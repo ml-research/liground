@@ -8,11 +8,11 @@
         slot="extra"
         class="icon mdi mdi-checkerboard"
       /> Open PGN</a>
-      <a
-        @click=<Popup />><em
+      <a><em
         slot="extra"
-        class="icon mdi mdi-hammer-screwdriver"
-      /> Engines </a> />
+        class="icon mdi mdi-checkerboard"
+      /> Engines
+      </a> />
       <a href="#"><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
@@ -29,20 +29,45 @@
       /></a>
       <div class="animation start-home" />
     </nav>
+      <div id="popup">
+    <button
+      type="button"
+      class="btn"
+      @click="showModal"
+    >
+      Open Modal!
+    </button>
+
+    <modal
+      v-show="isModalVisible"
+      @close="closeModal"
+    />
+  </div>
   </div>
 </template>
 
 <script>
 import fs from 'fs'
 import ffish from 'ffish'
-import Popup from './Popup'
+import modal from './Modal'
 
 export default {
   name: 'MenuBar',
   components: {
-    Popup
+    modal
+  },
+  data () {
+    return {
+      isModalVisible: false
+    }
   },
   methods: {
+    showModal () {
+      this.isModalVisible = true
+    },
+    closeModal () {
+      this.isModalVisible = false
+    },
     goToEngines () {
       this.$router.push('LPE')
     },
