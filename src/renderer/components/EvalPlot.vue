@@ -1,6 +1,12 @@
 <template>
   <div>
-    <VueApexCharts width="710" height="260" type="area" :options="options" :series="series"></VueApexCharts>
+    <VueApexCharts
+      width="710"
+      height="260"
+      type="area"
+      :options="options"
+      :series="series"
+    />
   </div>
 </template>
 
@@ -12,9 +18,6 @@ export default {
   components: {
     VueApexCharts
   },
-  props: {
-    msg: String
-  },
   data: function () {
     return {
       options: {
@@ -22,17 +25,17 @@ export default {
           id: 'vuechart-example'
         },
         xaxis: {
-          categories: [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]
+          categories: ['THIS IS A DUMMY']
         },
         yaxis: {
           title: {
-            text: 'Evaluation [cp]'
+            text: 'THIS IS A DUMMY'
           }
         }
       },
       series: [{
         name: 'evaluation',
-        data: [10, 23, 102, -12, -24, +34, -200, -320]
+        data: []
       }]
     }
   }

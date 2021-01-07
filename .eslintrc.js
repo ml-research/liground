@@ -10,8 +10,9 @@ module.exports = {
     node: true
   },
   extends: [
+    'eslint:recommended',
     'standard',
-    'plugin:vue/essential'
+    'plugin:vue/recommended'
   ],
   globals: {
     __static: true

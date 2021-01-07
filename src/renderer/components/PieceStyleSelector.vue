@@ -1,14 +1,21 @@
 <template>
-<div>
-  <multiselect class="multiselect" v-model="selected" :options="variants" :allow-empty="false" :show-labels="false" :placeholder="selected"></multiselect>
-</div>
+  <div>
+    <multiselect
+      v-model="selected"
+      class="multiselect"
+      :options="variants"
+      :allow-empty="false"
+      :show-labels="false"
+      :placeholder="selected"
+    />
+  </div>
 </template>
 
 <script>
 import Multiselect from 'vue-multiselect'
 
 export default {
-  name: 'pieceStyleSelector',
+  name: 'PieceStyleSelector',
   components: {
     Multiselect
   },

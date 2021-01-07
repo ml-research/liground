@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <MenuBar id="menubar" />
-    <GameBoards id="gameboards"/>
+    <GameBoards id="gameboards" />
   </div>
 </template>
 
@@ -10,7 +10,7 @@ import GameBoards from './GameBoards'
 import MenuBar from './MenuBar.vue'
 
 export default {
-  name: 'landing-page',
+  name: 'LandingPage',
   components: {
     MenuBar,
     GameBoards
@@ -18,7 +18,7 @@ export default {
   methods: {
     open (link) {
       this.$electron.shell.openExternal(link)
-    },
+    }
   }
 }
 </script>

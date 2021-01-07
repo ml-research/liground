@@ -1,6 +1,12 @@
 <template>
-  <div class="progress" v-bind:class='{ black : $store.getters.orientation == "black" }'>
-    <div class="progress-value" v-bind:style="{ height: filterSectionHeight }"/>
+  <div
+    class="progress"
+    :class="{ black : $store.getters.orientation == &quot;black&quot; }"
+  >
+    <div
+      class="progress-value"
+      :style="{ height: filterSectionHeight }"
+    />
   </div>
 </template>
 
