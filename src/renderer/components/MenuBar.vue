@@ -9,7 +9,7 @@
         class="icon mdi mdi-checkerboard"
       /> Open PGN</a>
       <a
-        @click="goToEngines"><em
+        @click=<Popup />><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
       /> Engines </a> />
@@ -35,14 +35,16 @@
 <script>
 import fs from 'fs'
 import ffish from 'ffish'
+import Popup from './Popup'
 
 export default {
   name: 'MenuBar',
   components: {
+    Popup
   },
   methods: {
     goToEngines () {
-      this.$router.push('@/MenuEngines.vue')
+      this.$router.push('LPE')
     },
     openExternalBrowser () {
       const shell = require('electron').shell
