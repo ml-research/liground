@@ -34,6 +34,7 @@ export default class EngineDriver {
       options: []
     }
     this.input = input
+    this.output = output
     this.rl = readline.createInterface({
       input: output,
       output: input
@@ -73,12 +74,47 @@ export default class EngineDriver {
       case 'readyok':
         this.events.emit('ready')
         break
-      case 'id':
-        this.events.emit('id', line)
+      case 'id': {
+        const [, type, value] = line.match(/^id\s+(.+?)\s(.+)$/)
+        if (type === 'name' || type === 'author') {
+          this.info[type] = value
+        }
+        this.events.emit('id', { [type]: value })
         break
-      case 'option':
-        this.events.emit('option', line)
+      }
+      case 'option': {
+        const option = {}
+        const regexp = /\s+(name|type|default|var|min|max)\s+(.+?)(?=\s+(?:name|type|default|var|min|max)|\s*$)/g
+        for (const [, name, value] of line.matchAll(regexp)) {
+          if (name === 'var') {
+            if (!option.var) {
+              option.var = []
+            }
+            option.var.push(value)
+          } else {
+            option[name] = value
+          }
+        }
+        if (option.type === 'spin') {
+          for (const key of ['default', 'min', 'max']) {
+            if (key in option) {
+              option[key] = parseInt(option[key])
+            }
+          }
+        }
+        this.info.options.push(option)
+        this.events.emit('option', option)
         break
+      }
+      case 'info': {
+        const info = {}
+        const regexp = /\s+(depth|seldepth|multipv|cp|nodes|nps|hashfull|tbhits|time|pv)\s+(.+?)(?=\s+(?:depth|seldepth|multipv|score|nodes|nps|hashfull|tbhits|time|pv)|\s*$)/g
+        for (const [, type, value] of line.matchAll(regexp)) {
+          info[type] = type.match(/depth|seldepth|multipv|cp|nodes|nps|hashfull|tbhits|time/) ? parseInt(value) : value
+        }
+        this.events.emit('info', info)
+        break
+      }
     }
   }
 
@@ -105,7 +141,6 @@ export default class EngineDriver {
    * Execute a UCI command.
    * If the command is not known it will be executed after a ready check.
    * @param {string} cmd UCI command
-   * @returns {Promise<void>}
    */
   async exec (cmd) {
     cmd = cmd.trim()
@@ -114,6 +149,11 @@ export default class EngineDriver {
         return await this.initialize()
       case 'quit':
         return await this.quit()
+      case 'setoption':
+      case 'position':
+      case 'go':
+        this._write(cmd)
+        break
       default:
         this.ready = false
         this._write(cmd)
@@ -125,43 +165,11 @@ export default class EngineDriver {
    * Initialize the UCI communication with the engine.
    */
   async initialize () {
-    // add listeners
-    const onId = line => {
-      const [, type, value] = line.match(/^id\s+(.+?)\s(.+)$/)
-      switch (type) {
-        case 'name':
-        case 'author':
-          this.info[type] = value
-          break
-      }
-    }
-    const onOption = line => {
-      const option = {}
-      const regexp = /\s+(name|type|default|var|min|max)\s+(.+?)(?=\s+(?:name|type|default|var|min|max)|$)/g
-      for (const [, name, value] of line.matchAll(regexp)) {
-        if (name === 'var') {
-          if (!option.var) {
-            option.var = []
-          }
-          option.var.push(value)
-        } else {
-          option[name] = value
-        }
-      }
-      this.info.options.push(option)
-    }
-    this.events.on('id', onId)
-    this.events.on('option', onOption)
-
     // send "uci" to engine
     this._write('uci')
 
     // wait until done
     await waitFor(this.events, 'initialized')
-
-    // remove listeners
-    this.events.off('id', onId)
-    this.events.off('option', onOption)
 
     // peform ready check
     await this.waitForReady()
@@ -173,5 +181,30 @@ export default class EngineDriver {
   async quit () {
     await this.waitForReady()
     this._write('quit')
+    await waitFor(this.input, 'close')
+  }
+
+  /**
+   * Set an engine option.
+   * @param {string} name Name of the option
+   * @param {any} [value=null] Value to set
+   */
+  async setOption (name, value = null) {
+    this._write(`setoption name ${name} ${value !== null ? `value ${value}` : ''}`)
+  }
+
+  /**
+   * Set the engine position
+   * @param {string} [fen = null] Position in FEN notation
+   */
+  async position (fen = null) {
+    this._write(`position ${fen || ''}`)
+  }
+
+  /**
+   * Start the engine in infinite mode.
+   */
+  async goInfinite () {
+    this._write('go infinite')
   }
 }

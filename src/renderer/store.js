@@ -123,19 +123,14 @@ export const store = new Vuex.Store({
       state.idAuthor = payload
     },
     multipv (state, payload) {
-      state.multipv = payload
-      for (let idx = 0; idx < state.multipv.length; ++idx) {
-        if (state.multipv[idx].mate) {
-          if (state.sideToMove === 'b') {
-            state.multipv[idx].cpDisplay = '#' + String(-state.multipv[idx].mate)
-          } else {
-            state.multipv[idx].cpDisplay = '#' + state.multipv[idx].mate
-          }
+      for (const pvline of payload) {
+        if (pvline.mate) {
+          pvline.cpDisplay = '#' + (state.sideToMove === 'b' ? String(-pvline.mate) : pvline.mate)
         } else {
-          const cpWhite = cpForWhite(state.multipv[idx].cp, state.sideToMove)
-          state.multipv[idx].cpDisplay = cpforWhiteStr(cpWhite)
+          pvline.cpDisplay = cpforWhiteStr(cpForWhite(pvline.cp, state.sideToMove))
         }
       }
+      state.multipv = payload
     },
     hoveredpv (state, payload) {
       state.hoveredpv = payload
@@ -229,17 +224,17 @@ export const store = new Vuex.Store({
       context.dispatch('updateBoard')
     },
     startEngine (context) {
-      ws.send('startEngine~' + context.getters.engineBinary + '~' + context.getters.variant)
+      // TODO
       console.log('startEngine')
       context.commit('started', true)
     },
     goEngine (context) {
-      ws.send('goEngine')
+      ipc.send('go infinite')
       console.log('goEngine')
       context.commit('active', true)
     },
     stopEngine (context) {
-      ws.send('stopEngine')
+      ipc.send('stop')
       console.log('stopEngine')
       context.commit('active', false)
     },
@@ -247,7 +242,7 @@ export const store = new Vuex.Store({
       context.commit('resetMultiPV')
     },
     position (context) {
-      ws.send(`position~fen~${context.getters.fen}`)
+      ipc.send(`position ${context.getters.fen}`)
       context.commit('sideToMove', context.getters.fen.split(' ')[1])
       console.log(`state.sideToMove: ${context.sideToMove}`)
     },
@@ -296,8 +291,12 @@ export const store = new Vuex.Store({
     idAuthor (context, payload) {
       context.commit('idAuthor', payload)
     },
-    multipv (context, payload) {
-      context.commit('multipv', payload)
+    updateMultiPV (context, payload) {
+      const multipv = context.getters.multipv.slice(0)
+      payload.ucimove = payload.pv.split(/\s/)[0]
+      payload.pv = context.state.board.variationSan(payload.pv)
+      multipv[payload.multipv - 1] = payload
+      context.commit('multipv', multipv)
     },
     loadedGames (context, payload) {
       context.commit('loadedGames', payload)
@@ -524,7 +523,9 @@ function cpforWhiteStr (cpForWhite) {
 (async () => {
   ipc.on('output', line => store.dispatch('stdIO', line))
   ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
-  const engine = await ipc.runEngine()
-  console.log(`Engine active: "${engine.name}" by ${engine.author}`)
-  console.log('Engine Options:', engine.options)
+  ipc.on('info', info => store.dispatch('updateMultiPV', info))
+  const engineInfo = await ipc.runEngine()
+  console.log(`Engine active: "${engineInfo.name}" by ${engineInfo.author}`)
+  console.log('Engine Options:', engineInfo.options)
+  ipc.send('setoption name MultiPV value 5')
 })()

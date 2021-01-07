@@ -26,6 +26,7 @@ ipcMain.on('run', async event => {
     engine = new EngineDriver(child.stdin, child.stdout)
     engine.events.on('input', line => event.reply('engine-input', line))
     engine.events.on('line', line => event.reply('engine-output', line))
+    engine.events.on('info', info => event.reply('engine-info', info))
 
     // initialize
     await engine.initialize()
@@ -39,7 +40,7 @@ ipcMain.on('cmd', (event, cmd) => {
   cmd = cmd.trim()
   event.reply('debug', `Received command "${cmd}"`)
   if (engine) {
-    engine.exec(cmd)
+    engine.exec(cmd).catch(err => event.reply('error', err))
   } else {
     event.reply('error', 'Engine not running')
   }
