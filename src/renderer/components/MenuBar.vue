@@ -8,11 +8,13 @@
         slot="extra"
         class="icon mdi mdi-checkerboard"
       /> Open PGN</a>
-      <a><em
+      <a
+        @click="showModal"
+      ><em
         slot="extra"
         class="icon mdi mdi-checkerboard"
       /> Engines
-      </a> />
+      </a>
       <a href="#"><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
@@ -29,20 +31,12 @@
       /></a>
       <div class="animation start-home" />
     </nav>
-      <div id="popup">
-    <button
-      type="button"
-      class="btn"
-      @click="showModal"
-    >
-      Open Modal!
-    </button>
-
-    <modal
-      v-show="isModalVisible"
-      @close="closeModal"
-    />
-  </div>
+    <div id="popup">
+      <modal
+        v-show="isModalVisible"
+        @close="closeModal"
+      />
+    </div>
   </div>
 </template>
 

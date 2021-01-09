@@ -18,17 +18,17 @@
         <slot name="body">
           I'm the default body!
         </slot>
-       </section>
-       <footer class="modal-footer">
-          <slot name="footer">
-            I'm the default footer!
+      </section>
+      <footer class="modal-footer">
+        <slot name="footer">
+          I'm the default footer!
 
-            <button
-              type="button"
-              class="btn-green"
-              @click="close"
-            >
-              Close me!
+          <button
+            type="button"
+            class="btn-green"
+            @click="close"
+          >
+            Close me!
           </button>
         </slot>
       </footer>
@@ -38,7 +38,7 @@
 
 <script>
 export default {
-  name: 'modal',
+  name: 'Modal',
   methods: {
     close () {
       this.$emit('close')
