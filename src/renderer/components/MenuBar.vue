@@ -31,7 +31,7 @@
       /></a>
       <div class="animation start-home" />
     </nav>
-    <div id="popup">
+    <div id="Modal">
       <modal
         v-show="isModalVisible"
         @close="closeModal"

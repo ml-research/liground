@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <i class="logo icon mdi mdi-feature-search-outline" />LiGround
+    <em class="logo icon mdi mdi-feature-search-outline" />LiGround
     <multiselect
       class="multiselect"
       :value="displayVariant"
@@ -22,7 +22,7 @@
       class="p-icon p-curve p-smooth"
       color="primary-o"
     >
-      <i
+      <em
         slot="extra"
         class="icon mdi mdi-check"
       />

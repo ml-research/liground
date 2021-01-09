@@ -3,32 +3,55 @@
     <div class="modal">
       <header class="modal-header">
         <slot name="header">
-          This is the default tile!
-
-          <button
-            type="button"
-            class="btn-close"
-            @click="close"
-          >
-            x
-          </button>
+          Engine Settings
         </slot>
       </header>
       <section class="modal-body">
         <slot name="body">
-          I'm the default body!
+          <PrettyCheck
+            class="p-icon p-curve p-smooth"
+            color="primary-o"
+          >
+            <em
+              slot="extra"
+              class="icon mdi mdi-check"
+            />
+            <p>1st Option</p>
+          </PrettyCheck>
+          <br>
+          <PrettyCheck
+            class="p-icon p-curve p-smooth"
+            color="primary-o"
+          >
+            <em
+              slot="extra"
+              class="icon mdi mdi-check"
+            />
+            2nd Option
+          </PrettyCheck>
+          <br>
+          <PrettyCheck
+            class="p-icon p-curve p-smooth"
+            color="primary-o"
+          >
+            <em
+              slot="extra"
+              class="icon mdi mdi-check"
+            />
+            3rd Option
+          </PrettyCheck>
+          <br>
         </slot>
       </section>
       <footer class="modal-footer">
         <slot name="footer">
-          I'm the default footer!
-
+          <p />
           <button
             type="button"
             class="btn-green"
             @click="close"
           >
-            Close me!
+            <p> Save & Exit</p>
           </button>
         </slot>
       </footer>
@@ -37,8 +60,12 @@
 </template>
 
 <script>
+import PrettyCheck from 'pretty-checkbox-vue/check'
 export default {
   name: 'Modal',
+  components: {
+    PrettyCheck
+  },
   methods: {
     close () {
       this.$emit('close')
@@ -49,6 +76,7 @@ export default {
 
 <style>
   .modal-backdrop {
+    z-index: 1;
     position: fixed;
     top: 0;
     bottom: 0;
