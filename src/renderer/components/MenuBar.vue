@@ -15,7 +15,10 @@
         class="icon mdi mdi-checkerboard"
       /> Engines
       </a>
-      <a href="#"><em
+      <a
+        href="#"
+        @click="openTab"
+      ><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
       /> Settings </a>
@@ -44,11 +47,12 @@
 import fs from 'fs'
 import ffish from 'ffish'
 import modal from './Modal'
+import NewTab from './NewTab'
 
 export default {
   name: 'MenuBar',
   components: {
-    modal
+    modal, NewTab
   },
   data () {
     return {
@@ -62,8 +66,12 @@ export default {
     closeModal () {
       this.isModalVisible = false
     },
-    goToEngines () {
-      this.$router.push('LPE')
+    openTab () {
+      const { BrowserWindow } = require('electron').remote
+      const win = new BrowserWindow({ backgroundColor: '#FFFFFF' })
+      win.loadURL('D:/Dokumente/Studium/BP/liground/src/renderer/components/NewTab.vue')
+      // window.open('D:/Dokumente/Studium/BP/liground/src/renderer/components/NewTab.vue')
+      // this.$router.push('NewTab')
     },
     openExternalBrowser () {
       const shell = require('electron').shell

@@ -1,6 +1,6 @@
 <template>
   <div id="about">
-    <title>LPE</title>
+    <title>NewTab</title>
     <h1>About</h1>
     <p>What is this about?</p>
   </div>
@@ -8,6 +8,9 @@
 
 <script>
 export default {
-  name: 'LPE'
+  name: 'NewTab'
 }
 </script>
+<style scoped>
+
+</style>

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import LPE from 'D:/Dokumente/Studium/BP/liground/src/renderer/components/LPE.vue'
+import NewTab from 'D:/Dokumente/Studium/BP/liground/src/renderer/components/NewTab.vue'
 
 Vue.use(Router)
 
@@ -13,8 +13,8 @@ export default new Router({
     },
     {
       path: 'D:/Dokumente/Studium/BP/liground/src/renderer/components/MenuEngines.vue',
-      name: 'LPE',
-      component: LPE.Vue
+      name: 'NewTab',
+      component: NewTab.Vue
     }
     /* {
       path: '*',
