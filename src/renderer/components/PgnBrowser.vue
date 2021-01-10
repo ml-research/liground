@@ -1,20 +1,25 @@
 <template>
   <div>
     <div id="gameselect">
-      <pgn-browser-option
+      <div
         v-for="game in loadedGames"
         :key="game.id"
-        :game="game"
-      />
+      >
+        <div
+          class="gameoption"
+          :class="{active : game == selectedGame}"
+          @click="selectedGame = game"
+        >
+          {{ game ? game.headers("White") : '' }} vs {{ game ? game.headers("Black") : '' }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import PgnBrowserOption from './PgnBrowserOption.vue'
 export default {
   name: 'PgnBrowser',
-  components: { PgnBrowserOption },
   computed: {
     selectedGame: {
       get: function () {
@@ -41,9 +46,22 @@ export default {
   height: 100%
 }
 
-#gameselect a {
+.gameoption {
   text-decoration: none;
   display: block;
+  border-bottom: 1px solid black;
+  font-size: 0.8em;
+  font-weight: 600;
+}
 
+.gameoption:hover {
+  background-color: #2196F3;
+  color: white;
+  cursor: pointer;
+}
+
+.gameoption.active {
+  background-color:#444;
+  color: white;
 }
 </style>
