@@ -1,6 +1,13 @@
 <template>
   <div>
     <div id="gameselect">
+      <input
+        id="gamefilter"
+        v-model.lazy="gameFilter"
+        type="text"
+        name="gamefilter"
+        placeholder="filter games"
+      >
       <div
         v-for="game in loadedGames"
         :key="game.id"
@@ -10,7 +17,7 @@
           :class="{active : game == selectedGame}"
           @click="selectedGame = game"
         >
-          {{ game ? game.headers("White") : '' }} vs {{ game ? game.headers("Black") : '' }}
+          {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
         </div>
       </div>
     </div>
@@ -20,6 +27,11 @@
 <script>
 export default {
   name: 'PgnBrowser',
+  data: function () {
+    return {
+      gameFilter: ''
+    }
+  },
   computed: {
     selectedGame: {
       get: function () {
@@ -31,8 +43,24 @@ export default {
     },
     loadedGames: {
       get: function () {
-        return this.$store.getters.loadedGames
+        if (this.gameFilter === '' || !this.$store.getters.loadedGames) {
+          return this.$store.getters.loadedGames
+        } else {
+          return this.$store.getters.loadedGames.filter((value, idx, arr) => {
+            for (const key of value.headerKeys().split(' ')) {
+              if (value.headers(key).toLowerCase().indexOf(this.gameFilter.toLowerCase()) !== -1) {
+                return true
+              }
+            }
+            return false
+          })
+        }
       }
+    }
+  },
+  watch: {
+    gameFilter: function (foo, bar) {
+      console.log('gameFilter change')
     }
   }
 
@@ -46,12 +74,17 @@ export default {
   height: 100%
 }
 
+#gamefilter {
+  width: 100%;
+}
+
 .gameoption {
   text-decoration: none;
   display: block;
   border-bottom: 1px solid black;
   font-size: 0.8em;
   font-weight: 600;
+  text-align: left;
 }
 
 .gameoption:hover {
