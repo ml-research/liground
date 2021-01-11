@@ -3,6 +3,9 @@ import { ipcMain } from 'electron'
 import Engines from './engines'
 import EngineDriver from './driver'
 
+/** @type {import('child_process').ChildProcess} */
+let child = null
+
 /** @type {EngineDriver} */
 let engine = null
 
@@ -23,6 +26,7 @@ ipcMain.on('run', async event => {
     event.reply('debug', 'Killing...')
 
     // remove listeners
+    child.removeAllListeners('exit')
     for (const [event, listener] of Object.entries(listeners)) {
       engine.events.off(event, listener)
     }
@@ -33,12 +37,16 @@ ipcMain.on('run', async event => {
   }
 
   // spawn engine process
-  const child = spawn(binary, []).on('error', err => event.reply('error', err))
+  child = spawn(binary, []).on('error', err => event.reply('error', err))
 
   // success
   if (typeof child.pid === 'number') {
     // create engine
     engine = new EngineDriver(child.stdin, child.stdout)
+
+    // setup error logging & crash handling
+    child.stderr.on('data', err => event.reply('error', err.toString().trim()))
+    child.on('exit', () => event.reply('engine-crash'))
 
     // setup listeners
     listeners.input = line => event.reply('engine-input', line)
@@ -52,6 +60,8 @@ ipcMain.on('run', async event => {
 
     // initialize
     await engine.initialize()
+
+    event.reply('debug', 'Engine active:', engine.info)
 
     // reply with engine infos
     event.reply('active', engine.info)
