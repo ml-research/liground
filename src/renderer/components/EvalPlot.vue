@@ -12,6 +12,7 @@
 
 <script>
 import VueApexCharts from 'vue-apexcharts'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'EvalPlot',
@@ -35,8 +36,28 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: []
+        data: ['1', '2']
       }]
+    }
+  },
+  computed: {
+    ...mapGetters(['active'])
+  },
+  watch: {
+    active () {
+      this.gainData()
+    }
+  },
+  methods: {
+    gainData () {
+      if (this.$store.getters.active === true) {
+        const newData = this.series.data
+        console.log(newData)
+        // newData.push('1')
+        this.series = [{
+          data: newData
+        }]
+      }
     }
   }
 }
