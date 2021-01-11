@@ -16,7 +16,7 @@
               slot="extra"
               class="icon mdi mdi-check"
             />
-            <p>1st Option</p>
+            <p>Option 1</p>
           </PrettyCheck>
           <br>
           <PrettyCheck
@@ -27,7 +27,7 @@
               slot="extra"
               class="icon mdi mdi-check"
             />
-            2nd Option
+            Option 2
           </PrettyCheck>
           <br>
           <PrettyCheck
@@ -38,7 +38,7 @@
               slot="extra"
               class="icon mdi mdi-check"
             />
-            3rd Option
+            Option 3
           </PrettyCheck>
           <br>
         </slot>
@@ -62,7 +62,7 @@
 <script>
 import PrettyCheck from 'pretty-checkbox-vue/check'
 export default {
-  name: 'Modal',
+  name: 'EngineModal',
   components: {
     PrettyCheck
   },

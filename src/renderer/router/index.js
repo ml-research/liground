@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import NewTab from 'D:/Dokumente/Studium/BP/liground/src/renderer/components/NewTab.vue'
 
 Vue.use(Router)
 
@@ -12,13 +11,8 @@ export default new Router({
       component: require('@/components/LandingPage').default
     },
     {
-      path: 'D:/Dokumente/Studium/BP/liground/src/renderer/components/MenuEngines.vue',
-      name: 'NewTab',
-      component: NewTab.Vue
-    }
-    /* {
       path: '*',
       redirect: '/'
-    } */
+    }
   ]
 })

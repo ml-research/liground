@@ -17,7 +17,7 @@
       </a>
       <a
         href="#"
-        @click="openTab"
+        @click="changeTab"
       ><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
@@ -46,13 +46,12 @@
 <script>
 import fs from 'fs'
 import ffish from 'ffish'
-import modal from './Modal'
-import NewTab from './NewTab'
+import modal from './EngineModal'
 
 export default {
   name: 'MenuBar',
   components: {
-    modal, NewTab
+    modal
   },
   data () {
     return {
@@ -66,12 +65,8 @@ export default {
     closeModal () {
       this.isModalVisible = false
     },
-    openTab () {
-      const { BrowserWindow } = require('electron').remote
-      const win = new BrowserWindow({ backgroundColor: '#FFFFFF' })
-      win.loadURL('D:/Dokumente/Studium/BP/liground/src/renderer/components/NewTab.vue')
-      // window.open('D:/Dokumente/Studium/BP/liground/src/renderer/components/NewTab.vue')
-      // this.$router.push('NewTab')
+    changeTab () {
+      this.$store.commit('viewAnalysis', !this.$store.getters.viewAnalysis)
     },
     openExternalBrowser () {
       const shell = require('electron').shell
