@@ -6,6 +6,12 @@ import EngineDriver from './driver'
 /** @type {EngineDriver} */
 let engine = null
 
+const listeners = {
+  input: null,
+  line: null,
+  info: null
+}
+
 // eslint-disable-next-line prefer-const
 let binary = Engines.stockfish
 
@@ -14,7 +20,16 @@ ipcMain.on('run', async event => {
 
   // kill old engine
   if (engine) {
+    event.reply('debug', 'Killing...')
+
+    // remove listeners
+    for (const [event, listener] of Object.entries(listeners)) {
+      engine.events.off(event, listener)
+    }
+
+    // quit engine
     await engine.quit()
+    event.reply('debug', 'Killed!')
   }
 
   // spawn engine process
@@ -24,9 +39,16 @@ ipcMain.on('run', async event => {
   if (typeof child.pid === 'number') {
     // create engine
     engine = new EngineDriver(child.stdin, child.stdout)
-    engine.events.on('input', line => event.reply('engine-input', line))
-    engine.events.on('line', line => event.reply('engine-output', line))
-    engine.events.on('info', info => event.reply('engine-info', info))
+
+    // setup listeners
+    listeners.input = line => event.reply('engine-input', line)
+    listeners.line = line => event.reply('engine-output', line)
+    listeners.info = info => event.reply('engine-info', info)
+
+    // register listeners
+    for (const [event, listener] of Object.entries(listeners)) {
+      engine.events.on(event, listener)
+    }
 
     // initialize
     await engine.initialize()
