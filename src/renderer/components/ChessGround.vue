@@ -168,19 +168,21 @@ export default {
       movable: {
         events: { after: this.changeTurn() },
         color: 'white',
-        free: false
+        free: false,
       },
       orientation: this.orientation,
       geometry: this.$store.getters.dimensionNumber
-
     })
+
+     document.body.dispatchEvent(new Event('chessground.resize'))
     }
+
     this.board.set({
       variant: this.variant,
       lastMove: false,
     })
+
       this.updateBoard()
-      document.body.dispatchEvent(new Event('chessground.resize'))
     }
   },
   methods: {
@@ -226,6 +228,24 @@ export default {
       console.log(`dropPiece: ${event} ${pieceType} ${color}`)
       console.log(`dropPiece: ${this.board.getFen()}`)
     },
+    increaseNumbers(move){
+      let ret = move
+      for(let j = 9; j >= 0; j--){
+        if(ret.includes(String(j)))
+        ret = ret.replace(String(j), String(j+1)) 
+        ret = ret.replace(String(j), String(j+1)) 
+      }
+      return ret
+    },
+    lowerNumbers(move){
+      let ret = move
+      for(let j = 1; j < 11; j++){
+        if(ret.includes(String(j)))
+        ret = ret.replace(String(j), String(j-1)) 
+        ret = ret.replace(String(j), String(j-1)) 
+      }
+      return ret
+    },
     possibleMoves () {
       const dests = {}
 
@@ -234,8 +254,12 @@ export default {
       for (let i = 0; i < this.legalMoves.length; i++) {
         // don't include dropping moves
         if (this.legalMoves[i].length !== 3) {
-          fromSq = this.legalMoves[i].substring(0, 2)
-          toSq = this.legalMoves[i].substring(2, 4)
+          var Move = this.legalMoves[i]
+          if(this.dimensionNumber == 3){
+            Move = this.lowerNumbers(Move)
+          }
+          fromSq = Move.substring(0, 2)
+          toSq = Move.substring(2, 4)
         }
         if (fromSq in dests) {
           dests[fromSq].push(toSq)
@@ -259,7 +283,10 @@ export default {
         if (this.isPromotion(orig, dest)) {
           this.promoteTo = this.onPromotion()
         }
-        const uciMove = orig + dest
+        var uciMove = orig + dest
+        if(this.dimensionNumber===3){
+          uciMove = this.increaseNumbers(uciMove)
+        }
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
         this.$store.dispatch('push', uciMove)
         console.log('colorAfterPush:' + this.turn)
@@ -327,7 +354,7 @@ export default {
       movable: {
         events: { after: this.changeTurn() },
         color: 'white',
-        free: false
+        free: false,
       },
       orientation: this.orientation,
 
@@ -341,6 +368,7 @@ export default {
 @import '../assets/theme.css';
 @import '../assets/dim9x9.css';
 @import '../assets/dim8x8.css';
+@import '../assets/dim9x10.css';
 
 .chess-pocket {
   float: left;
@@ -414,44 +442,6 @@ coords {
 /*
   CSS for 9x10 board e.g. xiangqi/janggi etc. 
 */
-.dim9x10 .cg-board-wrap {
-    background-image: url('/src/renderer/assets/images/board/xiangqi.svg');
 
-}
-.dim9x10 .cg-wrap{
-  width: 540px;
-  height: 600px;
-}
-.dim9x10 cg-helper {
-  position: absolute;
-  width: 11.11%;
-  height: 10%;
-  bottom: 0;
-}
-.dim9x10 cg-container {
-  position: absolute;
-  width: 900%;
-  height: 1000%;
-  bottom: 0;
-}
-.dim9x10 .cg-wrap piece {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 11.11%;
-  height: 10%;
-  background-size: cover;
-  z-index: 2;
-  
-  pointer-events: none;
-}
-.dim9x10 cg-board square {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 11.11%;
-  height: 10%;
-  pointer-events: none;
-}
 
 </style>
