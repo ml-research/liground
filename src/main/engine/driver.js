@@ -69,9 +69,8 @@ export default class EngineDriver {
     this.events.emit('line', line)
     line = line.trim()
     if (this.ignore) {
-      if (line === 'readyok') {
+      if (line.startsWith('bestmove')) {
         this.ignore = false
-        this.events.emit('ready')
       }
       return
     }
@@ -164,9 +163,7 @@ export default class EngineDriver {
         break
       case 'stop':
         this.ignore = true
-        this.ready = false
         this._write(cmd)
-        await this.waitForReady()
         break
       default:
         this.ready = false

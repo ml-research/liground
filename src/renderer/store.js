@@ -53,7 +53,6 @@ function cpToString (cp) {
 export const store = new Vuex.Store({
   state: {
     initialized: false,
-    started: false,
     active: false,
     turn: 'white',
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -125,9 +124,6 @@ export const store = new Vuex.Store({
     },
     active (state, payload) {
       state.active = payload
-    },
-    started (state, payload) {
-      state.started = payload
     },
     destinations (state, payload) {
       state.destinations = payload
@@ -248,10 +244,14 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves', payload.split(' '))
-      context.dispatch('updateBoard')
-      if (context.state.active) {
+      const { active } = context.state
+      if (active) {
         context.dispatch('stopEngine')
+      }
+      context.commit('appendMoves', payload.split(' '))
+      context.dispatch('resetMultiPV')
+      context.dispatch('updateBoard')
+      if (active) {
         context.dispatch('position')
         context.dispatch('goEngine')
       }
@@ -282,9 +282,6 @@ export const store = new Vuex.Store({
     },
     destinations (context, payload) {
       context.commit('destinations', payload)
-    },
-    started (context, payload) {
-      context.commit('started', payload)
     },
     orientation (context, payload) {
       context.commit('orientation', payload)
@@ -320,9 +317,16 @@ export const store = new Vuex.Store({
       context.commit('idAuthor', payload)
     },
     updateMultiPV (context, payload) {
+      if (!context.state.active) {
+        return
+      }
       const multipv = context.getters.multipv.slice(0)
       payload.ucimove = payload.pv.split(/\s/)[0]
-      payload.pv = context.state.board.variationSan(payload.pv)
+      try {
+        payload.pv = context.state.board.variationSan(payload.pv)
+      } catch (err) {
+        console.error('Invalid move:', payload.pv)
+      }
       multipv[payload.multipv - 1] = payload
       context.commit('multipv', multipv)
     },
@@ -370,9 +374,6 @@ export const store = new Vuex.Store({
     },
     active (state) {
       return state.active
-    },
-    started (state) {
-      return state.started
     },
     redraw (state) {
       return state.redraw
