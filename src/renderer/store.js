@@ -413,15 +413,6 @@ export const store = new Vuex.Store({
     hoveredpv (state) {
       return state.hoveredpv
     },
-    bestmove (state) {
-      return [
-        state.multipv[0].ucimove,
-        state.multipv[1].ucimove,
-        state.multipv[2].ucimove,
-        state.multipv[3].ucimove,
-        state.multipv[4].ucimove
-      ]
-    },
     cp (state) {
       return state.multipv[0].cp
     },

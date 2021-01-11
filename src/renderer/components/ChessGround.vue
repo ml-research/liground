@@ -118,7 +118,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
   },
   watch: {
     initialized () {
@@ -133,45 +133,43 @@ export default {
     pieceStyle (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
     },
-    bestmove () {
+    multipv () {
       const multipv = this.multipv
       const shapes = []
       const pieceShapes = []
 
-      if (this.$store.getters.started) {
-        let lineWidth = 10
-        for (let idx = 0; idx < multipv.length; ++idx) {
-          if ('ucimove' in multipv[idx] && multipv[idx].ucimove.length > 0) {
-            const move = multipv[idx].ucimove
-            const orig = move.substring(0, 2)
-            const dest = move.substring(2, 4)
-            let drawShape
+      let lineWidth = 10
+      for (let idx = 0; idx < multipv.length; ++idx) {
+        if ('ucimove' in multipv[idx] && multipv[idx].ucimove.length > 0) {
+          const move = multipv[idx].ucimove
+          const orig = move.substring(0, 2)
+          const dest = move.substring(2, 4)
+          let drawShape
 
-            if (move.indexOf('@') !== -1) {
-              const pieceType = move[0].toLowerCase()
-              const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
-              pieceShapes.unshift({
-                orig: dest,
-                dest: dest,
-                brush: 'blue',
-                modifiers: { lineWidth: lineWidth },
-                piece: { role: pieceConv[pieceType], color: this.turn }
-              })
-              drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
-            } else {
-              drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
-            }
-
-            // adjust color if pv line is hovered
-            if (idx === this.hoveredpv) {
-              drawShape.brush = 'yellow'
-            }
-
-            // put item in front of list, so that the bestmove is drawn last
-            shapes.unshift(drawShape)
-
-            lineWidth -= 2
+          if (move.indexOf('@') !== -1) {
+            const pieceType = move[0].toLowerCase()
+            const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
+            pieceShapes.unshift({
+              orig: dest,
+              dest: dest,
+              brush: 'blue',
+              modifiers: { lineWidth: lineWidth },
+              piece: { role: pieceConv[pieceType], color: this.turn }
+            })
+            drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
+          } else {
+            drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
           }
+
+          // adjust color if pv line is hovered
+          if (idx === this.hoveredpv) {
+            drawShape.brush = 'yellow'
+          }
+
+          // put item in front of list, so that the best move is drawn last
+          shapes.unshift(drawShape)
+
+          lineWidth -= 2
         }
       }
       this.pieceShapes = pieceShapes
