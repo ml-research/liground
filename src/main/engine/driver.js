@@ -26,6 +26,7 @@ export default class EngineDriver {
    */
   constructor (input, output) {
     this.events = new EventEmitter()
+    this.ignore = false
     this.ready = false
     this.pendingReady = false
     this.info = {
@@ -67,6 +68,13 @@ export default class EngineDriver {
   _parseLine (line) {
     this.events.emit('line', line)
     line = line.trim()
+    if (this.ignore) {
+      if (line === 'readyok') {
+        this.ignore = false
+        this.events.emit('ready')
+      }
+      return
+    }
     switch (line.split(/\s/)[0].trim()) {
       case 'uciok':
         this.events.emit('initialized')
@@ -119,7 +127,7 @@ export default class EngineDriver {
   }
 
   /**
-   * Wait until the engine is ready for the next command.
+   * Wait until the engine is done with the previous command(s).
    * This will cause an "isready" if no ready check is pending already.
    * @returns {Promise<void>}
    */
@@ -139,7 +147,7 @@ export default class EngineDriver {
 
   /**
    * Execute a UCI command.
-   * If the command is not known it will be executed after a ready check.
+   * If the command is not known it will trigger a ready check after execution.
    * @param {string} cmd UCI command
    */
   async exec (cmd) {
@@ -153,6 +161,12 @@ export default class EngineDriver {
       case 'position':
       case 'go':
         this._write(cmd)
+        break
+      case 'stop':
+        this.ignore = true
+        this.ready = false
+        this._write(cmd)
+        await this.waitForReady()
         break
       default:
         this.ready = false
