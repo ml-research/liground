@@ -105,13 +105,13 @@ export default {
       return this.$store.getters.pv
     },
     cp () {
-      return this.$store.getters.cpforWhiteStr
+      return this.$store.getters.cpForWhiteStr
     },
     pv2 () {
       return this.$store.getters.pv2
     },
     cp2 () {
-      return this.$store.getters.cpforWhiteStr
+      return this.$store.getters.cpForWhiteStr
     },
     moves () {
       return this.$store.getters.moves

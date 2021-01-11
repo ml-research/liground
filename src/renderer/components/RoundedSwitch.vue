@@ -3,7 +3,7 @@
   <label class="switch">
     <input
       type="checkbox"
-      @click="pressed"
+      @click="onClick"
     >
     <span class="slider round" />
   </label>
@@ -15,21 +15,22 @@ export default {
   props: {},
   data () {
     return {
-      checked: false
+      running: false
     }
   },
-  methods: {
-    pressed () {
-      this.checked = !this.checked
-      if (this.checked) {
-        if (!this.$store.getters.started) {
-          this.$store.dispatch('startEngine')
-        }
+  watch: {
+    running () {
+      if (this.running) {
         this.$store.dispatch('position')
         this.$store.dispatch('goEngine')
       } else {
         this.$store.dispatch('stopEngine')
       }
+    }
+  },
+  methods: {
+    onClick () {
+      this.running = !this.running
     }
   }
 }

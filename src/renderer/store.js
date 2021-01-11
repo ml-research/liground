@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import ffish from 'ffish'
 import ipc from './ipc'
 
+Vue.use(Vuex)
+
 class TwoWayMap {
   constructor (map) {
     this.map = map
@@ -20,7 +22,33 @@ class TwoWayMap {
   revGet (key) { return this.reverseMap[key] }
 }
 
-Vue.use(Vuex)
+/**
+ * Calculate the value for current side to move.
+ * @param {number} value CP or Mate value
+ * @param {string} sideToMove Current side to move ('w' or 'b')
+ */
+function calcForSide (value, sideToMove) {
+  return sideToMove === 'b' ? -value : value
+}
+
+/**
+ * Convert a CP value to a display string.
+ * @param {number} cp CP value
+ */
+function cpToString (cp) {
+  if (isNaN(cp)) {
+    return ''
+  }
+  if (cp === 0) {
+    return '±0.00'
+  }
+  const normalizedEval = (cp / 100).toFixed(2)
+  if (cp > 0) {
+    return `+${normalizedEval}`
+  } else {
+    return normalizedEval
+  }
+}
 
 export const store = new Vuex.Store({
   state: {
@@ -125,9 +153,9 @@ export const store = new Vuex.Store({
     multipv (state, payload) {
       for (const pvline of payload) {
         if (pvline.mate) {
-          pvline.cpDisplay = '#' + (state.sideToMove === 'b' ? String(-pvline.mate) : pvline.mate)
+          pvline.cpDisplay = `#${state.sideToMove === 'b' ? -pvline.mate : pvline.mate}`
         } else {
-          pvline.cpDisplay = cpforWhiteStr(cpForWhite(pvline.cp, state.sideToMove))
+          pvline.cpDisplay = cpToString(calcForSide(pvline.cp, state.sideToMove))
         }
       }
       state.multipv = payload
@@ -222,11 +250,11 @@ export const store = new Vuex.Store({
     push (context, payload) {
       context.commit('appendMoves', payload.split(' '))
       context.dispatch('updateBoard')
-    },
-    startEngine (context) {
-      // TODO
-      console.log('startEngine')
-      context.commit('started', true)
+      if (context.state.active) {
+        context.dispatch('stopEngine')
+        context.dispatch('position')
+        context.dispatch('goEngine')
+      }
     },
     goEngine (context) {
       ipc.send('go infinite')
@@ -242,7 +270,7 @@ export const store = new Vuex.Store({
       context.commit('resetMultiPV')
     },
     position (context) {
-      ipc.send(`position ${context.getters.fen}`)
+      ipc.send(`position fen ${context.getters.fen}`)
       context.commit('sideToMove', context.getters.fen.split(' ')[1])
       console.log(`state.sideToMove: ${context.sideToMove}`)
     },
@@ -301,7 +329,6 @@ export const store = new Vuex.Store({
     loadedGames (context, payload) {
       context.commit('loadedGames', payload)
     },
-
     loadGame (context, payload) {
       let variant = payload.game.headers('Variant').toLowerCase()
 
@@ -423,29 +450,23 @@ export const store = new Vuex.Store({
       return state.multipv[0].pv
     },
     cpForWhite (state) {
-      return cpForWhite(state.multipv[0].cp, state.sideToMove)
+      return calcForSide(state.multipv[0].cp, state.sideToMove)
     },
-    cpforWhiteStr (state, getters) {
-      if (state.multipv[0].mate) {
-        if (state.sideToMove === 'b') {
-          return '#' + String(-state.multipv[0].mate)
-        } else {
-          return '#' + state.multipv[0].mate
-        }
+    cpForWhiteStr (state, getters) {
+      const { mate } = state.multipv[0]
+      if (mate) {
+        return `#${calcForSide(mate, state.sideToMove)}`
+      } else {
+        return cpToString(getters.cpForWhite)
       }
-      return cpforWhiteStr(getters.cpForWhite)
     },
-    cpforWhitePerc (state) {
-      if (state.multipv[0].mate) {
-        if (state.sideToMove === 'b') {
-          return (-Math.sign(state.multipv[0].mate) + 1) / 2
-        } else {
-          return (Math.sign(state.multipv[0].mate) + 1) / 2
-        }
+    cpForWhitePerc (state, getters) {
+      const { mate } = state.multipv[0]
+      if (mate) {
+        return ((state.sideToMove === 'b' ? -Math.sign(mate) : Math.sign(mate)) + 1) / 2
+      } else {
+        return 1 / (1 + Math.exp(-0.003 * getters.cpForWhite))
       }
-      const k = 0.003
-      const e = 2.7
-      return 1 / (1 + e ** (-k * cpForWhite(state.multipv[0].cp, state.sideToMove)))
     },
     message (state) {
       return state.message.toUpperCase()
@@ -498,28 +519,6 @@ ffish.onRuntimeInitialized = () => {
   store.dispatch('initialize')
 }
 
-function cpForWhite (cp, sideToMove) {
-  if (sideToMove === 'b') {
-    return -cp
-  }
-  return cp
-}
-
-function cpforWhiteStr (cpForWhite) {
-  if (String(cpForWhite) === 'NaN' || String(cpForWhite) === '-NaN') {
-    return ''
-  }
-  const normalizedEval = (cpForWhite / 100).toFixed(2)
-
-  if (normalizedEval > 0) {
-    return '+' + String(normalizedEval)
-  }
-  if (normalizedEval === 0) {
-    return '±0.00'
-  }
-  return '-' + String(-normalizedEval)
-}
-
 (async () => {
   ipc.on('output', line => store.dispatch('stdIO', line))
   ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
@@ -528,4 +527,6 @@ function cpforWhiteStr (cpForWhite) {
   console.log(`Engine active: "${engineInfo.name}" by ${engineInfo.author}`)
   console.log('Engine Options:', engineInfo.options)
   ipc.send('setoption name MultiPV value 5')
+  ipc.send('setoption name UCI_AnalyseMode value true')
+  ipc.send('setoption name Analysis Contempt value Off')
 })()

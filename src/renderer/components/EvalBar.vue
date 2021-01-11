@@ -15,7 +15,7 @@ export default {
   name: 'EvalBar',
   computed: {
     filterSectionHeight () {
-      return String(this.$store.getters.cpforWhitePerc * 600) + 'px'
+      return `${this.$store.getters.cpForWhitePerc * 600}px`
     }
   }
 }
