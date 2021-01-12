@@ -95,7 +95,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'dimensionNumber'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'dimensionNumber'])
   },
   watch: {
     initialized () {
@@ -106,6 +106,9 @@ export default {
     },
     pieceStyle (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
+    },
+    boardStyle (boardStyle) {
+      this.updateBoardCSS(boardStyle)
     },
     bestmove () {
       const shapes = []
@@ -200,6 +203,23 @@ export default {
       }
       if (this.$store.getters.isShogi) {
         file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
+      }
+      document.head.appendChild(file)
+    },
+    updateBoardCSS (boardStyle) {
+      const file = document.createElement('link')
+      file.rel = 'stylesheet'
+      if(this.$store.getters.isInternational) {
+        file.href = 'src/renderer/assets/images/board-css/international/'+ boardStyle + '.css'
+      }else
+      if(this.$store.getters.isXiangqi){
+        file.href = 'src/renderer/assets/images/board-css/xiangqi/'+ this.variant+ '/' + boardStyle + '.css'
+      }else
+      if(this.$store.getters.isSEA){
+        file.href = 'src/renderer/assets/images/board-css/sea/'+ boardStyle + '.css'
+      }else
+      if(this.$store.getters.isShogi){
+        file.href = 'src/renderer/assets/images/board-css/shogi/'+ boardStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -410,8 +430,7 @@ coords {
   color: black;
 }
 .cg-board-wrap {
-  background-image: url('/src/renderer/assets/images/board/blue.svg');
-
+  background-image: url('/src/renderer/assets/images/board/svg/blue.svg');
 }
 
 .koth cg-board::before {

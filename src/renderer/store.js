@@ -43,6 +43,7 @@ export const store = new Vuex.Store({
     ],
     sideToMove: 'w',
     counter: 0,
+    boardStyle: 'blue', 
     pieceStyle: 'tatiana',
     board: null,
     internationalVariants: [
@@ -142,6 +143,9 @@ export const store = new Vuex.Store({
     },
     pieceStyle (state, payload) {
       state.pieceStyle = payload
+    },
+    boardStyle (state, payload) {
+      state.boardStyle = payload
     },
     newBoard (state, payload) {
       if (typeof payload.fen === 'string') {
@@ -273,6 +277,9 @@ export const store = new Vuex.Store({
     },
     pieceStyle (context, payload) {
       context.commit('pieceStyle', payload)
+    },
+    boardStyle (context, payload) {
+      context.commit('boardStyle', payload)
     }
   },
   getters: {
@@ -387,6 +394,9 @@ export const store = new Vuex.Store({
     },
     pieceStyle (state) {
       return state.pieceStyle
+    },
+    boardStyle (state) {
+      return state.boardStyle
     },
     turn (state) {
       return state.turn

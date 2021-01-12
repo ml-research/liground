@@ -7,7 +7,10 @@
           <EvalBar class="float-right-child" id="evalbar"/>
           <br/>
           <div id="fen-field">FEN <input type="text" id="lname" name="lname" placeholder="fen position" v-on:change="checkValidFEN" :value="fen" size="60"></div>
-          <PieceStyleSelector id="piece-style"/>
+            <div id="selector-container">
+              <PieceStyleSelector id="piece-style"/>
+              <BoardStyleSelector id="board-style"/>
+            </div>
           <EvalPlot/>
         </div>
         <AnalysisView id="analysisview" v-on:flip-board="flipBoard" :reset="resetAnalysis"/>
@@ -22,6 +25,7 @@ import EvalBar from './EvalBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
+import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
 
@@ -34,6 +38,7 @@ export default {
     EvalBar,
     ChessGround,
     PieceStyleSelector,
+    BoardStyleSelector,
     EvalPlot
   },
   beforeCreate () {
@@ -130,10 +135,20 @@ input {
 #fen-field {
   margin-left: 48px;
 }
+#selector-container {
+  height:60px;
+}
 #piece-style {
   margin-top: 10px;
-  width: 300px;
-  margin-left: 142px;
+  width: 210px;
+  margin-left: 60px;
+  position: absolute;
+}
+#board-style {
+  margin-top: 10px;
+  width: 210px;
+  margin-left: 330px;
+  position: absolute;
 }
 .grid-parent {
   display: grid;

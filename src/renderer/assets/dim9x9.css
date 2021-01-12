@@ -7,9 +7,7 @@
     height: 600px;
 }
 
-.dim9x9 .cg-board-wrap {
-    background-image: url('/src/renderer/assets/images/board/shogi.svg');
-}
+
 
 .dim9x9 cg-helper {
     width: calc( 100% / 9);

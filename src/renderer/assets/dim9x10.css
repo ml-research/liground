@@ -2,10 +2,7 @@
 * CSS for Chessground with 9x10 board dimensions
 */
 
-.dim9x10 .cg-board-wrap {
-    background-image: url('/src/renderer/assets/images/board/xiangqi.svg');
 
-}
 .dim9x10 .cg-wrap{
   width: 540px;
   height: 600px;
