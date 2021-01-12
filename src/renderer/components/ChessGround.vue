@@ -112,7 +112,6 @@ export default {
       pieceShapes: [],
       promotions: [],
       promoteTo: 'q',
-      promoting: true,
       isPromotionModalVisible: false,
       uciMove: undefined
     }
