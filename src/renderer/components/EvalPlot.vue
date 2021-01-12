@@ -4,7 +4,7 @@
       width="710"
       height="260"
       type="area"
-      :options="options"
+      :options="chartOptions"
       :series="series"
     />
   </div>
@@ -21,22 +21,22 @@ export default {
   },
   data: function () {
     return {
-      options: {
+      chartOptions: {
         chart: {
           id: 'vuechart-example'
         },
         xaxis: {
-          categories: ['THIS IS A DUMMY']
+          categories: ['Moves']
         },
         yaxis: {
           title: {
-            text: 'THIS IS A DUMMY'
+            text: 'Points'
           }
         }
       },
       series: [{
         name: 'evaluation',
-        data: ['1', '2']
+        data: []
       }]
     }
   },
@@ -45,17 +45,14 @@ export default {
   },
   watch: {
     active () {
-      this.gainData()
+      this.updateChart()
     }
   },
   methods: {
-    gainData () {
+    updateChart () {
       if (this.$store.getters.active === true) {
-        const newData = this.series.data
-        console.log(newData)
-        // newData.push('1')
         this.series = [{
-          data: newData
+          data: [1, 2, 3]
         }]
       }
     }
