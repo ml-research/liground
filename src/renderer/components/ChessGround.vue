@@ -1,6 +1,8 @@
 <template>
   <div class="blue merida is2d">
-    <div class="grid-parent">
+    <div
+      class="grid-parent"
+    >
       <div class="pockets">
         <div
           v-if="variant==='crazyhouse'"
@@ -27,6 +29,14 @@
           ref="board"
           class="cg-board-wrap"
         />
+        <div
+          id="PromotionModal"
+        >
+          <PromotionModal
+            v-show="isPromotionModalVisible"
+            @close="closePromotionModal"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -36,6 +46,7 @@
 import { mapGetters } from 'vuex'
 import { Chessground } from 'chessgroundx'
 import ChessPocket from './ChessPocket'
+import PromotionModal from './PromotionModal.vue'
 
 const WHITE = true
 const BLACK = false
@@ -43,7 +54,7 @@ const BLACK = false
 export default {
   name: 'ChessGround',
   components: {
-    ChessPocket
+    ChessPocket, PromotionModal
   },
   props: {
     free: {
@@ -100,7 +111,10 @@ export default {
       shapes: [],
       pieceShapes: [],
       promotions: [],
-      promoteTo: 'q'
+      promoteTo: 'q',
+      promoting: true,
+      isPromotionModalVisible: false,
+      uciMove: undefined
     }
   },
   computed: {
@@ -216,6 +230,42 @@ export default {
     })
   },
   methods: {
+    showPromotionModal () {
+      this.isPromotionModalVisible = true
+      const row = this.uciMove.substring(3, 4)
+      const col = this.uciMove.substring(2, 3)
+      let offset = document.getElementsByClassName('cg-board-wrap')[0].offsetTop
+      const dir = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 }
+      if (this.orientation === 'black') {
+        if (row === '8') {
+          offset += document.getElementsByClassName('cg-board-wrap')[0].offsetHeight * 0.5
+          document.getElementById('PromotionModal').style.top = offset + 'px'
+        } else {
+          document.getElementById('PromotionModal').style.top = offset + 'px'
+        }
+        document.getElementById('PromotionModal').style.top += 'px'
+        document.getElementById('PromotionModal').style.left = document.getElementsByClassName('cg-board-wrap')[0].offsetLeft + (7 - dir[col]) * 75 + 'px'
+      } else {
+        if (row === '1') {
+          offset += document.getElementsByClassName('cg-board-wrap')[0].offsetHeight * 0.5
+          document.getElementById('PromotionModal').style.top = offset + 'px'
+        } else {
+          document.getElementById('PromotionModal').style.top = offset + 'px'
+        }
+        document.getElementById('PromotionModal').style.top += 'px'
+        document.getElementById('PromotionModal').style.left = document.getElementsByClassName('cg-board-wrap')[0].offsetLeft + dir[col] * 75 + 'px'
+      }
+      document.dispatchEvent(new Event('startedPromotion'))
+    },
+    closePromotionModal (value) {
+      this.isPromotionModalVisible = false
+      this.promoteTo = value
+      this.uciMove = this.uciMove + String(this.promoteTo)
+      this.lastMoveSan = this.$store.getters.sanMove(this.uciMove)
+      this.$store.dispatch('push', this.uciMove)
+      this.updateHand()
+      this.afterMove()
+    },
     updatePieceCSS (pieceStyle) {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
@@ -247,9 +297,13 @@ export default {
       }
       return dests
     },
-    isPromotion (orig, dest) {
-      const filteredPromotions = this.promotions.filter(move => move.from === orig && move.to === dest)
-      return filteredPromotions.length > 0 // The current movement is a promotion
+    isPromotion (uciMove) {
+      try {
+        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+      } catch (err) {
+        return true
+      }
+      return false
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -266,15 +320,19 @@ export default {
     },
     changeTurn () {
       return (orig, dest) => {
-        if (this.isPromotion(orig, dest)) {
-          this.promoteTo = this.onPromotion()
-        }
         const uciMove = orig + dest
-        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-        this.$store.dispatch('push', uciMove)
-        console.log('colorAfterPush:' + this.turn)
-        this.updateHand()
-        this.afterMove()
+        if (this.isPromotion(uciMove)) {
+          this.uciMove = uciMove
+          this.showPromotionModal()
+          // console.log('last move' + this.moves[this.moves.length - 1].name)
+        } else {
+          this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+          console.log('after error')
+          this.$store.dispatch('push', uciMove)
+          console.log('colorAfterPush:' + this.turn)
+          this.updateHand()
+          this.afterMove()
+        }
       }
     },
     updatePocket (pocket, pocketPieces, color) {
@@ -367,6 +425,9 @@ export default {
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
 
+#PromotionModal {
+  position: absolute;
+}
 .black {
   transform: scaleY(-1);
 }
