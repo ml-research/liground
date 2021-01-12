@@ -76,23 +76,21 @@ export const store = new Vuex.Store({
     idName: '',
     idAuthor: '',
     orientation: 'white',
+    engineStats: {
+      depth: 0,
+      seldepth: 0,
+      nodes: 0,
+      nps: 0,
+      hashfull: 0,
+      tbhits: 0,
+      time: 0
+    },
     multipv: [
       {
-        depth: 0,
-        seldepth: 0,
         cp: 0,
-        nodes: 0,
-        nps: 0,
-        hashfull: 0,
-        tbhits: 0,
-        time: 0,
         pv: '',
         ucimove: ''
-      },
-      {},
-      {},
-      {},
-      {}
+      }
     ],
     hoveredpv: -1,
     sideToMove: 'w',
@@ -145,6 +143,9 @@ export const store = new Vuex.Store({
     },
     idAuthor (state, payload) {
       state.idAuthor = payload
+    },
+    engineStats (state, payload) {
+      state.engineStats = payload
     },
     multipv (state, payload) {
       for (const pvline of payload) {
@@ -317,17 +318,33 @@ export const store = new Vuex.Store({
       context.commit('idAuthor', payload)
     },
     updateMultiPV (context, payload) {
+      // ignore pv updates when engine is expected to be inactive
       if (!context.state.active) {
         return
       }
+
+      // update engine stats
+      const stats = { ...context.state.engineStats }
+      for (const key of Object.keys(stats)) {
+        if (key in payload) {
+          stats[key] = payload[key]
+        }
+      }
+      context.commit('engineStats', stats)
+
+      // update pvline
       const multipv = context.getters.multipv.slice(0)
-      payload.ucimove = payload.pv.split(/\s/)[0]
+      const pvline = {
+        cp: payload.cp,
+        mate: payload.mate,
+        ucimove: payload.pv.split(/\s/)[0]
+      }
       try {
-        payload.pv = context.state.board.variationSan(payload.pv)
+        pvline.pv = context.state.board.variationSan(payload.pv)
       } catch (err) {
         console.error('Invalid move:', payload.pv)
       }
-      multipv[payload.multipv - 1] = payload
+      multipv[payload.multipv - 1] = pvline
       context.commit('multipv', multipv)
     },
     loadedGames (context, payload) {
@@ -418,25 +435,25 @@ export const store = new Vuex.Store({
       return state.multipv[0].cp
     },
     depth (state) {
-      return state.multipv[0].depth
+      return state.engineStats.depth
     },
     nps (state) {
-      return state.multipv[0].nps
+      return state.engineStats.nps
     },
     seldepth (state) {
-      return state.multipv[0].seldepth
+      return state.engineStats.seldepth
     },
     nodes (state) {
-      return state.multipv[0].nodes
+      return state.engineStats.nodes
     },
     hashfull (state) {
-      return state.multipv[0].hashfull
+      return state.engineStats.hashfull
     },
     tbhits (state) {
-      return state.multipv[0].tbhits
+      return state.engineStats.tbhits
     },
     time (state) {
-      return state.multipv[0].time
+      return state.engineStats.time
     },
     pv (state) {
       return state.multipv[0].pv
