@@ -50,6 +50,7 @@ export default {
       this.$store.commit('hoveredpv', -1)
     },
     onClick (line) {
+      this.$store.commit('hoveredpv', -1)
       this.$store.dispatch('push', line.ucimove)
     }
   }
