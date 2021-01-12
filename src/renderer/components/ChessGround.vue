@@ -138,38 +138,39 @@ export default {
       const shapes = []
       const pieceShapes = []
 
-      let lineWidth = 10
-      for (let idx = 0; idx < multipv.length; ++idx) {
-        if ('ucimove' in multipv[idx] && multipv[idx].ucimove.length > 0) {
-          const move = multipv[idx].ucimove
+      for (const [i, pvline] of multipv.entries()) {
+        if ('ucimove' in pvline && pvline.ucimove.length > 0) {
+          const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
+          const move = pvline.ucimove
           const orig = move.substring(0, 2)
           const dest = move.substring(2, 4)
           let drawShape
 
-          if (move.indexOf('@') !== -1) {
+          if (move.includes('@')) {
             const pieceType = move[0].toLowerCase()
             const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
             pieceShapes.unshift({
               orig: dest,
               dest: dest,
               brush: 'blue',
-              modifiers: { lineWidth: lineWidth },
-              piece: { role: pieceConv[pieceType], color: this.turn }
+              modifiers: { lineWidth },
+              piece: {
+                role: pieceConv[pieceType],
+                color: this.turn
+              }
             })
-            drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
+            drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth } }
           } else {
-            drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
+            drawShape = { orig, dest, brush: 'blue', modifiers: { lineWidth } }
           }
 
           // adjust color if pv line is hovered
-          if (idx === this.hoveredpv) {
+          if (i === this.hoveredpv) {
             drawShape.brush = 'yellow'
           }
 
           // put item in front of list, so that the best move is drawn last
           shapes.unshift(drawShape)
-
-          lineWidth -= 2
         }
       }
       this.pieceShapes = pieceShapes
