@@ -249,23 +249,19 @@ export default {
       console.log(`dropPiece: ${this.board.getFen()}`)
     },
     increaseNumbers(move){
-      let ret = move
-      for(let j = 9; j >= 0; j--){
-        if(ret.includes(String(j)))
-        ret = ret.replace(String(j), String(j+1)) 
-        ret = ret.replace(String(j), String(j+1)) 
-      }
+      var letters = move.split(/(\d+)/)
+      letters[1] = String(parseInt(letters[1])+1)
+      letters[3] = String(parseInt(letters[3])+1)
+      let ret = letters.join('')
       return ret
     },
     lowerNumbers(move){
-      let ret = move
-      for(let j = 1; j < 11; j++){
-        if(ret.includes(String(j)))
-        ret = ret.replace(String(j), String(j-1)) 
-        ret = ret.replace(String(j), String(j-1)) 
-      }
+      var letters = move.split(/(\d+)/)
+      letters[1] = String(parseInt(letters[1])-1)
+      letters[3] = String(parseInt(letters[3])-1)
+      let ret = letters.join('')
       return ret
-    },
+      },
     possibleMoves () {
       const dests = {}
 
@@ -354,6 +350,8 @@ export default {
         },
         orientation: this.orientation
       })
+      console.log(this.$store.getters.legalMoves)
+      console.log(this.board.state.movable.dests)
     }
   },
   mounted () {
