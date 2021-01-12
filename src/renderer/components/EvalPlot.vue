@@ -24,22 +24,15 @@ export default {
       evalArray: [],
       currentValue: 0,
       chartOptions: {
-        tooltip: {
-          shared: false,
-          intersect: true
-        },
-        dataLabels: {
-          enabled: true,
-          distributed: true
+        markers: {
+          size: 8
         },
         chart: {
           id: 'vuechart-example',
           events: {
-            dataPointSelection: function (event, chartContext, config) {
-              console.log('datapoint')
-            },
-            mounted: function (chartContext, config) {
-              console.log('mounted')
+            markerClick: function (event, chartContext, { seriesIndex, dataPointIndex, config }) {
+              console.log('marker')
+              // load FEN von data
             }
           }
         },
@@ -54,15 +47,8 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: [1, 2, 3, 4, -4]
-      }],
-      markers: {
-        size: 7,
-        onClick: function (e) {
-          console.log('markerclicked')
-        },
-        data: [1, 2, 3, 4]
-      }
+        data: [1, -1, 1, -1]
+      }]
     }
   },
   computed: {
