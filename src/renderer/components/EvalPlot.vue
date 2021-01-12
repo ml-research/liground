@@ -24,6 +24,28 @@ export default {
       evalArray: [],
       currentValue: 0,
       chartOptions: {
+        colors: ['#000000'],
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 1,
+            opacityTo: 0,
+            colorStops: [
+              {
+                offset: 67,
+                // calc offset
+                color: '#FFFFFF',
+                opacity: 0
+              },
+              {
+                offset: 0,
+                color: '#000000',
+                opacity: 1
+              }
+            ]
+          }
+        },
         markers: {
           size: 8
         },
@@ -47,7 +69,7 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: [1, -1, 1, -1]
+        data: [0, 5, -5, 4, -2, 6]
       }]
     }
   },
@@ -56,6 +78,7 @@ export default {
   },
   watch: {
     points () {
+      // korrekte Punktzahl übergeben
       // this.updatePoints()
     },
     turn () {
