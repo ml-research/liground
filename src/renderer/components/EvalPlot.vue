@@ -24,8 +24,24 @@ export default {
       evalArray: [],
       currentValue: 0,
       chartOptions: {
+        tooltip: {
+          shared: false,
+          intersect: true
+        },
+        dataLabels: {
+          enabled: true,
+          distributed: true
+        },
         chart: {
-          id: 'vuechart-example'
+          id: 'vuechart-example',
+          events: {
+            dataPointSelection: function (event, chartContext, config) {
+              console.log('datapoint')
+            },
+            mounted: function (chartContext, config) {
+              console.log('mounted')
+            }
+          }
         },
         xaxis: {
           categories: ['Start', '1. White', '1. Black']
@@ -38,8 +54,15 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: [1, 2, 3]
-      }]
+        data: [1, 2, 3, 4, -4]
+      }],
+      markers: {
+        size: 7,
+        onClick: function (e) {
+          console.log('markerclicked')
+        },
+        data: [1, 2, 3, 4]
+      }
     }
   },
   computed: {
@@ -47,10 +70,10 @@ export default {
   },
   watch: {
     points () {
-      this.updatePoints()
+      // this.updatePoints()
     },
     turn () {
-      this.updateGraph()
+      // this.updateGraph()
     }
   },
   methods: {
