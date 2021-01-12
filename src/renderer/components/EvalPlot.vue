@@ -21,12 +21,14 @@ export default {
   },
   data: function () {
     return {
+      evalArray: [],
+      currentValue: 0,
       chartOptions: {
         chart: {
           id: 'vuechart-example'
         },
         xaxis: {
-          categories: ['Moves']
+          categories: ['Start', '1. White', '1. Black']
         },
         yaxis: {
           title: {
@@ -36,25 +38,31 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: []
+        data: [1, 2, 3]
       }]
     }
   },
   computed: {
-    ...mapGetters(['active'])
+    ...mapGetters(['points', 'turn'])
   },
   watch: {
-    active () {
-      this.updateChart()
+    points () {
+      this.updatePoints()
+    },
+    turn () {
+      this.updateGraph()
     }
   },
   methods: {
-    updateChart () {
-      if (this.$store.getters.active === true) {
-        this.series = [{
-          data: [1, 2, 3]
-        }]
-      }
+    updatePoints () {
+      this.currentValue = this.$store.getters.cpforWhiteStr
+    },
+    updateGraph () {
+      this.evalArray.push(this.currentValue)
+      console.log(this.evalArray)
+      this.series = [{
+        data: this.evalArray
+      }]
     }
   }
 }
