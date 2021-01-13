@@ -22,8 +22,7 @@ export default {
   },
   data: function () {
     return {
-      evalArray: [],
-      calcOffset: 100,
+      evalArray: [0],
       currentValue: 0,
       first: true,
       chartOptions: {
@@ -38,23 +37,21 @@ export default {
             fontSize: '14px'
           }
         },
-        colors: ['#000000'],
+        colors: ['#FF4500'],
         fill: {
           type: 'gradient',
           gradient: {
             shadeIntensity: 1,
-            opacityFrom: 1,
-            opacityTo: 0,
             colorStops: [
               {
-                offset: 99, // this.calcOffset,
+                offset: 100,
                 color: '#FFFFFF',
                 opacity: 0
               },
               {
                 offset: 0,
                 color: '#000000',
-                opacity: 1
+                opacity: 0
               }
             ]
           }
@@ -66,9 +63,15 @@ export default {
           id: 'plot',
           events: {
             markerClick: function (event, chartContext, { seriesIndex, dataPointIndex, config }) {
-              console.log('marker')
+              console.log('marker at pos' + dataPointIndex)
               // load FEN von data
             }
+          }
+        },
+        xaxis: {
+          title: {
+            text: '',
+            categories: ['']
           }
         },
         yaxis: {
@@ -79,7 +82,7 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: [0.61, -0.01]
+        data: []
       }]
     }
   },
@@ -101,9 +104,9 @@ export default {
   methods: {
     updatePoints () {
       this.currentValue = this.$store.getters.cpforWhiteStr
-      if ((this.currentValue.includes('#') && this.turn === 'white') || this.currentValue > 10) {
+      if ((this.currentValue.includes('#') && !this.currentValue.includes('-')) || this.currentValue > 10) {
         this.currentValue = 10
-      } else if ((this.currentValue.includes('#') && this.turn === 'black') || this.currentValue < -10) {
+      } else if ((this.currentValue.includes('#') && this.currentValue.includes('-')) || this.currentValue < -10) {
         this.currentValue = -10
       }
     },
@@ -111,30 +114,24 @@ export default {
       this.evalArray.push(this.currentValue)
       const min = Math.min(...this.evalArray)
       const max = Math.max(...this.evalArray)
-      console.log('max = ' + max)
-      console.log('min = ' + min)
       let newOffset = 0
       if (min >= 0) {
         newOffset = 100
-      } else if (Math.abs(min) > Math.abs(max)) {
-        newOffset = Math.abs(max) + Math.abs(min)
-        newOffset = Math.abs(min) / newOffset
-      } else if (Math.abs(max) > Math.abs(min)) {
+      } else {
         newOffset = Math.abs(max) + Math.abs(min)
         newOffset = Math.abs(max) / newOffset
       }
       if (newOffset < 1) {
         newOffset *= 100
       }
-      console.log('newOffset = ' + newOffset)
-      newOffset = Math.round(newOffset)
-      this.calcOffset = newOffset
       this.series = [{
         data: this.evalArray
       }]
-      console.log('calcOffset = ' + this.calcOffset)
-      this.chartOptions.fill.gradient.colorStops[0].offset = this.calcOffset
-      
+      newOffset = Math.ceil(newOffset)
+      this.chartOptions.fill.gradient.colorStops[0].offset = newOffset
+      if (this.chartOptions.fill.gradient.colorStops[1].gradient !== 0.8 && min < 0) {
+        this.chartOptions.fill.gradient.colorStops[1].gradient = 0.8
+      }
     }
 
   }
