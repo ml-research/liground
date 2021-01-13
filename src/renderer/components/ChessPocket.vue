@@ -12,12 +12,12 @@
     >
       <div
         class="piece"
-        :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' ]"
+        :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' , orientation === 'white' && color === 'black' ? 'flipB' : '', orientation === 'black' && color === 'white' ? 'flipW' : '']"
         @mousedown="clicked($event, piece.type, color, piece.count)"
       />
       <div
         class="piece-count noselect"
-        :class="[piece.count > 1 ? 'show' : 'invisible']"
+        :class="[piece.count > 1 ? 'show' : 'invisible', orientation === 'black' ? 'flipW' : '']"
       >
         {{ piece.count }}
       </div>
@@ -54,6 +54,9 @@ export default {
     }
   },
   computed: {
+    orientation () {
+      return this.$store.getters.orientation
+    },
     emptySlots: function () {
       return Math.max(8 - this.pieces.length, 0)
     },
@@ -87,6 +90,12 @@ export default {
 
 <!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
+.flipB {
+  transform: scaleX(1);
+}
+.flipW {
+  transform: scaleY(-1);
+}
 .wrapper {
   text-align: left;
 }
