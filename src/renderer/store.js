@@ -283,8 +283,9 @@ export const store = new Vuex.Store({
     variant (context, payload) {
       if (context.getters.variant !== payload) {
         context.commit('variant', payload)
-        context.commit('newBoard', {
-        })
+        context.commit('newBoard', {})
+        context.dispatch('stopEngine')
+        context.dispatch('resetMultiPV')
       }
     },
     set960 (context, payload) {
