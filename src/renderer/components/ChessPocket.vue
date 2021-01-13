@@ -12,7 +12,7 @@
     >
       <div
         class="piece"
-        :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' , orientation === 'white' && color === 'black' ? 'flipB' : '', orientation === 'black' && color === 'white' ? 'flipW' : '']"
+        :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' , orientation === 'white' && color === 'black' ? 'flipB' : '', orientation === 'black' ? 'flipW' : '']"
         @mousedown="clicked($event, piece.type, color, piece.count)"
       />
       <div
@@ -90,9 +90,6 @@ export default {
 
 <!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
-.flipB {
-  transform: scaleX(1);
-}
 .flipW {
   transform: scaleY(-1);
 }
