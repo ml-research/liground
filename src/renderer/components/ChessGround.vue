@@ -3,7 +3,7 @@
     <div class="grid-parent">
       <div class="pockets">
         <div
-          v-if="variant==='crazyhouse'"
+          :style="{visibility: variant === 'crazyhouse' ? 'visible' : 'hidden'}"
           :class="{ black : $store.getters.orientation == &quot;black&quot;}"
         >
           <ChessPocket

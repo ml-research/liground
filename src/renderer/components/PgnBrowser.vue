@@ -70,9 +70,6 @@ export default {
     }
   },
   watch: {
-    gameFilter: function () {
-      console.log('gameFilter change')
-    },
     loadedGames: function () {
       if (this.$store.getters.loadedGames) {
         // get distinct rounds
