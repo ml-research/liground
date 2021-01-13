@@ -133,6 +133,8 @@ export default {
         data: this.evalArray
       }]
       console.log('calcOffset = ' + this.calcOffset)
+      this.chartOptions.fill.gradient.colorStops[0].offset = this.calcOffset
+      
     }
 
   }
