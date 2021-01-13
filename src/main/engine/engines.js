@@ -8,12 +8,12 @@ function resolveBinary (name) {
   return path.resolve(
     process.env.NODE_ENV !== 'development' ? __static.replace('app.asar', 'app.asar.unpacked') : __static,
     'bin',
-    name
+    `${name}${process.platform === 'win32' ? '.exe' : ''}`
   )
 }
 
 export default {
   get stockfish () {
-    return resolveBinary(`stockfish${process.platform === 'win32' ? '.exe' : ''}`)
+    return resolveBinary('stockfish')
   }
 }
