@@ -38,9 +38,14 @@ export const store = new Vuex.Store({
       '🏠 Crazyhouse': 'crazyhouse',
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
-      Antichess: 'antichess',
-      Horde: 'horde',
-      '🏇 Racing Kings': 'racingkings'
+      'Antichess': 'antichess',
+      'Horde': 'horde',
+      '🏇 Racing Kings': 'racingkings',
+      'Makruk': 'makruk',
+      'Shogi': 'shogi',
+      'Janggi': 'janggi',
+      'Xiangqi': 'xiangqi',
+
     }),
     engineBinary: 'stockfish',
     stdIO: [],
@@ -73,7 +78,7 @@ export const store = new Vuex.Store({
     board: null,
     gameInfo: {},
     loadedGames: [],
-    selectedGame: null
+    selectedGame: null,
     boardStyle: 'blue', 
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
