@@ -10,21 +10,34 @@
       >
       <div
         v-for="round in rounds"
-        :key="round"
+        :key="round.name"
       >
-        <div class="browserelement">
-          Round {{ round }}
-        </div>
         <div
-          v-for="game in loadedGames.filter(filterGameHeader('Round', round))"
-          :key="game.id"
+          class="browserelement roundseperator"
+          :class="{active : selectedGame.headers('Round') === round.name}"
+          @click="round.visible = !round.visible"
         >
+          Round {{ round.name }}
+          <span
+            slot="extra"
+            class="icon mdi"
+            :class="[round.visible ? 'mdi-menu-up' : 'mdi-menu-down']"
+            style="float: right;"
+          />
+        </div>
+        <div v-show="round.visible">
           <div
-            class="browserelement gameoption"
-            :class="{active : game == selectedGame}"
-            @click="selectedGame = game"
+            v-for="game in loadedGames"
+            :key="game.id"
           >
-            {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+            <div
+              v-if="game.headers('Round') === round.name && (filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game))"
+              class="browserelement gameoption"
+              :class="{active : game == selectedGame}"
+              @click="selectedGame = game"
+            >
+              {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+            </div>
           </div>
         </div>
       </div>
@@ -37,7 +50,8 @@ export default {
   name: 'PgnBrowser',
   data: function () {
     return {
-      gameFilter: ''
+      gameFilter: '',
+      rounds: []
     }
   },
   computed: {
@@ -49,43 +63,32 @@ export default {
         this.$store.dispatch('loadGame', { game: newVal })
       }
     },
-    rounds: {
-      get: function () {
-        if (this.$store.getters.loadedGames) {
-          // get distinct rounds
-          const rounds = this.$store.getters.loadedGames.map((value, idx, arr) => {
-            return value.headers('Round')
-          }).filter((value, idx, arr) => {
-            return arr.indexOf(value) === idx
-          })
-
-          return rounds
-        }
-        return undefined
-      }
-    },
     loadedGames: {
       get: function () {
-        if (this.$store.getters.loadedGames) {
-          return this.$store.getters.loadedGames.filter((game) => {
-            return this.filterGameHeader('White', this.gameFilter)(game) || this.filterGameHeader('Black', this.gameFilter)(game)
-          })
-        } else {
-          return this.$store.getters.loadedGames
-        }
+        return this.$store.getters.loadedGames
       }
     }
   },
   watch: {
-    gameFilter: function (foo, bar) {
+    gameFilter: function () {
       console.log('gameFilter change')
+    },
+    loadedGames: function () {
+      if (this.$store.getters.loadedGames) {
+        // get distinct rounds
+        this.rounds = this.$store.getters.loadedGames.map((value, idx, arr) => {
+          return value.headers('Round')
+        }).filter((value, idx, arr) => {
+          return arr.indexOf(value) === idx
+        }).map((value, idx) => {
+          return { name: value, visible: idx === 0 }
+        })
+      }
     }
   },
   methods: {
-    filterGameHeader (key, searchString) {
-      return function (game) {
-        return game.headers(key).toLowerCase().indexOf(searchString.toLowerCase()) !== -1
-      }
+    filterGameHeader (key, searchString, game) {
+      return game.headers(key).toLowerCase().indexOf(searchString.toLowerCase()) !== -1
     }
   }
 
@@ -103,6 +106,10 @@ export default {
   width: 100%;
 }
 
+.roundseperator {
+  border-top: 2px solid black;
+}
+
 .browserelement {
   text-decoration: none;
   display: block;
@@ -118,7 +125,7 @@ export default {
   cursor: pointer;
 }
 
-.gameoption.active {
+.gameoption.active, .roundseperator.active {
   background-color:#444;
   color: white;
 }
