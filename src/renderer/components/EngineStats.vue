@@ -1,7 +1,10 @@
 <template>
-<div class='base-demo' style='width: 600px'>
-  <vue-table-dynamic :params='params'></vue-table-dynamic>
-</div>
+  <div
+    class="base-demo"
+    style="width: 600px"
+  >
+    <vue-table-dynamic :params="params" />
+  </div>
 </template>
 
 <script>
@@ -45,6 +48,21 @@ export default {
       default: 232
     }
   },
+  computed: {
+    params: function () {
+      const g = this.$store.getters
+      return {
+        data: [
+          ['Depth', 'node/s', 'Nodes', 'Time', 'Hash', 'TB'],
+          [g.depth + '/' + g.seldepth, this.parse(g.nps) + 'nps', this.parse(g.nodes), this.parseTime(g.time), g.hashfull, this.parse(g.tbhits)]
+        ],
+        header: 'row',
+        border: true,
+        stripe: true
+      }
+    }
+
+  },
   methods: {
 
     parse: function (value) {
@@ -63,21 +81,6 @@ export default {
       const date = new Date(Number(value))
       return `${date.getUTCHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
     }
-  },
-  computed: {
-    params: function () {
-      const g = this.$store.getters
-      return {
-        data: [
-          ['Depth', 'node/s', 'Nodes', 'Time', 'Ponder', 'Hash', 'TB'],
-          [g.depth + '/' + g.seldepth, this.parse(g.nps) + 'nps', this.parse(g.nodes), this.parseTime(g.time), '-', g.hashfull, this.parse(g.tbhits)]
-        ],
-        header: 'row',
-        border: true,
-        stripe: true
-      }
-    }
-
   }
 }
 </script>

@@ -2,6 +2,23 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
 
+class TwoWayMap {
+  constructor (map) {
+    this.map = map
+    this.reverseMap = {}
+    this.keys = []
+    for (const key in map) {
+      const value = map[key]
+      this.reverseMap[value] = key
+      this.keys.concat(key)
+    }
+  }
+
+  getAll () { return this.map }
+  get (key) { return this.map[key] }
+  revGet (key) { return this.reverseMap[key] }
+}
+
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -11,16 +28,26 @@ export const store = new Vuex.Store({
     active: false,
     turn: 'white',
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', //to track the end of the current line
+    lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     moves: [],
     legalMoves: '',
     destinations: {},
     variant: 'chess',
+    variantOptions: new TwoWayMap({ // all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
+      '♟️ Standard': 'chess',
+      '🏠 Crazyhouse': 'crazyhouse',
+      '⛰️ King of the Hill': 'kingofthehill',
+      '️Three-Check': '3check',
+      Antichess: 'antichess',
+      Horde: 'horde',
+      '🏇 Racing Kings': 'racingkings'
+    }),
     engineBinary: 'stockfish',
     stdIO: [],
     message: 'hello from Vuex',
-    idName: 'idName',
-    idAuthor: 'idAuthor',
+    idName: '',
+    idAuthor: '',
+    orientation: 'white',
     multipv: [
       {
         depth: 0,
@@ -34,18 +61,20 @@ export const store = new Vuex.Store({
         pv: '',
         ucimove: ''
       },
-      {
-        pv: ''
-      },
+      {},
       {},
       {},
       {}
     ],
+    hoveredpv: -1,
     sideToMove: 'w',
     counter: 0,
-    boardStyle: 'blue', 
-    pieceStyle: 'tatiana',
+    pieceStyle: 'merida',
     board: null,
+    gameInfo: {},
+    loadedGames: [],
+    selectedGame: null
+    boardStyle: 'blue', 
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
     ],
@@ -74,6 +103,9 @@ export const store = new Vuex.Store({
     },
     initialized (state, payload) {
       state.initialized = payload
+    },
+    orientation (state, payload) {
+      state.orientation = payload
     },
     active (state, payload) {
       state.active = payload
@@ -117,6 +149,9 @@ export const store = new Vuex.Store({
         }
       }
     },
+    hoveredpv (state, payload) {
+      state.hoveredpv = payload
+    },
     increment (state, payload) {
       state.counter += payload
     },
@@ -158,25 +193,39 @@ export const store = new Vuex.Store({
         state.board = new ffish.Board(state.variant)
       }
       state.moves = []
+      state.gameInfo = {}
       this.commit('fen', state.board.fen())
       this.commit('turn', state.board.turn())
       this.commit('legalMoves', state.board.legalMoves())
       this.commit('lastFen', state.board.fen())
     },
     resetBoard (state, payload) {
-      state.board = new ffish.Board(state.variant, payload.fen, payload.is960)
+      this.commit('newBoard', payload)
       state.moves = []
     },
     appendMoves (state, payload) {
-      state.moves = state.moves.concat(payload.map( (curVal,idx, arr) =>{
-        let sanMove = state.board.sanMove(curVal)
-        state.board.push(curVal);
-        return {ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen()};
+      state.moves = state.moves.concat(payload.map((curVal, idx, arr) => {
+        const sanMove = state.board.sanMove(curVal)
+        state.board.push(curVal)
+        return { ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false) }
       }))
       state.lastFen = state.board.fen()
+    },
+    gameInfo (state, payload) {
+      state.gameInfo = payload
+    },
+    loadedGames (state, payload) {
+      state.loadedGames = payload
+    },
+    selectedGame (state, payload) {
+      state.selectedGame = payload
     }
   },
   actions: { // async
+    resetBoard (context, payload) {
+      context.commit('resetMultiPV')
+      context.commit('resetBoard', payload)
+    },
     initialize (context) {
       context.commit('newBoard', {
         fen: '',
@@ -191,7 +240,7 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves',payload.split(" "))
+      context.commit('appendMoves', payload.split(' '))
       context.dispatch('updateBoard')
     },
     startEngine (context) {
@@ -229,6 +278,9 @@ export const store = new Vuex.Store({
     started (context, payload) {
       context.commit('started', payload)
     },
+    orientation (context, payload) {
+      context.commit('orientation', payload)
+    },
     active (context, payload) {
       context.commit('active', payload)
     },
@@ -262,16 +314,35 @@ export const store = new Vuex.Store({
     multipv (context, payload) {
       context.commit('multipv', payload)
     },
-    loadGame (context, payload) {
-      const variant = payload.game.headers("Variant").toLowerCase();
-      const board = new ffish.Board(variant);
+    loadedGames (context, payload) {
+      context.commit('loadedGames', payload)
+    },
 
+    loadGame (context, payload) {
+      let variant = payload.game.headers('Variant').toLowerCase()
+
+      if (variant === '') { // if no variant is given we assume it to be standard chess
+        variant = 'chess'
+      }
+
+      if (!context.getters.variantOptions.revGet(variant)) {
+        alert('This variant is currently not supported.')
+        return
+      }
+
+      const board = new ffish.Board(variant)
+      const gameInfo = {}
+      for (const curVal of payload.game.headerKeys().split(' ')) {
+        gameInfo[curVal] = payload.game.headers(curVal)
+      }
+
+      context.commit('selectedGame', payload.game)
       context.commit('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
+      context.commit('gameInfo', gameInfo)
       context.dispatch('push', payload.game.mainlineMoves())
       context.dispatch('updateBoard')
     },
-
     increment (context, payload) {
       context.commit('increment', payload)
     },
@@ -307,8 +378,14 @@ export const store = new Vuex.Store({
     destinations (state) {
       return state.destinations
     },
+    orientation (state) {
+      return state.orientation
+    },
     variant (state) {
       return state.variant
+    },
+    variantOptions (state) {
+      return state.variantOptions
     },
     engineBinary (state) {
       return state.engineBinary
@@ -324,6 +401,9 @@ export const store = new Vuex.Store({
     },
     multipv (state) {
       return state.multipv
+    },
+    hoveredpv (state) {
+      return state.hoveredpv
     },
     bestmove (state) {
       return [
@@ -409,6 +489,15 @@ export const store = new Vuex.Store({
     },
     pocket (state) {
       return (turn) => state.board.pocket(turn)
+    },
+    gameInfo (state) {
+      return state.gameInfo
+    },
+    loadedGames (state) {
+      return state.loadedGames
+    },
+    selectedGame (state) {
+      return state.selectedGame
     },
 
     // TODO: integrate getters into store state?

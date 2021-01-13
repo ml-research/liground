@@ -1,10 +1,23 @@
 <template>
-<div class="wrapper template grid-parent" :style="{'text-align': align}">
-  <LiveEval/>
-  <div class="engine-banner" :style="{ backgroundImage: 'url(' + require('../assets/images/engines/'+engineBannerURL) + ')' }"></div>
-  <multiselect class="multiselect" v-model="selected" :options="options" :allow-empty="false" :show-labels="false" :placeholder="selected"></multiselect>
-  <RoundedSwitch id="switch"/>
-</div>
+  <div
+    class="wrapper template grid-parent"
+    :style="{'text-align': align}"
+  >
+    <LiveEval />
+    <div
+      class="engine-banner"
+      :style="{ backgroundImage: 'url(' + require('../assets/images/engines/'+engineBannerURL) + ')' }"
+    />
+    <multiselect
+      v-model="selected"
+      class="multiselect"
+      :options="options"
+      :allow-empty="false"
+      :show-labels="false"
+      :placeholder="selected"
+    />
+    <RoundedSwitch id="switch" />
+  </div>
 </template>
 
 <script scoped>
@@ -14,34 +27,6 @@ import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'AnalysisEvalRow',
-  data () {
-    return {
-      engines:
-      {chess: [
-        'Multi-Variant Stockfish 10',
-        'ClassicAra 0.8.1'
-      ],
-      crazyhouse: [
-        'Multi-Variant Stockfish 10',
-        'CrazyAra 0.8.1'
-      ]},
-      options: [
-        'Fairy-Stockfish'
-      ],
-      selected: 'Fairy-Stockfish',
-      engineBinaries: {
-        'Fairy-Stockfish': 'stockfish',
-        'CrazyAra 0.8.1': 'CrazyAra',
-        'ClassicAra 0.8.1': 'ClassicAra'
-      },
-      imageUrl: 'Stockfish.png',
-      engineBanners: {
-        'Fairy-Stockfish': 'stockfish_transp.png',
-        'CrazyAra 0.8.1': 'crazyara_logo_small_artwork.png',
-        'ClassicAra 0.8.1': 'crazyara_logo_small_artwork.png'
-      }
-    }
-  },
   components: {
     LiveEval,
     RoundedSwitch,
@@ -69,9 +54,35 @@ export default {
       default: 'left'
     }
   },
-  methods: {
-    methodToRunOnSelect (payload) {
-      console.log(payload)
+  data () {
+    return {
+      engines:
+      {
+        chess: [
+          'Multi-Variant Stockfish 10',
+          'ClassicAra 0.8.1'
+        ],
+        crazyhouse: [
+          'Multi-Variant Stockfish 10',
+          'CrazyAra 0.8.1'
+        ]
+      },
+      options: [
+        'Multi-Variant Stockfish 10',
+        'CrazyAra 0.8.1'
+      ],
+      selected: 'Multi-Variant Stockfish 10',
+      engineBinaries: {
+        'Multi-Variant Stockfish 10': 'stockfish',
+        'CrazyAra 0.8.1': 'CrazyAra',
+        'ClassicAra 0.8.1': 'ClassicAra'
+      },
+      imageUrl: 'Stockfish.png',
+      engineBanners: {
+        'Multi-Variant Stockfish 10': 'stockfish_transp.png',
+        'CrazyAra 0.8.1': 'crazyara_logo_small_artwork.png',
+        'ClassicAra 0.8.1': 'crazyara_logo_small_artwork.png'
+      }
     }
   },
   computed: {
@@ -83,11 +94,20 @@ export default {
     }
   },
   watch: {
+    /* variant: function (variant) {
+      console.log(`variant: ${variant}`)
+      this.options = this.engines[variant]
+    }, */
     selected: function () {
       this.$store.dispatch('started', false)
       this.$store.dispatch('selected', false)
       console.log(`engineBinary: ${this.engineBinaries[this.selected]}`)
       this.$store.dispatch('engineBinary', this.engineBinaries[this.selected])
+    }
+  },
+  methods: {
+    methodToRunOnSelect (payload) {
+      console.log(payload)
     }
   }
 }

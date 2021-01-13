@@ -9,7 +9,7 @@ import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'pieceStyleSelector',
+  name: 'PieceStyleSelector',
   components: {
     Multiselect
   },

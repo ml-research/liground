@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <MenuBar id="menubar"/>
-    <GameBoards id="gameboards"/>
+    <MenuBar id="menubar" />
+    <GameBoards id="gameboards" />
   </div>
 </template>
 
@@ -10,7 +10,7 @@ import GameBoards from './GameBoards'
 import MenuBar from './MenuBar.vue'
 
 export default {
-  name: 'landing-page',
+  name: 'LandingPage',
   components: {
     MenuBar,
     GameBoards
