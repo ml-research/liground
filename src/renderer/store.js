@@ -93,7 +93,7 @@ export const store = new Vuex.Store({
       }
     ],
     hoveredpv: -1,
-    sideToMove: 'w',
+    sideToMove: 'w', // TODO: duplicate of turn
     counter: 0,
     pieceStyle: 'merida',
     board: null,
@@ -164,24 +164,12 @@ export const store = new Vuex.Store({
       state.counter += payload
     },
     resetMultiPV (state) {
-      state.multipv = [{
-        depth: 0,
-        seldepth: 0,
-        cp: 0,
-        nodes: 0,
-        nps: 0,
-        hashfull: 0,
-        tbhits: 0,
-        time: 0,
-        pv: '',
-        ucimove: ''
-      },
-      {
-        pv: ''
-      },
-      {},
-      {},
-      {}
+      state.multipv = [
+        {
+          cp: 0,
+          pv: '',
+          ucimove: ''
+        }
       ]
     },
     pieceStyle (state, payload) {
@@ -240,8 +228,8 @@ export const store = new Vuex.Store({
       context.commit('initialized', true)
     },
     updateBoard (context) {
+      context.state.board.setFen(context.state.fen)
       context.commit('turn', context.state.board.turn())
-      context.commit('fen', context.state.board.fen())
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
