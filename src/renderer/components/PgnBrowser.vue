@@ -9,15 +9,23 @@
         placeholder="filter games"
       >
       <div
-        v-for="game in loadedGames"
-        :key="game.id"
+        v-for="round in rounds"
+        :key="round"
       >
+        <div class="browserelement">
+          Round {{ round }}
+        </div>
         <div
-          class="gameoption"
-          :class="{active : game == selectedGame}"
-          @click="selectedGame = game"
+          v-for="game in loadedGames.filter(filterGameHeader('Round', round))"
+          :key="game.id"
         >
-          {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+          <div
+            class="browserelement gameoption"
+            :class="{active : game == selectedGame}"
+            @click="selectedGame = game"
+          >
+            {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+          </div>
         </div>
       </div>
     </div>
@@ -41,19 +49,29 @@ export default {
         this.$store.dispatch('loadGame', { game: newVal })
       }
     },
+    rounds: {
+      get: function () {
+        if (this.$store.getters.loadedGames) {
+          // get distinct rounds
+          const rounds = this.$store.getters.loadedGames.map((value, idx, arr) => {
+            return value.headers('Round')
+          }).filter((value, idx, arr) => {
+            return arr.indexOf(value) === idx
+          })
+
+          return rounds
+        }
+        return undefined
+      }
+    },
     loadedGames: {
       get: function () {
-        if (this.gameFilter === '' || !this.$store.getters.loadedGames) {
-          return this.$store.getters.loadedGames
-        } else {
-          return this.$store.getters.loadedGames.filter((value, idx, arr) => {
-            for (const key of value.headerKeys().split(' ')) {
-              if (value.headers(key).toLowerCase().indexOf(this.gameFilter.toLowerCase()) !== -1) {
-                return true
-              }
-            }
-            return false
+        if (this.$store.getters.loadedGames) {
+          return this.$store.getters.loadedGames.filter((game) => {
+            return this.filterGameHeader('White', this.gameFilter)(game) || this.filterGameHeader('Black', this.gameFilter)(game)
           })
+        } else {
+          return this.$store.getters.loadedGames
         }
       }
     }
@@ -61,6 +79,13 @@ export default {
   watch: {
     gameFilter: function (foo, bar) {
       console.log('gameFilter change')
+    }
+  },
+  methods: {
+    filterGameHeader (key, searchString) {
+      return function (game) {
+        return game.headers(key).toLowerCase().indexOf(searchString.toLowerCase()) !== -1
+      }
     }
   }
 
@@ -78,7 +103,7 @@ export default {
   width: 100%;
 }
 
-.gameoption {
+.browserelement {
   text-decoration: none;
   display: block;
   border-bottom: 1px solid black;
