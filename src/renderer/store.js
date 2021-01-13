@@ -233,17 +233,10 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', context.state.board.legalMoves())
     },
     push (context, payload) {
-      const { active } = context.state
-      if (active) {
-        context.dispatch('stopEngine')
-      }
       context.commit('appendMoves', payload.split(' '))
       context.dispatch('resetMultiPV')
       context.dispatch('updateBoard')
-      if (active) {
-        context.dispatch('position')
-        context.dispatch('goEngine')
-      }
+      context.dispatch('restartEngine')
     },
     goEngine (context) {
       ipc.send('go infinite')
@@ -255,6 +248,13 @@ export const store = new Vuex.Store({
       console.log('stopEngine')
       context.commit('active', false)
     },
+    restartEngine (context) {
+      if (context.state.active) {
+        context.dispatch('stopEngine')
+        context.dispatch('position')
+        context.dispatch('goEngine')
+      }
+    },
     resetMultiPV (context) {
       context.commit('resetMultiPV')
     },
@@ -265,6 +265,8 @@ export const store = new Vuex.Store({
     },
     fen (context, payload) {
       context.commit('fen', payload)
+      context.dispatch('updateBoard')
+      context.dispatch('restartEngine')
     },
     lastFen (context, payload) {
       context.commit('lastFen', payload)
