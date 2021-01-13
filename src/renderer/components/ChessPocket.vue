@@ -17,7 +17,7 @@
       />
       <div
         class="piece-count noselect"
-        :class="[piece.count > 1 ? 'show' : 'invisible', orientation === 'black' ? 'flipW' : '']"
+        :class="[piece.count > 1 ? 'show' : 'invisible', orientation === 'black' ? 'flipNum' : '']"
       >
         {{ piece.count }}
       </div>
@@ -103,7 +103,7 @@ export default {
   text-align: center;
   font-size: 12pt;
   margin-left:38px;
-  margin-top:-25px;
+  margin-top:-24px;
   width: 18px;
   padding: 0px 0px 0px 0px;
   border-radius: 4px 4px 4px 4px;
@@ -114,6 +114,10 @@ export default {
   border-width: 1px;
   border-style: solid;
   color: black;
+}
+.flipNum {
+  transform: scaleY(-1);
+  margin-top: -56px;
 }
 .slot {
   width: 60px;
