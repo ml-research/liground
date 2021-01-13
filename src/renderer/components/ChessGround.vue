@@ -116,7 +116,7 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'dimensionNumber'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'bestmove', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'dimensionNumber', 'hoveredpv', 'orientation', 'moves'])
   },
   watch: {
     initialized () {
