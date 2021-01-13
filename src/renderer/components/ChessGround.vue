@@ -22,7 +22,7 @@
           />
         </div>
       </div>
-      <div @mouseup='getBoardPos' :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
+      <div :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
         <div ref='board' class='cg-board-wrap' >
         </div>
       </div>
@@ -405,7 +405,10 @@ export default {
       if (this.currentMove === undefined || this.moves.length === 0) {
         this.board.state.lastMove = undefined
       } else {
-        const string = String(this.currentMove.uci)
+        let string = String(this.currentMove.uci)
+        if(this.dimensionNumber==3){
+          string = lowerNumbers(string)
+        }
         const first = string.substring(0, 2)
         const second = string.substring(2, 4)
         this.board.state.lastMove = [first, second]
