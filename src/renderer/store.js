@@ -185,6 +185,7 @@ export const store = new Vuex.Store({
     },
     resetBoard (state, payload) {
       this.commit('newBoard', payload)
+      state.selectedGame = null
       state.moves = []
     },
     appendMoves (state, payload) {

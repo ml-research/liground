@@ -14,7 +14,7 @@
       >
         <div
           class="browserelement roundseperator"
-          :class="{active : selectedGame.headers('Round') === round.name}"
+          :class="{active : selectedGame && selectedGame.headers('Round') === round.name}"
           @click="round.visible = !round.visible"
         >
           Round {{ round.name }}
