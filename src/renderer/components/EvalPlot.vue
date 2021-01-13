@@ -69,19 +69,17 @@ export default {
           }
         },
         xaxis: {
-          title: {
-            text: '',
-            categories: ['']
-          }
+          type: 'category',
+          categories: ['']
         },
         yaxis: {
           title: {
-            text: 'Points'
+            text: 'Eval'
           }
         }
       },
       series: [{
-        name: 'evaluation',
+        name: 'Evaluation',
         data: []
       }]
     }
