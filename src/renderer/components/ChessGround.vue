@@ -22,9 +22,11 @@
           />
         </div>
       </div>
-      <div :class ="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
-        <div ref='board' class='cg-board-wrap' >
-        </div>
+      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
+        <div
+          ref="board"
+          class="cg-board-wrap"
+        />
       </div>
     </div>
   </div>
@@ -187,38 +189,37 @@ export default {
       this.drawShapes()
     },
     variant () {
-      
-      if(this.board.state.geometry != this.dimensionNumber){
+      if (this.board.state.geometry !== this.dimensionNumber) {
         this.board = Chessground(this.$refs.board, {
-      coordinates: false,
-      fen: this.fen,
-      turnColor: 'white',
-      resizable:true,
-      highlight: {
-        lastMove: true, // add last-move class to squares
-        check: false // add check class to squares
-      },
-      drawable: {
-        enabled: true, // can draw
-        visible: true, // can view
-        eraseOnClick: false
-      },
-      movable: {
-        events: { after: this.changeTurn() },
-        color: 'white',
-        free: false,
-      },
-      orientation: this.orientation,
-      geometry: this.$store.getters.dimensionNumber
-    })
+          coordinates: false,
+          fen: this.fen,
+          turnColor: 'white',
+          resizable: true,
+          highlight: {
+            lastMove: true, // add last-move class to squares
+            check: false // add check class to squares
+          },
+          drawable: {
+            enabled: true, // can draw
+            visible: true, // can view
+            eraseOnClick: false
+          },
+          movable: {
+            events: { after: this.changeTurn() },
+            color: 'white',
+            free: false
+          },
+          orientation: this.orientation,
+          geometry: this.$store.getters.dimensionNumber
+        })
 
-     document.body.dispatchEvent(new Event('chessground.resize'))
-    }
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      }
 
-    this.board.set({
-      variant: this.variant,
-      lastMove: false,
-    })
+      this.board.set({
+        variant: this.variant,
+        lastMove: false
+      })
 
       this.updateBoard()
     }
@@ -266,17 +267,17 @@ export default {
     updateBoardCSS (boardStyle) {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
-      if(this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/board-css/international/'+ boardStyle + '.css'
-      }else
-      if(this.$store.getters.isXiangqi){
-        file.href = 'src/renderer/assets/images/board-css/xiangqi/'+ this.variant+ '/' + boardStyle + '.css'
-      }else
-      if(this.$store.getters.isSEA){
-        file.href = 'src/renderer/assets/images/board-css/sea/'+ boardStyle + '.css'
-      }else
-      if(this.$store.getters.isShogi){
-        file.href = 'src/renderer/assets/images/board-css/shogi/'+ boardStyle + '.css'
+      if (this.$store.getters.isInternational) {
+        file.href = 'src/renderer/assets/images/board-css/international/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isXiangqi) {
+        file.href = 'src/renderer/assets/images/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isSEA) {
+        file.href = 'src/renderer/assets/images/board-css/sea/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isShogi) {
+        file.href = 'src/renderer/assets/images/board-css/shogi/' + boardStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -286,20 +287,20 @@ export default {
       console.log(`dropPiece: ${event} ${pieceType} ${color}`)
       console.log(`dropPiece: ${this.board.getFen()}`)
     },
-    increaseNumbers(move){
-      var letters = move.split(/(\d+)/)
-      letters[1] = String(parseInt(letters[1])+1)
-      letters[3] = String(parseInt(letters[3])+1)
-      let ret = letters.join('')
+    increaseNumbers (move) {
+      const letters = move.split(/(\d+)/)
+      letters[1] = String(parseInt(letters[1]) + 1)
+      letters[3] = String(parseInt(letters[3]) + 1)
+      const ret = letters.join('')
       return ret
     },
-    lowerNumbers(move){
-      var letters = move.split(/(\d+)/)
-      letters[1] = String(parseInt(letters[1])-1)
-      letters[3] = String(parseInt(letters[3])-1)
-      let ret = letters.join('')
+    lowerNumbers (move) {
+      const letters = move.split(/(\d+)/)
+      letters[1] = String(parseInt(letters[1]) - 1)
+      letters[3] = String(parseInt(letters[3]) - 1)
+      const ret = letters.join('')
       return ret
-      },
+    },
     possibleMoves () {
       const dests = {}
 
@@ -308,8 +309,8 @@ export default {
       for (let i = 0; i < this.legalMoves.length; i++) {
         // don't include dropping moves
         if (this.legalMoves[i].length !== 3) {
-          var Move = this.legalMoves[i]
-          if(this.dimensionNumber == 3){
+          let Move = this.legalMoves[i]
+          if (this.dimensionNumber === 3) {
             Move = this.lowerNumbers(Move)
           }
           fromSq = Move.substring(0, 2)
@@ -345,8 +346,8 @@ export default {
         if (this.isPromotion(orig, dest)) {
           this.promoteTo = this.onPromotion()
         }
-        var uciMove = orig + dest
-        if(this.dimensionNumber===3){
+        let uciMove = orig + dest
+        if (this.dimensionNumber === 3) {
           uciMove = this.increaseNumbers(uciMove)
         }
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
@@ -406,8 +407,8 @@ export default {
         this.board.state.lastMove = undefined
       } else {
         let string = String(this.currentMove.uci)
-        if(this.dimensionNumber==3){
-          string = lowerNumbers(string)
+        if (this.dimensionNumber === 3) {
+          string = this.lowerNumbers(string)
         }
         const first = string.substring(0, 2)
         const second = string.substring(2, 4)
@@ -524,8 +525,7 @@ coords {
     border-radius: 4px 4px 0px 0px;
 }
 /*
-  CSS for 9x10 board e.g. xiangqi/janggi etc. 
+  CSS for 9x10 board e.g. xiangqi/janggi etc.
 */
-
 
 </style>

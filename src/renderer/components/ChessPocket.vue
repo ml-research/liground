@@ -91,7 +91,7 @@ export default {
         file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
       }
       document.head.appendChild(file)
-    },
+    }
   }
 }
 </script>

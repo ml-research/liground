@@ -1,7 +1,14 @@
 <template>
-<div>
-  <multiselect class="multiselect" v-model="selected" :options="pieceStyles" :allow-empty="false" :show-labels="false" :placeholder="selected"></multiselect>
-</div>
+  <div>
+    <multiselect
+      v-model="selected"
+      class="multiselect"
+      :options="pieceStyles"
+      :allow-empty="false"
+      :show-labels="false"
+      :placeholder="selected"
+    />
+  </div>
 </template>
 
 <script>
@@ -16,7 +23,7 @@ export default {
   data () {
     return {
       internationalVariants: [
-      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+        'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
       ],
       seaVariants: [
         'makruk'
@@ -25,7 +32,7 @@ export default {
         'janggi', 'xiangqi'
       ],
       shogiVariants: [
-        'shogi',
+        'shogi'
       ],
       pieceStyles: [
         'alpha',
@@ -137,28 +144,28 @@ export default {
         this.pieceStyles = []
         this.internationalPieces.forEach(element => {
           this.pieceStyles.push(element)
-        });
+        })
       }
       if (this.shogiVariants.includes(this.variant)) {
         this.selected = this.shogiPieces[0]
         this.pieceStyles = []
         this.shogiPieces.forEach(element => {
           this.pieceStyles.push(element)
-        });
+        })
       }
       if (this.seaVariants.includes(this.variant)) {
         this.selected = this.seaPieces[0]
         this.pieceStyles = []
         this.seaPieces.forEach(element => {
           this.pieceStyles.push(element)
-        });
+        })
       }
       if (this.xiangqiVariants.includes(this.variant)) {
         this.selected = this.xiangqiPieces[0]
         this.pieceStyles = []
         this.xiangqiPieces.forEach(element => {
           this.pieceStyles.push(element)
-        });
+        })
       }
     }
   }

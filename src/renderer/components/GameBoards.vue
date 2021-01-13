@@ -27,11 +27,11 @@
               @change="checkValidFEN"
             >
           </div>
-            <div id="selector-container">
-              <PieceStyleSelector id="piece-style"/>
-              <BoardStyleSelector id="board-style"/>
-            </div>
-          <EvalPlot/>
+          <div id="selector-container">
+            <PieceStyleSelector id="piece-style" />
+            <BoardStyleSelector id="board-style" />
+          </div>
+          <EvalPlot />
         </div>
         <AnalysisView
           id="analysisview"

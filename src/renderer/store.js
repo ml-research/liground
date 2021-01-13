@@ -38,13 +38,13 @@ export const store = new Vuex.Store({
       '🏠 Crazyhouse': 'crazyhouse',
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
-      'Antichess': 'antichess',
-      'Horde': 'horde',
+      Antichess: 'antichess',
+      Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
-      'Makruk': 'makruk',
-      'Shogi': 'shogi',
-      'Janggi': 'janggi',
-      'Xiangqi': 'xiangqi',
+      Makruk: 'makruk',
+      Shogi: 'shogi',
+      Janggi: 'janggi',
+      Xiangqi: 'xiangqi'
 
     }),
     engineBinary: 'stockfish',
@@ -79,7 +79,7 @@ export const store = new Vuex.Store({
     gameInfo: {},
     loadedGames: [],
     selectedGame: null,
-    boardStyle: 'blue', 
+    boardStyle: 'blue',
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
     ],
@@ -90,7 +90,7 @@ export const store = new Vuex.Store({
       'janggi', 'xiangqi'
     ],
     shogiVariants: [
-      'shogi',
+      'shogi'
     ]
   },
   mutations: { // sync
@@ -531,11 +531,11 @@ export const store = new Vuex.Store({
       return state.shogiVariants.includes(state.variant)
     },
     dimensionNumber (state) {
-      if (state.internationalVariants.includes(state.variant)){
+      if (state.internationalVariants.includes(state.variant)) {
         return 0
-      }else {
+      } else {
         const var2Dim = {
-          'shogi': 1 , 'xiangqi': 3 , 'janggi': 3 , 'makruk': 0
+          shogi: 1, xiangqi: 3, janggi: 3, makruk: 0
         }
         return var2Dim[state.variant]
       }
