@@ -210,7 +210,8 @@ export default {
       movable: {
         events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
         color: 'white',
-        free: false
+        free: false,
+        rookCastle: true
       },
       orientation: this.orientation
     })
