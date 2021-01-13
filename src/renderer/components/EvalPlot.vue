@@ -1,6 +1,7 @@
 <template>
   <div>
     <VueApexCharts
+      title="plot"
       width="710"
       height="260"
       type="area"
@@ -22,8 +23,21 @@ export default {
   data: function () {
     return {
       evalArray: [],
+      calcOffset: 100,
       currentValue: 0,
+      first: true,
       chartOptions: {
+        noData: {
+          text: 'Start the Engine for data',
+          align: 'center',
+          verticalAlign: 'middle',
+          offsetX: 0,
+          offsetY: 0,
+          style: {
+            color: '#000000',
+            fontSize: '14px'
+          }
+        },
         colors: ['#000000'],
         fill: {
           type: 'gradient',
@@ -33,8 +47,7 @@ export default {
             opacityTo: 0,
             colorStops: [
               {
-                offset: 67,
-                // calc offset
+                offset: 99, // this.calcOffset,
                 color: '#FFFFFF',
                 opacity: 0
               },
@@ -50,16 +63,13 @@ export default {
           size: 8
         },
         chart: {
-          id: 'vuechart-example',
+          id: 'plot',
           events: {
             markerClick: function (event, chartContext, { seriesIndex, dataPointIndex, config }) {
               console.log('marker')
               // load FEN von data
             }
           }
-        },
-        xaxis: {
-          categories: ['Start', '1. White', '1. Black']
         },
         yaxis: {
           title: {
@@ -69,7 +79,7 @@ export default {
       },
       series: [{
         name: 'evaluation',
-        data: [0, 5, -5, 4, -2, 6]
+        data: [0.61, -0.01]
       }]
     }
   },
@@ -78,24 +88,53 @@ export default {
   },
   watch: {
     points () {
-      // korrekte Punktzahl übergeben
-      // this.updatePoints()
+      this.updatePoints()
     },
     turn () {
-      // this.updateGraph()
+      if (!this.first) {
+        this.updateGraph()
+      } else {
+        this.first = false
+      }
     }
   },
   methods: {
     updatePoints () {
       this.currentValue = this.$store.getters.cpforWhiteStr
+      if ((this.currentValue.includes('#') && this.turn === 'white') || this.currentValue > 10) {
+        this.currentValue = 10
+      } else if ((this.currentValue.includes('#') && this.turn === 'black') || this.currentValue < -10) {
+        this.currentValue = -10
+      }
     },
     updateGraph () {
       this.evalArray.push(this.currentValue)
-      console.log(this.evalArray)
+      const min = Math.min(...this.evalArray)
+      const max = Math.max(...this.evalArray)
+      console.log('max = ' + max)
+      console.log('min = ' + min)
+      let newOffset = 0
+      if (min >= 0) {
+        newOffset = 100
+      } else if (Math.abs(min) > Math.abs(max)) {
+        newOffset = Math.abs(max) + Math.abs(min)
+        newOffset = Math.abs(min) / newOffset
+      } else if (Math.abs(max) > Math.abs(min)) {
+        newOffset = Math.abs(max) + Math.abs(min)
+        newOffset = Math.abs(max) / newOffset
+      }
+      if (newOffset < 1) {
+        newOffset *= 100
+      }
+      console.log('newOffset = ' + newOffset)
+      newOffset = Math.round(newOffset)
+      this.calcOffset = newOffset
       this.series = [{
         data: this.evalArray
       }]
+      console.log('calcOffset = ' + this.calcOffset)
     }
+
   }
 }
 </script>
