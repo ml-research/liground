@@ -14,6 +14,9 @@
 <script>
 import VueApexCharts from 'vue-apexcharts'
 import { mapGetters } from 'vuex'
+import Module from 'ffish-es6'
+
+let ffish = null
 
 export default {
   name: 'EvalPlot',
@@ -24,8 +27,11 @@ export default {
     return {
       evalArray: [0],
       currentValue: 0,
-      first: true,
       chartOptions: {
+        tooltip: {
+          shared: false,
+          intersect: true
+        },
         noData: {
           text: 'Start the Engine for data',
           align: 'center',
@@ -62,15 +68,21 @@ export default {
         chart: {
           id: 'plot',
           events: {
-            markerClick: function (event, chartContext, { seriesIndex, dataPointIndex, config }) {
-              console.log('marker at pos' + dataPointIndex)
-              // load FEN von data
+            markerClick: (event, chartContext, { seriesIndex, dataPointIndex, config }) => {
+              if (dataPointIndex === 0) {
+                const board = new ffish.Board(this.$store.getters.variant)
+                const startFen = board.fen()
+                this.$store.dispatch('fen', startFen)
+                return
+              }
+              const move = this.moves[dataPointIndex - 1]
+              this.$store.dispatch('fen', move.fen)
             }
           }
         },
         xaxis: {
           type: 'category',
-          categories: ['']
+          categories: ['Start']
         },
         yaxis: {
           title: {
@@ -85,6 +97,9 @@ export default {
     }
   },
   computed: {
+    moves () {
+      return this.$store.getters.moves
+    },
     ...mapGetters(['points', 'turn'])
   },
   watch: {
@@ -92,12 +107,17 @@ export default {
       this.updatePoints()
     },
     turn () {
-      if (!this.first) {
-        this.updateGraph()
-      } else {
-        this.first = false
-      }
+      this.updateGraph()
     }
+  },
+  beforeCreate () {
+    console.log('beforeCreate()')
+    new Module().then(loadedModule => {
+      ffish = loadedModule
+      console.log(`initialized ${ffish} ${loadedModule}`)
+      const game = new ffish.Board()
+      console.log(game.fen())
+    })
   },
   methods: {
     updatePoints () {
@@ -130,6 +150,7 @@ export default {
       if (this.chartOptions.fill.gradient.colorStops[1].gradient !== 0.8 && min < 0) {
         this.chartOptions.fill.gradient.colorStops[1].gradient = 0.8
       }
+      this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 1].name)
     }
 
   }

@@ -26,7 +26,7 @@ export const store = new Vuex.Store({
     initialized: false,
     started: false,
     active: false,
-    turn: 'white',
+    turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     moves: [],
