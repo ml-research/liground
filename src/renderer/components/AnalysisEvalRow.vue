@@ -117,7 +117,6 @@ export default {
 .wrapper {
   text-align: center;
   padding: 1.05em 0em;
-  width: 600px;
 }
 
 .clock-border {

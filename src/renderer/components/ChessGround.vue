@@ -222,9 +222,9 @@ export default {
     resize () {
       const ev = document.createEvent('Event')
       const width = this.$el.parentNode.clientWidth - this.$refs.pockets.offsetWidth
-
-      this.$refs.board.style.width = `${width}px`
-      this.$refs.board.style.height = `${width}px`
+      const height = this.$el.parentNode.clientHeight
+      this.$refs.board.style.width = `${Math.min(height, width)}px`
+      this.$refs.board.style.height = `${Math.min(height, width)}px`
       ev.initEvent('chessground.resize', false, false)
       document.body.dispatchEvent(ev)
     },
