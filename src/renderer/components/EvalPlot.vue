@@ -25,7 +25,7 @@ export default {
   },
   data: function () {
     return {
-      evalArray: [0],
+      evalArray: [0], // zug namen pushen, nachdem er gespielt ist bewerten
       currentValue: 0,
       chartOptions: {
         grid: {
