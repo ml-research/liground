@@ -356,6 +356,9 @@ export const store = new Vuex.Store({
     lastFen (state) {
       return state.lastFen
     },
+    isPast (state, getters) {
+      return state.fen !== getters.lastFen
+    },
     destinations (state) {
       return state.destinations
     },
