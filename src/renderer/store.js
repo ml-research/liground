@@ -356,7 +356,7 @@ export const store = new Vuex.Store({
       }
 
       context.commit('selectedGame', payload.game)
-      context.commit('variant', variant)
+      context.dispatch('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
       context.dispatch('push', payload.game.mainlineMoves())
