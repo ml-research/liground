@@ -21,11 +21,11 @@
           <span
             slot="extra"
             class="icon mdi"
-            :class="[round.visible ? 'mdi-menu-up' : 'mdi-menu-down']"
+            :class="[round.visible || gameFilter !== '' ? 'mdi-menu-up' : 'mdi-menu-down']"
             style="float: right;"
           />
         </div>
-        <div v-show="round.visible">
+        <div v-show="round.visible || gameFilter !== ''">
           <div
             v-for="game in loadedGames"
             :key="game.id"
