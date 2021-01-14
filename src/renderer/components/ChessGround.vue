@@ -3,7 +3,7 @@
     <div class="grid-parent">
       <div class="pockets">
         <div
-          v-if="variant==='crazyhouse'"
+          v-if="variant==='crazyhouse'|| variant==='shogi' "
           :class="{ black : $store.getters.orientation == &quot;black&quot;}"
         >
           <ChessPocket
@@ -77,6 +77,18 @@ export default {
         { count: 0, type: 'rook' },
         { count: 0, type: 'queen' }
       ])
+    },
+    shogipiecesB: {
+      type: Array, 
+      default: () => ([
+        { count: 0, type: 'pawn'},
+        { count: 0, type: 'lance'},
+        { count: 0, type: 'knight'},
+        { count: 0, type: 'silver'},
+        { count: 0, type: 'gold'},
+        { count: 0, type: 'bishop'},
+        { count: 0, type: 'rook'},
+      ])
     }
   },
   data () {
@@ -96,6 +108,15 @@ export default {
         r: 3,
         q: 4
       },
+      shogiPocket: [
+        { count: 0, type: 'pawn'},
+        { count: 0, type: 'lance'},
+        { count: 0, type: 'knight'},
+        { count: 0, type: 'silver'},
+        { count: 0, type: 'gold'},
+        { count: 0, type: 'bishop'},
+        { count: 0, type: 'rook'},
+      ],
       board: null,
       shapes: [],
       pieceShapes: [],
@@ -189,6 +210,10 @@ export default {
       this.drawShapes()
     },
     variant () {
+      if(this.variant === 'shogi'){
+        this.piecesW = this.shogiPocket
+        this.piecesB = this.shogiPocket
+      }
       if (this.board.state.geometry !== this.dimensionNumber) {
         this.board = Chessground(this.$refs.board, {
           coordinates: false,
