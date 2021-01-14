@@ -70,12 +70,15 @@ export const store = new Vuex.Store({
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings'
     }),
+    orientation: 'white',
+    message: 'hello from Vuex',
     engineBinary: 'stockfish',
     stdIO: [],
-    message: 'hello from Vuex',
-    idName: '',
-    idAuthor: '',
-    orientation: 'white',
+    engineInfo: {
+      name: '',
+      author: '',
+      options: []
+    },
     engineStats: {
       depth: 0,
       seldepth: 0,
@@ -134,11 +137,8 @@ export const store = new Vuex.Store({
     stdIO (state, payload) {
       state.stdIO = state.stdIO.concat(payload)
     },
-    idName (state, payload) {
-      state.idName = payload
-    },
-    idAuthor (state, payload) {
-      state.idAuthor = payload
+    engineInfo (state, payload) {
+      state.engineInfo = payload
     },
     engineStats (state, payload) {
       state.engineStats = payload
@@ -403,11 +403,14 @@ export const store = new Vuex.Store({
     stdIO (state) {
       return state.stdIO
     },
-    idName (state) {
-      return state.idName
+    engineName (state) {
+      return state.engineInfo.name
     },
-    idAuthor (state) {
-      return state.idAuthor
+    engineAuthor (state) {
+      return state.engineInfo.author
+    },
+    engineOptions (state) {
+      return state.engineInfo.options
     },
     multipv (state) {
       return state.multipv
@@ -517,7 +520,7 @@ ffish.onRuntimeInitialized = () => {
   ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
   ipc.on('info', info => store.dispatch('updateMultiPV', info))
   const engineInfo = await ipc.runEngine()
-  console.log('Received Options:', engineInfo.options)
+  store.commit('engineInfo', engineInfo)
   ipc.send('setoption name MultiPV value 5')
   ipc.send('setoption name UCI_AnalyseMode value true')
   ipc.send(`setoption name UCI_Variant value ${store.getters.variant}`)
