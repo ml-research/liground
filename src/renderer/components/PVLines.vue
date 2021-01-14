@@ -31,15 +31,8 @@ export default {
       return this.$store.getters.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
     },
     engineDetails () {
-      const { idName, idAuthor } = this.$store.getters
-      const details = []
-      if (idName.length > 0) {
-        details.push(idName)
-      }
-      if (idAuthor.length > 0) {
-        details.push(idAuthor)
-      }
-      return details.join(' ')
+      const { engineName, engineAuthor } = this.$store.getters
+      return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     }
   },
   methods: {
