@@ -76,7 +76,7 @@ export default {
     resetBoard () {
       if (confirm('Do you really want to reset the board?')) {
         document.dispatchEvent(new Event('resetPlot'))
-        this.$store.dispatch('resetBoard', false) // TODO when implementing 960 Mode false should probably be changed to some other value and changes to the store method will be necessary, the problem extends with evalPlot
+        this.$store.dispatch('resetBoard', false) // TODO when implementing 960 Mode false should probably be changed to some other value and changes to the store method will be necessary
       }
     }
   }
