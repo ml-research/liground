@@ -147,8 +147,8 @@ export default {
       }]
       newOffset = Math.ceil(newOffset)
       this.chartOptions.fill.gradient.colorStops[0].offset = newOffset
-      if (this.chartOptions.fill.gradient.colorStops[1].gradient !== 0.8 && min < 0) {
-        this.chartOptions.fill.gradient.colorStops[1].gradient = 0.8
+      if (this.chartOptions.fill.gradient.colorStops[1].opacity !== 0.8 && min < 0) {
+        this.chartOptions.fill.gradient.colorStops[1].opacity = 0.8
       }
       this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 1].name)
     }
