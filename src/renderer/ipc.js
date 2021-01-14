@@ -35,7 +35,7 @@ function runEngine () {
   return new Promise((resolve, reject) => {
     function onError (_, err) {
       ipcRenderer.removeListener('active', onSuccess)
-      reject(new Error(err))
+      reject(err)
     }
     function onSuccess (_, response) {
       ipcRenderer.removeListener('error', onError)

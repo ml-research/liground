@@ -36,7 +36,12 @@ export default function setupEngineIPC () {
     }
 
     // spawn engine process
-    child = spawn(Engines[engineId], []).on('error', err => event.reply('error', err))
+    const binary = Engines[engineId]
+    if (!binary) {
+      event.reply('error', new Error(`Could not find engine binary for "${engineId}"`))
+      return
+    }
+    child = spawn(binary, []).on('error', err => event.reply('error', err))
 
     // success
     if (typeof child.pid === 'number') {
@@ -44,7 +49,7 @@ export default function setupEngineIPC () {
       engine = new EngineDriver(child.stdin, child.stdout)
 
       // setup error logging & crash handling
-      child.stderr.on('data', err => event.reply('error', err.toString().trim()))
+      child.stderr.on('data', err => event.reply('error', new Error(err.toString().trim())))
       child.on('exit', () => event.reply('engine-crash'))
 
       // setup listeners
@@ -73,7 +78,7 @@ export default function setupEngineIPC () {
     if (engine) {
       engine.exec(cmd).catch(err => event.reply('error', err))
     } else {
-      event.reply('error', 'Engine not running')
+      event.reply('error', new Error('Engine not running'))
     }
   })
 }
