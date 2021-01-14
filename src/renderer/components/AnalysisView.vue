@@ -89,9 +89,6 @@ export default {
     stdIO () {
       return this.$store.getters.stdIO
     },
-    engineDetails () {
-      return this.$store.getters.idName + ' ' + this.$store.getters.idAuthor
-    },
     message () {
       return this.$store.getters.message
     },
