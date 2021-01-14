@@ -25,10 +25,10 @@ class TwoWayMap {
 /**
  * Calculate the value for current side to move.
  * @param {number} value CP or Mate value
- * @param {string} sideToMove Current side to move ('w' or 'b')
+ * @param {boolean} sideToMove Current side to move (true = white)
  */
 function calcForSide (value, sideToMove) {
-  return sideToMove === 'b' ? -value : value
+  return sideToMove ? value : -value
 }
 
 /**
@@ -54,7 +54,7 @@ export const store = new Vuex.Store({
   state: {
     initialized: false,
     active: false,
-    turn: 'white',
+    turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     moves: [],
@@ -93,7 +93,6 @@ export const store = new Vuex.Store({
       }
     ],
     hoveredpv: -1,
-    sideToMove: 'w', // TODO: duplicate of turn
     counter: 0,
     pieceStyle: 'merida',
     board: null,
@@ -132,9 +131,6 @@ export const store = new Vuex.Store({
     engineBinary (state, payload) {
       state.engineBinary = payload
     },
-    sideToMove (state, payload) {
-      state.sideToMove = payload
-    },
     stdIO (state, payload) {
       state.stdIO = state.stdIO.concat(payload)
     },
@@ -150,9 +146,9 @@ export const store = new Vuex.Store({
     multipv (state, payload) {
       for (const pvline of payload) {
         if (pvline.mate) {
-          pvline.cpDisplay = `#${state.sideToMove === 'b' ? -pvline.mate : pvline.mate}`
+          pvline.cpDisplay = `#${state.turn ? pvline.mate : -pvline.mate}`
         } else {
-          pvline.cpDisplay = cpToString(calcForSide(pvline.cp, state.sideToMove))
+          pvline.cpDisplay = cpToString(calcForSide(pvline.cp, state.turn))
         }
       }
       state.multipv = payload
@@ -260,8 +256,8 @@ export const store = new Vuex.Store({
     },
     position (context) {
       ipc.send(`position fen ${context.getters.fen}`)
-      context.commit('sideToMove', context.getters.fen.split(' ')[1])
-      console.log(`state.sideToMove: ${context.sideToMove}`)
+      context.commit('turn', context.getters.fen.split(' ')[1] === 'w')
+      console.log(`state.sideToMove: ${context.turn ? 'white' : 'black'}`)
     },
     fen (context, payload) {
       context.commit('fen', payload)
@@ -454,12 +450,12 @@ export const store = new Vuex.Store({
       return state.multipv[0].pv
     },
     cpForWhite (state) {
-      return calcForSide(state.multipv[0].cp, state.sideToMove)
+      return calcForSide(state.multipv[0].cp, state.turn)
     },
     cpForWhiteStr (state, getters) {
       const { mate } = state.multipv[0]
       if (mate) {
-        return `#${calcForSide(mate, state.sideToMove)}`
+        return `#${calcForSide(mate, state.turn)}`
       } else {
         return cpToString(getters.cpForWhite)
       }
@@ -467,7 +463,7 @@ export const store = new Vuex.Store({
     cpForWhitePerc (state, getters) {
       const { mate } = state.multipv[0]
       if (mate) {
-        return ((state.sideToMove === 'b' ? -Math.sign(mate) : Math.sign(mate)) + 1) / 2
+        return ((state.turn ? Math.sign(mate) : -Math.sign(mate)) + 1) / 2
       } else {
         return 1 / (1 + Math.exp(-0.003 * getters.cpForWhite))
       }
