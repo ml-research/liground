@@ -282,10 +282,13 @@ export const store = new Vuex.Store({
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
+        if (context.getters.active) {
+          context.dispatch('stopEngine')
+        }
         context.commit('variant', payload)
         context.commit('newBoard', {})
-        context.dispatch('stopEngine')
         context.dispatch('resetMultiPV')
+        ipc.send(`setoption name UCI_Variant value ${payload}`)
       }
     },
     set960 (context, payload) {
@@ -298,6 +301,7 @@ export const store = new Vuex.Store({
     },
     engineBinary (context, payload) {
       context.commit('engineBinary', payload)
+      ipc.setBinary(payload)
     },
     stdIO (context, payload) {
       context.commit('stdIO', payload)
@@ -527,5 +531,6 @@ ffish.onRuntimeInitialized = () => {
   console.log('Received Options:', engineInfo.options)
   ipc.send('setoption name MultiPV value 5')
   ipc.send('setoption name UCI_AnalyseMode value true')
+  ipc.send(`setoption name UCI_Variant value ${store.getters.variant}`)
   ipc.send('setoption name Analysis Contempt value Off')
 })()

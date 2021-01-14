@@ -17,10 +17,7 @@ export default function setupEngineIPC () {
     info: null
   }
 
-  // eslint-disable-next-line prefer-const
-  let binary = Engines.stockfish
-
-  ipcMain.on('run', async event => {
+  ipcMain.on('run', async (event, engineId) => {
     event.reply('debug', 'Running engine')
 
     // kill old engine
@@ -39,7 +36,7 @@ export default function setupEngineIPC () {
     }
 
     // spawn engine process
-    child = spawn(binary, []).on('error', err => event.reply('error', err))
+    child = spawn(Engines[engineId], []).on('error', err => event.reply('error', err))
 
     // success
     if (typeof child.pid === 'number') {
