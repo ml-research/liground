@@ -3,7 +3,7 @@
     <div id="gameselect">
       <input
         id="gamefilter"
-        v-model.lazy="gameFilter"
+        v-model="gameFilter"
         type="text"
         name="gamefilter"
         placeholder="filter games"
