@@ -1,7 +1,7 @@
 <template>
   <div class="blue merida is2d">
     <div class="grid-parent">
-      <div class="pockets">
+      <div ref="pockets" class="pockets">
         <div
           :style="{visibility: variant === 'crazyhouse' ? 'visible' : 'hidden'}"
           :class="{ black : $store.getters.orientation == &quot;black&quot;}"
@@ -212,10 +212,22 @@ export default {
         color: 'white',
         free: false
       },
-      orientation: this.orientation
+      orientation: this.orientation,
+      resizable: true
     })
+    this.resize()
+    window.addEventListener('resize', this.resize)
   },
   methods: {
+    resize () {
+      const ev = document.createEvent('Event')
+      const width = this.$el.parentNode.clientWidth - this.$refs.pockets.offsetWidth
+
+      this.$refs.board.style.width = `${width}px`
+      this.$refs.board.style.height = `${width}px`
+      ev.initEvent('chessground.resize', false, false)
+      document.body.dispatchEvent(ev)
+    },
     updatePieceCSS (pieceStyle) {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
@@ -381,43 +393,7 @@ export default {
 .pockets {
   margin-right: 1.5px;
 }
-coords.ranks {
-  height: 100%;
-  width: .8em;
-  margin-bottom: 10px;
-}
-coords.files {
-  height: 100%;
-  width: .8em;
-  width: 10px;
-  padding-left: 30px;
-  margin-right: 10px;
-}
-coords {
-  text-shadow: var(--cg-coord-shadow);
-  font-size: calc(8px + 4 * ((100vw - 320px) / 880));
-  display: flex;
-  color: #fff;
-  text-shadow: 0 1px 2px #000;
-  font-weight: bold;
-}
-.coords {
-  margin-right: 1.5px;
-  text-align: center;
-  font-size: 8px;
-  width: 10px;
-  padding: 0px 0px 0px 0px;
-  color: black;
-}
-.cg-board-wrap {
-  border-radius: 4px 4px 4px 4px;
-}
-.cg-wrap {
-  width: 600px;
-  height: 600px;
-  position: sticky;
-  display: table;
-}
+
 .koth cg-container::before {
   width: 25%;
   height: 25%;

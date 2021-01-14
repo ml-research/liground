@@ -242,7 +242,7 @@ export default {
 .main-grid > .chessboard-grid {
   grid-area: chessboard;
   display: grid;
-  grid-template-columns: 20% auto auto;
+  grid-template-columns: 20% 70% auto;
   grid-template-rows: auto auto;
   gap: 1em;
   grid-template-areas:
