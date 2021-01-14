@@ -100,26 +100,44 @@ export default {
     moves () {
       return this.$store.getters.moves
     },
-    ...mapGetters(['points', 'turn'])
+    ...mapGetters(['points', 'turn', 'selectedGame', 'variant'])
   },
   watch: {
+    variant () {
+      this.clear()
+    },
     points () {
       this.updatePoints()
     },
     turn () {
       this.updateGraph()
+    },
+    selectedGame () {
+      this.clear()
+      this.loadPGNData()
     }
   },
-  beforeCreate () {
-    console.log('beforeCreate()')
+  beforeCreate () { // this is necessary to genereate the starting FEN for the current variation
     new Module().then(loadedModule => {
       ffish = loadedModule
-      console.log(`initialized ${ffish} ${loadedModule}`)
-      const game = new ffish.Board()
-      console.log(game.fen())
+    })
+  },
+  created () {
+    document.addEventListener('resetPlot', () => {
+      this.clear()
     })
   },
   methods: {
+    clear () {
+      this.chartOptions.xaxis.categories.splice(0, this.chartOptions.xaxis.categories.length)
+      this.chartOptions.xaxis.categories.push('Start')
+      this.series = [{
+        data: []
+      }]
+      this.evalArray = [0]
+      this.chartOptions.fill.gradient.colorStops[1].opacity = 0
+      this.currentValue = 0
+    },
     updatePoints () {
       this.currentValue = this.$store.getters.cpforWhiteStr
       if ((this.currentValue.includes('#') && !this.currentValue.includes('-')) || this.currentValue > 10) {
@@ -129,6 +147,10 @@ export default {
       }
     },
     updateGraph () {
+      if (this.moves.length === 0) {
+        this.evalArray = [0]
+        return
+      }
       this.evalArray.push(this.currentValue)
       const min = Math.min(...this.evalArray)
       const max = Math.max(...this.evalArray)
@@ -151,6 +173,20 @@ export default {
         this.chartOptions.fill.gradient.colorStops[1].opacity = 0.8
       }
       this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 1].name)
+    },
+    loadPGNData () { // pushes all the moves to the plot when loading a pgn
+      const newArray = [0]
+      let index = 0
+      const length = this.moves.length
+      while (index < length) {
+        newArray.push(0)
+        this.chartOptions.xaxis.categories.push(this.moves[index].name)
+        index++
+      }
+      this.evalArray = newArray
+      this.series = [{
+        data: newArray
+      }]
     }
 
   }
