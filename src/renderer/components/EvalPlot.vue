@@ -28,6 +28,19 @@ export default {
       evalArray: [0],
       currentValue: 0,
       chartOptions: {
+        grid: {
+          yaxis: {
+            lines: {
+              show: false
+            }
+          }
+        },
+        annotations: {
+          yaxis: [{
+            y: 0,
+            borderColor: '#999'
+          }]
+        },
         tooltip: {
           shared: false,
           intersect: true
@@ -172,7 +185,11 @@ export default {
       if (this.chartOptions.fill.gradient.colorStops[1].opacity !== 0.8 && min < 0) {
         this.chartOptions.fill.gradient.colorStops[1].opacity = 0.8
       }
-      this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 1].name)
+      if (this.moves[this.moves.length - 1].ply % 2 === 0) {
+        this.chartOptions.xaxis.categories.push('..' + this.moves[this.moves.length - 1].name)
+      } else {
+        this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 1].name)
+      }
     },
     loadPGNData () { // pushes all the moves to the plot when loading a pgn
       const newArray = [0]
