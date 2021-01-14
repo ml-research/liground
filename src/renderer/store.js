@@ -186,8 +186,7 @@ export const store = new Vuex.Store({
       state.legalMoves = state.board.legalMoves()
       state.lastFen = state.board.fen()
     },
-    resetBoard (state, payload) {
-      this.commit('newBoard', payload)
+    resetMoves (state, payload) {
       state.moves = []
     },
     appendMoves (state, payload) {
@@ -210,8 +209,9 @@ export const store = new Vuex.Store({
   },
   actions: { // async
     resetBoard (context, payload) {
-      context.commit('resetMultiPV')
-      context.commit('resetBoard', payload)
+      context.dispatch('restartEngine')
+      context.commit('newBoard', payload)
+      context.commit('resetMoves')
     },
     initialize (context) {
       context.commit('newBoard', {
@@ -240,14 +240,12 @@ export const store = new Vuex.Store({
       context.commit('active', false)
     },
     restartEngine (context) {
-      if (context.state.active) {
+      context.commit('resetMultiPV')
+      if (context.getters.active) {
         context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEngine')
       }
-    },
-    resetMultiPV (context) {
-      context.commit('resetMultiPV')
     },
     position (context) {
       ipc.send(`position fen ${context.getters.fen}`)
@@ -256,7 +254,6 @@ export const store = new Vuex.Store({
       if (context.state.fen !== payload) {
         context.commit('fen', payload)
         context.dispatch('updateBoard')
-        context.dispatch('resetMultiPV')
         context.dispatch('restartEngine')
       }
     },
@@ -279,7 +276,7 @@ export const store = new Vuex.Store({
         }
         context.commit('variant', payload)
         context.commit('newBoard', {})
-        context.dispatch('resetMultiPV')
+        context.commit('resetMultiPV')
         ipc.send(`setoption name UCI_Variant value ${payload}`)
       }
     },
