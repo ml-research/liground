@@ -145,10 +145,8 @@ export const store = new Vuex.Store({
     },
     multipv (state, payload) {
       for (const pvline of payload) {
-        if (pvline.mate) {
-          pvline.cpDisplay = `#${state.turn ? pvline.mate : -pvline.mate}`
-        } else {
-          pvline.cpDisplay = cpToString(calcForSide(pvline.cp, state.turn))
+        if (pvline) {
+          pvline.cpDisplay = pvline.mate ? `#${calcForSide(pvline.mate, state.turn)}` : cpToString(calcForSide(pvline.cp, state.turn))
         }
       }
       state.multipv = payload
@@ -183,10 +181,10 @@ export const store = new Vuex.Store({
       }
       state.moves = []
       state.gameInfo = {}
-      this.commit('fen', state.board.fen())
-      this.commit('turn', state.board.turn())
-      this.commit('legalMoves', state.board.legalMoves())
-      this.commit('lastFen', state.board.fen())
+      state.fen = state.board.fen()
+      state.turn = state.board.turn()
+      state.legalMoves = state.board.legalMoves()
+      state.lastFen = state.board.fen()
     },
     resetBoard (state, payload) {
       this.commit('newBoard', payload)
@@ -224,24 +222,21 @@ export const store = new Vuex.Store({
       context.commit('initialized', true)
     },
     updateBoard (context) {
-      context.state.board.setFen(context.state.fen)
-      context.commit('turn', context.state.board.turn())
-      context.commit('legalMoves', context.state.board.legalMoves())
+      const { board } = context.state
+      board.setFen(context.state.fen)
+      context.commit('turn', board.turn())
+      context.commit('legalMoves', board.legalMoves())
     },
     push (context, payload) {
       context.commit('appendMoves', payload.split(' '))
-      context.dispatch('resetMultiPV')
-      context.dispatch('updateBoard')
-      context.dispatch('restartEngine')
+      context.dispatch('fen', context.state.board.fen())
     },
     goEngine (context) {
       ipc.send('go infinite')
-      console.log('goEngine')
       context.commit('active', true)
     },
     stopEngine (context) {
       ipc.send('stop')
-      console.log('stopEngine')
       context.commit('active', false)
     },
     restartEngine (context) {
@@ -256,13 +251,14 @@ export const store = new Vuex.Store({
     },
     position (context) {
       ipc.send(`position fen ${context.getters.fen}`)
-      context.commit('turn', context.getters.fen.split(' ')[1] === 'w')
-      console.log(`state.sideToMove: ${context.turn ? 'white' : 'black'}`)
     },
     fen (context, payload) {
-      context.commit('fen', payload)
-      context.dispatch('updateBoard')
-      context.dispatch('restartEngine')
+      if (context.state.fen !== payload) {
+        context.commit('fen', payload)
+        context.dispatch('updateBoard')
+        context.dispatch('resetMultiPV')
+        context.dispatch('restartEngine')
+      }
     },
     lastFen (context, payload) {
       context.commit('lastFen', payload)
@@ -463,7 +459,7 @@ export const store = new Vuex.Store({
     cpForWhitePerc (state, getters) {
       const { mate } = state.multipv[0]
       if (mate) {
-        return ((state.turn ? Math.sign(mate) : -Math.sign(mate)) + 1) / 2
+        return (calcForSide(Math.sign(mate), state.turn) + 1) / 2
       } else {
         return 1 / (1 + Math.exp(-0.003 * getters.cpForWhite))
       }
