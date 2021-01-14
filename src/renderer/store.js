@@ -146,6 +146,17 @@ export const store = new Vuex.Store({
     engineStats (state, payload) {
       state.engineStats = payload
     },
+    resetEngineStats (state) {
+      state.engineStats = {
+        depth: 0,
+        seldepth: 0,
+        nodes: 0,
+        nps: 0,
+        hashfull: 0,
+        tbhits: 0,
+        time: 0
+      }
+    },
     multipv (state, payload) {
       for (const pvline of payload) {
         if (pvline) {
@@ -234,6 +245,10 @@ export const store = new Vuex.Store({
       context.commit('appendMoves', payload.split(' '))
       context.dispatch('fen', context.state.board.fen())
     },
+    resetEngineData (context) {
+      context.commit('resetMultiPV')
+      context.commit('resetEngineStats')
+    },
     goEngine (context) {
       ipc.send('go infinite')
       context.commit('active', true)
@@ -243,7 +258,7 @@ export const store = new Vuex.Store({
       context.commit('active', false)
     },
     restartEngine (context) {
-      context.commit('resetMultiPV')
+      context.dispatch('resetEngineData')
       if (context.getters.active) {
         context.dispatch('stopEngine')
         context.dispatch('position')
@@ -279,7 +294,7 @@ export const store = new Vuex.Store({
         }
         context.commit('variant', payload)
         context.commit('newBoard', {})
-        context.commit('resetMultiPV')
+        context.dispatch('resetEngineData')
         ipc.send(`setoption name UCI_Variant value ${payload}`)
       }
     },
@@ -295,6 +310,7 @@ export const store = new Vuex.Store({
       if (context.getters.engineBinary !== payload) {
         context.commit('engineBinary', payload)
         context.commit('clearIO')
+        context.dispatch('resetEngineData')
         ipc.setBinary(payload)
         context.dispatch('initEngineOptions')
       }
