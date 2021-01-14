@@ -296,6 +296,21 @@ export const store = new Vuex.Store({
         context.commit('engineBinary', payload)
         context.commit('clearIO')
         ipc.setBinary(payload)
+        context.dispatch('initEngineOptions')
+      }
+    },
+    initEngineOptions (context) {
+      context.dispatch('setEngineOptions', {
+        MultiPV: 5,
+        UCI_AnalyseMode: true,
+        UCI_Variant: context.getters.variant,
+        'Analysis Contempt': 'Off'
+      })
+    },
+    setEngineOptions (_, payload) {
+      for (const [name, value] of Object.entries(payload)) {
+        // TODO: check for invalid options
+        ipc.send(`setoption name ${name} value ${value}`)
       }
     },
     stdIO (context, payload) {
@@ -527,8 +542,5 @@ ffish.onRuntimeInitialized = () => {
   ipc.on('info', info => store.dispatch('updateMultiPV', info))
   const engineInfo = await ipc.runEngine()
   store.commit('engineInfo', engineInfo)
-  ipc.send('setoption name MultiPV value 5')
-  ipc.send('setoption name UCI_AnalyseMode value true')
-  ipc.send(`setoption name UCI_Variant value ${store.getters.variant}`)
-  ipc.send('setoption name Analysis Contempt value Off')
+  store.dispatch('initEngineOptions')
 })()
