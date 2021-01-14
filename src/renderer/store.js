@@ -137,6 +137,9 @@ export const store = new Vuex.Store({
     stdIO (state, payload) {
       state.stdIO = state.stdIO.concat(payload)
     },
+    clearIO (state) {
+      state.stdIO = []
+    },
     engineInfo (state, payload) {
       state.engineInfo = payload
     },
@@ -289,8 +292,11 @@ export const store = new Vuex.Store({
       }
     },
     engineBinary (context, payload) {
-      context.commit('engineBinary', payload)
-      ipc.setBinary(payload)
+      if (context.getters.engineBinary !== payload) {
+        context.commit('engineBinary', payload)
+        context.commit('clearIO')
+        ipc.setBinary(payload)
+      }
     },
     stdIO (context, payload) {
       context.commit('stdIO', payload)
