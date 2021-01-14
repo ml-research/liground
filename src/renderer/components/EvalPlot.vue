@@ -197,7 +197,11 @@ export default {
       const length = this.moves.length
       while (index < length) {
         newArray.push(0)
-        this.chartOptions.xaxis.categories.push(this.moves[index].name)
+        if (index % 2 === 1) {
+          this.chartOptions.xaxis.categories.push('..' + this.moves[index].name)
+        } else {
+          this.chartOptions.xaxis.categories.push(this.moves[index].name)
+        }
         index++
       }
       this.evalArray = newArray
