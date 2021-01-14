@@ -32,6 +32,7 @@ export default function setupEngineIPC () {
 
       // quit engine
       await engine.quit()
+      engine = null
       event.reply('debug', 'Killed!')
     }
 
