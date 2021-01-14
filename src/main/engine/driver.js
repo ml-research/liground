@@ -115,9 +115,9 @@ export default class EngineDriver {
       }
       case 'info': {
         const info = {}
-        const regexp = /\s+(depth|seldepth|multipv|cp|nodes|nps|hashfull|tbhits|time|pv)\s+(.+?)(?=\s+(?:depth|seldepth|multipv|score|nodes|nps|hashfull|tbhits|time|pv)|\s*$)/g
+        const regexp = /\s+(depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time|pv)\s+(.+?)(?=\s+(?:depth|seldepth|multipv|score|nodes|nps|hashfull|tbhits|time|pv)|\s*$)/g
         for (const [, type, value] of line.matchAll(regexp)) {
-          info[type] = type.match(/depth|seldepth|multipv|cp|nodes|nps|hashfull|tbhits|time/) ? parseInt(value) : value
+          info[type] = type.match(/depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time/) ? parseInt(value) : value
         }
         this.events.emit('info', info)
         break
