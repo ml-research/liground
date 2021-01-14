@@ -190,6 +190,12 @@ export default class EngineDriver {
    * Tell the engine to quit.
    */
   async quit () {
+    // check for already destroyed stream
+    if (this.input.destroyed) {
+      return
+    }
+
+    // wait for ready, then quit & wait for stream close
     await this.waitForReady()
     this._write('quit')
     await waitFor(this.input, 'close')
