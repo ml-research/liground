@@ -207,7 +207,7 @@ export const store = new Vuex.Store({
     multipv (state, payload) {
       for (const pvline of payload) {
         if (pvline) {
-          pvline.cpDisplay = pvline.mate ? `#${calcForSide(pvline.mate, state.turn)}` : cpToString(calcForSide(pvline.cp, state.turn))
+          pvline.cpDisplay = typeof pvline.mate === 'number' ? `#${calcForSide(pvline.mate, state.turn)}` : cpToString(calcForSide(pvline.cp, state.turn))
         }
       }
       state.multipv = payload
@@ -402,17 +402,21 @@ export const store = new Vuex.Store({
 
       // update pvline
       const multipv = context.getters.multipv.slice(0)
-      const pvline = {
-        cp: payload.cp,
-        mate: payload.mate,
-        ucimove: payload.pv.split(/\s/)[0]
+      if (payload.mate === 0) {
+        multipv[0] = { mate: payload.mate }
+      } else {
+        const pvline = {
+          cp: payload.cp,
+          mate: payload.mate,
+          ucimove: payload.pv.split(/\s/)[0]
+        }
+        try {
+          pvline.pv = context.state.board.variationSan(payload.pv)
+        } catch (err) {
+          console.error('Invalid move:', payload.pv)
+        }
+        multipv[payload.multipv - 1] = pvline
       }
-      try {
-        pvline.pv = context.state.board.variationSan(payload.pv)
-      } catch (err) {
-        console.error('Invalid move:', payload.pv)
-      }
-      multipv[payload.multipv - 1] = pvline
       context.commit('multipv', multipv)
     },
     loadedGames (context, payload) {
@@ -534,7 +538,7 @@ export const store = new Vuex.Store({
     },
     cpForWhiteStr (state, getters) {
       const { mate } = state.multipv[0]
-      if (mate) {
+      if (typeof mate === 'number') {
         return `#${calcForSide(mate, state.turn)}`
       } else {
         return cpToString(getters.cpForWhite)
@@ -542,7 +546,7 @@ export const store = new Vuex.Store({
     },
     cpForWhitePerc (state, getters) {
       const { mate } = state.multipv[0]
-      if (mate) {
+      if (typeof mate === 'number') {
         return (calcForSide(Math.sign(mate), state.turn) + 1) / 2
       } else {
         return 1 / (1 + Math.exp(-0.003 * getters.cpForWhite))
@@ -603,7 +607,6 @@ ffish.onRuntimeInitialized = () => {
   ipc.on('output', line => store.dispatch('stdIO', line))
   ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
   ipc.on('info', info => store.dispatch('updateMultiPV', info))
-  const engineInfo = await ipc.runEngine()
-  store.commit('engineInfo', engineInfo)
+  store.commit('engineInfo', await ipc.runEngine())
   store.dispatch('initEngineOptions')
 })()
