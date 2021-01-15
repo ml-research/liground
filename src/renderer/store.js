@@ -50,6 +50,53 @@ function cpToString (cp) {
   }
 }
 
+/**
+ * Check if an option value is valid and emit warnings if necessary.
+ * @param {any[]} options Array of engine options
+ * @param {string} name Name of option
+ * @param {any} value Option value to check
+ */
+function checkOption (options, name, value) {
+  const option = options.find(e => e.name === name)
+  if (!option) {
+    console.warn(`[Engine] Unknown option "${name}"`)
+  } else {
+    switch (option.type) {
+      case 'check':
+        if (typeof value !== 'boolean') {
+          console.warn(`[Engine] Invalid value type "${value}" for check option "${name}"`)
+        }
+        break
+      case 'spin':
+        if (typeof value !== 'number') {
+          console.warn(`[Engine] Invalid value "${value}" for spin option "${name}"`)
+        } else if (typeof option.max === 'number' && value > option.max) {
+          console.warn(`[Engine] Out of range value "${value}" for spin option "${name}" (range ${option.min} to ${option.max})`)
+        } else if (typeof option.min === 'number' && value < option.min) {
+          console.warn(`[Engine] Out of range value "${value}" for spin option "${name}" (range ${option.min} to ${option.max})`)
+        }
+        break
+      case 'combo':
+        if (typeof value !== 'string') {
+          console.warn(`[Engine] Invalid value "${value}" for combo option "${name}"`)
+        } else if (Array.isArray(option.var) && !option.var.includes(value)) {
+          console.warn(`[Engine] Unknown value "${value}" for combo option "${name}" (values ${option.var.map(e => `"${e}"`).join(', ')})`)
+        }
+        break
+      case 'button':
+        if (value !== undefined && value !== null) {
+          console.warn(`[Engine] Unexpected value "${value}" for button option "${name}"`)
+        }
+        break
+      case 'string':
+        if (typeof value !== 'string') {
+          console.warn(`[Engine] Invalid value "${value}" for string option "${name}"`)
+        }
+        break
+    }
+  }
+}
+
 export const store = new Vuex.Store({
   state: {
     initialized: false,
@@ -323,9 +370,9 @@ export const store = new Vuex.Store({
         'Analysis Contempt': 'Off'
       })
     },
-    setEngineOptions (_, payload) {
+    setEngineOptions (context, payload) {
       for (const [name, value] of Object.entries(payload)) {
-        // TODO: check for invalid options
+        checkOption(context.state.engineInfo.options, name, value)
         ipc.send(`setoption name ${name} value ${value}`)
       }
     },
