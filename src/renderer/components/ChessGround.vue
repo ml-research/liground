@@ -139,7 +139,7 @@ export default {
       const pieceShapes = []
 
       for (const [i, pvline] of multipv.entries()) {
-        if ('ucimove' in pvline && pvline.ucimove.length > 0) {
+        if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
           const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
           const move = pvline.ucimove
           const orig = move.substring(0, 2)
