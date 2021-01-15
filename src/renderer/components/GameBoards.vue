@@ -251,10 +251,12 @@ export default {
 }
 #analysisview {
   grid-area: analysisview;
+  max-width: 40vw;
+  max-height: calc(100vh - 25px);
 }
 input {
   font-size: 12pt;
-  width: 600px;
+  max-width: 60vw;
 }
 #fen-field {
   grid-area: fenfield;
@@ -262,7 +264,7 @@ input {
 }
 #piece-style {
   margin-top: 10px;
-  width: 300px;
+  max-width: 300px;
   margin-left: 142px;
 }
 #pgnbrowser {

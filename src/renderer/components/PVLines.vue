@@ -63,7 +63,6 @@ export default {
   white-space: nowrap;
 }
 .scroller {
-  max-width: 600px;
   overflow-x: scroll;
 }
 .list {

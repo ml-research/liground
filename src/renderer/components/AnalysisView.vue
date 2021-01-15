@@ -139,7 +139,7 @@ input {
   margin-bottom: -20px;
 }
 .game-window {
-  height: 270px;
+  height: 20%;
   overflow-y: scroll;
 }
 .panel {
@@ -159,7 +159,7 @@ input {
   font-family: monospace;
   font-weight: 100;
   font-size: 8pt;
-  height: 200px;
+  height: 20%;
   overflow-y: scroll;
   white-space: nowrap;
   text-align: left;

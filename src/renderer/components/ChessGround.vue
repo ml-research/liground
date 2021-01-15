@@ -1,7 +1,10 @@
 <template>
   <div class="blue merida is2d">
     <div class="grid-parent">
-      <div ref="pockets" class="pockets">
+      <div
+        ref="pockets"
+        class="pockets"
+      >
         <div
           :style="{visibility: variant === 'crazyhouse' ? 'visible' : 'hidden'}"
           :class="{ black : $store.getters.orientation == &quot;black&quot;}"
