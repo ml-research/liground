@@ -25,8 +25,8 @@ export default {
   },
   data: function () {
     return {
-      evalArray: [0], // zug namen pushen, nachdem er gespielt ist bewerten
-      currentValue: 0,
+      evalArray: [0],
+      currentValue: [0],
       chartOptions: {
         grid: {
           yaxis: {
@@ -46,7 +46,7 @@ export default {
           intersect: true
         },
         noData: {
-          text: 'Start the Engine for data',
+          text: 'Start the Engine for data and do your 2nd move',
           align: 'center',
           verticalAlign: 'middle',
           offsetX: 0,
@@ -149,22 +149,34 @@ export default {
       }]
       this.evalArray = [0]
       this.chartOptions.fill.gradient.colorStops[1].opacity = 0
-      this.currentValue = 0
+      this.currentValue = [0]
     },
     updatePoints () {
-      this.currentValue = this.$store.getters.cpforWhiteStr
-      if ((this.currentValue.includes('#') && !this.currentValue.includes('-')) || this.currentValue > 10) {
-        this.currentValue = 10
-      } else if ((this.currentValue.includes('#') && this.currentValue.includes('-')) || this.currentValue < -10) {
-        this.currentValue = -10
+      if (this.moves.length === 0) {
+        return
       }
+      const index = this.moves.length
+      this.currentValue[index] = this.$store.getters.cpforWhiteStr
+      if ((this.currentValue[index].includes('#') && !this.currentValue[index].includes('-')) || this.currentValue[index] > 10) {
+        this.currentValue[index] = 10
+      } else if ((this.currentValue[index].includes('#') && this.currentValue[index].includes('-')) || this.currentValue[index] < -10) {
+        this.currentValue[index] = -10
+      }
+      console.log(this.currentValue)
     },
     updateGraph () {
-      if (this.moves.length === 0) {
+      if (this.moves.length <= 1) {
         this.evalArray = [0]
         return
       }
-      this.evalArray.push(this.currentValue)
+      const index = this.moves.length - 1
+      console.log(this.currentValue[index])
+      if (this.currentValue.length <= index) {
+        console.log('if')
+        this.evalArray.push(this.currentValue[this.currentValue.length - 1])
+      } else {
+        this.evalArray.push(this.currentValue[index])
+      }
       const min = Math.min(...this.evalArray)
       const max = Math.max(...this.evalArray)
       let newOffset = 0
@@ -185,17 +197,17 @@ export default {
       if (this.chartOptions.fill.gradient.colorStops[1].opacity !== 0.8 && min < 0) {
         this.chartOptions.fill.gradient.colorStops[1].opacity = 0.8
       }
-      if (this.moves[this.moves.length - 1].ply % 2 === 0) {
-        this.chartOptions.xaxis.categories.push('..' + this.moves[this.moves.length - 1].name)
+      if (this.moves[this.moves.length - 2].ply % 2 === 0) {
+        this.chartOptions.xaxis.categories.push('..' + this.moves[this.moves.length - 2].name)
       } else {
-        this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 1].name)
+        this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 2].name)
       }
     },
     loadPGNData () { // pushes all the moves to the plot when loading a pgn
       const newArray = [0]
       let index = 0
       const length = this.moves.length
-      while (index < length) {
+      while (index < length - 1) {
         newArray.push(0)
         if (index % 2 === 1) {
           this.chartOptions.xaxis.categories.push('..' + this.moves[index].name)
