@@ -162,7 +162,6 @@ export default {
       } else if ((this.currentValue[index].includes('#') && this.currentValue[index].includes('-')) || this.currentValue[index] < -10) {
         this.currentValue[index] = -10
       }
-      console.log(this.currentValue)
     },
     updateGraph () {
       if (this.moves.length <= 1) {
@@ -170,9 +169,7 @@ export default {
         return
       }
       const index = this.moves.length - 1
-      console.log(this.currentValue[index])
       if (this.currentValue.length <= index) {
-        console.log('if')
         this.evalArray.push(this.currentValue[this.currentValue.length - 1])
       } else {
         this.evalArray.push(this.currentValue[index])
