@@ -137,9 +137,9 @@ export default {
   font-size: 11px;
 }
 nav a {
-  line-height: 10px;
-  /* height: 100%; */
-  height: 20px;
+  line-height: 20px;
+  padding-bottom: 20px;
+  height: 15px;
   font-size: 8px;
   display: inline-block;
   position: relative;
