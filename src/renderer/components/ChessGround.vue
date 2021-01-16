@@ -318,12 +318,9 @@ export default {
         if (this.isPromotion(uciMove)) {
           this.uciMove = uciMove
           this.showPromotionModal()
-          // console.log('last move' + this.moves[this.moves.length - 1].name)
         } else {
           this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-          console.log('after error')
           this.$store.dispatch('push', uciMove)
-          console.log('colorAfterPush:' + this.turn)
           this.updateHand()
           this.afterMove()
         }

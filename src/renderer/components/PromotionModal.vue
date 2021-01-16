@@ -42,9 +42,6 @@ export default {
       return this.$store.getters.pieceStyle
     },
     turn () {
-      if (this.$store.getters.turn === undefined) {
-        return false
-      }
       return this.$store.getters.turn
     },
     orientation () {
@@ -71,7 +68,6 @@ export default {
       document.getElementById('op4').style.order = '1'
     },
     loadPieceStyle () {
-      console.log('test')
       // document.getElementById('op1').style.backgroundImage = "url('src/renderer/assets/piece/international/" + this.pieceStyle + "/wQ.svg)"
     },
     close (value) {
