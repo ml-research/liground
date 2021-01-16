@@ -241,6 +241,9 @@ export default {
         color: 'white',
         free: false
       },
+      premovable: {
+        enabled: false
+      },
       orientation: this.orientation
     })
   },
