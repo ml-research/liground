@@ -25,17 +25,18 @@
         </div>
       </div>
       <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
-        <div
-          ref="board"
-          class="cg-board-wrap"
-        />
-        <div
-          id="PromotionModal"
-        >
-          <PromotionModal
-            v-show="isPromotionModalVisible"
-            @close="closePromotionModal"
-          />
+        <div class="cg-board-wrap">
+          <div ref="board" />
+          <div
+            id="PromotionModal"
+            ref="promotion"
+            :style="promotionPosition"
+          >
+            <PromotionModal
+              v-show="isPromotionModalVisible"
+              @close="closePromotionModal"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -45,6 +46,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { Chessground } from 'chessgroundx'
+import * as cgUtil from 'chessgroundx/util'
 import ChessPocket from './ChessPocket'
 import PromotionModal from './PromotionModal.vue'
 
@@ -130,6 +132,22 @@ export default {
     },
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
+    },
+    promotionPosition () {
+      if (this.uciMove) {
+        const dest = this.uciMove.substring(2, 4)
+
+        let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5
+
+        if (this.orientation === 'white') {
+          left = 87.5 - left
+        }
+
+        const vertical = this.turn === this.orientation ? 0 : (7 - 3) * 12.5
+        return { left: `${left}%`, top: `${vertical}%` }
+      } else {
+        return undefined
+      }
     },
     ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
   },
@@ -231,29 +249,6 @@ export default {
   methods: {
     showPromotionModal () {
       this.isPromotionModalVisible = true
-      const row = this.uciMove.substring(3, 4)
-      const col = this.uciMove.substring(2, 3)
-      let offset = document.getElementsByClassName('cg-board-wrap')[0].offsetTop
-      const dir = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 }
-      if (this.orientation === 'black') {
-        if (row === '8') {
-          offset += document.getElementsByClassName('cg-board-wrap')[0].offsetHeight * 0.5
-          document.getElementById('PromotionModal').style.top = offset + 'px'
-        } else {
-          document.getElementById('PromotionModal').style.top = offset + 'px'
-        }
-        document.getElementById('PromotionModal').style.top += 'px'
-        document.getElementById('PromotionModal').style.left = document.getElementsByClassName('cg-board-wrap')[0].offsetLeft + (7 - dir[col]) * 75 + 'px'
-      } else {
-        if (row === '1') {
-          offset += document.getElementsByClassName('cg-board-wrap')[0].offsetHeight * 0.5
-          document.getElementById('PromotionModal').style.top = offset + 'px'
-        } else {
-          document.getElementById('PromotionModal').style.top = offset + 'px'
-        }
-        document.getElementById('PromotionModal').style.top += 'px'
-        document.getElementById('PromotionModal').style.left = document.getElementsByClassName('cg-board-wrap')[0].offsetLeft + dir[col] * 75 + 'px'
-      }
       document.dispatchEvent(new Event('startedPromotion'))
     },
     closePromotionModal (value) {
@@ -471,6 +466,9 @@ coords {
 }
 .cg-board-wrap {
   border-radius: 4px 4px 4px 4px;
+  position: relative;
+  width: max-content;
+  height: max-content;
 }
 .cg-wrap {
   width: 600px;
