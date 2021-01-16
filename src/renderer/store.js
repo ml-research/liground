@@ -172,7 +172,7 @@ export const store = new Vuex.Store({
     },
     newBoard (state, payload) {
       if (payload.is960) {
-        state.board = new ffish.Board(state.variant, payload.fen)
+        state.board = new ffish.Board(state.variant, payload.fen, true)
       } else {
         state.board = new ffish.Board(state.variant)
       }
@@ -278,8 +278,8 @@ export const store = new Vuex.Store({
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
-          const stndrd = varFen !== ''
-          context.commit('newBoard', { is960: stndrd, fen: varFen })
+          const is960Mode = varFen !== ''
+          context.commit('newBoard', { is960: is960Mode, fen: varFen })
         } else {
           context.commit('newBoard', { is960: false, fen: '' })
         }

@@ -311,7 +311,6 @@ export default {
     afterMove () {
       const events = {}
       events.fen = this.fen
-
       events.history = [this.lastMoveSan]
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
