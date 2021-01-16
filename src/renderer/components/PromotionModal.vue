@@ -126,5 +126,8 @@ export default {
     display: flex;
     flex-direction: column;
   }
+  .prom-container:hover {
+    cursor: pointer;
+  }
 
 </style>
