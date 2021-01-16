@@ -17,6 +17,7 @@
       </a>
       <a
         href="#"
+        :class="{ active: !viewAnalysis }"
         @click="changeTab"
       ><em
         slot="extra"
@@ -32,7 +33,6 @@
         slot="extra"
         class="icon mdi mdi-github"
       /></a>
-      <div class="animation start-home" />
     </nav>
     <div id="Modal">
       <modal
@@ -47,6 +47,7 @@
 import fs from 'fs'
 import ffish from 'ffish'
 import modal from './EngineModal'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'MenuBar',
@@ -57,6 +58,9 @@ export default {
     return {
       isModalVisible: false
     }
+  },
+  computed: {
+    ...mapGetters(['viewAnalysis'])
   },
   methods: {
     showModal () {
@@ -128,44 +132,25 @@ export default {
 
 <style scoped>
  nav {
-  margin: 10px auto 0;
+  margin: 10px auto;
   position: relative;
-  width: 500px;
-  height: 20px;
   background-color: #34495e;
-  border-radius: 8px;
   font-size: 11px;
+  width: 33.3%;
+  border-radius: 8px;
 }
 nav a {
-  line-height: 20px;
-  padding-bottom: 20px;
-  height: 15px;
-  font-size: 8px;
   display: inline-block;
-  position: relative;
-  z-index: 1;
   text-decoration: none;
   text-align: center;
   color: white;
+  padding: 5px 16px;
   cursor: pointer;
 }
-
-a:nth-child(1) {
-  width: 100px;
+a:hover:not(.active) {
+  background-color: #22303d;
 }
-a:nth-child(2) {
-  width: 100px;
-}
-a:nth-child(3) {
-  width: 100px;
-}
-a:nth-child(4) {
-  width: 100px;
-}
-a:nth-child(5) {
-  width: 100px;
-}
-a:hover {
-  color: #688cb0;
+.active {
+  background-color: #00af89;
 }
 </style>
