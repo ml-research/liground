@@ -353,12 +353,12 @@ export const store = new Vuex.Store({
         })
       }
     },
-    engineBinary (context, payload) {
+    async engineBinary (context, payload) {
       if (context.getters.engineBinary !== payload) {
         context.commit('engineBinary', payload)
         context.commit('clearIO')
         context.dispatch('resetEngineData')
-        ipc.setBinary(payload)
+        context.commit('engineInfo', await ipc.setBinary(payload))
         context.dispatch('initEngineOptions')
       }
     },

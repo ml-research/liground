@@ -54,7 +54,9 @@ function runEngine () {
 async function setBinary (id) {
   if (engine !== id) {
     engine = id
-    await runEngine()
+    return await runEngine()
+  } else {
+    return null
   }
 }
 
