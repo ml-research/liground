@@ -266,7 +266,9 @@ export default {
 
         document.body.dispatchEvent(new Event('chessground.resize'))
       }
-
+      if(this.variant === 'crazyhouse' || this.variant === 'shogi'){
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      }
       this.board.set({
         variant: this.variant,
         lastMove: false
@@ -537,7 +539,7 @@ export default {
   margin-right: 1.5px;
   height: 100%;
 }
-.shogi .pockets{
+.pockets.shogi{
   display:grid;
   grid-template-columns: 1fr 1fr ;
 
