@@ -91,7 +91,7 @@ export const store = new Vuex.Store({
     ],
     shogiVariants: [
       'shogi'
-    ]
+    ],
     viewAnalysis: true
   },
   mutations: { // sync

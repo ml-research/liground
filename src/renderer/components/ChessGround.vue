@@ -534,10 +534,13 @@ export default {
   grid-template-columns: auto 1fr
 }
 .pockets {
-  display:grid;
   margin-right: 1.5px;
   height: 100%;
+}
+.shogi .pockets{
+  display:grid;
   grid-template-columns: 1fr 1fr ;
+
 }
 coords.ranks {
   height: 100%;
