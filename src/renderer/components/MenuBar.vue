@@ -4,39 +4,79 @@
       <a
         href="#"
         @click="openPgn"
-      ><i
+      ><em
         slot="extra"
         class="icon mdi mdi-checkerboard"
       /> Open PGN</a>
-      <a href="#"><i
+      <a
+        @click="showModal"
+      ><em
         slot="extra"
-        class="icon mdi mdi-robot"
-      /> Engines</a>
-      <a href="#"><i
+        class="icon mdi mdi-checkerboard"
+      /> Engines
+      </a>
+      <a
+        href="#"
+        :class="{ active: !viewAnalysis }"
+        @click="changeTab"
+      ><em
         slot="extra"
         class="icon mdi mdi-hammer-screwdriver"
       /> Settings </a>
-      <a href="#"><i
+      <a
+        href="#"
+        @click="openExternalBrowser"
+      ><em
         slot="extra"
         class="icon mdi mdi-information-outline"
-      /> About <i
+      /> About <em
         slot="extra"
         class="icon mdi mdi-github"
       /></a>
-      <div class="animation start-home" />
     </nav>
+    <div id="Modal">
+      <modal
+        v-show="isModalVisible"
+        @close="closeModal"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import fs from 'fs'
 import ffish from 'ffish'
+import modal from './EngineModal'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'MenuBar',
   components: {
+    modal
+  },
+  data () {
+    return {
+      isModalVisible: false
+    }
+  },
+  computed: {
+    ...mapGetters(['viewAnalysis'])
   },
   methods: {
+    showModal () {
+      this.isModalVisible = true
+    },
+    closeModal () {
+      this.isModalVisible = false
+    },
+    changeTab () {
+      this.$store.commit('viewAnalysis', !this.$store.getters.viewAnalysis)
+    },
+    openExternalBrowser () {
+      const shell = require('electron').shell
+      event.preventDefault()
+      shell.openExternal('https://github.com/ml-research/liground')
+    },
     openPgn () {
       const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
       let games = []
@@ -92,44 +132,25 @@ export default {
 
 <style scoped>
  nav {
-  margin: 10px auto 0;
+  margin: 10px auto;
   position: relative;
-  width: 500px;
-  height: 20px;
   background-color: #34495e;
-  border-radius: 8px;
   font-size: 11px;
+  width: 33.3%;
+  border-radius: 8px;
 }
 nav a {
-  line-height: 10px;
-  /* height: 100%; */
-  height: 20px;
-  font-size: 8px;
   display: inline-block;
-  position: relative;
-  z-index: 1;
   text-decoration: none;
   text-align: center;
   color: white;
+  padding: 5px 16px;
   cursor: pointer;
 }
-
-a:nth-child(1) {
-  width: 100px;
+a:hover:not(.active) {
+  background-color: #22303d;
 }
-a:nth-child(2) {
-  width: 100px;
-}
-a:nth-child(3) {
-  width: 100px;
-}
-a:nth-child(4) {
-  width: 100px;
-}
-a:nth-child(5) {
-  width: 100px;
-}
-a:hover {
-  color: #688cb0;
+.active {
+  background-color: #00af89;
 }
 </style>
