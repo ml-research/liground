@@ -31,7 +31,7 @@
             :style="promotionPosition"
           >
             <PromotionModal
-              v-show="isPromotionModalVisible"
+              v-show="isPromotionModalVisible && !isPast"
               @close="closePromotionModal"
             />
           </div>
@@ -147,7 +147,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast'])
   },
   watch: {
     initialized () {
@@ -220,6 +220,7 @@ export default {
         lastMove: false
       })
       this.updateBoard()
+      this.isPromotionModalVisible = false
     }
   },
   mounted () {
