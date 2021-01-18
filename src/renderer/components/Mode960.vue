@@ -80,6 +80,7 @@ export default {
         n *= -1
       }
       n = Math.floor(n) % 960
+      this.curVar = n
 
       const pieces = ['.', '.', '.', '.', '.', '.', '.', '.']
 

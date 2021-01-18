@@ -371,7 +371,7 @@ export default {
     updateBoard () {
       // logic to find out if a check should be displayed:
       let isCheck = false // ensures that no check is displayed when the current move was not a check
-      if (this.currentMove !== undefined && this.currentMove.name.includes('+')) { // the last move was check iff the san notation of the last move contained a '+'
+      if (this.currentMove !== undefined && (this.currentMove.name.includes('+') || this.currentMove.name.includes('#'))) { // the last move was check iff the san notation of the last move contained a '+'
         this.moves[this.moves.length - 1].check = this.turn // the check property of the board accepts a color or a boolean
         isCheck = this.currentMove.check
       }
