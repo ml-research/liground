@@ -102,6 +102,8 @@ export default {
   text-align: left;
 }
 .wrapper.enabled {
+  position: relative;
+  height: 50%;
   cursor: pointer;
 }
 .piece-count {
@@ -121,20 +123,32 @@ export default {
   color: black;
 }
 .slot {
-  width: 60px;
-  height: 60px;
+  height: 20%;
   border-radius: 3px 3px 3px 3px;
   vertical-align: middle;
   font-size: 35px;
+}
+.shogi .wrapper.enabled{
+  height: 100%
+}
+.shogi #chesspocket_top{
+  grid-column-start: 1;
+}
+.shogi #chesspocket_bottom{
+  grid-column-start: 2;
+}
+.shogi .slot {
+  height: calc( 100% / 7);
 }
 .slot:hover {
   background-color: #ddd;
   color: black;
 }
 .piece {
-  height: 60px;
-  width: 60px;
-  background-size: 60px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
 }
 .piece.selected {
   background-color: rgb(112, 201, 146);

@@ -1,26 +1,25 @@
 <template>
   <div class="blue merida is2d">
     <div class="grid-parent">
-      <div class="pockets">
-        <div
-          v-if="variant==='crazyhouse'|| variant==='shogi' "
-          :class="{ black : $store.getters.orientation == &quot;black&quot;}"
-        >
-          <ChessPocket
-            id="chesspocket_top"
-            color="black"
-            :pieces="piecesB"
-            :class="{ black : $store.getters.orientation == &quot;white&quot; }"
-            @selection="dropPiece"
-          />
-          <ChessPocket
-            id="chesspocket_bottom"
-            color="white"
-            :pieces="piecesW"
-            :class="{ black : $store.getters.orientation == &quot;black&quot; }"
-            @selection="dropPiece"
-          />
-        </div>
+      <div
+        v-if="variant==='crazyhouse'|| variant==='shogi' "
+        class="pockets"
+        :class="{ black : $store.getters.orientation == &quot;black&quot;, shogi: variant == &quot;shogi&quot;}"
+      >
+        <ChessPocket
+          id="chesspocket_top"
+          color="black"
+          :pieces="piecesB"
+          :class="{ black : $store.getters.orientation == &quot;white&quot; }"
+          @selection="dropPiece"
+        />
+        <ChessPocket
+          id="chesspocket_bottom"
+          color="white"
+          :pieces="piecesW"
+          :class="{ black : $store.getters.orientation == &quot;black&quot; }"
+          @selection="dropPiece"
+        />
       </div>
       <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
         <div
@@ -57,38 +56,6 @@ export default {
     colors: {
       type: Array,
       default: () => (['w', 'b'])
-    },
-    piecesW: {
-      type: Array,
-      default: () => ([
-        { count: 0, type: 'queen' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'pawn' }
-      ])
-    },
-    piecesB: {
-      type: Array,
-      default: () => ([
-        { count: 0, type: 'pawn' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'queen' }
-      ])
-    },
-    shogipiecesB: {
-      type: Array, 
-      default: () => ([
-        { count: 0, type: 'pawn'},
-        { count: 0, type: 'lance'},
-        { count: 0, type: 'knight'},
-        { count: 0, type: 'silver'},
-        { count: 0, type: 'gold'},
-        { count: 0, type: 'bishop'},
-        { count: 0, type: 'rook'},
-      ])
     }
   },
   data () {
@@ -97,25 +64,78 @@ export default {
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
       selectedPiece: null,
       piecesToIdx: {
-        P: 4,
-        N: 3,
+        P: 0,
+        N: 1,
         B: 2,
-        R: 1,
-        Q: 0,
+        R: 3,
+        Q: 4,
         p: 0,
         n: 1,
         b: 2,
         r: 3,
         q: 4
       },
-      shogiPocket: [
-        { count: 0, type: 'pawn'},
-        { count: 0, type: 'lance'},
-        { count: 0, type: 'knight'},
-        { count: 0, type: 'silver'},
-        { count: 0, type: 'gold'},
-        { count: 0, type: 'bishop'},
-        { count: 0, type: 'rook'},
+      shogiPiecesToIdx: {
+        P: 0,
+        L: 1,
+        N: 2,
+        S: 3,
+        G: 4,
+        B: 5,
+        R: 6,
+        p: 0,
+        l: 1,
+        n: 2,
+        s: 3,
+        g: 4,
+        b: 5,
+        r: 6
+      },
+      piecesW: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      piecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      chessPiecesW: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      chessPiecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      shogiPiecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'lance' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'silver' },
+        { count: 0, type: 'gold' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' }
+      ],
+      shogiPiecesW: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'lance' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'silver' },
+        { count: 0, type: 'gold' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' }
       ],
       board: null,
       shapes: [],
@@ -210,10 +230,16 @@ export default {
       this.drawShapes()
     },
     variant () {
-      if(this.variant === 'shogi'){
-        this.piecesW = this.shogiPocket
-        this.piecesB = this.shogiPocket
+      if (this.variant === 'shogi') {
+        this.piecesW = this.shogiPiecesW
+        this.piecesB = this.shogiPiecesB
       }
+      if (this.variant === 'crazyhouse') {
+        this.piecesW = this.chessPiecesW
+        this.piecesB = this.chessPiecesB
+      }
+      this.resetPockets(this.piecesW)
+      this.resetPockets(this.piecesB)
       if (this.board.state.geometry !== this.dimensionNumber) {
         this.board = Chessground(this.$refs.board, {
           coordinates: false,
@@ -230,7 +256,7 @@ export default {
             eraseOnClick: false
           },
           movable: {
-            events: { after: this.changeTurn() },
+            events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
             color: 'white',
             free: false
           },
@@ -254,6 +280,7 @@ export default {
       coordinates: false,
       fen: this.fen,
       turnColor: 'white',
+      resizable: true,
       highlight: {
         lastMove: true, // add last-move class to squares
         check: true // add check class to squares
@@ -360,10 +387,14 @@ export default {
     },
     afterDrag () {
       return (role, key) => {
-        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
+        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', silver: 'S', gold: 'G', lance: 'L' }
         const move = pieces[role] + '@' + key
-        this.$store.dispatch('push', move)
-        this.updateHand()
+        if (this.$store.getters.legalMoves.includes(move)) {
+          this.$store.dispatch('push', move)
+          this.updateHand()
+        } else {
+          this.updateBoard()
+        }
       }
     },
     changeTurn () {
@@ -385,10 +416,18 @@ export default {
     updatePocket (pocket, pocketPieces, color) {
       for (let idx = 0; idx < pocketPieces.length; ++idx) {
         let pieceIdx
-        if (color === WHITE) {
-          pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()]
+        if (this.variant === 'shogi') {
+          if (color === WHITE) {
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx].toUpperCase()]
+          } else {
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx]]
+          }
         } else {
-          pieceIdx = this.piecesToIdx[pocketPieces[idx]]
+          if (color === WHITE) {
+            pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()]
+          } else {
+            pieceIdx = this.piecesToIdx[pocketPieces[idx]]
+          }
         }
         pocket[pieceIdx].count += 1
       }
@@ -458,7 +497,8 @@ export default {
             },
         orientation: this.orientation
       })
-      if (this.variant === 'crazyhouse') {
+
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
         this.updateHand()
       }
     },
@@ -490,7 +530,10 @@ export default {
   grid-template-columns: auto 1fr
 }
 .pockets {
+  display:grid;
   margin-right: 1.5px;
+  height: 100%;
+  grid-template-columns: 1fr 1fr ;
 }
 coords.ranks {
   height: 100%;
