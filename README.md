@@ -4,33 +4,29 @@
 
 <img src="./media/screenshots/liground-0.0.1.png" alt="LiGround screenshot" title="LiGround screenshot." />
 
-#### Build Setup
+### Build Setup
 
 ``` bash
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:9080
-node src/server/index.js
+# run dev server with hot reload at localhost:9080
 npm run dev
 
 # build electron application for production
 npm run build
 
-
-# lint all JS/Vue component files in `src/`
+# lint all JS/Vue component files
 npm run lint
-
 ```
 
 ### Post-Installation Actions
 
-* Move `ffish.wasm` of package `ml-research/liground/node_modules/ffish-es6` to the main directory `ml-research/liground`.
+* Move `ffish.wasm` of package `./node_modules/ffish-es6/` to the root project directory.
 
 * [Download](https://github.com/ddugovic/Stockfish/releases) a binary of _Multi-Variant-Stockfish_ or build it from scratch.
 
-* Rename the _Multi-Variant-Stockfish_ binary to `stockfish` and move it to `ml-research/liground/src/server/engines`.
-
+* Rename the _Multi-Variant-Stockfish_ binary to `stockfish` and move it to `./static/bin/`.
 
 ### Libraries
 
