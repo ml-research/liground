@@ -92,8 +92,12 @@ export const store = new Vuex.Store({
     shogiVariants: [
       'shogi'
     ]
+    viewAnalysis: true
   },
   mutations: { // sync
+    viewAnalysis (state, payload) {
+      state.viewAnalysis = payload
+    },
     fen (state, payload) {
       state.fen = payload
     },
@@ -354,6 +358,9 @@ export const store = new Vuex.Store({
     pieceStyle (context, payload) {
       context.commit('pieceStyle', payload)
     },
+    viewAnalysis (context, payload) {
+      context.commit('viewAnalysis', payload)
+    },
     boardStyle (context, payload) {
       context.commit('boardStyle', payload)
     }
@@ -379,6 +386,9 @@ export const store = new Vuex.Store({
     },
     lastFen (state) {
       return state.lastFen
+    },
+    isPast (state, getters) {
+      return state.fen !== getters.lastFen
     },
     destinations (state) {
       return state.destinations
@@ -539,6 +549,9 @@ export const store = new Vuex.Store({
         }
         return var2Dim[state.variant]
       }
+    },
+    viewAnalysis (state) {
+      return state.viewAnalysis
     }
   }
 })

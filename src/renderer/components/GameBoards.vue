@@ -33,15 +33,22 @@
           </div>
           <EvalPlot />
         </div>
-        <AnalysisView
-          id="analysisview"
-          :reset="resetAnalysis"
-          @move-to-start="moveToStart"
-          @move-to-end="moveToEnd"
-          @move-back-one="moveBackOne"
-          @move-forward-one="moveForwardOne"
-          @flip-board="flipBoard"
-        />
+        <div v-if="viewAnalysis">
+          <AnalysisView
+            id="analysisview"
+            :reset="resetAnalysis"
+            @move-to-start="moveToStart"
+            @move-to-end="moveToEnd"
+            @move-back-one="moveBackOne"
+            @move-forward-one="moveForwardOne"
+            @flip-board="flipBoard"
+          />
+        </div>
+        <div v-else>
+          <SettingsTab
+            id="settingstab"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -57,6 +64,7 @@ import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
 import PgnBrowser from './PgnBrowser.vue'
+import SettingsTab from './SettingsTab'
 // TODO: use GameInfo component?
 // import GameInfo from './GameInfo.vue'
 
@@ -72,7 +80,8 @@ export default {
     BoardStyleSelector,
     EvalPlot,
     // GameInfo,
-    PgnBrowser
+    PgnBrowser,
+    SettingsTab
   },
   data () {
     return {
@@ -82,6 +91,9 @@ export default {
     }
   },
   computed: {
+    viewAnalysis () {
+      return this.$store.getters.viewAnalysis
+    },
     variant () {
       return this.$store.getters.variant
     },

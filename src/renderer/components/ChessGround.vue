@@ -476,7 +476,11 @@ export default {
         }
         const first = string.substring(0, 2)
         const second = string.substring(2, 4)
-        this.board.state.lastMove = [first, second]
+        if (string.includes('@')) { // no longer displays a green box in the corner
+          this.board.state.lastMove = [second]
+        } else {
+          this.board.state.lastMove = [first, second]
+        }
       }
       this.board.set({
         check: isCheck,
@@ -518,7 +522,7 @@ export default {
 @import '../assets/dim8x8.css';
 @import '../assets/dim9x10.css';
 
-.black {
+.mirror {
   transform: scaleY(-1);
 }
 .chess-pocket {
