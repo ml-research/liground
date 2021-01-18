@@ -266,7 +266,7 @@ export default {
 
         document.body.dispatchEvent(new Event('chessground.resize'))
       }
-      if(this.variant === 'crazyhouse' || this.variant === 'shogi'){
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
         document.body.dispatchEvent(new Event('chessground.resize'))
       }
       this.board.set({
