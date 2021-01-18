@@ -4,20 +4,18 @@
       <div class="pockets">
         <div
           v-if="variant==='crazyhouse'"
-          :class="{ black : $store.getters.orientation == &quot;black&quot;}"
+          :class="{ mirror : $store.getters.orientation == 'black'}"
         >
           <ChessPocket
             id="chesspocket_top"
             color="black"
             :pieces="piecesB"
-            :class="{ black : $store.getters.orientation == &quot;white&quot; }"
             @selection="dropPiece"
           />
           <ChessPocket
             id="chesspocket_bottom"
             color="white"
             :pieces="piecesW"
-            :class="{ black : $store.getters.orientation == &quot;black&quot; }"
             @selection="dropPiece"
           />
         </div>
@@ -329,7 +327,11 @@ export default {
         const string = String(this.currentMove.uci)
         const first = string.substring(0, 2)
         const second = string.substring(2, 4)
-        this.board.state.lastMove = [first, second]
+        if (string.includes('@')) { // no longer displays a green box in the corner
+          this.board.state.lastMove = [second]
+        } else {
+          this.board.state.lastMove = [first, second]
+        }
       }
       this.board.set({
         check: isCheck,
@@ -367,7 +369,7 @@ export default {
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
 
-.black {
+.mirror {
   transform: scaleY(-1);
 }
 .chess-pocket {

@@ -14,7 +14,7 @@
       class="p-icon p-curve p-smooth"
       color="primary-o"
     >
-      <i
+      <em
         slot="extra"
         class="icon mdi mdi-check"
       />
