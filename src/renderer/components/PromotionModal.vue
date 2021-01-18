@@ -94,6 +94,15 @@ export default {
     flex-grow: 1;
     flex-shrink: 1;
   }
+
+  .prom-container{
+    box-shadow: 0 0 10px black;
+  }
+
+  .prom-option:hover {
+    background-color: rgb(182, 155, 107);
+  }
+
   .promOptionB1 {
     background-image: url('../assets/images/pieces/merida/bQ.svg');
     order: 4;
