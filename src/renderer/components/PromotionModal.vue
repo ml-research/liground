@@ -49,7 +49,7 @@ export default {
     }
   },
   created () {
-    document.addEventListener('startedPromotion', () => {
+    document.addEventListener('renderPromotion', () => {
       this.main()
     })
   },
@@ -60,12 +60,16 @@ export default {
     },
     orderPieces () {
       if (this.orientation === 'white') {
-        return
+        document.getElementById('op1').style.order = '1'
+        document.getElementById('op2').style.order = '2'
+        document.getElementById('op3').style.order = '3'
+        document.getElementById('op4').style.order = '4'
+      } else {
+        document.getElementById('op1').style.order = '4'
+        document.getElementById('op2').style.order = '3'
+        document.getElementById('op3').style.order = '2'
+        document.getElementById('op4').style.order = '1'
       }
-      document.getElementById('op1').style.order = '4'
-      document.getElementById('op2').style.order = '3'
-      document.getElementById('op3').style.order = '2'
-      document.getElementById('op4').style.order = '1'
     },
     loadPieceStyle () {
       // document.getElementById('op1').style.backgroundImage = "url('src/renderer/assets/piece/international/" + this.pieceStyle + "/wQ.svg)"

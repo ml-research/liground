@@ -158,9 +158,11 @@ export default {
     },
     orientation () {
       this.updateBoard()
+      document.dispatchEvent(new Event('renderPromotion'))
     },
     pieceStyle (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
+      document.dispatchEvent(new Event('renderPromotion'))
     },
     bestmove () {
       const multipv = this.multipv
@@ -251,7 +253,7 @@ export default {
   methods: {
     showPromotionModal () {
       this.isPromotionModalVisible = true
-      document.dispatchEvent(new Event('startedPromotion'))
+      document.dispatchEvent(new Event('renderPromotion'))
     },
     closePromotionModal (value) {
       this.isPromotionModalVisible = false
