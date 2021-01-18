@@ -270,9 +270,9 @@ export const store = new Vuex.Store({
   },
   actions: { // async
     resetBoard (context, payload) {
-      context.dispatch('restartEngine')
       context.commit('newBoard', payload)
       context.commit('resetMoves')
+      context.dispatch('restartEngine')
     },
     initialize (context) {
       context.commit('newBoard', {
