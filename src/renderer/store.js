@@ -92,9 +92,13 @@ export const store = new Vuex.Store({
     shogiVariants: [
       'shogi'
     ],
+    curVar960Fen: '',
     viewAnalysis: true
   },
   mutations: { // sync
+    curVar960Fen (state, payload) {
+      state.curVar960Fen = payload
+    },
     viewAnalysis (state, payload) {
       state.viewAnalysis = payload
     },
@@ -192,12 +196,8 @@ export const store = new Vuex.Store({
       state.boardStyle = payload
     },
     newBoard (state, payload) {
-      if (typeof payload.fen === 'string') {
-        if (payload.is960) {
-          state.board = new ffish.Board(state.variant, payload.fen, true)
-        } else {
-          state.board = new ffish.Board(state.variant, payload.fen)
-        }
+      if (payload.is960) {
+        state.board = new ffish.Board(state.variant, payload.fen, true)
       } else {
         state.board = new ffish.Board(state.variant)
       }
@@ -209,7 +209,9 @@ export const store = new Vuex.Store({
       this.commit('lastFen', state.board.fen())
     },
     resetBoard (state, payload) {
+      state.curVar960Fen = ''
       this.commit('newBoard', payload)
+      state.selectedGame = null
       state.moves = []
     },
     appendMoves (state, payload) {
@@ -231,6 +233,9 @@ export const store = new Vuex.Store({
     }
   },
   actions: { // async
+    curVar960Fen (context, payload) {
+      context.commit('curVar960Fen', payload)
+    },
     resetBoard (context, payload) {
       context.commit('resetMultiPV')
       context.commit('resetBoard', payload)
@@ -296,17 +301,21 @@ export const store = new Vuex.Store({
     variant (context, payload) {
       if (context.getters.variant !== payload) {
         context.commit('variant', payload)
-        context.commit('newBoard', {
-        })
+        const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
+        if (variants.includes(payload)) {
+          const varFen = context.getters.curVar960Fen
+          const is960Mode = varFen !== ''
+          context.commit('newBoard', { is960: is960Mode, fen: varFen })
+        } else {
+          context.commit('newBoard', { is960: false, fen: '' })
+        }
       }
     },
     set960 (context, payload) {
-      if (context.getters.is960 !== payload) {
-        context.commit('newBoard', {
-          fen: context.getters.fen,
-          is960: payload
-        })
-      }
+      context.commit('newBoard', {
+        fen: payload.fen,
+        is960: payload.is960
+      })
     },
     engineBinary (context, payload) {
       context.commit('engineBinary', payload)
@@ -366,6 +375,9 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    curVar960Fen (state) {
+      return state.curVar960Fen
+    },
     board (state) {
       return state.board
     },

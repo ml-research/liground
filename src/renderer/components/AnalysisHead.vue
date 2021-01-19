@@ -10,16 +10,7 @@
       :show-labels="false"
       @input="updateVariant"
     />
-    <PrettyCheck
-      class="p-icon p-curve p-smooth"
-      color="primary-o"
-    >
-      <em
-        slot="extra"
-        class="icon mdi mdi-check"
-      />
-      960 Mode
-    </PrettyCheck>
+    <Mode960 />
     <input
       type="button"
       value="Reset"
@@ -30,14 +21,14 @@
 </template>
 
 <script>
-import PrettyCheck from 'pretty-checkbox-vue/check'
 import Multiselect from 'vue-multiselect'
+import Mode960 from './Mode960'
 import { mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
   components: {
-    PrettyCheck, Multiselect
+    Multiselect, Mode960
   },
   data () {
     return {
@@ -67,7 +58,7 @@ export default {
     },
     resetBoard () {
       if (confirm('Do you really want to reset the board?')) {
-        this.$store.dispatch('resetBoard', false) // TODO when implementing 960 Mode false should probably be changed to some other value and changes to the store method will be necessary
+        this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
       }
     }
   }
@@ -79,6 +70,8 @@ export default {
   background-color:lightgray ;
   border: black;
   outline: none;
+  padding-bottom: 5px;
+  padding-top: 5px;
 }
 .reset:hover {
   cursor:pointer;

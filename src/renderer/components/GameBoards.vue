@@ -2,20 +2,16 @@
   <div id="inner">
     <div>
       <div class="main-grid">
-        <div>
-          <div
-            class="chessboard-grid"
-            @mousewheel.prevent="scroll($event)"
-          >
-            <pgn-browser id="pgnbrowser" />
+        <div class="chessboard-grid">
+          <pgn-browser id="pgnbrowser" />
+          <div @mousewheel.prevent="scroll($event)">
             <ChessGround
               id="chessboard"
               :orientation="orientation"
               @onMove="showInfo"
             />
-            <EvalBar id="evalbar" />
           </div>
-          <br>
+          <EvalBar id="evalbar" />
           <div id="fen-field">
             FEN <input
               id="lname"
@@ -31,9 +27,12 @@
             <PieceStyleSelector id="piece-style" />
             <BoardStyleSelector id="board-style" />
           </div>
-          <EvalPlot />
         </div>
-        <div v-if="viewAnalysis">
+        <EvalPlot id="evalplot" />
+        <div
+          v-if="viewAnalysis"
+          id="right-column"
+        >
           <AnalysisView
             id="analysisview"
             :reset="resetAnalysis"
@@ -251,13 +250,41 @@ export default {
 </script>
 
 <style scoped>
-
+.main-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: auto auto;
+  gap: 1em 1em;
+  grid-template-areas:
+    "chessboard analysisview"
+    "evalplot analysisview";
+}
+.main-grid > .chessboard-grid {
+  grid-area: chessboard;
+  display: grid;
+  grid-template-columns: 20% 70% auto;
+  grid-template-rows: auto auto;
+  gap: 1em;
+  grid-template-areas:
+    "pgnbrowser . ."
+    "fenfield fenfield fenfield";
+}
+#analysisview {
+  height: 100%;
+  width: 100%;
+}
+#right-column {
+  grid-area: analysisview;
+  max-width: 40vw;
+  max-height: calc(100vh - 25px);
+}
 input {
   font-size: 12pt;
-  width: 600px;
+  max-width: 60vw;
 }
 #fen-field {
-  margin-left: 48px;
+  grid-area: fenfield;
+  /*margin-left: 48px;*/
 }
 #selector-container {
   height:60px;
@@ -283,14 +310,14 @@ input {
   grid-template-columns: 20% auto auto;
 }
 #pgnbrowser {
-  min-width: 8em;
-  margin: 0em 1em;
+  grid-area: pgnbrowser;
   border: 1px solid black;
   border-radius: 4px;
+  margin-left: 1em;
+  max-height: 60vh;
 }
 #chessboard {
   display: inline-block;
-  margin: 0em 0em 1em 0em;
 }
 .bottom-margin {
   margin-bottom: 1.5em;
@@ -299,14 +326,14 @@ input {
   display: table;
   margin: 0 auto;
 }
-
 #analysisview {
   margin-left: 15px;
 }
-
 #evalbar {
-  margin: 0em 1em;
-  float: center;
+  float: left;
+}
+#evalplot {
+  grid-area: evalplot;
 }
 
 </style>
