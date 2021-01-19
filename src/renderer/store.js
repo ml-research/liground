@@ -190,6 +190,7 @@ export const store = new Vuex.Store({
     resetBoard (state, payload) {
       state.curVar960Fen = ''
       this.commit('newBoard', payload)
+      state.selectedGame = null
       state.moves = []
     },
     appendMoves (state, payload) {

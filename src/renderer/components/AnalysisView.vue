@@ -139,7 +139,7 @@ input {
   margin-bottom: -20px;
 }
 .game-window {
-  height: 270px;
+  height: 20%;
   overflow-y: scroll;
 }
 .panel {
@@ -147,7 +147,6 @@ input {
   border: 1px solid #888;
   font-family: 'Noto Chess';
   font-weight: 200;
-  width: 600px;
 }
 .panel + .panel {
   margin-top: 7px;
@@ -160,8 +159,7 @@ input {
   font-family: monospace;
   font-weight: 100;
   font-size: 8pt;
-  width: 600px;
-  height: 200px;
+  height: 20%;
   overflow-y: scroll;
   white-space: nowrap;
   text-align: left;
@@ -235,7 +233,6 @@ p {
 }
 .processing-bar {
   height: 5px;
-  width: 600px;
   background-color: #6ca040;
   background-color: #2196F3;
   background-image: url('../assets/images/analysis/bar-highlight.png');

@@ -88,21 +88,22 @@ export default {
 <style scoped>
   .prom-option {
     background-size: cover;
-    height: 75px;
-    width: 75px;
+    width: 100%;
     background-color: white;
-    flex-grow: 1;
-    flex-shrink: 1;
   }
-
-  .prom-container{
-    box-shadow: 0 0 10px black;
-  }
-
   .prom-option:hover {
     background-color: rgb(182, 155, 107);
   }
 
+  .prom-container{
+    box-shadow: 0 0 10px black;
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    height: 100%;
+  }
+  .prom-container:hover {
+    cursor: pointer;
+  }
   .promOptionB1 {
     background-image: url('../assets/images/pieces/merida/bQ.svg');
     order: 4;
@@ -134,13 +135,6 @@ export default {
   .promOptionW4 {
     background-image: url('../assets/images/pieces/merida/wB.svg');
     order: 4;
-  }
-  .prom-container {
-    display: flex;
-    flex-direction: column;
-  }
-  .prom-container:hover {
-    cursor: pointer;
   }
 
 </style>

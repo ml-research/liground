@@ -1,11 +1,12 @@
 <template>
   <div class="blue merida is2d">
-    <div
-      class="grid-parent"
-    >
-      <div class="pockets">
+    <div class="grid-parent">
+      <div
+        ref="pockets"
+        class="pockets"
+      >
         <div
-          v-if="variant==='crazyhouse'"
+          :style="{visibility: variant === 'crazyhouse' ? 'visible' : 'hidden'}"
           :class="{ mirror : $store.getters.orientation == 'black'}"
         >
           <ChessPocket
@@ -26,12 +27,12 @@
         <div class="cg-board-wrap">
           <div ref="board" />
           <div
+            v-if="isPromotionModalVisible && !isPast"
             id="PromotionModal"
             ref="promotion"
             :style="promotionPosition"
           >
             <PromotionModal
-              v-show="isPromotionModalVisible && !isPast"
               @close="closePromotionModal"
             />
           </div>
@@ -248,10 +249,22 @@ export default {
       premovable: {
         enabled: false
       },
-      orientation: this.orientation
+      orientation: this.orientation,
+      resizable: true
     })
+    this.resize()
+    window.addEventListener('resize', this.resize)
   },
   methods: {
+    resize () {
+      const ev = document.createEvent('Event')
+      const width = this.$el.parentNode.clientWidth - this.$refs.pockets.offsetWidth
+      const height = this.$el.parentNode.clientHeight
+      this.$refs.board.style.width = `${Math.min(height, width)}px`
+      this.$refs.board.style.height = `${Math.min(height, width)}px`
+      ev.initEvent('chessground.resize', false, false)
+      document.body.dispatchEvent(ev)
+    },
     showPromotionModal () {
       this.isPromotionModalVisible = true
       document.dispatchEvent(new Event('renderPromotion'))
@@ -426,6 +439,9 @@ export default {
 
 #PromotionModal {
   position: absolute;
+  z-index: 4;
+  width: 12.5%;
+  height: 50%;
 }
 .mirror {
   transform: scaleY(-1);
@@ -441,45 +457,8 @@ export default {
 .pockets {
   margin-right: 1.5px;
 }
-coords.ranks {
-  height: 100%;
-  width: .8em;
-  margin-bottom: 10px;
-}
-coords.files {
-  height: 100%;
-  width: .8em;
-  width: 10px;
-  padding-left: 30px;
-  margin-right: 10px;
-}
-coords {
-  text-shadow: var(--cg-coord-shadow);
-  font-size: calc(8px + 4 * ((100vw - 320px) / 880));
-  display: flex;
-  color: #fff;
-  text-shadow: 0 1px 2px #000;
-  font-weight: bold;
-}
-.coords {
-  margin-right: 1.5px;
-  text-align: center;
-  font-size: 8px;
-  width: 10px;
-  padding: 0px 0px 0px 0px;
-  color: black;
-}
 .cg-board-wrap {
-  border-radius: 4px 4px 4px 4px;
   position: relative;
-  width: max-content;
-  height: max-content;
-}
-.cg-wrap {
-  width: 600px;
-  height: 600px;
-  position: sticky;
-  display: table;
 }
 .koth cg-container::before {
   width: 25%;
