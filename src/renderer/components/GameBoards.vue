@@ -260,6 +260,7 @@ export default {
     "evalplot analysisview";
 }
 .main-grid > .chessboard-grid {
+  min-width: 925px;
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% 70% auto;
