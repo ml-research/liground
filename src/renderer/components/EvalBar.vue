@@ -1,7 +1,7 @@
 <template>
   <div
     class="progress"
-    :class="{ black : $store.getters.orientation == &quot;black&quot; }"
+    :class="{ transform : $store.getters.orientation == 'black' }"
   >
     <div
       class="progress-value"
@@ -36,7 +36,7 @@ export default {
   height: 600px;
   width: 17px;
 }
-.black {
+.transform {
   transform: scaleY(-1);
 }
 

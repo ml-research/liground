@@ -148,9 +148,17 @@ export const store = new Vuex.Store({
     board: null,
     gameInfo: {},
     loadedGames: [],
-    selectedGame: null
+    selectedGame: null,
+    curVar960Fen: '',
+    viewAnalysis: true
   },
   mutations: { // sync
+    curVar960Fen (state, payload) {
+      state.curVar960Fen = payload
+    },
+    viewAnalysis (state, payload) {
+      state.viewAnalysis = payload
+    },
     fen (state, payload) {
       state.fen = payload
     },
@@ -248,7 +256,10 @@ export const store = new Vuex.Store({
       state.legalMoves = state.board.legalMoves()
       state.lastFen = state.board.fen()
     },
-    resetMoves (state, payload) {
+    resetBoard (state, payload) {
+      state.curVar960Fen = ''
+      this.commit('newBoard', payload)
+      state.selectedGame = null
       state.moves = []
     },
     appendMoves (state, payload) {
@@ -270,9 +281,12 @@ export const store = new Vuex.Store({
     }
   },
   actions: { // async
-    resetBoard (context) {
-      context.commit('newBoard')
-      context.commit('resetMoves')
+    curVar960Fen (context, payload) {
+      context.commit('curVar960Fen', payload)
+    },
+    resetBoard (context, payload) {
+      context.commit('resetMultiPV')
+      context.commit('resetBoard', payload)
       context.dispatch('restartEngine')
     },
     initialize (context) {
@@ -341,18 +355,23 @@ export const store = new Vuex.Store({
           context.dispatch('stopEngine')
         }
         context.commit('variant', payload)
-        context.commit('newBoard', {})
+        const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
+        if (variants.includes(payload)) {
+          const varFen = context.getters.curVar960Fen
+          const is960Mode = varFen !== ''
+          context.commit('newBoard', { is960: is960Mode, fen: varFen })
+        } else {
+          context.commit('newBoard', { is960: false, fen: '' })
+        }
         context.dispatch('resetEngineData')
         ipc.send(`setoption name UCI_Variant value ${payload}`)
       }
     },
     set960 (context, payload) {
-      if (context.getters.is960 !== payload) {
-        context.commit('newBoard', {
-          fen: context.getters.fen,
-          is960: payload
-        })
-      }
+      context.commit('newBoard', {
+        fen: payload.fen,
+        is960: payload.is960
+      })
     },
     async engineBinary (context, payload) {
       if (context.getters.engineBinary !== payload) {
@@ -453,9 +472,15 @@ export const store = new Vuex.Store({
     },
     pieceStyle (context, payload) {
       context.commit('pieceStyle', payload)
+    },
+    viewAnalysis (context, payload) {
+      context.commit('viewAnalysis', payload)
     }
   },
   getters: {
+    curVar960Fen (state) {
+      return state.curVar960Fen
+    },
     board (state) {
       return state.board
     },
@@ -473,6 +498,9 @@ export const store = new Vuex.Store({
     },
     lastFen (state) {
       return state.lastFen
+    },
+    isPast (state, getters) {
+      return state.fen !== getters.lastFen
     },
     destinations (state) {
       return state.destinations
@@ -596,6 +624,9 @@ export const store = new Vuex.Store({
     },
     is960 (state) {
       return state.board.is960()
+    },
+    viewAnalysis (state) {
+      return state.viewAnalysis
     }
   }
 })

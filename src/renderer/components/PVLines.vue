@@ -6,9 +6,10 @@
           v-for="(line, id) in lines"
           :key="id"
           class="item"
+          :class="{ clickable: !isPast }"
           @mouseenter="onMouseEnter(id)"
           @mouseleave="onMouseLeave(id)"
-          @click="onClick(line)"
+          @click="!isPast ? onClick(line) : null"
         >
           <span class="left">{{ line.cpDisplay }}</span>
           <span class="right">{{ line.pv }}</span>
@@ -25,6 +26,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   computed: {
     lines () {
@@ -33,7 +36,8 @@ export default {
     engineDetails () {
       const { engineName, engineAuthor } = this.$store.getters
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
-    }
+    },
+    ...mapGetters(['isPast'])
   },
   methods: {
     onMouseEnter (id) {
@@ -57,7 +61,6 @@ export default {
   white-space: nowrap;
 }
 .scroller {
-  max-width: 600px;
   overflow-x: scroll;
 }
 .list {
@@ -68,10 +71,13 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  cursor: pointer;
+  cursor: default;
 }
 .item:hover {
   background-color: #d3e1eb;
+}
+.item.clickable {
+  cursor: pointer;
 }
 .item + .item {
   border-top: 1px solid #333;
