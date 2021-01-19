@@ -231,11 +231,12 @@ export const store = new Vuex.Store({
       state.pieceStyle = payload
     },
     newBoard (state, payload) {
-      if (typeof payload.fen === 'string') {
-        if (payload.is960) {
-          state.board = new ffish.Board(state.variant, payload.fen, true)
+      const { fen, is960 } = payload || {}
+      if (typeof fen === 'string') {
+        if (is960) {
+          state.board = new ffish.Board(state.variant, fen, true)
         } else {
-          state.board = new ffish.Board(state.variant, payload.fen)
+          state.board = new ffish.Board(state.variant, fen)
         }
       } else {
         state.board = new ffish.Board(state.variant)
@@ -269,16 +270,13 @@ export const store = new Vuex.Store({
     }
   },
   actions: { // async
-    resetBoard (context, payload) {
-      context.commit('newBoard', payload)
+    resetBoard (context) {
+      context.commit('newBoard')
       context.commit('resetMoves')
       context.dispatch('restartEngine')
     },
     initialize (context) {
-      context.commit('newBoard', {
-        fen: '',
-        is960: false
-      })
+      context.commit('newBoard')
       context.dispatch('updateBoard')
       context.commit('initialized', true)
     },
@@ -416,7 +414,7 @@ export const store = new Vuex.Store({
         try {
           pvline.pv = context.state.board.variationSan(payload.pv)
         } catch (err) {
-          console.error('Invalid move:', payload.pv)
+          console.warn('Invalid move:', payload.pv)
         }
         multipv[payload.multipv - 1] = pvline
       }

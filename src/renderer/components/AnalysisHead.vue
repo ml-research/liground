@@ -74,7 +74,7 @@ export default {
     },
     resetBoard () {
       if (confirm('Do you really want to reset the board?')) {
-        this.$store.dispatch('resetBoard', false) // TODO when implementing 960 Mode false should probably be changed to some other value and changes to the store method will be necessary
+        this.$store.dispatch('resetBoard') // TODO when implementing 960 Mode false should probably be changed to some other value and changes to the store method will be necessary
       }
     }
   }
