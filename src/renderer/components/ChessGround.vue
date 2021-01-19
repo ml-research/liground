@@ -106,28 +106,28 @@ export default {
         { count: 0, type: 'rook' },
         { count: 0, type: 'bishop' },
         { count: 0, type: 'knight' },
-        { count: 0, type: 'pawn' },       
+        { count: 0, type: 'pawn' }
       ],
       piecesB: [
         { count: 0, type: 'pawn' },
         { count: 0, type: 'knight' },
         { count: 0, type: 'bishop' },
         { count: 0, type: 'rook' },
-        { count: 0, type: 'queen' },
+        { count: 0, type: 'queen' }
       ],
       chessPiecesW: [
         { count: 0, type: 'queen' },
         { count: 0, type: 'rook' },
         { count: 0, type: 'bishop' },
         { count: 0, type: 'knight' },
-        { count: 0, type: 'pawn' },     
+        { count: 0, type: 'pawn' }
       ],
       chessPiecesB: [
         { count: 0, type: 'pawn' },
         { count: 0, type: 'knight' },
         { count: 0, type: 'bishop' },
         { count: 0, type: 'rook' },
-        { count: 0, type: 'queen' },
+        { count: 0, type: 'queen' }
       ],
       shogiPiecesB: [
         { count: 0, type: 'pawn' },
@@ -136,7 +136,7 @@ export default {
         { count: 0, type: 'silver' },
         { count: 0, type: 'gold' },
         { count: 0, type: 'bishop' },
-        { count: 0, type: 'rook' },
+        { count: 0, type: 'rook' }
       ],
       shogiPiecesW: [
         { count: 0, type: 'rook' },
@@ -145,7 +145,7 @@ export default {
         { count: 0, type: 'silver' },
         { count: 0, type: 'knight' },
         { count: 0, type: 'lance' },
-        { count: 0, type: 'pawn' },      
+        { count: 0, type: 'pawn' }
       ],
       board: null,
       shapes: [],
@@ -332,8 +332,7 @@ export default {
       premovable: {
         enabled: false
       },
-      orientation: this.orientation,
-      resizable: true
+      orientation: this.orientation
     })
   },
   methods: {
@@ -455,7 +454,7 @@ export default {
     changeTurn () {
       return (orig, dest) => {
         let uciMove = orig + dest
-         if (this.dimensionNumber === 3) {
+        if (this.dimensionNumber === 3) {
           uciMove = this.increaseNumbers(uciMove)
         }
         if (this.isPromotion(uciMove)) {
