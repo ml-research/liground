@@ -115,7 +115,7 @@ export default class EngineDriver {
       }
       case 'info': {
         const info = {}
-        const regexp = /\s+(depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time|pv)\s+(.+?)(?=\s+(?:depth|seldepth|multipv|score|nodes|nps|hashfull|tbhits|time|pv)|\s*$)/g
+        const regexp = /\s+(depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time|pv)\s+(.+?)(?=\s+(?:depth|seldepth|time|nodes|pv|multipv|score|currmove|currmovenumber|hashfull|tbhits|cpuload|string|refutation|currline)|\s*$)/g
         for (const [, type, value] of line.matchAll(regexp)) {
           info[type] = type.match(/depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time/) ? parseInt(value) : value
         }

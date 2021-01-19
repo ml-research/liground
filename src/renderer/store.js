@@ -442,23 +442,25 @@ export const store = new Vuex.Store({
       context.commit('engineStats', stats)
 
       // update pvline
-      const multipv = context.getters.multipv.slice(0)
-      if (payload.mate === 0) {
-        multipv[0] = { mate: payload.mate }
-      } else {
-        const pvline = {
-          cp: payload.cp,
-          mate: payload.mate,
-          ucimove: payload.pv.split(/\s/)[0]
+      if ('pv' in payload) {
+        const multipv = context.getters.multipv.slice(0)
+        if (payload.mate === 0) {
+          multipv[0] = { mate: payload.mate }
+        } else {
+          const pvline = {
+            cp: payload.cp,
+            mate: payload.mate,
+            ucimove: payload.pv.split(/\s/)[0]
+          }
+          try {
+            pvline.pv = context.state.board.variationSan(payload.pv)
+          } catch (err) {
+            console.warn('Invalid engine pv move.\nFEN:', context.state.board.fen(), '\nPV:', payload.pv)
+          }
+          multipv[payload.multipv - 1] = pvline
         }
-        try {
-          pvline.pv = context.state.board.variationSan(payload.pv)
-        } catch (err) {
-          console.warn('Invalid move:', payload.pv)
-        }
-        multipv[payload.multipv - 1] = pvline
+        context.commit('multipv', multipv)
       }
-      context.commit('multipv', multipv)
     },
     loadedGames (context, payload) {
       context.commit('loadedGames', payload)
