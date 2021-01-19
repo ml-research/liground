@@ -444,20 +444,31 @@ export const store = new Vuex.Store({
       // update pvline
       if ('pv' in payload) {
         const multipv = context.getters.multipv.slice(0)
+
+        // handle checkmate
         if (payload.mate === 0) {
           multipv[0] = { mate: payload.mate }
         } else {
-          const pvline = {
-            cp: payload.cp,
-            mate: payload.mate,
-            ucimove: payload.pv.split(/\s/)[0]
+          const ucimove = payload.pv.split(/\s/)[0]
+          const { board } = context.state
+
+          // assert first move is valid
+          if (board.legalMoves().includes(ucimove)) {
+            const pvline = {
+              cp: payload.cp,
+              mate: payload.mate,
+              ucimove
+            }
+            try {
+              pvline.pv = board.variationSan(payload.pv)
+            } catch (err) {
+              // currently invalid moves cause ffish to error mid calculation and fail to reset the fen
+              // so to avoid getting stuck with a future fen, we reset the board fen on error
+              board.setFen(context.state.fen)
+              console.warn('Invalid engine pv move.\nFEN:', board.fen(), '\nPV:', payload.pv)
+            }
+            multipv[payload.multipv - 1] = pvline
           }
-          try {
-            pvline.pv = context.state.board.variationSan(payload.pv)
-          } catch (err) {
-            console.warn('Invalid engine pv move.\nFEN:', context.state.board.fen(), '\nPV:', payload.pv)
-          }
-          multipv[payload.multipv - 1] = pvline
         }
         context.commit('multipv', multipv)
       }
