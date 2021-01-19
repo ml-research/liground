@@ -1,0 +1,15 @@
+.is2d .pawn.white {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/red_pawn2.svg')}
+.is2d .rook.white {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/red_chariot2.svg')}
+.is2d .cannon.white {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/red_cannon2.svg')}
+.is2d .knight.white {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/red_horse2.svg')}
+.is2d .bishop.white {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/red_elephant2.svg')}
+.is2d .advisor.white {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/red_advisor2.svg')}
+.is2d .king.white {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/red_king2.svg')}
+.is2d .pawn.black {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/black_pawn2.svg')}
+.is2d .rook.black {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/black_chariot2.svg')}
+.is2d .cannon.black {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/black_cannon2.svg')}
+.is2d .knight.black {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/black_horse2.svg')}
+.is2d .bishop.black {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/black_elephant2.svg')}
+.is2d .advisor.black {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/black_advisor2.svg')}
+.is2d .king.black {background-image:url('/src/renderer/assets/piece/Xiangqi/ct2/black_king2.svg')}
+

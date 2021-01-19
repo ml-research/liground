@@ -2,28 +2,25 @@
   <div class="blue merida is2d">
     <div class="grid-parent">
       <div
+        v-if="variant==='crazyhouse'|| variant==='shogi' "
         ref="pockets"
         class="pockets"
+        :class="{ mirror : $store.getters.orientation == &quot;black&quot;, shogi: variant == &quot;shogi&quot;}"
       >
-        <div
-          :style="{visibility: variant === 'crazyhouse' ? 'visible' : 'hidden'}"
-          :class="{ mirror : $store.getters.orientation == 'black'}"
-        >
-          <ChessPocket
-            id="chesspocket_top"
-            color="black"
-            :pieces="piecesB"
-            @selection="dropPiece"
-          />
-          <ChessPocket
-            id="chesspocket_bottom"
-            color="white"
-            :pieces="piecesW"
-            @selection="dropPiece"
-          />
-        </div>
+        <ChessPocket
+          id="chesspocket_top"
+          color="black"
+          :pieces="piecesB"
+          @selection="dropPiece"
+        />
+        <ChessPocket
+          id="chesspocket_bottom"
+          color="white"
+          :pieces="piecesW"
+          @selection="dropPiece"
+        />
       </div>
-      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
+      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
         <div class="cg-board-wrap">
           <div ref="board" />
           <div
@@ -69,26 +66,6 @@ export default {
     colors: {
       type: Array,
       default: () => (['w', 'b'])
-    },
-    piecesW: {
-      type: Array,
-      default: () => ([
-        { count: 0, type: 'queen' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'pawn' }
-      ])
-    },
-    piecesB: {
-      type: Array,
-      default: () => ([
-        { count: 0, type: 'pawn' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'queen' }
-      ])
     }
   },
   data () {
@@ -108,6 +85,68 @@ export default {
         r: 3,
         q: 4
       },
+      shogiPiecesToIdx: {
+        P: 6,
+        L: 5,
+        N: 4,
+        S: 3,
+        G: 2,
+        B: 1,
+        R: 0,
+        p: 0,
+        l: 1,
+        n: 2,
+        s: 3,
+        g: 4,
+        b: 5,
+        r: 6
+      },
+      piecesW: [
+        { count: 0, type: 'queen' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'pawn' }
+      ],
+      piecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      chessPiecesW: [
+        { count: 0, type: 'queen' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'pawn' }
+      ],
+      chessPiecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      shogiPiecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'lance' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'silver' },
+        { count: 0, type: 'gold' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' }
+      ],
+      shogiPiecesW: [
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'gold' },
+        { count: 0, type: 'silver' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'lance' },
+        { count: 0, type: 'pawn' }
+      ],
       board: null,
       shapes: [],
       pieceShapes: [],
@@ -148,7 +187,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber'])
   },
   watch: {
     initialized () {
@@ -164,6 +203,9 @@ export default {
     pieceStyle (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
       document.dispatchEvent(new Event('renderPromotion'))
+    },
+    boardStyle (boardStyle) {
+      this.updateBoardCSS(boardStyle)
     },
     multipv () {
       const multipv = this.multipv
@@ -217,10 +259,50 @@ export default {
       this.drawShapes()
     },
     variant () {
+      if (this.variant === 'shogi') {
+        this.piecesW = this.shogiPiecesW
+        this.piecesB = this.shogiPiecesB
+      }
+      if (this.variant === 'crazyhouse') {
+        this.piecesW = this.chessPiecesW
+        this.piecesB = this.chessPiecesB
+      }
+      this.resetPockets(this.piecesW)
+      this.resetPockets(this.piecesB)
+      if (this.board.state.geometry !== this.dimensionNumber) {
+        this.board = Chessground(this.$refs.board, {
+          coordinates: false,
+          fen: this.fen,
+          turnColor: 'white',
+          resizable: true,
+          highlight: {
+            lastMove: true, // add last-move class to squares
+            check: false // add check class to squares
+          },
+          drawable: {
+            enabled: true, // can draw
+            visible: true, // can view
+            eraseOnClick: false
+          },
+          movable: {
+            events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
+            color: 'white',
+            free: false
+          },
+          orientation: this.orientation,
+          geometry: this.$store.getters.dimensionNumber
+        })
+
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      }
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      }
       this.board.set({
         variant: this.variant,
         lastMove: false
       })
+
       this.updateBoard()
       this.isPromotionModalVisible = false
     }
@@ -230,6 +312,7 @@ export default {
       coordinates: false,
       fen: this.fen,
       turnColor: 'white',
+      resizable: true,
       highlight: {
         lastMove: true, // add last-move class to squares
         check: true // add check class to squares
@@ -248,22 +331,10 @@ export default {
       premovable: {
         enabled: false
       },
-      orientation: this.orientation,
-      resizable: true
+      orientation: this.orientation
     })
-    this.resize()
-    window.addEventListener('resize', this.resize)
   },
   methods: {
-    resize () {
-      const ev = document.createEvent('Event')
-      const width = this.$el.parentNode.clientWidth - this.$refs.pockets.offsetWidth
-      const height = this.$el.parentNode.clientHeight
-      this.$refs.board.style.width = `${Math.min(height, width)}px`
-      this.$refs.board.style.height = `${Math.min(height, width)}px`
-      ev.initEvent('chessground.resize', false, false)
-      document.body.dispatchEvent(ev)
-    },
     showPromotionModal () {
       this.isPromotionModalVisible = true
       document.dispatchEvent(new Event('renderPromotion'))
@@ -280,7 +351,35 @@ export default {
     updatePieceCSS (pieceStyle) {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
-      file.href = 'src/renderer/assets/images/piece-css/' + pieceStyle + '.css'
+      if (this.$store.getters.isInternational) {
+        file.href = 'src/renderer/assets/images/piece-css/international/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isSEA) {
+        file.href = 'src/renderer/assets/images/piece-css/sea/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isXiangqi) {
+        file.href = 'src/renderer/assets/images/piece-css/xiangqi/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isShogi) {
+        file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
+      }
+      document.head.appendChild(file)
+    },
+    updateBoardCSS (boardStyle) {
+      const file = document.createElement('link')
+      file.rel = 'stylesheet'
+      if (this.$store.getters.isInternational) {
+        file.href = 'src/renderer/assets/images/board-css/international/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isXiangqi) {
+        file.href = 'src/renderer/assets/images/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isSEA) {
+        file.href = 'src/renderer/assets/images/board-css/sea/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isShogi) {
+        file.href = 'src/renderer/assets/images/board-css/shogi/' + boardStyle + '.css'
+      }
       document.head.appendChild(file)
     },
     dropPiece (event, pieceType, color) {
@@ -288,6 +387,20 @@ export default {
       this.selectedPiece = pieceType
       console.log(`dropPiece: ${event} ${pieceType} ${color}`)
       console.log(`dropPiece: ${this.board.getFen()}`)
+    },
+    increaseNumbers (move) {
+      const letters = move.split(/(\d+)/)
+      letters[1] = String(parseInt(letters[1]) + 1)
+      letters[3] = String(parseInt(letters[3]) + 1)
+      const ret = letters.join('')
+      return ret
+    },
+    lowerNumbers (move) {
+      const letters = move.split(/(\d+)/)
+      letters[1] = String(parseInt(letters[1]) - 1)
+      letters[3] = String(parseInt(letters[3]) - 1)
+      const ret = letters.join('')
+      return ret
     },
     possibleMoves () {
       const dests = {}
@@ -297,8 +410,12 @@ export default {
       for (let i = 0; i < this.legalMoves.length; i++) {
         // don't include dropping moves
         if (this.legalMoves[i].length !== 3) {
-          fromSq = this.legalMoves[i].substring(0, 2)
-          toSq = this.legalMoves[i].substring(2, 4)
+          let Move = this.legalMoves[i]
+          if (this.dimensionNumber === 3) {
+            Move = this.lowerNumbers(Move)
+          }
+          fromSq = Move.substring(0, 2)
+          toSq = Move.substring(2, 4)
         }
         if (fromSq in dests) {
           dests[fromSq].push(toSq)
@@ -323,15 +440,22 @@ export default {
     },
     afterDrag () {
       return (role, key) => {
-        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
+        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', silver: 'S', gold: 'G', lance: 'L' }
         const move = pieces[role] + '@' + key
-        this.$store.dispatch('push', move)
-        this.updateHand()
+        if (this.$store.getters.legalMoves.includes(move)) {
+          this.$store.dispatch('push', move)
+          this.updateHand()
+        } else {
+          this.updateBoard()
+        }
       }
     },
     changeTurn () {
       return (orig, dest) => {
-        const uciMove = orig + dest
+        let uciMove = orig + dest
+        if (this.dimensionNumber === 3) {
+          uciMove = this.increaseNumbers(uciMove)
+        }
         if (this.isPromotion(uciMove)) {
           this.uciMove = uciMove
           this.showPromotionModal()
@@ -346,10 +470,18 @@ export default {
     updatePocket (pocket, pocketPieces, color) {
       for (let idx = 0; idx < pocketPieces.length; ++idx) {
         let pieceIdx
-        if (color === WHITE) {
-          pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()]
+        if (this.variant === 'shogi') {
+          if (color === WHITE) {
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx].toUpperCase()]
+          } else {
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx]]
+          }
         } else {
-          pieceIdx = this.piecesToIdx[pocketPieces[idx]]
+          if (color === WHITE) {
+            pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()]
+          } else {
+            pieceIdx = this.piecesToIdx[pocketPieces[idx]]
+          }
         }
         pocket[pieceIdx].count += 1
       }
@@ -391,7 +523,10 @@ export default {
       if (this.currentMove === undefined || this.moves.length === 0) {
         this.board.state.lastMove = undefined
       } else {
-        const string = String(this.currentMove.uci)
+        let string = String(this.currentMove.uci)
+        if (this.dimensionNumber === 3) {
+          string = this.lowerNumbers(string)
+        }
         const first = string.substring(0, 2)
         const second = string.substring(2, 4)
         if (string.includes('@')) { // no longer displays a green box in the corner
@@ -419,7 +554,8 @@ export default {
             },
         orientation: this.orientation
       })
-      if (this.variant === 'crazyhouse') {
+
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
         this.updateHand()
       }
     },
@@ -435,6 +571,9 @@ export default {
 <style>
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
+@import '../assets/dim9x9.css';
+@import '../assets/dim8x8.css';
+@import '../assets/dim9x10.css';
 
 #PromotionModal {
   position: absolute;
@@ -455,8 +594,43 @@ export default {
 }
 .pockets {
   margin-right: 1.5px;
+  height: 100%;
+}
+.pockets.shogi{
+  display:grid;
+  grid-template-columns: 1fr 1fr ;
+
+}
+coords.ranks {
+  height: 100%;
+  width: .8em;
+  margin-bottom: 10px;
+}
+coords.files {
+  height: 100%;
+  width: .8em;
+  width: 10px;
+  padding-left: 30px;
+  margin-right: 10px;
+}
+coords {
+  text-shadow: var(--cg-coord-shadow);
+  font-size: calc(8px + 4 * ((100vw - 320px) / 880));
+  display: flex;
+  color: #fff;
+  text-shadow: 0 1px 2px #000;
+  font-weight: bold;
+}
+.coords {
+  margin-right: 1.5px;
+  text-align: center;
+  font-size: 8px;
+  width: 10px;
+  padding: 0px 0px 0px 0px;
+  color: black;
 }
 .cg-board-wrap {
+  background-image: url('/src/renderer/assets/images/board/svg/blue.svg');
   position: relative;
 }
 .koth cg-container::before {
@@ -472,8 +646,7 @@ export default {
   pointer-events: none;
   border-radius: 0px 0px 0px 0px;
 }
-
-.rk cg-container::before{
+.rk cg-board::before{
     background: rgba(230,230,230,0.2);
     width: 100%;
     height: 12.5%;
@@ -485,4 +658,8 @@ export default {
     pointer-events: none;
     border-radius: 4px 4px 0px 0px;
 }
+/*
+  CSS for 9x10 board e.g. xiangqi/janggi etc.
+*/
+
 </style>

@@ -22,7 +22,10 @@
               size="60"
               @change="checkValidFEN"
             >
+          </div>
+          <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
+            <BoardStyleSelector id="board-style" />
           </div>
         </div>
         <EvalPlot id="evalplot" />
@@ -56,6 +59,7 @@ import EvalBar from './EvalBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
+import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
 import PgnBrowser from './PgnBrowser.vue'
@@ -72,6 +76,7 @@ export default {
     EvalBar,
     ChessGround,
     PieceStyleSelector,
+    BoardStyleSelector,
     EvalPlot,
     // GameInfo,
     PgnBrowser,
@@ -255,6 +260,7 @@ export default {
     "evalplot analysisview";
 }
 .main-grid > .chessboard-grid {
+  min-width: 925px;
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% 70% auto;
@@ -281,10 +287,28 @@ input {
   grid-area: fenfield;
   /*margin-left: 48px;*/
 }
+#selector-container {
+  height:60px;
+}
 #piece-style {
   margin-top: 10px;
-  max-width: 300px;
-  margin-left: 142px;
+  width: 210px;
+  margin-left: 60px;
+  position: absolute;
+}
+#board-style {
+  margin-top: 10px;
+  width: 210px;
+  margin-left: 330px;
+  position: absolute;
+}
+.main-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+.chessboard-grid {
+  display: grid;
+  grid-template-columns: 20% auto auto;
 }
 #pgnbrowser {
   grid-area: pgnbrowser;
