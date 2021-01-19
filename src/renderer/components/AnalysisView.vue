@@ -118,7 +118,7 @@ export default {
   },
   watch: {
     reset: function () {
-      this.$store.dispatch('resetMultiPV')
+      this.$store.commit('resetMultiPV')
     }
   },
   methods: {
