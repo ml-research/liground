@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="base-demo"
-    style="width: 600px"
-  >
+  <div class="base-demo">
     <vue-table-dynamic :params="params" />
   </div>
 </template>
