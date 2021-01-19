@@ -51,10 +51,11 @@
     </div>
     <input
       id="lname"
+      v-model="cmd"
       type="text"
       name="lname"
-      :value="fen"
       size="60"
+      @keyup="onKeyup"
     >
   </div>
 </template>
@@ -73,13 +74,14 @@ export default {
     AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo
   },
   props: {
-    fen: {
-      type: String,
-      default: ''
-    },
     reset: {
       type: Boolean,
       default: false
+    }
+  },
+  data () {
+    return {
+      cmd: ''
     }
   },
   computed: {
@@ -122,6 +124,12 @@ export default {
   methods: {
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
+    },
+    onKeyup (event) {
+      if (event.key === 'Enter') {
+        this.$store.dispatch('sendEngineCommand', this.cmd)
+        this.cmd = ''
+      }
     }
   }
 }

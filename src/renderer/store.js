@@ -315,6 +315,9 @@ export const store = new Vuex.Store({
     position (context) {
       ipc.send(`position fen ${context.getters.fen}`)
     },
+    sendEngineCommand (_, payload) {
+      ipc.send(payload)
+    },
     fen (context, payload) {
       if (context.state.fen !== payload) {
         context.commit('fen', payload)
