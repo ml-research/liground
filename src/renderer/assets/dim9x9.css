@@ -1,0 +1,28 @@
+/*
+* CSS for Chessground with 9x9 board dimensions
+*/
+
+.dim9x9 .cg-wrap {
+    width: 520px;
+    height: 600px;
+}
+
+
+
+.dim9x9 cg-helper {
+    width: calc( 100% / 9);
+    height: calc( 100% / 9);
+}
+
+.dim9x9 cg-container {
+    width: 900%;
+    height: 900%;
+}
+.dim9x9 .cg-wrap piece {
+    width: calc( 100% / 9);
+    height: calc( 100% / 9); 
+}
+.dim9x9 cg-board square {
+    width: calc( 100% / 9);
+    height: calc( 100% / 9);
+}

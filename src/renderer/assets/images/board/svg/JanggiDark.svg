@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 900 1e3" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<metadata>
+<rdf:RDF>
+<cc:Work rdf:about="">
+<dc:format>image/svg+xml</dc:format>
+<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+<dc:title/>
+</cc:Work>
+</rdf:RDF>
+</metadata>
+<rect width="900" height="1e3" fill="#262421" style="paint-order:normal"/>
+<line x1="50" x2="850" y1="50" y2="50" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="150" y2="150" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="250" y2="250" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="350" y2="350" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="450" y2="450" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="550" y2="550" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="650" y2="650" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="750" y2="750" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="850" y2="850" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="850" y1="950" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="50" x2="50" y1="50" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="150" x2="150" y1="50" y2="550" stroke="#fff" stroke-width="2.2361"/>
+<line x1="250" x2="250" y1="50" y2="550" stroke="#fff" stroke-width="2.2361"/>
+<line x1="350" x2="350" y1="50" y2="550" stroke="#fff" stroke-width="2.2361"/>
+<line x1="450" x2="450" y1="50" y2="550" stroke="#fff" stroke-width="2.2361"/>
+<line x1="550" x2="550" y1="50" y2="550" stroke="#fff" stroke-width="2.2361"/>
+<line x1="650" x2="650" y1="50" y2="550" stroke="#fff" stroke-width="2.2361"/>
+<line x1="750" x2="750" y1="50" y2="550" stroke="#fff" stroke-width="2.2361"/>
+<line x1="850" x2="850" y1="50" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="150" x2="150" y1="550" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="250" x2="250" y1="550" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="350" x2="350" y1="550" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="450" x2="450" y1="550" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="550" x2="550" y1="550" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="650" x2="650" y1="550" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="750" x2="750" y1="550" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="350" x2="550" y1="50" y2="250" stroke="#fff" stroke-width="2"/>
+<line x1="350" x2="550" y1="250" y2="50" stroke="#fff" stroke-width="2"/>
+<line x1="350" x2="550" y1="750" y2="950" stroke="#fff" stroke-width="2"/>
+<line x1="350" x2="550" y1="950" y2="750" stroke="#fff" stroke-width="2"/>
+<g transform="translate(-.12749 .36768)" stroke="#fff">
+<g transform="matrix(.37004 -.37004 .37004 .37004 -30.589 212.69)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.36896 .36896 .36896 -.36896 669.09 386.6)" stroke-width="4.7913">
+<path d="m194 267.03 0.022 26.606-26.959-0.0298" fill="none" stroke="#fff" stroke-width="4.7913"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 69.664 312.84)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 569.35 213.09)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 469.57 313.15)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 269.38 312.93)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(-.36896 .36896 -.36896 -.36896 230.65 386.72)" stroke-width="4.7913">
+<path d="m194 267.03 0.022 26.606-26.959-0.0298" fill="none" stroke="#fff" stroke-width="4.7913"/>
+</g>
+<g transform="matrix(1 0 0 -1 -.071131 999.73)">
+<g transform="matrix(.37004 -.37004 .37004 .37004 -30.589 212.69)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.36896 .36896 .36896 -.36896 669.09 386.6)" stroke-width="4.7913">
+<path d="m194 267.03 0.022 26.606-26.959-0.0298" fill="none" stroke="#fff" stroke-width="4.7913"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 69.664 312.84)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 569.35 213.09)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 469.57 313.15)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(.37004 -.37004 .37004 .37004 269.38 312.93)" fill="none" stroke-width="4.7772">
+<path d="m194 267.05v53.557"/>
+<path d="m220.78 293.83h-53.557"/>
+</g>
+<g transform="matrix(-.36896 .36896 -.36896 -.36896 230.65 386.72)" stroke-width="4.7913">
+<path d="m194 267.03 0.022 26.606-26.959-0.0298" fill="none" stroke="#fff" stroke-width="4.7913"/>
+</g>
+</g>
+</g>
+</svg>

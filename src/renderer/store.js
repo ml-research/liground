@@ -40,7 +40,12 @@ export const store = new Vuex.Store({
       '️Three-Check': '3check',
       Antichess: 'antichess',
       Horde: 'horde',
-      '🏇 Racing Kings': 'racingkings'
+      '🏇 Racing Kings': 'racingkings',
+      Makruk: 'makruk',
+      Shogi: 'shogi',
+      Janggi: 'janggi',
+      Xiangqi: 'xiangqi'
+
     }),
     engineBinary: 'stockfish',
     stdIO: [],
@@ -75,6 +80,19 @@ export const store = new Vuex.Store({
     loadedGames: [],
     selectedGame: null,
     points: 0,
+    boardStyle: 'blue',
+    internationalVariants: [
+      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+    ],
+    seaVariants: [
+      'makruk'
+    ],
+    xiangqiVariants: [
+      'janggi', 'xiangqi'
+    ],
+    shogiVariants: [
+      'shogi'
+    ],
     curVar960Fen: '',
     viewAnalysis: true
   },
@@ -174,6 +192,9 @@ export const store = new Vuex.Store({
     },
     pieceStyle (state, payload) {
       state.pieceStyle = payload
+    },
+    boardStyle (state, payload) {
+      state.boardStyle = payload
     },
     newBoard (state, payload) {
       if (payload.is960) {
@@ -355,6 +376,9 @@ export const store = new Vuex.Store({
     },
     viewAnalysis (context, payload) {
       context.commit('viewAnalysis', payload)
+    },
+    boardStyle (context, payload) {
+      context.commit('boardStyle', payload)
     }
   },
   getters: {
@@ -488,6 +512,9 @@ export const store = new Vuex.Store({
     pieceStyle (state) {
       return state.pieceStyle
     },
+    boardStyle (state) {
+      return state.boardStyle
+    },
     turn (state) {
       return state.turn
     },
@@ -522,6 +549,28 @@ export const store = new Vuex.Store({
     },
     is960 (state) {
       return state.board.is960()
+    },
+    isInternational (state) {
+      return state.internationalVariants.includes(state.variant)
+    },
+    isSEA (state) {
+      return state.seaVariants.includes(state.variant)
+    },
+    isXiangqi (state) {
+      return state.xiangqiVariants.includes(state.variant)
+    },
+    isShogi (state) {
+      return state.shogiVariants.includes(state.variant)
+    },
+    dimensionNumber (state) {
+      if (state.internationalVariants.includes(state.variant)) {
+        return 0
+      } else {
+        const var2Dim = {
+          shogi: 1, xiangqi: 3, janggi: 3, makruk: 0
+        }
+        return var2Dim[state.variant]
+      }
     },
     viewAnalysis (state) {
       return state.viewAnalysis
