@@ -1,11 +1,11 @@
 /*
  * Board
  */
-.blue .cg-wrap {
+/* .blue .cg-wrap {
   background-image: url('images/board/blue.svg');
 }
 
-/* .merida .cg-wrap piece.pawn.white {
+ .merida .cg-wrap piece.pawn.white {
   background-image: url('images/pieces/merida/wP.svg');
 }
 .merida .cg-wrap piece.bishop.white {

@@ -6,8 +6,8 @@
  */
 
 .cg-wrap {
-  width: 320px;
-  height: 320px;
+  width: 600px;
+  height: 600px;
   position: relative;
   display: block;
 }
@@ -15,7 +15,7 @@
 cg-helper {
   position: absolute;
   width: 12.5%;
-  padding-bottom: 12.5%;
+  height: 12.5%;
   display: table; /* hack: round to full pixel size in chrome */
   bottom: 0;
 }

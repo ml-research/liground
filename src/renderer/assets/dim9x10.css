@@ -1,0 +1,40 @@
+/*
+* CSS for Chessground with 9x10 board dimensions
+*/
+
+
+.dim9x10 .cg-wrap{
+  width: 540px;
+  height: 600px;
+}
+.dim9x10 cg-helper {
+  position: absolute;
+  width: 11.11%;
+  height: 10%;
+  bottom: 0;
+}
+.dim9x10 cg-container {
+  position: absolute;
+  width: 900%;
+  height: 1000%;
+  bottom: 0;
+}
+.dim9x10 .cg-wrap piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11.11%;
+  height: 10%;
+  background-size: cover;
+  z-index: 2;
+  
+  pointer-events: none;
+}
+.dim9x10 cg-board square {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11.11%;
+  height: 10%;
+  pointer-events: none;
+}
