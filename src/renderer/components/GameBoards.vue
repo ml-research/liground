@@ -26,15 +26,25 @@
           </div>
         </div>
         <EvalPlot id="evalplot" />
-        <AnalysisView
-          id="analysisview"
-          :reset="resetAnalysis"
-          @move-to-start="moveToStart"
-          @move-to-end="moveToEnd"
-          @move-back-one="moveBackOne"
-          @move-forward-one="moveForwardOne"
-          @flip-board="flipBoard"
-        />
+        <div
+          v-if="viewAnalysis"
+          id="right-column"
+        >
+          <AnalysisView
+            id="analysisview"
+            :reset="resetAnalysis"
+            @move-to-start="moveToStart"
+            @move-to-end="moveToEnd"
+            @move-back-one="moveBackOne"
+            @move-forward-one="moveForwardOne"
+            @flip-board="flipBoard"
+          />
+        </div>
+        <div v-else>
+          <SettingsTab
+            id="settingstab"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -49,6 +59,7 @@ import PieceStyleSelector from './PieceStyleSelector'
 import Vue from 'vue'
 import Module from 'ffish-es6'
 import PgnBrowser from './PgnBrowser.vue'
+import SettingsTab from './SettingsTab'
 // TODO: use GameInfo component?
 // import GameInfo from './GameInfo.vue'
 
@@ -63,7 +74,8 @@ export default {
     PieceStyleSelector,
     EvalPlot,
     // GameInfo,
-    PgnBrowser
+    PgnBrowser,
+    SettingsTab
   },
   data () {
     return {
@@ -73,6 +85,9 @@ export default {
     }
   },
   computed: {
+    viewAnalysis () {
+      return this.$store.getters.viewAnalysis
+    },
     variant () {
       return this.$store.getters.variant
     },
@@ -250,6 +265,10 @@ export default {
     "fenfield fenfield fenfield";
 }
 #analysisview {
+  height: 100%;
+  width: 100%;
+}
+#right-column {
   grid-area: analysisview;
   max-width: 40vw;
   max-height: calc(100vh - 25px);

@@ -53,7 +53,6 @@
   },
   "dependencies": {
     "apexcharts": "^3.22.3",
-    "axios": "^0.18.0",
     "chessgroundx": "^7.6.42",
     "epic-spinners": "^1.1.0",
     "ffish": "^0.5.1",

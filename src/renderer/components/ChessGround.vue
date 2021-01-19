@@ -7,29 +7,36 @@
       >
         <div
           :style="{visibility: variant === 'crazyhouse' ? 'visible' : 'hidden'}"
-          :class="{ black : $store.getters.orientation == &quot;black&quot;}"
+          :class="{ mirror : $store.getters.orientation == 'black'}"
         >
           <ChessPocket
             id="chesspocket_top"
             color="black"
             :pieces="piecesB"
-            :class="{ black : $store.getters.orientation == &quot;white&quot; }"
             @selection="dropPiece"
           />
           <ChessPocket
             id="chesspocket_bottom"
             color="white"
             :pieces="piecesW"
-            :class="{ black : $store.getters.orientation == &quot;black&quot; }"
             @selection="dropPiece"
           />
         </div>
       </div>
       <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
-        <div
-          ref="board"
-          class="cg-board-wrap"
-        />
+        <div class="cg-board-wrap">
+          <div ref="board" />
+          <div
+            v-if="isPromotionModalVisible && !isPast"
+            id="PromotionModal"
+            ref="promotion"
+            :style="promotionPosition"
+          >
+            <PromotionModal
+              @close="closePromotionModal"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -38,7 +45,9 @@
 <script>
 import { mapGetters } from 'vuex'
 import { Chessground } from 'chessgroundx'
+import * as cgUtil from 'chessgroundx/util'
 import ChessPocket from './ChessPocket'
+import PromotionModal from './PromotionModal.vue'
 
 const WHITE = true
 const BLACK = false
@@ -46,7 +55,7 @@ const BLACK = false
 export default {
   name: 'ChessGround',
   components: {
-    ChessPocket
+    ChessPocket, PromotionModal
   },
   props: {
     free: {
@@ -103,7 +112,9 @@ export default {
       shapes: [],
       pieceShapes: [],
       promotions: [],
-      promoteTo: 'q'
+      promoteTo: 'q',
+      isPromotionModalVisible: false,
+      uciMove: undefined
     }
   },
   computed: {
@@ -121,7 +132,23 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
+    promotionPosition () {
+      if (this.uciMove) {
+        const dest = this.uciMove.substring(2, 4)
+
+        let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5
+
+        if (this.orientation === 'white') {
+          left = 87.5 - left
+        }
+
+        const vertical = this.turn === this.orientation ? 0 : (7 - 3) * 12.5
+        return { left: `${left}%`, top: `${vertical}%` }
+      } else {
+        return undefined
+      }
+    },
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast'])
   },
   watch: {
     initialized () {
@@ -132,9 +159,11 @@ export default {
     },
     orientation () {
       this.updateBoard()
+      document.dispatchEvent(new Event('renderPromotion'))
     },
     pieceStyle (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
+      document.dispatchEvent(new Event('renderPromotion'))
     },
     bestmove () {
       const multipv = this.multipv
@@ -194,6 +223,7 @@ export default {
         lastMove: false
       })
       this.updateBoard()
+      this.isPromotionModalVisible = false
     }
   },
   mounted () {
@@ -213,7 +243,11 @@ export default {
       movable: {
         events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
         color: 'white',
-        free: false
+        free: false,
+        rookCastle: true
+      },
+      premovable: {
+        enabled: false
       },
       orientation: this.orientation,
       resizable: true
@@ -230,6 +264,19 @@ export default {
       this.$refs.board.style.height = `${Math.min(height, width)}px`
       ev.initEvent('chessground.resize', false, false)
       document.body.dispatchEvent(ev)
+    },
+    showPromotionModal () {
+      this.isPromotionModalVisible = true
+      document.dispatchEvent(new Event('renderPromotion'))
+    },
+    closePromotionModal (value) {
+      this.isPromotionModalVisible = false
+      this.promoteTo = value
+      this.uciMove = this.uciMove + String(this.promoteTo)
+      this.lastMoveSan = this.$store.getters.sanMove(this.uciMove)
+      this.$store.dispatch('push', this.uciMove)
+      this.updateHand()
+      this.afterMove()
     },
     updatePieceCSS (pieceStyle) {
       const file = document.createElement('link')
@@ -262,9 +309,13 @@ export default {
       }
       return dests
     },
-    isPromotion (orig, dest) {
-      const filteredPromotions = this.promotions.filter(move => move.from === orig && move.to === dest)
-      return filteredPromotions.length > 0 // The current movement is a promotion
+    isPromotion (uciMove) {
+      try {
+        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+      } catch (err) {
+        return true
+      }
+      return false
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -281,15 +332,16 @@ export default {
     },
     changeTurn () {
       return (orig, dest) => {
-        if (this.isPromotion(orig, dest)) {
-          this.promoteTo = this.onPromotion()
-        }
         const uciMove = orig + dest
-        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-        this.$store.dispatch('push', uciMove)
-        console.log('colorAfterPush:' + this.turn)
-        this.updateHand()
-        this.afterMove()
+        if (this.isPromotion(uciMove)) {
+          this.uciMove = uciMove
+          this.showPromotionModal()
+        } else {
+          this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+          this.$store.dispatch('push', uciMove)
+          this.updateHand()
+          this.afterMove()
+        }
       }
     },
     updatePocket (pocket, pocketPieces, color) {
@@ -325,7 +377,6 @@ export default {
     afterMove () {
       const events = {}
       events.fen = this.fen
-
       events.history = [this.lastMoveSan]
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
@@ -333,7 +384,7 @@ export default {
     updateBoard () {
       // logic to find out if a check should be displayed:
       let isCheck = false // ensures that no check is displayed when the current move was not a check
-      if (this.currentMove !== undefined && this.currentMove.name.includes('+')) { // the last move was check iff the san notation of the last move contained a '+'
+      if (this.currentMove !== undefined && (this.currentMove.name.includes('+') || this.currentMove.name.includes('#'))) { // the last move was check iff the san notation of the last move contained a '+'
         this.moves[this.moves.length - 1].check = this.turn // the check property of the board accepts a color or a boolean
         isCheck = this.currentMove.check
       }
@@ -344,7 +395,11 @@ export default {
         const string = String(this.currentMove.uci)
         const first = string.substring(0, 2)
         const second = string.substring(2, 4)
-        this.board.state.lastMove = [first, second]
+        if (string.includes('@')) { // no longer displays a green box in the corner
+          this.board.state.lastMove = [second]
+        } else {
+          this.board.state.lastMove = [first, second]
+        }
       }
       this.board.set({
         check: isCheck,
@@ -382,7 +437,13 @@ export default {
 @import '../assets/chessground.css';
 @import '../assets/theme.css';
 
-.black {
+#PromotionModal {
+  position: absolute;
+  z-index: 4;
+  width: 12.5%;
+  height: 50%;
+}
+.mirror {
   transform: scaleY(-1);
 }
 .chess-pocket {
@@ -396,7 +457,9 @@ export default {
 .pockets {
   margin-right: 1.5px;
 }
-
+.cg-board-wrap {
+  position: relative;
+}
 .koth cg-container::before {
   width: 25%;
   height: 25%;
