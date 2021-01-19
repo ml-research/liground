@@ -1,0 +1,12 @@
+.is2d .pawn.white {background-image:url('/src/renderer/assets/piece/international/letter/wP.svg')}
+.is2d .knight.white {background-image:url('/src/renderer/assets/piece/international/letter/wN.svg')}
+.is2d .bishop.white {background-image:url('/src/renderer/assets/piece/international/letter/wB.svg')}
+.is2d .rook.white {background-image:url('/src/renderer/assets/piece/international/letter/wR.svg')}
+.is2d .queen.white {background-image:url('/src/renderer/assets/piece/international/letter/wQ.svg')}
+.is2d .king.white {background-image:url('/src/renderer/assets/piece/international/letter/wK.svg')}
+.is2d .pawn.black {background-image:url('/src/renderer/assets/piece/international/letter/bP.svg')}
+.is2d .knight.black {background-image:url('/src/renderer/assets/piece/international/letter/bN.svg')}
+.is2d .bishop.black {background-image:url('/src/renderer/assets/piece/international/letter/bB.svg')}
+.is2d .rook.black {background-image:url('/src/renderer/assets/piece/international/letter/bR.svg')}
+.is2d .queen.black {background-image:url('/src/renderer/assets/piece/international/letter/bQ.svg')}
+.is2d .king.black {background-image:url('/src/renderer/assets/piece/international/letter/bK.svg')}

@@ -1,0 +1,12 @@
+.is2d .pawn.white {background-image:url('/src/renderer/assets/piece/international/chessnut/wP.svg')}
+.is2d .knight.white {background-image:url('/src/renderer/assets/piece/international/chessnut/wN.svg')}
+.is2d .bishop.white {background-image:url('/src/renderer/assets/piece/international/chessnut/wB.svg')}
+.is2d .rook.white {background-image:url('/src/renderer/assets/piece/international/chessnut/wR.svg')}
+.is2d .queen.white {background-image:url('/src/renderer/assets/piece/international/chessnut/wQ.svg')}
+.is2d .king.white {background-image:url('/src/renderer/assets/piece/international/chessnut/wK.svg')}
+.is2d .pawn.black {background-image:url('/src/renderer/assets/piece/international/chessnut/bP.svg')}
+.is2d .knight.black {background-image:url('/src/renderer/assets/piece/international/chessnut/bN.svg')}
+.is2d .bishop.black {background-image:url('/src/renderer/assets/piece/international/chessnut/bB.svg')}
+.is2d .rook.black {background-image:url('/src/renderer/assets/piece/international/chessnut/bR.svg')}
+.is2d .queen.black {background-image:url('/src/renderer/assets/piece/international/chessnut/bQ.svg')}
+.is2d .king.black {background-image:url('/src/renderer/assets/piece/international/chessnut/bK.svg')}
