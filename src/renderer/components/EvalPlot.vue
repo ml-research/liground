@@ -38,12 +38,6 @@ export default {
             }
           }
         },
-        annotations: {
-          yaxis: [{
-            y: 0,
-            borderColor: '#999'
-          }]
-        },
         tooltip: {
           shared: false,
           intersect: true
