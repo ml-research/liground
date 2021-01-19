@@ -28,6 +28,9 @@ export default {
       evalArray: [0],
       currentValue: [0],
       chartOptions: {
+        dataLabels: {
+          enabled: false
+        },
         grid: {
           yaxis: {
             lines: {
@@ -64,8 +67,8 @@ export default {
             colorStops: [
               {
                 offset: 100,
-                color: '#FFFFFF',
-                opacity: 0
+                color: '#888888',
+                opacity: 0.8
               },
               {
                 offset: 0,
