@@ -27,6 +27,7 @@
             v-if="isPromotionModalVisible && !isPast"
             id="PromotionModal"
             ref="promotion"
+            v-bind:turn="turn"
             :style="promotionPosition"
           >
             <PromotionModal
@@ -426,12 +427,20 @@ export default {
       return dests
     },
     isPromotion (uciMove) {
-      try {
+      for(let i = 0; i < this.legalMoves.length; i++){
+        if(this.legalMoves[i].length === 5){
+          if(this.legalMoves[i].includes(uciMove)){
+            return true 
+          }
+        }
+      }
+      return false 
+      /*try {
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
       } catch (err) {
         return true
       }
-      return false
+      return false*/
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -457,8 +466,13 @@ export default {
           uciMove = this.increaseNumbers(uciMove)
         }
         if (this.isPromotion(uciMove)) {
-          this.uciMove = uciMove
-          this.showPromotionModal()
+          if(this.variant === 'makruk'){
+            let move = uciMove + 'm'
+            this.$store.dispatch('push', move)
+          }else{
+            this.uciMove = uciMove
+            this.showPromotionModal()
+          }
         } else {
           this.lastMoveSan = this.$store.getters.sanMove(uciMove)
           this.$store.dispatch('push', uciMove)

@@ -2,96 +2,55 @@
   <div
     class="prom-container"
   >
-    <div
-      id="op1"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW1' : 'promOptionB4']"
-      @click="close('1')"
-    />
-    <div
-      id="op2"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW2' : 'promOptionB3']"
-      @click="close('2')"
-    />
-    <div
-      id="op3"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW3' : 'promOptionB2']"
-      @click="close('3')"
-    />
-    <div
-      id="op4"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW4' : 'promOptionB1']"
-      @click="close('4')"
-    />
+    <template v-for="piece in promOptions">
+      <option
+      :key="piece.type"
+      v-bind:class="[piece.type, turn]"
+      @click="close(piece.type)"
+      />
+    </template>
   </div>
 </template>
 
 <script>
 export default {
   name: 'PromotionModal',
+  props:{
+    promOptions: {
+      type: Array,
+      default: () => ([
+        {type: 'queen'},
+        {type: 'rook'},
+        {type: 'bishop'},
+        {type: 'knight'},
+      ])
+    },
+    turn: {
+      type: String,
+      default: 'white'
+    }
+    
+  },
   data () {
     return {
-      promDir: { 1: 'q', 2: 'n', 3: 'r', 4: 'b' }
+      promDir: { 'queen':'q', 'rook': 'r', 'bishop':'b', 'knight':'n'}
     }
-  },
-  computed: {
-    pieceStyle () {
-      return this.$store.getters.pieceStyle
-    },
-    turn () {
-      return this.$store.getters.turn
-    },
-    orientation () {
-      return this.$store.getters.orientation
-    }
-  },
-  created () {
-    document.addEventListener('renderPromotion', () => {
-      this.main()
-    })
   },
   methods: {
-    main () {
-      this.loadPieceStyle()
-      this.orderPieces()
-    },
-    orderPieces () {
-      if (this.orientation === 'white') {
-        document.getElementById('op1').style.order = '1'
-        document.getElementById('op2').style.order = '2'
-        document.getElementById('op3').style.order = '3'
-        document.getElementById('op4').style.order = '4'
-      } else {
-        document.getElementById('op1').style.order = '4'
-        document.getElementById('op2').style.order = '3'
-        document.getElementById('op3').style.order = '2'
-        document.getElementById('op4').style.order = '1'
-      }
-    },
-    loadPieceStyle () {
-      // document.getElementById('op1').style.backgroundImage = "url('src/renderer/assets/piece/international/" + this.pieceStyle + "/wQ.svg)"
-    },
     close (value) {
-      if (this.turn) {
-        this.$emit('close', this.promDir[value])
-      } else {
-        this.$emit('close', this.promDir[5 - value])
-      }
+      this.$emit('close', this.promDir[value])
     }
   }
 }
 </script>
 
 <style scoped>
-  .prom-option {
+   option {
     background-size: cover;
     width: 100%;
     background-color: white;
   }
-  .prom-option:hover {
+  option:hover {
     background-color: rgb(182, 155, 107);
   }
 
