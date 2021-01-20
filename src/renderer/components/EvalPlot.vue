@@ -28,6 +28,7 @@ export default {
       evalArray: [0],
       lastValue: 0,
       currentValue: [0],
+      is960: false,
       chartOptions: {
         dataLabels: {
           enabled: false
@@ -111,9 +112,19 @@ export default {
     moves () {
       return this.$store.getters.moves
     },
-    ...mapGetters(['points', 'turn', 'selectedGame', 'variant'])
+    ...mapGetters(['points', 'turn', 'selectedGame', 'variant', 'board'])
   },
   watch: {
+    board () {
+      const board960 = this.$store.getters.is960
+      if (board960 && !this.is960) {
+        this.clear()
+        this.is960 = true
+      }
+      if (board960 && this.is960) {
+        this.is960 = false
+      }
+    },
     variant () {
       this.clear()
     },
