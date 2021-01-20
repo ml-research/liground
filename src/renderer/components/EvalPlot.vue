@@ -151,6 +151,7 @@ export default {
   },
   methods: {
     clear () {
+      this.lastValue = 0
       this.chartOptions.xaxis.categories.splice(0, this.chartOptions.xaxis.categories.length)
       this.chartOptions.xaxis.categories.push('Start')
       this.series = [{
