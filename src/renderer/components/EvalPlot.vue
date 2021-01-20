@@ -26,6 +26,7 @@ export default {
   data: function () {
     return {
       evalArray: [0],
+      lastValue: 0,
       currentValue: [0],
       chartOptions: {
         dataLabels: {
@@ -166,10 +167,15 @@ export default {
         return
       }
       const index = this.moves.length - 1
-      if (this.currentValue.length <= index) {
-        this.evalArray.push(this.currentValue[this.currentValue.length - 1])
+      if (this.moves[index - 1].name === this.chartOptions.xaxis.categories[index] || '..' + this.moves[index - 1].name === this.chartOptions.xaxis.categories[index]) {
+        return
+      }
+
+      if (this.currentValue[index] === '±0.00' || this.currentValue[index] === undefined) {
+        this.evalArray.push(this.lastValue)
       } else {
         this.evalArray.push(this.currentValue[index])
+        this.lastValue = this.currentValue[index]
       }
       const min = Math.min(...this.evalArray)
       const max = Math.max(...this.evalArray)
