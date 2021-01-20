@@ -57,6 +57,7 @@ export default {
     },
     resetBoard () {
       if (confirm('Do you really want to reset the board?')) {
+        document.dispatchEvent(new Event('resetPlot'))
         this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
       }
     }
