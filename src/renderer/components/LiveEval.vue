@@ -9,8 +9,8 @@ export default {
   name: 'LiveEval',
   computed: {
     eval: function () {
-      this.$store.commit('points', this.$store.getters.cpforWhiteStr)
-      return this.$store.getters.cpforWhiteStr
+      this.$store.commit('points', this.$store.getters.cpForWhiteStr)
+      return this.$store.getters.cpForWhiteStr
     }
   }
 }

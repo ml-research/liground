@@ -153,7 +153,7 @@ export default {
         return
       }
       const index = this.moves.length
-      this.currentValue[index] = this.$store.getters.cpforWhiteStr
+      this.currentValue[index] = this.$store.getters.cpForWhiteStr
       if ((this.currentValue[index].includes('#') && !this.currentValue[index].includes('-')) || this.currentValue[index] > 10) {
         this.currentValue[index] = 10
       } else if ((this.currentValue[index].includes('#') && this.currentValue[index].includes('-')) || this.currentValue[index] < -10) {
