@@ -53,7 +53,6 @@ export default {
   },
   methods: {
     updateVariant (payload) {
-      this.$store.dispatch('started', false) // from the previously used method, not sure why this was here, it seemed to work without this line
       this.$store.dispatch('variant', this.variantOptions.get(payload))
     },
     resetBoard () {

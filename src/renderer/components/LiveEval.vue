@@ -9,7 +9,7 @@ export default {
   name: 'LiveEval',
   computed: {
     eval: function () {
-      return this.$store.getters.cpforWhiteStr
+      return this.$store.getters.cpForWhiteStr
     }
   }
 }

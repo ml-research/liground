@@ -3,28 +3,24 @@
   <label class="switch">
     <input
       type="checkbox"
-      @click="pressed"
+      :checked="active"
+      @click="onClick"
     >
     <span class="slider round" />
   </label>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'RoundedSwitch',
-  props: {},
-  data () {
-    return {
-      checked: false
-    }
+  computed: {
+    ...mapGetters(['active'])
   },
   methods: {
-    pressed () {
-      this.checked = !this.checked
-      if (this.checked) {
-        if (!this.$store.getters.started) {
-          this.$store.dispatch('startEngine')
-        }
+    onClick () {
+      if (!this.active) {
         this.$store.dispatch('position')
         this.$store.dispatch('goEngine')
       } else {
@@ -35,7 +31,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* The switch - the box around the slider */
 .switch {
  position: relative;
