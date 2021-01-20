@@ -101,7 +101,6 @@ export default {
       this.options = this.engines[variant]
     }, */
     selected: function () {
-      this.$store.dispatch('started', false)
       this.$store.dispatch('selected', false)
       console.log(`engineBinary: ${this.engineBinaries[this.selected]}`)
       this.$store.dispatch('engineBinary', this.engineBinaries[this.selected])

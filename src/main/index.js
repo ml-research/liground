@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
+import setupEngineIPC from './engine'
 
 /**
  * Set `__static` path to static files in production
@@ -9,6 +10,9 @@ import { app, BrowserWindow } from 'electron'
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
+
+// setup ipc
+setupEngineIPC()
 
 let mainWindow
 

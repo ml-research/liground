@@ -26,6 +26,9 @@
     "files": [
       "dist/electron/**/*"
     ],
+    "asarUnpack": [
+      "**/static/bin/*"
+    ],
     "dmg": {
       "contents": [
         {

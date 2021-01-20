@@ -9,7 +9,6 @@ npm-debug.log.*
 thumbs.db
 !.gitkeep
 *.wasm
-engines/*
-src/server/engines/*
+static/bin/*
 
 run.bat

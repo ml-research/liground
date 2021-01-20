@@ -51,10 +51,11 @@
     </div>
     <input
       id="lname"
+      v-model="cmd"
       type="text"
       name="lname"
-      :value="fen"
       size="60"
+      @keyup="onKeyup"
     >
   </div>
 </template>
@@ -73,13 +74,14 @@ export default {
     AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo
   },
   props: {
-    fen: {
-      type: String,
-      default: ''
-    },
     reset: {
       type: Boolean,
       default: false
+    }
+  },
+  data () {
+    return {
+      cmd: ''
     }
   },
   computed: {
@@ -88,9 +90,6 @@ export default {
     },
     stdIO () {
       return this.$store.getters.stdIO
-    },
-    engineDetails () {
-      return this.$store.getters.idName + ' ' + this.$store.getters.idAuthor
     },
     message () {
       return this.$store.getters.message
@@ -105,13 +104,13 @@ export default {
       return this.$store.getters.pv
     },
     cp () {
-      return this.$store.getters.cpforWhiteStr
+      return this.$store.getters.cpForWhiteStr
     },
     pv2 () {
       return this.$store.getters.pv2
     },
     cp2 () {
-      return this.$store.getters.cpforWhiteStr
+      return this.$store.getters.cpForWhiteStr
     },
     moves () {
       return this.$store.getters.moves
@@ -119,12 +118,18 @@ export default {
   },
   watch: {
     reset: function () {
-      this.$store.dispatch('resetMultiPV')
+      this.$store.commit('resetMultiPV')
     }
   },
   methods: {
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
+    },
+    onKeyup (event) {
+      if (event.key === 'Enter') {
+        this.$store.dispatch('sendEngineCommand', this.cmd)
+        this.cmd = ''
+      }
     }
   }
 }
