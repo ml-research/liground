@@ -168,7 +168,8 @@ export const store = new Vuex.Store({
       'shogi'
     ],
     curVar960Fen: '',
-    viewAnalysis: true
+    viewAnalysis: true,
+    analysisMode: true
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -284,11 +285,18 @@ export const store = new Vuex.Store({
       state.moves = []
     },
     appendMoves (state, payload) {
-      state.moves = state.moves.concat(payload.map((curVal, idx, arr) => {
+      const mov = payload.move.split(' ')
+      const prev = payload.prev
+      state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
         const sanMove = state.board.sanMove(curVal)
         state.board.push(curVal)
-        return { ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false) }
+        return { ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: '', next: [], prev: prev }
       }))
+      if (prev) {
+        prev.next.push(mov)
+        prev.main = mov
+        console.log('prev name: ' + prev.name + 'prev next: ' + prev.next + ' main: ' + prev.main)
+      }
       state.lastFen = state.board.fen()
     },
     gameInfo (state, payload) {
@@ -299,6 +307,9 @@ export const store = new Vuex.Store({
     },
     selectedGame (state, payload) {
       state.selectedGame = payload
+    },
+    analysisMode (state, payload) {
+      state.analysisMode = payload
     }
   },
   actions: { // async
@@ -322,7 +333,7 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves', payload.split(' '))
+      context.commit('appendMoves', payload)
       context.dispatch('fen', context.state.board.fen())
     },
     resetEngineData (context) {
@@ -512,6 +523,9 @@ export const store = new Vuex.Store({
     },
     boardStyle (context, payload) {
       context.commit('boardStyle', payload)
+    },
+    analysisMode (context, payload) {
+      context.commit('analysisMode', payload)
     }
   },
   getters: {
@@ -689,6 +703,9 @@ export const store = new Vuex.Store({
     },
     viewAnalysis (state) {
       return state.viewAnalysis
+    },
+    analysisMode (state) {
+      return state.analysisMode
     }
   }
 })
