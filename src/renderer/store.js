@@ -726,8 +726,8 @@ ffish.onRuntimeInitialized = () => {
 }
 
 (async () => {
-  ipc.on('output', line => store.dispatch('stdIO', line))
-  ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
+  // ipc.on('output', line => store.dispatch('stdIO', line))
+  // ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
   ipc.on('info', info => store.dispatch('updateMultiPV', info))
   store.commit('engineInfo', await ipc.runEngine())
   store.dispatch('initEngineOptions')
