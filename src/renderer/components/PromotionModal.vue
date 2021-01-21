@@ -1,14 +1,14 @@
 <template>
   <div
     class="prom-container"
+    @click="close(piece.type)"
   >
-    <template v-for="piece in promOptions">
-      <option
-      :key="piece.type"
-      v-bind:class="[piece.type, turn]"
-      @click="close(piece.type)"
-      />
-    </template>
+    <li v-for="piece in promOptions"
+    :key="piece.id"
+    :class="[piece.type, side, pieceoption]"
+    @click="close(piece.type)"
+    >
+    </li>
   </div>
 </template>
 
@@ -16,41 +16,38 @@
 export default {
   name: 'PromotionModal',
   props:{
-    promOptions: {
+    promotions: {
       type: Array,
-      default: () => ([
-        {type: 'queen'},
-        {type: 'rook'},
-        {type: 'bishop'},
-        {type: 'knight'},
-      ])
     },
-    turn: {
-      type: String,
-      default: 'white'
-    }
-    
   },
   data () {
     return {
-      promDir: { 'queen':'q', 'rook': 'r', 'bishop':'b', 'knight':'n'}
+      promDir: { 'queen':'q', 'rook': 'r', 'bishop':'b', 'knight':'n', 'pawn': 'p' , 'ppawn': 'p+'},
+      promOptions: this.promotions,
     }
   },
+  computed: {
+    side () {
+      return this.$store.getters.turn ? 'white' : 'black'
+    }
+  },
+  
   methods: {
     close (value) {
       this.$emit('close', this.promDir[value])
     }
   }
 }
+
 </script>
 
 <style scoped>
-   option {
+   .pieceoption {
     background-size: cover;
     width: 100%;
     background-color: white;
   }
-  option:hover {
+  .pieceoption:hover {
     background-color: rgb(182, 155, 107);
   }
 

@@ -27,7 +27,7 @@
             v-if="isPromotionModalVisible && !isPast"
             id="PromotionModal"
             ref="promotion"
-            v-bind:turn="turn"
+            v-bind:promotions="promotions"
             :style="promotionPosition"
           >
             <PromotionModal
@@ -338,6 +338,7 @@ export default {
   methods: {
     showPromotionModal () {
       this.isPromotionModalVisible = true
+      console.log(this.promotions)
       document.dispatchEvent(new Event('renderPromotion'))
     },
     closePromotionModal (value) {
@@ -430,6 +431,25 @@ export default {
       for(let i = 0; i < this.legalMoves.length; i++){
         if(this.legalMoves[i].length === 5){
           if(this.legalMoves[i].includes(uciMove)){
+            if(this.$store.getters.isInternational){
+              if(this.variant === 'antichess'){
+                this.promotions = [
+                  {type: 'king', id:1},
+                  {type: 'queen', id:2},
+                  {type: 'rook', id:3},
+                  {type: 'bishop', id:4},
+                  {type: 'knight', id:5},
+                ]
+              }else{
+                this.promotions = [
+                  {type: 'queen', id:1},
+                  {type: 'rook', id:2},
+                  {type: 'bishop', id:3},
+                  {type: 'knight', id:4},
+                ]
+              }
+            }
+            //größenänderung für Promotionmodel berechnen und anpassen document.getobjectbyID...
             return true 
           }
         }
