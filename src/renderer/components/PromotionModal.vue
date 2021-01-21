@@ -1,14 +1,13 @@
 <template>
   <div
     class="prom-container"
-    @click="close(piece.type)"
   >
-    <li v-for="piece in promOptions"
-    :key="piece.id"
-    :class="[piece.type, side, pieceoption]"
+    <div v-for="(piece, index) in promOptions"
+    :key="piece.type"
+    :class="[piece.type, side, 'pieceoption', idtocss[index]]"
     @click="close(piece.type)"
     >
-    </li>
+    </div>
   </div>
 </template>
 
@@ -16,25 +15,43 @@
 export default {
   name: 'PromotionModal',
   props:{
-    promotions: {
+    promOptions: {
       type: Array,
+      default: () => ([
+        {type: 'king' },
+        {type: 'queen'},
+        {type: 'rook'},
+        {type: 'bishop'},
+        {type: 'knight'},
+      ])
     },
   },
   data () {
     return {
-      promDir: { 'queen':'q', 'rook': 'r', 'bishop':'b', 'knight':'n', 'pawn': 'p' , 'ppawn': 'p+'},
-      promOptions: this.promotions,
+      promDir: { 'queen':'q', 'rook': 'r', 'bishop':'b', 'knight':'n', 'pawn': 'p' , 'king': 'k'},
+      shogiPromDir: { 'pawn': '=', 'lance':'=', 'knight':'=', 'bishop':'=', 'silver':'=', 'rook':'=', 'ppawn':'+', 'plance': '+', 'pknight':'+', 'pbishop': '+', 'psilver': '+', 'prook':'+'},
+      idtocss: {
+        0: 'one',
+        1: 'two',
+        2: 'three',
+        3: 'four',
+        4: 'five',
+      }
     }
   },
   computed: {
     side () {
       return this.$store.getters.turn ? 'white' : 'black'
-    }
+    }, 
   },
   
   methods: {
     close (value) {
+      if(this.$store.getters.variant ==='shogi'){
+        this.$emit('close', this.shogiPromDir[value])
+      }else{
       this.$emit('close', this.promDir[value])
+      }
     }
   }
 }
@@ -43,8 +60,11 @@ export default {
 
 <style scoped>
    .pieceoption {
-    background-size: cover;
+    box-shadow: 0 0 10px black;
+    background-size: contain;
+    background-repeat: no-repeat;
     width: 100%;
+    height: 100%;
     background-color: white;
   }
   .pieceoption:hover {
@@ -52,9 +72,9 @@ export default {
   }
 
   .prom-container{
-    box-shadow: 0 0 10px black;
+   
     display: grid;
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 20%);
     height: 100%;
   }
   .prom-container:hover {
@@ -92,5 +112,19 @@ export default {
     background-image: url('../assets/images/pieces/merida/wB.svg');
     order: 4;
   }
-
+  .one{
+    grid-row-start: 1
+  }
+  .two{
+    grid-row-start: 2  
+  }
+  .three{
+    grid-row-start: 3 
+  }
+  .four{
+    grid-row-start: 4 
+    }
+  .five{
+    grid-row-start: 5 
+     }
 </style>

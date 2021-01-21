@@ -27,11 +27,12 @@
             v-if="isPromotionModalVisible && !isPast"
             id="PromotionModal"
             ref="promotion"
-            v-bind:promotions="promotions"
+            
             :style="promotionPosition"
           >
             <PromotionModal
               @close="closePromotionModal"
+              :promOptions="promotions"
             />
           </div>
         </div>
@@ -152,9 +153,8 @@ export default {
       shapes: [],
       pieceShapes: [],
       promotions: [],
-      promoteTo: 'q',
       isPromotionModalVisible: false,
-      uciMove: undefined
+      promotionMove: undefined,
     }
   },
   computed: {
@@ -173,8 +173,8 @@ export default {
       return this.$store.getters.legalMoves.split(' ')
     },
     promotionPosition () {
-      if (this.uciMove) {
-        const dest = this.uciMove.substring(2, 4)
+      if (this.promotionMove) {
+        const dest = this.promotionMove.substring(2, 4)
 
         let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5
 
@@ -338,15 +338,12 @@ export default {
   methods: {
     showPromotionModal () {
       this.isPromotionModalVisible = true
-      console.log(this.promotions)
-      document.dispatchEvent(new Event('renderPromotion'))
     },
     closePromotionModal (value) {
       this.isPromotionModalVisible = false
-      this.promoteTo = value
-      this.uciMove = this.uciMove + String(this.promoteTo)
-      this.lastMoveSan = this.$store.getters.sanMove(this.uciMove)
-      this.$store.dispatch('push', this.uciMove)
+      this.promotionMove = this.promotionMove + value
+      this.lastMoveSan = this.$store.getters.sanMove(this.promotionMove)
+      this.$store.dispatch('push', this.promotionMove)
       this.updateHand()
       this.afterMove()
     },
@@ -433,21 +430,58 @@ export default {
           if(this.legalMoves[i].includes(uciMove)){
             if(this.$store.getters.isInternational){
               if(this.variant === 'antichess'){
-                this.promotions = [
-                  {type: 'king', id:1},
-                  {type: 'queen', id:2},
-                  {type: 'rook', id:3},
-                  {type: 'bishop', id:4},
-                  {type: 'knight', id:5},
-                ]
+                 this.promotions= [
+                  {type: 'king'},
+                  {type: 'queen'},
+                  {type: 'rook'},
+                  {type: 'bishop'},
+                  {type: 'knight'},
+                 ]       
               }else{
+                  this.promotions= [
+                  {type: 'queen'},
+                  {type: 'rook'},
+                  {type: 'bishop'},
+                  {type: 'knight'},
+                  ]            
+              }
+            }
+            if(this.variant==='shogi'){
+              let key= uciMove.substring(2,4)
+              let type= this.board.state.pieces[key].role
+              if(type==='pawn'){
                 this.promotions = [
-                  {type: 'queen', id:1},
-                  {type: 'rook', id:2},
-                  {type: 'bishop', id:3},
-                  {type: 'knight', id:4},
+                  {type: 'pawn'},
+                  {type: 'ppawn'},
+                ]
+              }else if(type === 'lance'){
+                this.promotions = [
+                  {type: 'lance'},
+                  {type: 'plance'},
+                ]
+              }else if(type === 'knight'){
+                this.promotions = [
+                  {type: 'knight'},
+                  {type: 'pknight'},
+                ]
+              }else if(type === 'silver'){
+                this.promotions = [
+                  {type: 'silver'},
+                  {type: 'psilver'}
+                ]
+              }else if (type === 'bishop'){
+                this.promotions = [
+                  {type: 'bishop'},
+                  {type: 'pbishop'},              
+                ]
+              }else if (type === 'rook'){
+                this.promotions = [
+                  {type: 'rook'},
+                  {type: 'prook'}
                 ]
               }
+            
+              
             }
             //größenänderung für Promotionmodel berechnen und anpassen document.getobjectbyID...
             return true 
@@ -490,7 +524,7 @@ export default {
             let move = uciMove + 'm'
             this.$store.dispatch('push', move)
           }else{
-            this.uciMove = uciMove
+            this.promotionMove = uciMove
             this.showPromotionModal()
           }
         } else {
@@ -613,7 +647,7 @@ export default {
   position: absolute;
   z-index: 4;
   width: 12.5%;
-  height: 50%;
+  height: 62.5%;
 }
 .mirror {
   transform: scaleY(-1);
