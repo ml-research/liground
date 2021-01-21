@@ -153,6 +153,10 @@ if (process.env.NODE_ENV === 'production') {
           globOptions: {
             ignore: ['.*']
           }
+        },
+        {
+          from: path.join(__dirname, '../node_modules/ffish/ffish.wasm'),
+          to: path.join(__dirname, '../dist/electron/ffish.wasm')
         }
       ]
     }),
