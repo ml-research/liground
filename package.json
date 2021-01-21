@@ -17,46 +17,6 @@
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js"
   },
-  "build": {
-    "productName": "liground",
-    "appId": "com.example.yourapp",
-    "directories": {
-      "output": "build"
-    },
-    "files": [
-      "dist/electron/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "engines",
-        "to": "engines"
-      }
-    ],
-    "dmg": {
-      "contents": [
-        {
-          "x": 410,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        },
-        {
-          "x": 130,
-          "y": 150,
-          "type": "file"
-        }
-      ]
-    },
-    "mac": {
-      "icon": "build/icons/icon.icns"
-    },
-    "win": {
-      "icon": "build/icons/icon.ico"
-    },
-    "linux": {
-      "icon": "build/icons"
-    }
-  },
   "dependencies": {
     "apexcharts": "^3.22.3",
     "chessgroundx": "^7.6.42",
