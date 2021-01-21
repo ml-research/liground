@@ -104,6 +104,7 @@ export const store = new Vuex.Store({
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
+    startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
     legalMoves: '',
     destinations: {},
@@ -180,6 +181,9 @@ export const store = new Vuex.Store({
     },
     fen (state, payload) {
       state.fen = payload
+    },
+    startFen (state, payload) {
+      state.startFen = payload
     },
     lastFen (state, payload) {
       state.lastFen = payload
@@ -277,6 +281,7 @@ export const store = new Vuex.Store({
       state.turn = state.board.turn()
       state.legalMoves = state.board.legalMoves()
       state.lastFen = state.board.fen()
+      state.startFen = state.board.fen()
     },
     resetBoard (state, payload) {
       state.curVar960Fen = ''
@@ -356,14 +361,21 @@ export const store = new Vuex.Store({
       ipc.send(payload)
     },
     fen (context, payload) {
-      if (context.state.fen !== payload) {
-        context.commit('fen', payload)
-        context.dispatch('updateBoard')
-        context.dispatch('restartEngine')
+      if (ffish.validateFen(payload, this.state.variant) === 1) {
+        if (context.state.fen !== payload) {
+          context.commit('fen', payload)
+          context.dispatch('updateBoard')
+          context.dispatch('restartEngine')
+        }
+      } else {
+        console.log(`invalid fen: ${payload}`)
       }
     },
     lastFen (context, payload) {
       context.commit('lastFen', payload)
+    },
+    startFen (context, payload) {
+      context.commit('startFen', payload)
     },
     destinations (context, payload) {
       context.commit('destinations', payload)
@@ -548,6 +560,9 @@ export const store = new Vuex.Store({
     },
     lastFen (state) {
       return state.lastFen
+    },
+    startFen (state) {
+      return state.startFen
     },
     isPast (state, getters) {
       return state.fen !== getters.lastFen
