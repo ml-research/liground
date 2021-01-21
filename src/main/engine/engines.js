@@ -6,8 +6,8 @@ import path from 'path'
  */
 function resolveBinary (name) {
   return path.resolve(
-    process.env.NODE_ENV !== 'development' ? __static.replace('app.asar', 'app.asar.unpacked') : __static,
-    'bin',
+    process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
+    'engines',
     `${name}${process.platform === 'win32' ? '.exe' : ''}`
   )
 }
