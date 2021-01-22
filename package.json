@@ -1,6 +1,6 @@
 {
   "name": "liground",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Johannes Czech (johannes.czech@cs.tu-darmstadt.de)",
   "description": "A mordern Chess Variant Analysis GUI for the 21st century",
   "license": "AGPL-3.0",
