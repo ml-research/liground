@@ -198,7 +198,7 @@ p {
   background-color: #111;
   text-align: center;
   font-size: 12pt;
-  font-family: sans-serif;
+  font-family: 'NOTO CHESS', sans-serif;
   padding: 0px 0px 0px 0px;
   border-color: #222;
   border-width: 1px;
