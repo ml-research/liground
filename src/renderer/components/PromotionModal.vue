@@ -80,38 +80,6 @@ export default {
   .prom-container:hover {
     cursor: pointer;
   }
-  .promOptionB1 {
-    background-image: url('../assets/images/pieces/merida/bQ.svg');
-    order: 4;
-  }
-  .promOptionB2 {
-    background-image: url('../assets/images/pieces/merida/bN.svg');
-    order: 3;
-  }
-  .promOptionB3 {
-    background-image: url('../assets/images/pieces/merida/bR.svg');
-    order: 2;
-  }
-  .promOptionB4 {
-    background-image: url('../assets/images/pieces/merida/bB.svg');
-    order: 1;
-  }
-  .promOptionW1 {
-    background-image: url('../assets/images/pieces/merida/wQ.svg');
-    order: 1;
-  }
-  .promOptionW2 {
-    background-image: url('../assets/images/pieces/merida/wN.svg');
-    order: 2;
-  }
-  .promOptionW3 {
-    background-image: url('../assets/images/pieces/merida/wR.svg');
-    order: 3;
-  }
-  .promOptionW4 {
-    background-image: url('../assets/images/pieces/merida/wB.svg');
-    order: 4;
-  }
   .one{
     grid-row-start: 1
   }
