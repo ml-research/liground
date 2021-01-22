@@ -451,7 +451,8 @@ export default {
       }
     },
     changeTurn () {
-      return (orig, dest) => {
+      return (orig, dest, metadata) => {
+        this.playAudio(metadata.captured)
         let uciMove = orig + dest
         if (this.dimensionNumber === 3) {
           uciMove = this.increaseNumbers(uciMove)
@@ -466,6 +467,13 @@ export default {
           this.afterMove()
         }
       }
+    },
+    playAudio (data) { // Sounds from lichess https://github.com/ornicar/lila
+      let note = new Audio('/static/Move.mp3')
+      if (data !== undefined) {
+        note = new Audio('/static/Capture.mp3')
+      }
+      note.play()
     },
     updatePocket (pocket, pocketPieces, color) {
       for (let idx = 0; idx < pocketPieces.length; ++idx) {
