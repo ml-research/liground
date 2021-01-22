@@ -26,7 +26,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'ChessPocket',
   props: {
@@ -59,14 +58,6 @@ export default {
     },
     emptySlots: function () {
       return Math.max(8 - this.pieces.length, 0)
-    },
-    pieceStyle () {
-      return this.$store.getters.pieceStyle
-    }
-  },
-  watch: {
-    pieceStyle: function (pieceStyle) {
-      this.updatePieceCSS(pieceStyle)
     }
   },
   methods: {
@@ -77,29 +68,11 @@ export default {
       console.log(`pieceType: ${pieceType}`)
       console.log(`color: ${color}`)
       this.$emit('selection', event, pieceType, color)
-    },
-    updatePieceCSS (pieceStyle) {
-      const file = document.createElement('link')
-      file.rel = 'stylesheet'
-      if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/piece-css/international/' + pieceStyle + '.css'
-      }
-      if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/piece-css/sea/' + pieceStyle + '.css'
-      }
-      if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/piece-css/xiangqi/' + pieceStyle + '.css'
-      }
-      if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
-      }
-      document.head.appendChild(file)
     }
   }
 }
 </script>
 
-<!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
 .flipW {
   transform: scaleY(-1);

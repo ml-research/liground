@@ -27,9 +27,11 @@
             v-if="isPromotionModalVisible && !isPast"
             id="PromotionModal"
             ref="promotion"
+
             :style="promotionPosition"
           >
             <PromotionModal
+              :prom-options="promotions"
               @close="closePromotionModal"
             />
           </div>
@@ -151,9 +153,8 @@ export default {
       shapes: [],
       pieceShapes: [],
       promotions: [],
-      promoteTo: 'q',
       isPromotionModalVisible: false,
-      uciMove: undefined
+      promotionMove: undefined
     }
   },
   computed: {
@@ -172,8 +173,8 @@ export default {
       return this.$store.getters.legalMoves.split(' ')
     },
     promotionPosition () {
-      if (this.uciMove) {
-        const dest = this.uciMove.substring(2, 4)
+      if (this.promotionMove) {
+        const dest = this.promotionMove.substring(2, 4)
 
         let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5
 
@@ -333,18 +334,20 @@ export default {
       },
       orientation: this.orientation
     })
+
+    // set initial styles
+    this.updateBoardCSS(this.boardStyle)
+    this.updatePieceCSS(this.pieceStyle)
   },
   methods: {
     showPromotionModal () {
       this.isPromotionModalVisible = true
-      document.dispatchEvent(new Event('renderPromotion'))
     },
     closePromotionModal (value) {
       this.isPromotionModalVisible = false
-      this.promoteTo = value
-      this.uciMove = this.uciMove + String(this.promoteTo)
-      this.lastMoveSan = this.$store.getters.sanMove(this.uciMove)
-      this.$store.dispatch('push', this.uciMove)
+      this.promotionMove = this.promotionMove + value
+      this.lastMoveSan = this.$store.getters.sanMove(this.promotionMove)
+      this.$store.dispatch('push', this.promotionMove)
       this.updateHand()
       this.afterMove()
     },
@@ -352,16 +355,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/piece-css/international/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/international/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/piece-css/sea/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/sea/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/piece-css/xiangqi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -369,16 +372,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/board-css/international/' + boardStyle + '.css'
+        file.href = 'static/board-css/international/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+        file.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/board-css/sea/' + boardStyle + '.css'
+        file.href = 'static/board-css/sea/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/board-css/shogi/' + boardStyle + '.css'
+        file.href = 'static/board-css/shogi/' + boardStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -426,12 +429,72 @@ export default {
       return dests
     },
     isPromotion (uciMove) {
-      try {
-        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-      } catch (err) {
-        return true
+      for (let i = 0; i < this.legalMoves.length; i++) {
+        if (this.dimensionNumber === 3) {
+          return false
+        }
+        if (this.legalMoves[i].length === 5) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            return true
+          }
+        }
       }
       return false
+    },
+    setPromotionOptions (uciMove) {
+      if (this.$store.getters.isInternational) {
+        if (this.variant === 'antichess') {
+          this.promotions = [
+            { type: 'king' },
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        } else {
+          this.promotions = [
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        }
+      }
+      if (this.variant === 'shogi') {
+        const key = uciMove.substring(2, 4)
+        const type = this.board.state.pieces[key].role
+        if (type === 'pawn') {
+          this.promotions = [
+            { type: 'pawn' },
+            { type: 'ppawn' }
+          ]
+        } else if (type === 'lance') {
+          this.promotions = [
+            { type: 'lance' },
+            { type: 'plance' }
+          ]
+        } else if (type === 'knight') {
+          this.promotions = [
+            { type: 'knight' },
+            { type: 'pknight' }
+          ]
+        } else if (type === 'silver') {
+          this.promotions = [
+            { type: 'silver' },
+            { type: 'psilver' }
+          ]
+        } else if (type === 'bishop') {
+          this.promotions = [
+            { type: 'bishop' },
+            { type: 'pbishop' }
+          ]
+        } else if (type === 'rook') {
+          this.promotions = [
+            { type: 'rook' },
+            { type: 'prook' }
+          ]
+        }
+      }
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -457,8 +520,14 @@ export default {
           uciMove = this.increaseNumbers(uciMove)
         }
         if (this.isPromotion(uciMove)) {
-          this.uciMove = uciMove
-          this.showPromotionModal()
+          if (this.variant === 'makruk') {
+            const move = uciMove + 'm'
+            this.$store.dispatch('push', move)
+          } else {
+            this.setPromotionOptions(uciMove)
+            this.promotionMove = uciMove
+            this.showPromotionModal()
+          }
         } else {
           this.lastMoveSan = this.$store.getters.sanMove(uciMove)
           this.$store.dispatch('push', uciMove)
@@ -570,7 +639,6 @@ export default {
 
 <style>
 @import '../assets/chessground.css';
-@import '../assets/theme.css';
 @import '../assets/dim9x9.css';
 @import '../assets/dim8x8.css';
 @import '../assets/dim9x10.css';
@@ -579,7 +647,7 @@ export default {
   position: absolute;
   z-index: 4;
   width: 12.5%;
-  height: 50%;
+  height: 62.5%;
 }
 .mirror {
   transform: scaleY(-1);
@@ -630,7 +698,6 @@ coords {
   color: black;
 }
 .cg-board-wrap {
-  background-image: url('/src/renderer/assets/images/board/svg/blue.svg');
   position: relative;
 }
 .koth cg-container::before {
