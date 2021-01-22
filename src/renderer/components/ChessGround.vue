@@ -561,7 +561,7 @@ export default {
     },
     drawShapes () {
       if (this.board !== null) {
-        this.board.setShapes([...this.shapes, ...this.pieceShapes])
+        this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
       }
     }
   }
