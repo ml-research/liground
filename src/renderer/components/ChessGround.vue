@@ -426,73 +426,71 @@ export default {
     },
     isPromotion (uciMove) {
       for (let i = 0; i < this.legalMoves.length; i++) {
+        if (this.dimensionNumber === 3) {
+          return false
+        }
         if (this.legalMoves[i].length === 5) {
           if (this.legalMoves[i].includes(uciMove)) {
-            if (this.$store.getters.isInternational) {
-              if (this.variant === 'antichess') {
-                this.promotions = [
-                  { type: 'king' },
-                  { type: 'queen' },
-                  { type: 'rook' },
-                  { type: 'bishop' },
-                  { type: 'knight' }
-                ]
-              } else {
-                this.promotions = [
-                  { type: 'queen' },
-                  { type: 'rook' },
-                  { type: 'bishop' },
-                  { type: 'knight' }
-                ]
-              }
-            }
-            if (this.variant === 'shogi') {
-              const key = uciMove.substring(2, 4)
-              const type = this.board.state.pieces[key].role
-              if (type === 'pawn') {
-                this.promotions = [
-                  { type: 'pawn' },
-                  { type: 'ppawn' }
-                ]
-              } else if (type === 'lance') {
-                this.promotions = [
-                  { type: 'lance' },
-                  { type: 'plance' }
-                ]
-              } else if (type === 'knight') {
-                this.promotions = [
-                  { type: 'knight' },
-                  { type: 'pknight' }
-                ]
-              } else if (type === 'silver') {
-                this.promotions = [
-                  { type: 'silver' },
-                  { type: 'psilver' }
-                ]
-              } else if (type === 'bishop') {
-                this.promotions = [
-                  { type: 'bishop' },
-                  { type: 'pbishop' }
-                ]
-              } else if (type === 'rook') {
-                this.promotions = [
-                  { type: 'rook' },
-                  { type: 'prook' }
-                ]
-              }
-            }
-            // größenänderung für Promotionmodel berechnen und anpassen document.getobjectbyID...
             return true
           }
         }
       }
       return false
-      /* try {
-        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-      } catch (err) {
-        return true
+    },
+    setPromotionOptions (uciMove) {
+      if (this.$store.getters.isInternational) {
+        if (this.variant === 'antichess') {
+          this.promotions = [
+            { type: 'king' },
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        } else {
+          this.promotions = [
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        }
       }
-      return false */
+      if (this.variant === 'shogi') {
+        const key = uciMove.substring(2, 4)
+        const type = this.board.state.pieces[key].role
+        if (type === 'pawn') {
+          this.promotions = [
+            { type: 'pawn' },
+            { type: 'ppawn' }
+          ]
+        } else if (type === 'lance') {
+          this.promotions = [
+            { type: 'lance' },
+            { type: 'plance' }
+          ]
+        } else if (type === 'knight') {
+          this.promotions = [
+            { type: 'knight' },
+            { type: 'pknight' }
+          ]
+        } else if (type === 'silver') {
+          this.promotions = [
+            { type: 'silver' },
+            { type: 'psilver' }
+          ]
+        } else if (type === 'bishop') {
+          this.promotions = [
+            { type: 'bishop' },
+            { type: 'pbishop' }
+          ]
+        } else if (type === 'rook') {
+          this.promotions = [
+            { type: 'rook' },
+            { type: 'prook' }
+          ]
+        }
+      }
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -522,6 +520,7 @@ export default {
             const move = uciMove + 'm'
             this.$store.dispatch('push', move)
           } else {
+            this.setPromotionOptions(uciMove)
             this.promotionMove = uciMove
             this.showPromotionModal()
           }
