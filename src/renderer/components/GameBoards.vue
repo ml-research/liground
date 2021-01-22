@@ -105,14 +105,13 @@ export default {
     fen () {
       return this.$store.getters.fen
     },
-    currentMove () { // this returns the current half-move or -1 at the start of the game
-      const fen = this.$store.getters.fen
-      for (const move of this.moves) {
-        if (move.fen === fen) {
-          return move.ply - 1
+    currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
+          return this.moves[num]
         }
       }
-      return -1
+      return undefined
     }
   },
   beforeCreate () {
@@ -142,7 +141,7 @@ export default {
     }, false)
   },
   methods: {
-    scroll (event) { // also moves back and forth when being slightly next to the board and for example over the pockets
+    scroll (event) { // TODO: also moves back and forth when being slightly next to the board and for example over the pockets
       if (event.deltaY < 0) {
         this.moveBackOne()
       } else {
@@ -155,38 +154,37 @@ export default {
       this.$store.dispatch('fen', startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
-      if (this.currentMove >= this.moves.length - 1) {
+      const mov = this.currentMove
+      if (mov && mov.ply >= this.moves.length - 1) {
         return
       }
       this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
     },
     moveBackOne () { // this method moves back one move in the current line
-      const num = this.currentMove
-      if (num === -1) {
+      const mov = this.currentMove
+      if (!mov) {
         return
       }
-      if (num === 0) {
+      if (mov.ply === 1) {
         const board = new ffish.Board(this.variant)
         const startFen = board.fen()
         this.$store.dispatch('fen', startFen)
         return
       }
-      this.$store.dispatch('fen', this.moves[num - 1].fen)
+      this.$store.dispatch('fen', mov.prev.fen)
     },
     moveForwardOne () { // this method moves forward one move in the current line
-      const num = this.currentMove
-      if (num >= this.moves.length - 1) {
+      const mov = this.currentMove
+      if (!mov) {
+        if (this.moves) {
+          this.$store.dispatch('fen', this.moves[0].fen)
+        }
         return
       }
-      if (num === -1) {
-        this.$store.dispatch('fen', this.moves[0].fen)
+      if (!mov.main) {
         return
       }
-      if (num === 0) {
-        this.$store.dispatch('fen', this.moves[1].fen)
-        return
-      }
-      this.$store.dispatch('fen', this.moves[num + 1].fen)
+      this.$store.dispatch('fen', mov.main.fen)
     },
     flipBoard () {
       if (this.variant === 'racingkings') {

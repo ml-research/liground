@@ -11,18 +11,18 @@
     <div class="game-window panel noselect">
       <div
         v-for="move in moves"
-        :key="move.ply"
+        :key="move.fen"
       >
         <div class="move-field">
           <div
-            v-if="move.ply % 2 == 1"
+            v-if="move.ply % 2 == 1 "
             class="float-left-child move-number"
           >
             {{ (move.ply+1) / 2 }}.
           </div>
           <div
             class="float-left-child move-name"
-            :class="{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}"
+            :class="{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen, alternate: !move.prev || move.prev.main !== move.uci}"
             @click="updateBoard(move)"
           >
             {{ move.name }}
@@ -124,6 +124,7 @@ export default {
   methods: {
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
+      console.log(move)
     },
     onKeyup (event) {
       if (event.key === 'Enter') {
@@ -235,6 +236,9 @@ p {
 .move-name {
   margin-right: 4px;
   pointer-events: auto;
+}
+.alternate {
+  background-color: #2196F3;
 }
 .processing-bar {
   height: 5px;
