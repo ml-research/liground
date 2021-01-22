@@ -334,6 +334,10 @@ export default {
       },
       orientation: this.orientation
     })
+
+    // set initial styles
+    this.updateBoardCSS(this.boardStyle)
+    this.updatePieceCSS(this.pieceStyle)
   },
   methods: {
     showPromotionModal () {
@@ -351,16 +355,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/piece-css/international/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/international/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/piece-css/sea/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/sea/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/piece-css/xiangqi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -368,16 +372,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/board-css/international/' + boardStyle + '.css'
+        file.href = 'static/board-css/international/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+        file.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/board-css/sea/' + boardStyle + '.css'
+        file.href = 'static/board-css/sea/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/board-css/shogi/' + boardStyle + '.css'
+        file.href = 'static/board-css/shogi/' + boardStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -635,7 +639,6 @@ export default {
 
 <style>
 @import '../assets/chessground.css';
-@import '../assets/theme.css';
 @import '../assets/dim9x9.css';
 @import '../assets/dim8x8.css';
 @import '../assets/dim9x10.css';
@@ -695,7 +698,6 @@ coords {
   color: black;
 }
 .cg-board-wrap {
-  background-image: url('/src/renderer/assets/images/board/svg/blue.svg');
   position: relative;
 }
 .koth cg-container::before {
