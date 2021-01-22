@@ -2,55 +2,55 @@
   <div
     class="prom-container"
   >
-    <div v-for="(piece, index) in promOptions"
-    :key="piece.type"
-    :class="[piece.type, side, 'pieceoption', idtocss[index]]"
-    @click="close(piece.type)"
-    >
-    </div>
+    <div
+      v-for="(piece, index) in promOptions"
+      :key="piece.type"
+      :class="[piece.type, side, 'pieceoption', idtocss[index]]"
+      @click="close(piece.type)"
+    />
   </div>
 </template>
 
 <script>
 export default {
   name: 'PromotionModal',
-  props:{
+  props: {
     promOptions: {
       type: Array,
       default: () => ([
-        {type: 'king' },
-        {type: 'queen'},
-        {type: 'rook'},
-        {type: 'bishop'},
-        {type: 'knight'},
+        { type: 'king' },
+        { type: 'queen' },
+        { type: 'rook' },
+        { type: 'bishop' },
+        { type: 'knight' }
       ])
-    },
+    }
   },
   data () {
     return {
-      promDir: { 'queen':'q', 'rook': 'r', 'bishop':'b', 'knight':'n', 'pawn': 'p' , 'king': 'k'},
-      shogiPromDir: { 'pawn': '=', 'lance':'=', 'knight':'=', 'bishop':'=', 'silver':'=', 'rook':'=', 'ppawn':'+', 'plance': '+', 'pknight':'+', 'pbishop': '+', 'psilver': '+', 'prook':'+'},
+      promDir: { queen: 'q', rook: 'r', bishop: 'b', knight: 'n', pawn: 'p', king: 'k' },
+      shogiPromDir: { pawn: '=', lance: '=', knight: '=', bishop: '=', silver: '=', rook: '=', ppawn: '+', plance: '+', pknight: '+', pbishop: '+', psilver: '+', prook: '+' },
       idtocss: {
         0: 'one',
         1: 'two',
         2: 'three',
         3: 'four',
-        4: 'five',
+        4: 'five'
       }
     }
   },
   computed: {
     side () {
       return this.$store.getters.turn ? 'white' : 'black'
-    }, 
+    }
   },
-  
+
   methods: {
     close (value) {
-      if(this.$store.getters.variant ==='shogi'){
+      if (this.$store.getters.variant === 'shogi') {
         this.$emit('close', this.shogiPromDir[value])
-      }else{
-      this.$emit('close', this.promDir[value])
+      } else {
+        this.$emit('close', this.promDir[value])
       }
     }
   }
@@ -72,7 +72,7 @@ export default {
   }
 
   .prom-container{
-   
+
     display: grid;
     grid-template-rows: repeat(5, 20%);
     height: 100%;
@@ -116,15 +116,15 @@ export default {
     grid-row-start: 1
   }
   .two{
-    grid-row-start: 2  
+    grid-row-start: 2
   }
   .three{
-    grid-row-start: 3 
+    grid-row-start: 3
   }
   .four{
-    grid-row-start: 4 
+    grid-row-start: 4
     }
   .five{
-    grid-row-start: 5 
+    grid-row-start: 5
      }
 </style>

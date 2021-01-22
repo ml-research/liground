@@ -27,12 +27,12 @@
             v-if="isPromotionModalVisible && !isPast"
             id="PromotionModal"
             ref="promotion"
-            
+
             :style="promotionPosition"
           >
             <PromotionModal
+              :prom-options="promotions"
               @close="closePromotionModal"
-              :promOptions="promotions"
             />
           </div>
         </div>
@@ -154,7 +154,7 @@ export default {
       pieceShapes: [],
       promotions: [],
       isPromotionModalVisible: false,
-      promotionMove: undefined,
+      promotionMove: undefined
     }
   },
   computed: {
@@ -425,76 +425,74 @@ export default {
       return dests
     },
     isPromotion (uciMove) {
-      for(let i = 0; i < this.legalMoves.length; i++){
-        if(this.legalMoves[i].length === 5){
-          if(this.legalMoves[i].includes(uciMove)){
-            if(this.$store.getters.isInternational){
-              if(this.variant === 'antichess'){
-                 this.promotions= [
-                  {type: 'king'},
-                  {type: 'queen'},
-                  {type: 'rook'},
-                  {type: 'bishop'},
-                  {type: 'knight'},
-                 ]       
-              }else{
-                  this.promotions= [
-                  {type: 'queen'},
-                  {type: 'rook'},
-                  {type: 'bishop'},
-                  {type: 'knight'},
-                  ]            
-              }
-            }
-            if(this.variant==='shogi'){
-              let key= uciMove.substring(2,4)
-              let type= this.board.state.pieces[key].role
-              if(type==='pawn'){
+      for (let i = 0; i < this.legalMoves.length; i++) {
+        if (this.legalMoves[i].length === 5) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            if (this.$store.getters.isInternational) {
+              if (this.variant === 'antichess') {
                 this.promotions = [
-                  {type: 'pawn'},
-                  {type: 'ppawn'},
+                  { type: 'king' },
+                  { type: 'queen' },
+                  { type: 'rook' },
+                  { type: 'bishop' },
+                  { type: 'knight' }
                 ]
-              }else if(type === 'lance'){
+              } else {
                 this.promotions = [
-                  {type: 'lance'},
-                  {type: 'plance'},
-                ]
-              }else if(type === 'knight'){
-                this.promotions = [
-                  {type: 'knight'},
-                  {type: 'pknight'},
-                ]
-              }else if(type === 'silver'){
-                this.promotions = [
-                  {type: 'silver'},
-                  {type: 'psilver'}
-                ]
-              }else if (type === 'bishop'){
-                this.promotions = [
-                  {type: 'bishop'},
-                  {type: 'pbishop'},              
-                ]
-              }else if (type === 'rook'){
-                this.promotions = [
-                  {type: 'rook'},
-                  {type: 'prook'}
+                  { type: 'queen' },
+                  { type: 'rook' },
+                  { type: 'bishop' },
+                  { type: 'knight' }
                 ]
               }
-            
-              
             }
-            //größenänderung für Promotionmodel berechnen und anpassen document.getobjectbyID...
-            return true 
+            if (this.variant === 'shogi') {
+              const key = uciMove.substring(2, 4)
+              const type = this.board.state.pieces[key].role
+              if (type === 'pawn') {
+                this.promotions = [
+                  { type: 'pawn' },
+                  { type: 'ppawn' }
+                ]
+              } else if (type === 'lance') {
+                this.promotions = [
+                  { type: 'lance' },
+                  { type: 'plance' }
+                ]
+              } else if (type === 'knight') {
+                this.promotions = [
+                  { type: 'knight' },
+                  { type: 'pknight' }
+                ]
+              } else if (type === 'silver') {
+                this.promotions = [
+                  { type: 'silver' },
+                  { type: 'psilver' }
+                ]
+              } else if (type === 'bishop') {
+                this.promotions = [
+                  { type: 'bishop' },
+                  { type: 'pbishop' }
+                ]
+              } else if (type === 'rook') {
+                this.promotions = [
+                  { type: 'rook' },
+                  { type: 'prook' }
+                ]
+              }
+            }
+            // größenänderung für Promotionmodel berechnen und anpassen document.getobjectbyID...
+            return true
           }
         }
       }
-      return false 
-      /*try {
+      return false
+      /* try {
         this.lastMoveSan = this.$store.getters.sanMove(uciMove)
       } catch (err) {
         return true
       }
-      return false*/
+      return false */
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -520,10 +518,10 @@ export default {
           uciMove = this.increaseNumbers(uciMove)
         }
         if (this.isPromotion(uciMove)) {
-          if(this.variant === 'makruk'){
-            let move = uciMove + 'm'
+          if (this.variant === 'makruk') {
+            const move = uciMove + 'm'
             this.$store.dispatch('push', move)
-          }else{
+          } else {
             this.promotionMove = uciMove
             this.showPromotionModal()
           }
