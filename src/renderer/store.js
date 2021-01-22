@@ -172,15 +172,6 @@ export const store = new Vuex.Store({
     curVar960Fen: '',
     viewAnalysis: true
   },
-  methods: {
-    playAudio (move) { // Sounds from lichess https://github.com/ornicar/lila
-      let note = new Audio('/static/Move.mp3')
-      if (move.toString().includes('x')) {
-        note = new Audio('/static/Capture.mp3')
-      }
-      note.play()
-    }
-  },
   mutations: { // sync
     curVar960Fen (state, payload) {
       state.curVar960Fen = payload
@@ -303,10 +294,17 @@ export const store = new Vuex.Store({
         const sanMove = state.board.sanMove(curVal)
         state.board.push(curVal)
         console.log('sanMove: ' + sanMove)
-        this.playAudio(sanMove)
+        this.commit('playAudio', sanMove)
         return { ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false) }
       }))
       state.lastFen = state.board.fen()
+    },
+    playAudio (state, move) { // Sounds from lichess https://github.com/ornicar/lila
+      let note = new Audio('/static/audio/Move.mp3')
+      if (move.toString().includes('x')) {
+        note = new Audio('/static/audio/Capture.mp3')
+      }
+      note.play()
     },
     gameInfo (state, payload) {
       state.gameInfo = payload
