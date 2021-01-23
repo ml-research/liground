@@ -459,6 +459,16 @@ export default {
       if (this.variant === 'shogi') {
         const key = uciMove.substring(2, 4)
         const type = this.board.state.pieces[key].role
+        let num = 0
+        let promo = false
+        for(let i = 0; i<this.legalMoves.length; i++){
+          if(this.legalMoves[i].includes(uciMove)){
+            num = num + 1
+            if(this.legalMoves[i].includes('+')){
+              promo = true 
+            }
+          }
+        }
         if (type === 'pawn') {
           this.promotions = [
             { type: 'pawn' },
@@ -489,6 +499,9 @@ export default {
             { type: 'rook' },
             { type: 'prook' }
           ]
+        }
+        if(num == 1 && promo){
+          this.promotions = [this.promotions[1]]
         }
       }
     },
