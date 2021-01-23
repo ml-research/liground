@@ -182,7 +182,7 @@ export default {
           left = 87.5 - left
         }
 
-        const vertical = this.turn === this.orientation ? 0 : (7 - 3) * 12.5
+        const vertical = this.turn === this.orientation ? 0 : (8 - this.promotions.length) * 12.5
         return { left: `${left}%`, top: `${vertical}%` }
       } else {
         return undefined
@@ -468,6 +468,16 @@ export default {
       if (this.variant === 'shogi') {
         const key = uciMove.substring(2, 4)
         const type = this.board.state.pieces[key].role
+        let num = 0
+        let promo = false
+        for (let i = 0; i < this.legalMoves.length; i++) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            num = num + 1
+            if (this.legalMoves[i].includes('+')) {
+              promo = true
+            }
+          }
+        }
         if (type === 'pawn') {
           this.promotions = [
             { type: 'pawn' },
@@ -498,6 +508,9 @@ export default {
             { type: 'rook' },
             { type: 'prook' }
           ]
+        }
+        if (num === 1 && promo) {
+          this.promotions = [this.promotions[1]]
         }
       }
     },
