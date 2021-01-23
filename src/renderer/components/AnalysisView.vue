@@ -38,25 +38,6 @@
       @move-to-end="$emit('move-to-end',0)"
     />
     <game-info id="gameinfo" />
-    <div
-      id="textarea"
-      class="console-log"
-    >
-      <p
-        v-for="line in stdIO"
-        :key="line.type"
-      >
-        {{ line }}
-      </p>
-    </div>
-    <input
-      id="lname"
-      v-model="cmd"
-      type="text"
-      name="lname"
-      size="60"
-      @keyup="onKeyup"
-    >
   </div>
 </template>
 
