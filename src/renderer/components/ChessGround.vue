@@ -182,7 +182,7 @@ export default {
           left = 87.5 - left
         }
 
-        const vertical = this.turn === this.orientation ? 0 : (7 - 3) * 12.5
+        const vertical = this.turn === this.orientation ? 0 : (8 - this.promotions.length) * 12.5
         return { left: `${left}%`, top: `${vertical}%` }
       } else {
         return undefined
