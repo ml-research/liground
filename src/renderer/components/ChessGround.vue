@@ -470,11 +470,11 @@ export default {
         const type = this.board.state.pieces[key].role
         let num = 0
         let promo = false
-        for(let i = 0; i<this.legalMoves.length; i++){
-          if(this.legalMoves[i].includes(uciMove)){
+        for (let i = 0; i < this.legalMoves.length; i++) {
+          if (this.legalMoves[i].includes(uciMove)) {
             num = num + 1
-            if(this.legalMoves[i].includes('+')){
-              promo = true 
+            if (this.legalMoves[i].includes('+')) {
+              promo = true
             }
           }
         }
@@ -509,7 +509,7 @@ export default {
             { type: 'prook' }
           ]
         }
-        if(num == 1 && promo){
+        if (num === 1 && promo) {
           this.promotions = [this.promotions[1]]
         }
       }
