@@ -490,7 +490,7 @@ export const store = new Vuex.Store({
     loadedGames (context, payload) {
       context.commit('loadedGames', payload)
     },
-    loadGame (context, payload) {
+    async loadGame (context, payload) {
       let variant = payload.game.headers('Variant').toLowerCase()
 
       if (variant === '') { // if no variant is given we assume it to be standard chess
@@ -502,18 +502,15 @@ export const store = new Vuex.Store({
         return
       }
 
-      const board = new ffish.Board(variant)
       const gameInfo = {}
       for (const curVal of payload.game.headerKeys().split(' ')) {
         gameInfo[curVal] = payload.game.headers(curVal)
       }
 
       context.commit('selectedGame', payload.game)
-      context.dispatch('variant', variant)
-      context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
+      await context.dispatch('variant', variant)
       context.dispatch('push', payload.game.mainlineMoves())
-      context.dispatch('updateBoard')
     },
     increment (context, payload) {
       context.commit('increment', payload)
