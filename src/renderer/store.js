@@ -118,7 +118,7 @@ export const store = new Vuex.Store({
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
-      Shogi: 'shogi',
+      // Shogi: 'shogi',
       Janggi: 'janggi',
       Xiangqi: 'xiangqi'
 
@@ -361,14 +361,10 @@ export const store = new Vuex.Store({
       ipc.send(payload)
     },
     fen (context, payload) {
-      if (ffish.validateFen(payload, this.state.variant) === 1) {
-        if (context.state.fen !== payload) {
-          context.commit('fen', payload)
-          context.dispatch('updateBoard')
-          context.dispatch('restartEngine')
-        }
-      } else {
-        console.log(`invalid fen: ${payload}`)
+      if (context.state.fen !== payload) {
+        context.commit('fen', payload)
+        context.dispatch('updateBoard')
+        context.dispatch('restartEngine')
       }
     },
     lastFen (context, payload) {
