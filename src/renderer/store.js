@@ -118,7 +118,7 @@ export const store = new Vuex.Store({
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
-      // Shogi: 'shogi',
+      Shogi: 'shogi',
       Janggi: 'janggi',
       Xiangqi: 'xiangqi'
 
