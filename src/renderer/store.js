@@ -293,7 +293,6 @@ export const store = new Vuex.Store({
       state.moves = state.moves.concat(payload.map((curVal, idx, arr) => {
         const sanMove = state.board.sanMove(curVal)
         state.board.push(curVal)
-        console.log('sanMove: ' + sanMove)
         this.commit('playAudio', sanMove)
         return { ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false) }
       }))
