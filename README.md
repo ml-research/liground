@@ -22,9 +22,9 @@ npm run lint
 
 ### Post-Installation Actions
 
-* [Download](https://github.com/ddugovic/Stockfish/releases) a binary of _Multi-Variant-Stockfish_ or build it from scratch.
+* [Download](https://github.com/ianfab/Fairy-Stockfish/releases/) a **largeboard** binary of _Fairy-Stockfish_ or build it from scratch.
 
-* Rename the _Multi-Variant-Stockfish_ binary to `stockfish` and move it to `./engines/`.
+* Rename the _Fairy-Stockfish_ binary to `stockfish` and move it to `./engines/`.
 
 ### Libraries
 
