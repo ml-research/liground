@@ -465,6 +465,7 @@ export default {
           this.$store.dispatch('push', { move: uciMove, prev: prevMov })
           this.updateHand()
           this.afterMove()
+          console.log(this.turn)
         }
       }
     },

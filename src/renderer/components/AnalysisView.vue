@@ -10,19 +10,30 @@
     <PVLines class="panel" />
     <div class="game-window panel noselect">
       <div
-        v-for="move in moves"
+        v-for="move in orderedMoves"
         :key="move.fen"
       >
-        <div class="move-field">
+        <div
+          class="move-field"
+        >
           <div
             v-if="move.ply % 2 == 1 "
             class="float-left-child move-number"
+            :class="{
+              onlyMain: move.prev && move.prev.next.length == 1,
+              mainAlt: move.prev && move.prev.next.length > 1 && move.prev.main === move,
+              otherAlt: move.prev && move.prev.next.length > 1 && move.prev.main !== move
+            }"
           >
             {{ (move.ply+1) / 2 }}.
           </div>
           <div
             class="float-left-child move-name"
-            :class="{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen, alternate: !move.prev || move.prev.main !== move.uci}"
+            :class="{
+              active : move.active, onlyMain: move.prev && move.prev.next.length == 1,
+              mainAlt: move.prev && move.prev.next.length > 1 && move.prev.main === move,
+              otherAlt: move.prev && move.prev.next.length > 1 && move.prev.main !== move
+            }"
             @click="updateBoard(move)"
           >
             {{ move.name }}
@@ -67,6 +78,7 @@ import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
 import GameInfo from './GameInfo.vue'
+const _ = require('lodash')
 
 export default {
   name: 'AnalysisView',
@@ -85,6 +97,25 @@ export default {
     }
   },
   computed: {
+    orderedMoves () {
+      let result = []
+      const moves = this.moves
+      if (this.moves.length === 0) {
+        return result
+      } else {
+        for (const num in moves) {
+          let move = moves[num]
+          if (!result.includes(move)) {
+            console.log(move)
+            result.push(move)
+            if (move) {
+              result.push(move)
+            }
+          }
+        }
+      }
+      return result
+    },
     active () {
       return this.$store.getters.active
     },
@@ -122,8 +153,26 @@ export default {
     }
   },
   methods: {
+    recursiveHelper (move) {
+      let result = []
+      if (!move.main) {
+      } else if (move.next.length === 1) {
+        result.push(this.recursiveHelper(move.main))
+      } else {
+        for (const alt in move.next) {
+          result.push(this.recursiveHelper(move.next[alt]))
+        }
+      }
+    },
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
+      for (const num in this.moves) {
+        if (this.moves[num].active) {
+          this.moves[num].active = false
+          break
+        }
+      }
+      move.active = true
       console.log(move)
     },
     onKeyup (event) {
@@ -137,6 +186,15 @@ export default {
 </script>
 
 <style scoped>
+.onlyMain {
+  background-color: #6ca040;
+}
+.mainAlt {
+  background-color: antiquewhite;
+}
+.otherAlt {
+  background-color: #2196F3;
+}
 input {
   font-size: 11pt;
 }

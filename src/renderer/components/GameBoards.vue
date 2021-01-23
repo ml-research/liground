@@ -148,12 +148,25 @@ export default {
         this.moveForwardOne()
       }
     },
+    updateActive (move) {
+      for (const num in this.moves) {
+        if (this.moves[num].active) {
+          this.moves[num].active = false
+          break
+        }
+      }
+      if (move) {
+        move.active = true
+      }
+    },
     moveToStart () { // this method returns to the starting point of the current line
+      this.updateActive(undefined)
       const board = new ffish.Board(this.variant)
       const startFen = board.fen()
       this.$store.dispatch('fen', startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
+      this.updateActive(undefined)
       const mov = this.currentMove
       if (mov && mov.ply >= this.moves.length - 1) {
         return
@@ -166,18 +179,21 @@ export default {
         return
       }
       if (mov.ply === 1) {
+        this.updateActive(undefined)
         const board = new ffish.Board(this.variant)
         const startFen = board.fen()
         this.$store.dispatch('fen', startFen)
         return
       }
       this.$store.dispatch('fen', mov.prev.fen)
+      this.updateActive(mov.prev)
     },
     moveForwardOne () { // this method moves forward one move in the current line
       const mov = this.currentMove
       if (!mov) {
         if (this.moves) {
           this.$store.dispatch('fen', this.moves[0].fen)
+          this.updateActive(this.moves[0])
         }
         return
       }
@@ -185,6 +201,11 @@ export default {
         return
       }
       this.$store.dispatch('fen', mov.main.fen)
+      if (!mov.main.main) {
+        this.updateActive(undefined)
+      } else {
+        this.updateActive(mov.main)
+      }
     },
     flipBoard () {
       if (this.variant === 'racingkings') {
