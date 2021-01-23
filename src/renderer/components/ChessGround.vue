@@ -216,10 +216,15 @@ export default {
       for (const [i, pvline] of multipv.entries()) {
         if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
           const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
-          const move = pvline.ucimove
-          const orig = move.substring(0, 2)
-          const dest = move.substring(2, 4)
+          let move = pvline.ucimove
+          let orig = move.substring(0, 2)
+          let dest = move.substring(2, 4)
           let drawShape
+          if (this.dimensionNumber === 3) {
+            move = this.lowerNumbers(move)
+            orig = move.substring(0, 2)
+            dest = move.substring(2, 4)
+          }
 
           if (move.includes('@')) {
             const pieceType = move[0].toLowerCase()
@@ -399,9 +404,9 @@ export default {
       return ret
     },
     lowerNumbers (move) {
-      const letters = move.split(/(\d+)/)
-      letters[1] = String(parseInt(letters[1]) - 1)
-      letters[3] = String(parseInt(letters[3]) - 1)
+      const letters = move.split(/(\D)/)
+      letters[2] = String(parseInt(letters[2]) - 1)
+      letters[4] = String(parseInt(letters[4]) - 1)
       const ret = letters.join('')
       return ret
     },
