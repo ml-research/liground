@@ -397,7 +397,9 @@ export const store = new Vuex.Store({
           context.commit('newBoard', { is960: false, fen: '' })
         }
         context.dispatch('resetEngineData')
-        ipc.send(`setoption name UCI_Variant value ${payload}`)
+        context.dispatch('setEngineOptions', {
+          UCI_Variant: payload
+        })
       }
     },
     set960 (context, payload) {

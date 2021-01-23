@@ -19,7 +19,7 @@ const { VueLoaderPlugin } = require('vue-loader')
  * that provide pure *.vue files that need compiling
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
-let whiteListedModules = ['vue', 'ffish', 'ffish-es6', 'module', 'vm']
+let whiteListedModules = ['vue', 'ffish', 'module', 'vm']
 
 let rendererConfig = {
   devtool: 'eval-cheap-module-source-map',
@@ -153,6 +153,10 @@ if (process.env.NODE_ENV === 'production') {
           globOptions: {
             ignore: ['.*']
           }
+        },
+        {
+          from: path.join(__dirname, '../node_modules/ffish/ffish.wasm'),
+          to: path.join(__dirname, '../dist/electron/ffish.wasm')
         }
       ]
     }),
