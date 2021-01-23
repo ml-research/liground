@@ -401,12 +401,9 @@ export default {
       return ret
     },
     lowerNumbers (move) {
-      console.log('move: ' + move)
       const letters = move.split(/(\D)/)
-      console.log(letters)
       letters[2] = String(parseInt(letters[2]) - 1)
       letters[4] = String(parseInt(letters[4]) - 1)
-      console.log(letters)
       const ret = letters.join('')
       return ret
     },
