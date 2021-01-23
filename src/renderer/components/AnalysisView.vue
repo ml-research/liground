@@ -131,7 +131,7 @@ input {
 .panel {
   border-radius: 3px 3px 3px 3px;
   border: 1px solid #888;
-  font-family: 'Noto Chess', sans-serif;
+  font-family: sans-serif;
   font-weight: 200;
 }
 .panel + .panel {
