@@ -104,6 +104,7 @@ export const store = new Vuex.Store({
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
+    startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
     legalMoves: '',
     destinations: {},
@@ -117,7 +118,7 @@ export const store = new Vuex.Store({
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
-      Shogi: 'shogi',
+      // Shogi: 'shogi',
       Janggi: 'janggi',
       Xiangqi: 'xiangqi'
 
@@ -180,6 +181,9 @@ export const store = new Vuex.Store({
     },
     fen (state, payload) {
       state.fen = payload
+    },
+    startFen (state, payload) {
+      state.startFen = payload
     },
     lastFen (state, payload) {
       state.lastFen = payload
@@ -277,6 +281,7 @@ export const store = new Vuex.Store({
       state.turn = state.board.turn()
       state.legalMoves = state.board.legalMoves()
       state.lastFen = state.board.fen()
+      state.startFen = state.board.fen()
     },
     resetBoard (state, payload) {
       state.curVar960Fen = ''
@@ -365,6 +370,9 @@ export const store = new Vuex.Store({
     lastFen (context, payload) {
       context.commit('lastFen', payload)
     },
+    startFen (context, payload) {
+      context.commit('startFen', payload)
+    },
     destinations (context, payload) {
       context.commit('destinations', payload)
     },
@@ -389,7 +397,9 @@ export const store = new Vuex.Store({
           context.commit('newBoard', { is960: false, fen: '' })
         }
         context.dispatch('resetEngineData')
-        ipc.send(`setoption name UCI_Variant value ${payload}`)
+        context.dispatch('setEngineOptions', {
+          UCI_Variant: payload
+        })
       }
     },
     set960 (context, payload) {
@@ -548,6 +558,9 @@ export const store = new Vuex.Store({
     },
     lastFen (state) {
       return state.lastFen
+    },
+    startFen (state) {
+      return state.startFen
     },
     isPast (state, getters) {
       return state.fen !== getters.lastFen
@@ -711,8 +724,8 @@ ffish.onRuntimeInitialized = () => {
 }
 
 (async () => {
-  ipc.on('output', line => store.dispatch('stdIO', line))
-  ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
+  // ipc.on('output', line => store.dispatch('stdIO', line))
+  // ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
   ipc.on('info', info => store.dispatch('updateMultiPV', info))
   store.commit('engineInfo', await ipc.runEngine())
   store.dispatch('initEngineOptions')

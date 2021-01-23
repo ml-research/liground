@@ -216,10 +216,15 @@ export default {
       for (const [i, pvline] of multipv.entries()) {
         if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
           const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
-          const move = pvline.ucimove
-          const orig = move.substring(0, 2)
-          const dest = move.substring(2, 4)
+          let move = pvline.ucimove
+          let orig = move.substring(0, 2)
+          let dest = move.substring(2, 4)
           let drawShape
+          if (this.dimensionNumber === 3) {
+            move = this.lowerNumbers(move)
+            orig = move.substring(0, 2)
+            dest = move.substring(2, 4)
+          }
 
           if (move.includes('@')) {
             const pieceType = move[0].toLowerCase()
@@ -334,6 +339,10 @@ export default {
       },
       orientation: this.orientation
     })
+
+    // set initial styles
+    this.updateBoardCSS(this.boardStyle)
+    this.updatePieceCSS(this.pieceStyle)
   },
   methods: {
     showPromotionModal () {
@@ -351,16 +360,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/piece-css/international/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/international/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/piece-css/sea/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/sea/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/piece-css/xiangqi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -368,16 +377,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/board-css/international/' + boardStyle + '.css'
+        file.href = 'static/board-css/international/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+        file.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/board-css/sea/' + boardStyle + '.css'
+        file.href = 'static/board-css/sea/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/board-css/shogi/' + boardStyle + '.css'
+        file.href = 'static/board-css/shogi/' + boardStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -395,9 +404,9 @@ export default {
       return ret
     },
     lowerNumbers (move) {
-      const letters = move.split(/(\d+)/)
-      letters[1] = String(parseInt(letters[1]) - 1)
-      letters[3] = String(parseInt(letters[3]) - 1)
+      const letters = move.split(/(\D)/)
+      letters[2] = String(parseInt(letters[2]) - 1)
+      letters[4] = String(parseInt(letters[4]) - 1)
       const ret = letters.join('')
       return ret
     },
@@ -639,7 +648,7 @@ export default {
     },
     drawShapes () {
       if (this.board !== null) {
-        this.board.setShapes([...this.shapes, ...this.pieceShapes])
+        this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
       }
     }
   }
@@ -648,7 +657,6 @@ export default {
 
 <style>
 @import '../assets/chessground.css';
-@import '../assets/theme.css';
 @import '../assets/dim9x9.css';
 @import '../assets/dim8x8.css';
 @import '../assets/dim9x10.css';
@@ -708,7 +716,6 @@ coords {
   color: black;
 }
 .cg-board-wrap {
-  background-image: url('/src/renderer/assets/images/board/svg/blue.svg');
   position: relative;
 }
 .koth cg-container::before {

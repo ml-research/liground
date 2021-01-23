@@ -8,6 +8,7 @@
     </div>
     <div class="input960">
       <input
+        id="in"
         class="inputField"
         type="number"
         :value="curVar"
@@ -23,6 +24,7 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'Mode960',
   components: {
@@ -31,7 +33,7 @@ export default {
     return {
       curVar: '',
       fen: '',
-      variants: ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
+      variants: ['chess', 'crazyhouse', 'kingofthehill', '3check', 'antichess']
     }
   },
   computed: {
@@ -40,9 +42,14 @@ export default {
     },
     variant () {
       return this.$store.getters.variant
-    }
+    },
+    ...mapGetters(['variant'])
   },
   watch: {
+    variant () {
+      document.getElementById('in').value = ''
+      this.$store.commit('newBoard')
+    },
     curVar960Fen () {
       if (this.$store.getters.curVar960Fen === '') {
         this.curVar = ''

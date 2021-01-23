@@ -14,9 +14,6 @@
 <script>
 import VueApexCharts from 'vue-apexcharts'
 import { mapGetters } from 'vuex'
-import Module from 'ffish-es6'
-
-let ffish = null
 
 export default {
   name: 'EvalPlot',
@@ -82,9 +79,7 @@ export default {
           events: {
             markerClick: (event, chartContext, { seriesIndex, dataPointIndex, config }) => {
               if (dataPointIndex === 0) {
-                const board = new ffish.Board(this.$store.getters.variant)
-                const startFen = board.fen()
-                this.$store.dispatch('fen', startFen)
+                this.$store.dispatch('fen', this.startFen)
                 return
               }
               const move = this.moves[dataPointIndex - 1]
@@ -112,7 +107,7 @@ export default {
     moves () {
       return this.$store.getters.moves
     },
-    ...mapGetters(['points', 'turn', 'selectedGame', 'variant', 'board'])
+    ...mapGetters(['points', 'turn', 'selectedGame', 'variant', 'board', 'startFen'])
   },
   watch: {
     board () {
@@ -138,11 +133,6 @@ export default {
       this.clear()
       this.loadPGNData()
     }
-  },
-  beforeCreate () { // this is necessary to genereate the starting FEN for the current variation
-    new Module().then(loadedModule => {
-      ffish = loadedModule
-    })
   },
   created () {
     document.addEventListener('resetPlot', () => {
