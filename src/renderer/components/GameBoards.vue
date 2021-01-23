@@ -258,8 +258,7 @@ export default {
 }
 #right-column {
   grid-area: analysisview;
-  max-width: 40vw;
-  min-width: 40vw;
+  width: 40vw;
   max-height: calc(100vh - 25px);
 }
 input {
