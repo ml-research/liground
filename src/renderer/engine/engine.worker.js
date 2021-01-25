@@ -3,6 +3,7 @@ import Engines from './engines'
 import EngineDriver from './driver'
 import Sender from './sender'
 
+// TODO: only save last update of overriding updates
 // create sender with 50ms interval
 const msg = new Sender(50)
 
