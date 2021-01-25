@@ -2,20 +2,16 @@
   <div id="inner">
     <div>
       <div class="main-grid">
-        <div>
-          <div
-            class="chessboard-grid"
-            @mousewheel.prevent="scroll($event)"
-          >
-            <pgn-browser id="pgnbrowser" />
+        <div class="chessboard-grid">
+          <pgn-browser id="pgnbrowser" />
+          <div @mousewheel.prevent="scroll($event)">
             <ChessGround
               id="chessboard"
               :orientation="orientation"
               @onMove="showInfo"
             />
-            <EvalBar id="evalbar" />
           </div>
-          <br>
+          <EvalBar id="evalbar" />
           <div id="fen-field">
             FEN <input
               id="lname"
@@ -27,18 +23,31 @@
               @change="checkValidFEN"
             >
           </div>
-          <PieceStyleSelector id="piece-style" />
-          <EvalPlot />
+          <div id="selector-container">
+            <PieceStyleSelector id="piece-style" />
+            <BoardStyleSelector id="board-style" />
+          </div>
         </div>
-        <AnalysisView
-          id="analysisview"
-          :reset="resetAnalysis"
-          @move-to-start="moveToStart"
-          @move-to-end="moveToEnd"
-          @move-back-one="moveBackOne"
-          @move-forward-one="moveForwardOne"
-          @flip-board="flipBoard"
-        />
+        <EvalPlot id="evalplot" />
+        <div
+          v-if="viewAnalysis"
+          id="right-column"
+        >
+          <AnalysisView
+            id="analysisview"
+            :reset="resetAnalysis"
+            @move-to-start="moveToStart"
+            @move-to-end="moveToEnd"
+            @move-back-one="moveBackOne"
+            @move-forward-one="moveForwardOne"
+            @flip-board="flipBoard"
+          />
+        </div>
+        <div v-else>
+          <SettingsTab
+            id="settingstab"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -50,13 +59,12 @@ import EvalBar from './EvalBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
+import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
-import Module from 'ffish-es6'
 import PgnBrowser from './PgnBrowser.vue'
+import SettingsTab from './SettingsTab'
 // TODO: use GameInfo component?
 // import GameInfo from './GameInfo.vue'
-
-let ffish = null
 
 export default {
   name: 'GameBoards',
@@ -65,9 +73,11 @@ export default {
     EvalBar,
     ChessGround,
     PieceStyleSelector,
+    BoardStyleSelector,
     EvalPlot,
     // GameInfo,
-    PgnBrowser
+    PgnBrowser,
+    SettingsTab
   },
   data () {
     return {
@@ -77,6 +87,9 @@ export default {
     }
   },
   computed: {
+    viewAnalysis () {
+      return this.$store.getters.viewAnalysis
+    },
     variant () {
       return this.$store.getters.variant
     },
@@ -89,6 +102,9 @@ export default {
     fen () {
       return this.$store.getters.fen
     },
+    startFen () {
+      return this.$store.getters.startFen
+    },
     currentMove () { // this returns the current half-move or -1 at the start of the game
       const fen = this.$store.getters.fen
       for (const move of this.moves) {
@@ -98,15 +114,6 @@ export default {
       }
       return -1
     }
-  },
-  beforeCreate () {
-    console.log('beforeCreate()')
-    new Module().then(loadedModule => {
-      ffish = loadedModule
-      console.log(`initialized ${ffish} ${loadedModule}`)
-      const game = new ffish.Board()
-      console.log(game.fen())
-    })
   },
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
@@ -134,9 +141,7 @@ export default {
       }
     },
     moveToStart () { // this method returns to the starting point of the current line
-      const board = new ffish.Board(this.variant)
-      const startFen = board.fen()
-      this.$store.dispatch('fen', startFen)
+      this.$store.dispatch('fen', this.startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
       if (this.currentMove >= this.moves.length - 1) {
@@ -150,9 +155,7 @@ export default {
         return
       }
       if (num === 0) {
-        const board = new ffish.Board(this.variant)
-        const startFen = board.fen()
-        this.$store.dispatch('fen', startFen)
+        this.$store.dispatch('fen', this.startFen)
         return
       }
       this.$store.dispatch('fen', this.moves[num - 1].fen)
@@ -221,31 +224,65 @@ export default {
       console.log(`event: ${event}`)
     },
     checkValidFEN (event) {
-      if (ffish.validateFen(event.target.value, this.variant) === 1) {
-        this.$store.dispatch('fen', event.target.value)
-      } else {
-        console.log(`invalid fen: ${event.target.value}`)
-      }
+      this.$store.dispatch('fen', event.target.value)
       this.resetAnalysis = !this.resetAnalysis
     }
-
   }
 }
 </script>
 
 <style scoped>
-
+.main-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: auto auto;
+  gap: 1em 1em;
+  grid-template-areas:
+    "chessboard analysisview"
+    "evalplot analysisview";
+}
+.main-grid > .chessboard-grid {
+  min-width: 925px;
+  grid-area: chessboard;
+  display: grid;
+  grid-template-columns: 20% 70% auto;
+  grid-template-rows: auto auto;
+  gap: 1em;
+  grid-template-areas:
+    "pgnbrowser . ."
+    "fenfield fenfield fenfield";
+}
+#analysisview {
+  height: 100%;
+  width: 100%;
+}
+#right-column {
+  grid-area: analysisview;
+  width: 40vw;
+  max-height: calc(100vh - 25px);
+}
 input {
   font-size: 12pt;
-  width: 600px;
+  max-width: 60vw;
 }
 #fen-field {
-  margin-left: 48px;
+  grid-area: fenfield;
+  /*margin-left: 48px;*/
+}
+#selector-container {
+  height:60px;
 }
 #piece-style {
   margin-top: 10px;
-  width: 300px;
-  margin-left: 142px;
+  width: 210px;
+  margin-left: 60px;
+  position: absolute;
+}
+#board-style {
+  margin-top: 10px;
+  width: 210px;
+  margin-left: 330px;
+  position: absolute;
 }
 .main-grid {
   display: grid;
@@ -256,14 +293,14 @@ input {
   grid-template-columns: 20% auto auto;
 }
 #pgnbrowser {
-  min-width: 8em;
-  margin: 0em 1em;
+  grid-area: pgnbrowser;
   border: 1px solid black;
   border-radius: 4px;
+  margin-left: 1em;
+  max-height: 60vh;
 }
 #chessboard {
   display: inline-block;
-  margin: 0em 0em 1em 0em;
 }
 .bottom-margin {
   margin-bottom: 1.5em;
@@ -272,14 +309,14 @@ input {
   display: table;
   margin: 0 auto;
 }
-
 #analysisview {
   margin-left: 15px;
 }
-
 #evalbar {
-  margin: 0em 1em;
-  float: center;
+  float: left;
+}
+#evalplot {
+  grid-area: evalplot;
 }
 
 </style>

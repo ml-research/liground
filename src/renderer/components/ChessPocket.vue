@@ -12,12 +12,12 @@
     >
       <div
         class="piece"
-        :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' ]"
+        :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' , orientation === 'white' && color === 'black' ? 'flipB' : '', orientation === 'black' ? 'flipW' : '']"
         @mousedown="clicked($event, piece.type, color, piece.count)"
       />
       <div
         class="piece-count noselect"
-        :class="[piece.count > 1 ? 'show' : 'invisible']"
+        :class="[piece.count > 1 ? 'show' : 'invisible', orientation === 'black' ? 'flipNum' : '']"
       >
         {{ piece.count }}
       </div>
@@ -26,7 +26,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'ChessPocket',
   props: {
@@ -54,16 +53,11 @@ export default {
     }
   },
   computed: {
+    orientation () {
+      return this.$store.getters.orientation
+    },
     emptySlots: function () {
       return Math.max(8 - this.pieces.length, 0)
-    },
-    pieceStyle () {
-      return this.$store.getters.pieceStyle
-    }
-  },
-  watch: {
-    pieceStyle: function (pieceStyle) {
-      this.updatePieceCSS(pieceStyle)
     }
   },
   methods: {
@@ -74,30 +68,28 @@ export default {
       console.log(`pieceType: ${pieceType}`)
       console.log(`color: ${color}`)
       this.$emit('selection', event, pieceType, color)
-    },
-    updatePieceCSS (pieceStyle) {
-      const file = document.createElement('link')
-      file.rel = 'stylesheet'
-      file.href = 'assets/images/piece-css/' + pieceStyle + '.css'
-      document.head.appendChild(file)
     }
   }
 }
 </script>
 
-<!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
+.flipW {
+  transform: scaleY(-1);
+}
 .wrapper {
   text-align: left;
 }
 .wrapper.enabled {
+  position: relative;
+  height: 50%;
   cursor: pointer;
 }
 .piece-count {
   text-align: center;
   font-size: 12pt;
   margin-left:38px;
-  margin-top:-25px;
+  margin-top:-24px;
   width: 18px;
   padding: 0px 0px 0px 0px;
   border-radius: 4px 4px 4px 4px;
@@ -109,21 +101,37 @@ export default {
   border-style: solid;
   color: black;
 }
+.flipNum {
+  transform: scaleY(-1);
+  margin-top: -56px;
+}
 .slot {
-  width: 60px;
-  height: 60px;
+  height: 20%;
   border-radius: 3px 3px 3px 3px;
   vertical-align: middle;
   font-size: 35px;
+}
+.shogi .wrapper.enabled{
+  height: 100%
+}
+.shogi #chesspocket_top{
+  grid-column-start: 1;
+}
+.shogi #chesspocket_bottom{
+  grid-column-start: 2;
+}
+.shogi .slot {
+  height: calc( 100% / 7);
 }
 .slot:hover {
   background-color: #ddd;
   color: black;
 }
 .piece {
-  height: 60px;
-  width: 60px;
-  background-size: 60px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
 }
 .piece.selected {
   background-color: rgb(112, 201, 146);

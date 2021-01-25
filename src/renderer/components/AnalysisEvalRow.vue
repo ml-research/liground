@@ -6,7 +6,7 @@
     <LiveEval />
     <div
       class="engine-banner"
-      :style="{ backgroundImage: 'url(' + require('../assets/images/engines/'+engineBannerURL) + ')' }"
+      :style="{ backgroundImage: `url(${engineBannerURL})` }"
     />
     <multiselect
       v-model="selected"
@@ -20,10 +20,13 @@
   </div>
 </template>
 
-<script scoped>
+<script>
 import LiveEval from './LiveEval.vue'
 import RoundedSwitch from './RoundedSwitch.vue'
 import Multiselect from 'vue-multiselect'
+
+import logoStockfish from '../assets/images/engines/stockfish.png'
+import logoCrazyAra from '../assets/images/engines/crazyara.png'
 
 export default {
   name: 'AnalysisEvalRow',
@@ -77,11 +80,10 @@ export default {
         'CrazyAra 0.8.1': 'CrazyAra',
         'ClassicAra 0.8.1': 'ClassicAra'
       },
-      imageUrl: 'Stockfish.png',
       engineBanners: {
-        'Multi-Variant Stockfish 10': 'stockfish_transp.png',
-        'CrazyAra 0.8.1': 'crazyara_logo_small_artwork.png',
-        'ClassicAra 0.8.1': 'crazyara_logo_small_artwork.png'
+        'Multi-Variant Stockfish 10': logoStockfish,
+        'CrazyAra 0.8.1': logoCrazyAra,
+        'ClassicAra 0.8.1': logoCrazyAra
       }
     }
   },
@@ -99,7 +101,6 @@ export default {
       this.options = this.engines[variant]
     }, */
     selected: function () {
-      this.$store.dispatch('started', false)
       this.$store.dispatch('selected', false)
       console.log(`engineBinary: ${this.engineBinaries[this.selected]}`)
       this.$store.dispatch('engineBinary', this.engineBinaries[this.selected])
@@ -117,7 +118,6 @@ export default {
 .wrapper {
   text-align: center;
   padding: 1.05em 0em;
-  width: 600px;
 }
 
 .clock-border {

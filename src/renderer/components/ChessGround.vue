@@ -1,32 +1,41 @@
 <template>
   <div class="blue merida is2d">
     <div class="grid-parent">
-      <div class="pockets">
-        <div
-          v-if="variant==='crazyhouse'"
-          :class="{ black : $store.getters.orientation == &quot;black&quot;}"
-        >
-          <ChessPocket
-            id="chesspocket_top"
-            color="black"
-            :pieces="piecesB"
-            :class="{ black : $store.getters.orientation == &quot;white&quot; }"
-            @selection="dropPiece"
-          />
-          <ChessPocket
-            id="chesspocket_bottom"
-            color="white"
-            :pieces="piecesW"
-            :class="{ black : $store.getters.orientation == &quot;black&quot; }"
-            @selection="dropPiece"
-          />
-        </div>
-      </div>
-      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings'}">
-        <div
-          ref="board"
-          class="cg-board-wrap"
+      <div
+        v-if="variant==='crazyhouse'|| variant==='shogi' "
+        ref="pockets"
+        class="pockets"
+        :class="{ mirror : $store.getters.orientation == &quot;black&quot;, shogi: variant == &quot;shogi&quot;}"
+      >
+        <ChessPocket
+          id="chesspocket_top"
+          color="black"
+          :pieces="piecesB"
+          @selection="dropPiece"
         />
+        <ChessPocket
+          id="chesspocket_bottom"
+          color="white"
+          :pieces="piecesW"
+          @selection="dropPiece"
+        />
+      </div>
+      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
+        <div class="cg-board-wrap">
+          <div ref="board" />
+          <div
+            v-if="isPromotionModalVisible && !isPast"
+            id="PromotionModal"
+            ref="promotion"
+
+            :style="promotionPosition"
+          >
+            <PromotionModal
+              :prom-options="promotions"
+              @close="closePromotionModal"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -35,7 +44,9 @@
 <script>
 import { mapGetters } from 'vuex'
 import { Chessground } from 'chessgroundx'
+import * as cgUtil from 'chessgroundx/util'
 import ChessPocket from './ChessPocket'
+import PromotionModal from './PromotionModal.vue'
 
 const WHITE = true
 const BLACK = false
@@ -43,7 +54,7 @@ const BLACK = false
 export default {
   name: 'ChessGround',
   components: {
-    ChessPocket
+    ChessPocket, PromotionModal
   },
   props: {
     free: {
@@ -57,26 +68,6 @@ export default {
     colors: {
       type: Array,
       default: () => (['w', 'b'])
-    },
-    piecesW: {
-      type: Array,
-      default: () => ([
-        { count: 0, type: 'queen' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'pawn' }
-      ])
-    },
-    piecesB: {
-      type: Array,
-      default: () => ([
-        { count: 0, type: 'pawn' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'queen' }
-      ])
     }
   },
   data () {
@@ -96,11 +87,74 @@ export default {
         r: 3,
         q: 4
       },
+      shogiPiecesToIdx: {
+        P: 6,
+        L: 5,
+        N: 4,
+        S: 3,
+        G: 2,
+        B: 1,
+        R: 0,
+        p: 0,
+        l: 1,
+        n: 2,
+        s: 3,
+        g: 4,
+        b: 5,
+        r: 6
+      },
+      piecesW: [
+        { count: 0, type: 'queen' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'pawn' }
+      ],
+      piecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      chessPiecesW: [
+        { count: 0, type: 'queen' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'pawn' }
+      ],
+      chessPiecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'queen' }
+      ],
+      shogiPiecesB: [
+        { count: 0, type: 'pawn' },
+        { count: 0, type: 'lance' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'silver' },
+        { count: 0, type: 'gold' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'rook' }
+      ],
+      shogiPiecesW: [
+        { count: 0, type: 'rook' },
+        { count: 0, type: 'bishop' },
+        { count: 0, type: 'gold' },
+        { count: 0, type: 'silver' },
+        { count: 0, type: 'knight' },
+        { count: 0, type: 'lance' },
+        { count: 0, type: 'pawn' }
+      ],
       board: null,
       shapes: [],
       pieceShapes: [],
       promotions: [],
-      promoteTo: 'q'
+      isPromotionModalVisible: false,
+      promotionMove: undefined
     }
   },
   computed: {
@@ -118,7 +172,23 @@ export default {
     legalMoves () {
       return this.$store.getters.legalMoves.split(' ')
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'bestmove', 'redraw', 'pieceStyle', 'fen', 'lastFen', 'orientation', 'moves'])
+    promotionPosition () {
+      if (this.promotionMove) {
+        const dest = this.promotionMove.substring(2, 4)
+
+        let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5
+
+        if (this.orientation === 'white') {
+          left = 87.5 - left
+        }
+
+        const vertical = this.turn === this.orientation ? 0 : (8 - this.promotions.length) * 12.5
+        return { left: `${left}%`, top: `${vertical}%` }
+      } else {
+        return undefined
+      }
+    },
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber'])
   },
   watch: {
     initialized () {
@@ -129,49 +199,58 @@ export default {
     },
     orientation () {
       this.updateBoard()
+      document.dispatchEvent(new Event('renderPromotion'))
     },
     pieceStyle (pieceStyle) {
       this.updatePieceCSS(pieceStyle)
+      document.dispatchEvent(new Event('renderPromotion'))
     },
-    bestmove () {
+    boardStyle (boardStyle) {
+      this.updateBoardCSS(boardStyle)
+    },
+    multipv () {
       const multipv = this.multipv
       const shapes = []
       const pieceShapes = []
 
-      if (this.$store.getters.started) {
-        let lineWidth = 10
-        for (let idx = 0; idx < multipv.length; ++idx) {
-          if ('ucimove' in multipv[idx] && multipv[idx].ucimove.length > 0) {
-            const move = multipv[idx].ucimove
-            const orig = move.substring(0, 2)
-            const dest = move.substring(2, 4)
-            let drawShape
-
-            if (move.indexOf('@') !== -1) {
-              const pieceType = move[0].toLowerCase()
-              const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
-              pieceShapes.unshift({
-                orig: dest,
-                dest: dest,
-                brush: 'blue',
-                modifiers: { lineWidth: lineWidth },
-                piece: { role: pieceConv[pieceType], color: this.turn }
-              })
-              drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
-            } else {
-              drawShape = { orig: orig, dest: dest, brush: 'blue', modifiers: { lineWidth: lineWidth } }
-            }
-
-            // adjust color if pv line is hovered
-            if (idx === this.hoveredpv) {
-              drawShape.brush = 'yellow'
-            }
-
-            // put item in front of list, so that the bestmove is drawn last
-            shapes.unshift(drawShape)
-
-            lineWidth -= 2
+      for (const [i, pvline] of multipv.entries()) {
+        if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
+          const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
+          let move = pvline.ucimove
+          let orig = move.substring(0, 2)
+          let dest = move.substring(2, 4)
+          let drawShape
+          if (this.dimensionNumber === 3) {
+            move = this.lowerNumbers(move)
+            orig = move.substring(0, 2)
+            dest = move.substring(2, 4)
           }
+
+          if (move.includes('@')) {
+            const pieceType = move[0].toLowerCase()
+            const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
+            pieceShapes.unshift({
+              orig: dest,
+              dest: dest,
+              brush: 'blue',
+              modifiers: { lineWidth },
+              piece: {
+                role: pieceConv[pieceType],
+                color: this.turn
+              }
+            })
+            drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth } }
+          } else {
+            drawShape = { orig, dest, brush: 'blue', modifiers: { lineWidth } }
+          }
+
+          // adjust color if pv line is hovered
+          if (i === this.hoveredpv) {
+            drawShape.brush = 'yellow'
+          }
+
+          // put item in front of list, so that the best move is drawn last
+          shapes.unshift(drawShape)
         }
       }
       this.pieceShapes = pieceShapes
@@ -186,11 +265,52 @@ export default {
       this.drawShapes()
     },
     variant () {
+      if (this.variant === 'shogi') {
+        this.piecesW = this.shogiPiecesW
+        this.piecesB = this.shogiPiecesB
+      }
+      if (this.variant === 'crazyhouse') {
+        this.piecesW = this.chessPiecesW
+        this.piecesB = this.chessPiecesB
+      }
+      this.resetPockets(this.piecesW)
+      this.resetPockets(this.piecesB)
+      if (this.board.state.geometry !== this.dimensionNumber) {
+        this.board = Chessground(this.$refs.board, {
+          coordinates: false,
+          fen: this.fen,
+          turnColor: 'white',
+          resizable: true,
+          highlight: {
+            lastMove: true, // add last-move class to squares
+            check: false // add check class to squares
+          },
+          drawable: {
+            enabled: true, // can draw
+            visible: true, // can view
+            eraseOnClick: false
+          },
+          movable: {
+            events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
+            color: 'white',
+            free: false
+          },
+          orientation: this.orientation,
+          geometry: this.$store.getters.dimensionNumber
+        })
+
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      }
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      }
       this.board.set({
         variant: this.variant,
         lastMove: false
       })
+
       this.updateBoard()
+      this.isPromotionModalVisible = false
     }
   },
   mounted () {
@@ -198,6 +318,7 @@ export default {
       coordinates: false,
       fen: this.fen,
       turnColor: 'white',
+      resizable: true,
       highlight: {
         lastMove: true, // add last-move class to squares
         check: true // add check class to squares
@@ -210,16 +331,63 @@ export default {
       movable: {
         events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
         color: 'white',
-        free: false
+        free: false,
+        rookCastle: true
+      },
+      premovable: {
+        enabled: false
       },
       orientation: this.orientation
     })
+
+    // set initial styles
+    this.updateBoardCSS(this.boardStyle)
+    this.updatePieceCSS(this.pieceStyle)
   },
   methods: {
+    showPromotionModal () {
+      this.isPromotionModalVisible = true
+    },
+    closePromotionModal (value) {
+      this.isPromotionModalVisible = false
+      this.promotionMove = this.promotionMove + value
+      this.lastMoveSan = this.$store.getters.sanMove(this.promotionMove)
+      this.$store.dispatch('push', this.promotionMove)
+      this.updateHand()
+      this.afterMove()
+    },
     updatePieceCSS (pieceStyle) {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
-      file.href = 'src/renderer/assets/images/piece-css/' + pieceStyle + '.css'
+      if (this.$store.getters.isInternational) {
+        file.href = 'static/piece-css/international/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isSEA) {
+        file.href = 'static/piece-css/sea/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isXiangqi) {
+        file.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
+      }
+      if (this.$store.getters.isShogi) {
+        file.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
+      }
+      document.head.appendChild(file)
+    },
+    updateBoardCSS (boardStyle) {
+      const file = document.createElement('link')
+      file.rel = 'stylesheet'
+      if (this.$store.getters.isInternational) {
+        file.href = 'static/board-css/international/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isXiangqi) {
+        file.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isSEA) {
+        file.href = 'static/board-css/sea/' + boardStyle + '.css'
+      } else
+      if (this.$store.getters.isShogi) {
+        file.href = 'static/board-css/shogi/' + boardStyle + '.css'
+      }
       document.head.appendChild(file)
     },
     dropPiece (event, pieceType, color) {
@@ -227,6 +395,20 @@ export default {
       this.selectedPiece = pieceType
       console.log(`dropPiece: ${event} ${pieceType} ${color}`)
       console.log(`dropPiece: ${this.board.getFen()}`)
+    },
+    increaseNumbers (move) {
+      const letters = move.split(/(\d+)/)
+      letters[1] = String(parseInt(letters[1]) + 1)
+      letters[3] = String(parseInt(letters[3]) + 1)
+      const ret = letters.join('')
+      return ret
+    },
+    lowerNumbers (move) {
+      const letters = move.split(/(\D)/)
+      letters[2] = String(parseInt(letters[2]) - 1)
+      letters[4] = String(parseInt(letters[4]) - 1)
+      const ret = letters.join('')
+      return ret
     },
     possibleMoves () {
       const dests = {}
@@ -236,8 +418,12 @@ export default {
       for (let i = 0; i < this.legalMoves.length; i++) {
         // don't include dropping moves
         if (this.legalMoves[i].length !== 3) {
-          fromSq = this.legalMoves[i].substring(0, 2)
-          toSq = this.legalMoves[i].substring(2, 4)
+          let Move = this.legalMoves[i]
+          if (this.dimensionNumber === 3) {
+            Move = this.lowerNumbers(Move)
+          }
+          fromSq = Move.substring(0, 2)
+          toSq = Move.substring(2, 4)
         }
         if (fromSq in dests) {
           dests[fromSq].push(toSq)
@@ -247,9 +433,86 @@ export default {
       }
       return dests
     },
-    isPromotion (orig, dest) {
-      const filteredPromotions = this.promotions.filter(move => move.from === orig && move.to === dest)
-      return filteredPromotions.length > 0 // The current movement is a promotion
+    isPromotion (uciMove) {
+      for (let i = 0; i < this.legalMoves.length; i++) {
+        if (this.dimensionNumber === 3) {
+          return false
+        }
+        if (this.legalMoves[i].length === 5) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            return true
+          }
+        }
+      }
+      return false
+    },
+    setPromotionOptions (uciMove) {
+      if (this.$store.getters.isInternational) {
+        if (this.variant === 'antichess') {
+          this.promotions = [
+            { type: 'king' },
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        } else {
+          this.promotions = [
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        }
+      }
+      if (this.variant === 'shogi') {
+        const key = uciMove.substring(2, 4)
+        const type = this.board.state.pieces[key].role
+        let num = 0
+        let promo = false
+        for (let i = 0; i < this.legalMoves.length; i++) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            num = num + 1
+            if (this.legalMoves[i].includes('+')) {
+              promo = true
+            }
+          }
+        }
+        if (type === 'pawn') {
+          this.promotions = [
+            { type: 'pawn' },
+            { type: 'ppawn' }
+          ]
+        } else if (type === 'lance') {
+          this.promotions = [
+            { type: 'lance' },
+            { type: 'plance' }
+          ]
+        } else if (type === 'knight') {
+          this.promotions = [
+            { type: 'knight' },
+            { type: 'pknight' }
+          ]
+        } else if (type === 'silver') {
+          this.promotions = [
+            { type: 'silver' },
+            { type: 'psilver' }
+          ]
+        } else if (type === 'bishop') {
+          this.promotions = [
+            { type: 'bishop' },
+            { type: 'pbishop' }
+          ]
+        } else if (type === 'rook') {
+          this.promotions = [
+            { type: 'rook' },
+            { type: 'prook' }
+          ]
+        }
+        if (num === 1 && promo) {
+          this.promotions = [this.promotions[1]]
+        }
+      }
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -258,32 +521,54 @@ export default {
     },
     afterDrag () {
       return (role, key) => {
-        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q' }
+        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', silver: 'S', gold: 'G', lance: 'L' }
         const move = pieces[role] + '@' + key
-        this.$store.dispatch('push', move)
-        this.updateHand()
+        if (this.$store.getters.legalMoves.includes(move)) {
+          this.$store.dispatch('push', move)
+          this.updateHand()
+        } else {
+          this.updateBoard()
+        }
       }
     },
     changeTurn () {
       return (orig, dest) => {
-        if (this.isPromotion(orig, dest)) {
-          this.promoteTo = this.onPromotion()
+        let uciMove = orig + dest
+        if (this.dimensionNumber === 3) {
+          uciMove = this.increaseNumbers(uciMove)
         }
-        const uciMove = orig + dest
-        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-        this.$store.dispatch('push', uciMove)
-        console.log('colorAfterPush:' + this.turn)
-        this.updateHand()
-        this.afterMove()
+        if (this.isPromotion(uciMove)) {
+          if (this.variant === 'makruk') {
+            const move = uciMove + 'm'
+            this.$store.dispatch('push', move)
+          } else {
+            this.setPromotionOptions(uciMove)
+            this.promotionMove = uciMove
+            this.showPromotionModal()
+          }
+        } else {
+          this.lastMoveSan = this.$store.getters.sanMove(uciMove)
+          this.$store.dispatch('push', uciMove)
+          this.updateHand()
+          this.afterMove()
+        }
       }
     },
     updatePocket (pocket, pocketPieces, color) {
       for (let idx = 0; idx < pocketPieces.length; ++idx) {
         let pieceIdx
-        if (color === WHITE) {
-          pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()]
+        if (this.variant === 'shogi') {
+          if (color === WHITE) {
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx].toUpperCase()]
+          } else {
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx]]
+          }
         } else {
-          pieceIdx = this.piecesToIdx[pocketPieces[idx]]
+          if (color === WHITE) {
+            pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()]
+          } else {
+            pieceIdx = this.piecesToIdx[pocketPieces[idx]]
+          }
         }
         pocket[pieceIdx].count += 1
       }
@@ -310,7 +595,6 @@ export default {
     afterMove () {
       const events = {}
       events.fen = this.fen
-
       events.history = [this.lastMoveSan]
       this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
@@ -318,7 +602,7 @@ export default {
     updateBoard () {
       // logic to find out if a check should be displayed:
       let isCheck = false // ensures that no check is displayed when the current move was not a check
-      if (this.currentMove !== undefined && this.currentMove.name.includes('+')) { // the last move was check iff the san notation of the last move contained a '+'
+      if (this.currentMove !== undefined && (this.currentMove.name.includes('+') || this.currentMove.name.includes('#'))) { // the last move was check iff the san notation of the last move contained a '+'
         this.moves[this.moves.length - 1].check = this.turn // the check property of the board accepts a color or a boolean
         isCheck = this.currentMove.check
       }
@@ -326,10 +610,17 @@ export default {
       if (this.currentMove === undefined || this.moves.length === 0) {
         this.board.state.lastMove = undefined
       } else {
-        const string = String(this.currentMove.uci)
+        let string = String(this.currentMove.uci)
+        if (this.dimensionNumber === 3) {
+          string = this.lowerNumbers(string)
+        }
         const first = string.substring(0, 2)
         const second = string.substring(2, 4)
-        this.board.state.lastMove = [first, second]
+        if (string.includes('@')) { // no longer displays a green box in the corner
+          this.board.state.lastMove = [second]
+        } else {
+          this.board.state.lastMove = [first, second]
+        }
       }
       this.board.set({
         check: isCheck,
@@ -350,13 +641,14 @@ export default {
             },
         orientation: this.orientation
       })
-      if (this.variant === 'crazyhouse') {
+
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
         this.updateHand()
       }
     },
     drawShapes () {
       if (this.board !== null) {
-        this.board.setShapes([...this.shapes, ...this.pieceShapes])
+        this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
       }
     }
   }
@@ -365,9 +657,17 @@ export default {
 
 <style>
 @import '../assets/chessground.css';
-@import '../assets/theme.css';
+@import '../assets/dim9x9.css';
+@import '../assets/dim8x8.css';
+@import '../assets/dim9x10.css';
 
-.black {
+#PromotionModal {
+  position: absolute;
+  z-index: 4;
+  width: 12.5%;
+  height: 62.5%;
+}
+.mirror {
   transform: scaleY(-1);
 }
 .chess-pocket {
@@ -380,6 +680,12 @@ export default {
 }
 .pockets {
   margin-right: 1.5px;
+  height: 100%;
+}
+.pockets.shogi{
+  display:grid;
+  grid-template-columns: 1fr 1fr ;
+
 }
 coords.ranks {
   height: 100%;
@@ -410,13 +716,7 @@ coords {
   color: black;
 }
 .cg-board-wrap {
-  border-radius: 4px 4px 4px 4px;
-}
-.cg-wrap {
-  width: 600px;
-  height: 600px;
-  position: sticky;
-  display: table;
+  position: relative;
 }
 .koth cg-container::before {
   width: 25%;
@@ -431,8 +731,7 @@ coords {
   pointer-events: none;
   border-radius: 0px 0px 0px 0px;
 }
-
-.rk cg-container::before{
+.rk cg-board::before{
     background: rgba(230,230,230,0.2);
     width: 100%;
     height: 12.5%;
@@ -444,4 +743,8 @@ coords {
     pointer-events: none;
     border-radius: 4px 4px 0px 0px;
 }
+/*
+  CSS for 9x10 board e.g. xiangqi/janggi etc.
+*/
+
 </style>

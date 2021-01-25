@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
+import ipc from './ipc'
+
+Vue.use(Vuex)
 
 class TwoWayMap {
   constructor (map) {
@@ -19,16 +22,89 @@ class TwoWayMap {
   revGet (key) { return this.reverseMap[key] }
 }
 
-Vue.use(Vuex)
+/**
+ * Calculate the value for current side to move.
+ * @param {number} value CP or Mate value
+ * @param {boolean} sideToMove Current side to move (true = white)
+ */
+function calcForSide (value, sideToMove) {
+  return sideToMove ? value : -value
+}
+
+/**
+ * Convert a CP value to a display string.
+ * @param {number} cp CP value
+ */
+function cpToString (cp) {
+  if (isNaN(cp)) {
+    return ''
+  }
+  if (cp === 0) {
+    return '±0.00'
+  }
+  const normalizedEval = (cp / 100).toFixed(2)
+  if (cp > 0) {
+    return `+${normalizedEval}`
+  } else {
+    return normalizedEval
+  }
+}
+
+/**
+ * Check if an option value is valid and emit warnings if necessary.
+ * @param {any[]} options Array of engine options
+ * @param {string} name Name of option
+ * @param {any} value Option value to check
+ */
+function checkOption (options, name, value) {
+  const option = options.find(e => e.name === name)
+  if (!option) {
+    console.warn(`[Engine] Unknown option "${name}"`)
+  } else {
+    switch (option.type) {
+      case 'check':
+        if (typeof value !== 'boolean') {
+          console.warn(`[Engine] Invalid value type "${value}" for check option "${name}"`)
+        }
+        break
+      case 'spin':
+        if (typeof value !== 'number') {
+          console.warn(`[Engine] Invalid value "${value}" for spin option "${name}"`)
+        } else if (typeof option.max === 'number' && value > option.max) {
+          console.warn(`[Engine] Out of range value "${value}" for spin option "${name}" (range ${option.min} to ${option.max})`)
+        } else if (typeof option.min === 'number' && value < option.min) {
+          console.warn(`[Engine] Out of range value "${value}" for spin option "${name}" (range ${option.min} to ${option.max})`)
+        }
+        break
+      case 'combo':
+        if (typeof value !== 'string') {
+          console.warn(`[Engine] Invalid value "${value}" for combo option "${name}"`)
+        } else if (Array.isArray(option.var) && !option.var.includes(value)) {
+          console.warn(`[Engine] Unknown value "${value}" for combo option "${name}" (values ${option.var.map(e => `"${e}"`).join(', ')})`)
+        }
+        break
+      case 'button':
+        if (value !== undefined && value !== null) {
+          console.warn(`[Engine] Unexpected value "${value}" for button option "${name}"`)
+        }
+        break
+      case 'string':
+        if (typeof value !== 'string') {
+          console.warn(`[Engine] Invalid value "${value}" for string option "${name}"`)
+        }
+        break
+    }
+  }
+}
 
 export const store = new Vuex.Store({
   state: {
     initialized: false,
-    started: false,
     active: false,
-    turn: 'white',
+    turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
+    startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
     legalMoves: '',
     destinations: {},
@@ -40,44 +116,74 @@ export const store = new Vuex.Store({
       '️Three-Check': '3check',
       Antichess: 'antichess',
       Horde: 'horde',
-      '🏇 Racing Kings': 'racingkings'
+      '🏇 Racing Kings': 'racingkings',
+      Makruk: 'makruk',
+      Shogi: 'shogi',
+      Janggi: 'janggi',
+      Xiangqi: 'xiangqi'
+
     }),
+    orientation: 'white',
+    message: 'hello from Vuex',
     engineBinary: 'stockfish',
     stdIO: [],
-    message: 'hello from Vuex',
-    idName: '',
-    idAuthor: '',
-    orientation: 'white',
+    engineInfo: {
+      name: '',
+      author: '',
+      options: []
+    },
+    engineStats: {
+      depth: 0,
+      seldepth: 0,
+      nodes: 0,
+      nps: 0,
+      hashfull: 0,
+      tbhits: 0,
+      time: 0
+    },
     multipv: [
       {
-        depth: 0,
-        seldepth: 0,
         cp: 0,
-        nodes: 0,
-        nps: 0,
-        hashfull: 0,
-        tbhits: 0,
-        time: 0,
         pv: '',
         ucimove: ''
-      },
-      {},
-      {},
-      {},
-      {}
+      }
     ],
     hoveredpv: -1,
-    sideToMove: 'w',
     counter: 0,
     pieceStyle: 'merida',
     board: null,
     gameInfo: {},
     loadedGames: [],
-    selectedGame: null
+    selectedGame: null,
+    points: 0,
+    boardStyle: 'blue',
+    internationalVariants: [
+      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+    ],
+    seaVariants: [
+      'makruk'
+    ],
+    xiangqiVariants: [
+      'janggi', 'xiangqi'
+    ],
+    shogiVariants: [
+      'shogi'
+    ],
+    curVar960Fen: '',
+    viewAnalysis: true
   },
   mutations: { // sync
+    curVar960Fen (state, payload) {
+      state.curVar960Fen = payload
+    },
+    viewAnalysis (state, payload) {
+      state.viewAnalysis = payload
+    },
     fen (state, payload) {
       state.fen = payload
+    },
+    startFen (state, payload) {
+      state.startFen = payload
     },
     lastFen (state, payload) {
       state.lastFen = payload
@@ -97,9 +203,6 @@ export const store = new Vuex.Store({
     active (state, payload) {
       state.active = payload
     },
-    started (state, payload) {
-      state.started = payload
-    },
     destinations (state, payload) {
       state.destinations = payload
     },
@@ -109,32 +212,36 @@ export const store = new Vuex.Store({
     engineBinary (state, payload) {
       state.engineBinary = payload
     },
-    sideToMove (state, payload) {
-      state.sideToMove = payload
-    },
     stdIO (state, payload) {
       state.stdIO = state.stdIO.concat(payload)
     },
-    idName (state, payload) {
-      state.idName = payload
+    clearIO (state) {
+      state.stdIO = []
     },
-    idAuthor (state, payload) {
-      state.idAuthor = payload
+    engineInfo (state, payload) {
+      state.engineInfo = payload
+    },
+    engineStats (state, payload) {
+      state.engineStats = payload
+    },
+    resetEngineStats (state) {
+      state.engineStats = {
+        depth: 0,
+        seldepth: 0,
+        nodes: 0,
+        nps: 0,
+        hashfull: 0,
+        tbhits: 0,
+        time: 0
+      }
     },
     multipv (state, payload) {
-      state.multipv = payload
-      for (let idx = 0; idx < state.multipv.length; ++idx) {
-        if (state.multipv[idx].mate) {
-          if (state.sideToMove === 'b') {
-            state.multipv[idx].cpDisplay = '#' + String(-state.multipv[idx].mate)
-          } else {
-            state.multipv[idx].cpDisplay = '#' + state.multipv[idx].mate
-          }
-        } else {
-          const cpWhite = cpForWhite(state.multipv[idx].cp, state.sideToMove)
-          state.multipv[idx].cpDisplay = cpforWhiteStr(cpWhite)
+      for (const pvline of payload) {
+        if (pvline) {
+          pvline.cpDisplay = typeof pvline.mate === 'number' ? `#${calcForSide(pvline.mate, state.turn)}` : cpToString(calcForSide(pvline.cp, state.turn))
         }
       }
+      state.multipv = payload
     },
     hoveredpv (state, payload) {
       state.hoveredpv = payload
@@ -143,48 +250,43 @@ export const store = new Vuex.Store({
       state.counter += payload
     },
     resetMultiPV (state) {
-      state.multipv = [{
-        depth: 0,
-        seldepth: 0,
-        cp: 0,
-        nodes: 0,
-        nps: 0,
-        hashfull: 0,
-        tbhits: 0,
-        time: 0,
-        pv: '',
-        ucimove: ''
-      },
-      {
-        pv: ''
-      },
-      {},
-      {},
-      {}
+      state.multipv = [
+        {
+          cp: 0,
+          pv: '',
+          ucimove: ''
+        }
       ]
     },
     pieceStyle (state, payload) {
       state.pieceStyle = payload
     },
+    boardStyle (state, payload) {
+      state.boardStyle = payload
+    },
     newBoard (state, payload) {
-      if (typeof payload.fen === 'string') {
-        if (payload.is960) {
-          state.board = new ffish.Board(state.variant, payload.fen, true)
+      const { fen, is960 } = payload || {}
+      if (typeof fen === 'string') {
+        if (is960) {
+          state.board = new ffish.Board(state.variant, fen, true)
         } else {
-          state.board = new ffish.Board(state.variant, payload.fen)
+          state.board = new ffish.Board(state.variant, fen)
         }
       } else {
         state.board = new ffish.Board(state.variant)
       }
       state.moves = []
       state.gameInfo = {}
-      this.commit('fen', state.board.fen())
-      this.commit('turn', state.board.turn())
-      this.commit('legalMoves', state.board.legalMoves())
-      this.commit('lastFen', state.board.fen())
+      state.fen = state.board.fen()
+      state.turn = state.board.turn()
+      state.legalMoves = state.board.legalMoves()
+      state.lastFen = state.board.fen()
+      state.startFen = state.board.fen()
     },
     resetBoard (state, payload) {
+      state.curVar960Fen = ''
       this.commit('newBoard', payload)
+      state.selectedGame = null
       state.moves = []
     },
     appendMoves (state, payload) {
@@ -203,64 +305,76 @@ export const store = new Vuex.Store({
     },
     selectedGame (state, payload) {
       state.selectedGame = payload
+    },
+    points (state, payload) {
+      state.points = payload
     }
   },
   actions: { // async
+    curVar960Fen (context, payload) {
+      context.commit('curVar960Fen', payload)
+    },
     resetBoard (context, payload) {
       context.commit('resetMultiPV')
       context.commit('resetBoard', payload)
+      context.dispatch('restartEngine')
     },
     initialize (context) {
-      context.commit('newBoard', {
-        fen: '',
-        is960: false
-      })
+      context.commit('newBoard')
       context.dispatch('updateBoard')
       context.commit('initialized', true)
     },
     updateBoard (context) {
-      context.commit('turn', context.state.board.turn())
-      context.commit('fen', context.state.board.fen())
-      context.commit('legalMoves', context.state.board.legalMoves())
+      const { board } = context.state
+      board.setFen(context.state.fen)
+      context.commit('turn', board.turn())
+      context.commit('legalMoves', board.legalMoves())
     },
     push (context, payload) {
       context.commit('appendMoves', payload.split(' '))
-      context.dispatch('updateBoard')
+      context.dispatch('fen', context.state.board.fen())
     },
-    startEngine (context) {
-      ws.send('startEngine~' + context.getters.engineBinary + '~' + context.getters.variant)
-      console.log('startEngine')
-      context.commit('started', true)
+    resetEngineData (context) {
+      context.commit('resetMultiPV')
+      context.commit('resetEngineStats')
     },
     goEngine (context) {
-      ws.send('goEngine')
-      console.log('goEngine')
+      ipc.send('go infinite')
       context.commit('active', true)
     },
     stopEngine (context) {
-      ws.send('stopEngine')
-      console.log('stopEngine')
+      ipc.send('stop')
       context.commit('active', false)
     },
-    resetMultiPV (context) {
-      context.commit('resetMultiPV')
+    restartEngine (context) {
+      context.dispatch('resetEngineData')
+      if (context.getters.active) {
+        context.dispatch('stopEngine')
+        context.dispatch('position')
+        context.dispatch('goEngine')
+      }
     },
     position (context) {
-      ws.send(`position~fen~${context.getters.fen}`)
-      context.commit('sideToMove', context.getters.fen.split(' ')[1])
-      console.log(`state.sideToMove: ${context.sideToMove}`)
+      ipc.send(`position fen ${context.getters.fen}`)
+    },
+    sendEngineCommand (_, payload) {
+      ipc.send(payload)
     },
     fen (context, payload) {
-      context.commit('fen', payload)
+      if (context.state.fen !== payload) {
+        context.commit('fen', payload)
+        context.dispatch('updateBoard')
+        context.dispatch('restartEngine')
+      }
     },
     lastFen (context, payload) {
       context.commit('lastFen', payload)
     },
+    startFen (context, payload) {
+      context.commit('startFen', payload)
+    },
     destinations (context, payload) {
       context.commit('destinations', payload)
-    },
-    started (context, payload) {
-      context.commit('started', payload)
     },
     orientation (context, payload) {
       context.commit('orientation', payload)
@@ -270,21 +384,52 @@ export const store = new Vuex.Store({
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
+        if (context.getters.active) {
+          context.dispatch('stopEngine')
+        }
         context.commit('variant', payload)
-        context.commit('newBoard', {
+        const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
+        if (variants.includes(payload)) {
+          const varFen = context.getters.curVar960Fen
+          const is960Mode = varFen !== ''
+          context.commit('newBoard', { is960: is960Mode, fen: varFen })
+        } else {
+          context.commit('newBoard', { is960: false, fen: '' })
+        }
+        context.dispatch('resetEngineData')
+        context.dispatch('setEngineOptions', {
+          UCI_Variant: payload
         })
       }
     },
     set960 (context, payload) {
-      if (context.getters.is960 !== payload) {
-        context.commit('newBoard', {
-          fen: context.getters.fen,
-          is960: payload
-        })
+      context.commit('newBoard', {
+        fen: payload.fen,
+        is960: payload.is960
+      })
+    },
+    async engineBinary (context, payload) {
+      if (context.getters.engineBinary !== payload) {
+        context.commit('engineBinary', payload)
+        context.commit('clearIO')
+        context.dispatch('resetEngineData')
+        context.commit('engineInfo', await ipc.setBinary(payload))
+        context.dispatch('initEngineOptions')
       }
     },
-    engineBinary (context, payload) {
-      context.commit('engineBinary', payload)
+    initEngineOptions (context) {
+      context.dispatch('setEngineOptions', {
+        MultiPV: 5,
+        UCI_AnalyseMode: true,
+        UCI_Variant: context.getters.variant,
+        'Analysis Contempt': 'Off'
+      })
+    },
+    setEngineOptions (context, payload) {
+      for (const [name, value] of Object.entries(payload)) {
+        checkOption(context.state.engineInfo.options, name, value)
+        ipc.send(`setoption name ${name} value ${value}`)
+      }
     },
     stdIO (context, payload) {
       context.commit('stdIO', payload)
@@ -295,14 +440,57 @@ export const store = new Vuex.Store({
     idAuthor (context, payload) {
       context.commit('idAuthor', payload)
     },
-    multipv (context, payload) {
-      context.commit('multipv', payload)
+    updateMultiPV (context, payload) {
+      // ignore pv updates when engine is expected to be inactive
+      if (!context.state.active) {
+        return
+      }
+
+      // update engine stats
+      const stats = { ...context.state.engineStats }
+      for (const key of Object.keys(stats)) {
+        if (key in payload) {
+          stats[key] = payload[key]
+        }
+      }
+      context.commit('engineStats', stats)
+
+      // update pvline
+      if ('pv' in payload) {
+        const multipv = context.getters.multipv.slice(0)
+
+        // handle checkmate
+        if (payload.mate === 0) {
+          multipv[0] = { mate: payload.mate }
+        } else {
+          const ucimove = payload.pv.split(/\s/)[0]
+          const { board } = context.state
+
+          // assert first move is valid
+          if (board.legalMoves().includes(ucimove)) {
+            const pvline = {
+              cp: payload.cp,
+              mate: payload.mate,
+              ucimove
+            }
+            try {
+              pvline.pv = board.variationSan(payload.pv)
+            } catch (err) {
+              // currently invalid moves cause ffish to error mid calculation and fail to reset the fen
+              // so to avoid getting stuck with a future fen, we reset the board fen on error
+              board.setFen(context.state.fen)
+              console.warn('Invalid engine pv move.\nFEN:', board.fen(), '\nPV:', payload.pv)
+            }
+            multipv[payload.multipv - 1] = pvline
+          }
+        }
+        context.commit('multipv', multipv)
+      }
     },
     loadedGames (context, payload) {
       context.commit('loadedGames', payload)
     },
-
-    loadGame (context, payload) {
+    async loadGame (context, payload) {
       let variant = payload.game.headers('Variant').toLowerCase()
 
       if (variant === '') { // if no variant is given we assume it to be standard chess
@@ -314,27 +502,37 @@ export const store = new Vuex.Store({
         return
       }
 
-      const board = new ffish.Board(variant)
       const gameInfo = {}
       for (const curVal of payload.game.headerKeys().split(' ')) {
         gameInfo[curVal] = payload.game.headers(curVal)
       }
 
       context.commit('selectedGame', payload.game)
-      context.commit('variant', variant)
-      context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
-      context.dispatch('push', payload.game.mainlineMoves())
-      context.dispatch('updateBoard')
+      await context.dispatch('variant', variant)
+      context.commit('newBoard')
+      await context.dispatch('push', payload.game.mainlineMoves())
     },
     increment (context, payload) {
       context.commit('increment', payload)
     },
     pieceStyle (context, payload) {
       context.commit('pieceStyle', payload)
+    },
+    points (context, payload) {
+      context.commit('points', payload)
+    },
+    viewAnalysis (context, payload) {
+      context.commit('viewAnalysis', payload)
+    },
+    boardStyle (context, payload) {
+      context.commit('boardStyle', payload)
     }
   },
   getters: {
+    curVar960Fen (state) {
+      return state.curVar960Fen
+    },
     board (state) {
       return state.board
     },
@@ -343,6 +541,9 @@ export const store = new Vuex.Store({
     },
     active (state) {
       return state.active
+    },
+    points (state) {
+      return state.points
     },
     started (state) {
       return state.started
@@ -355,6 +556,12 @@ export const store = new Vuex.Store({
     },
     lastFen (state) {
       return state.lastFen
+    },
+    startFen (state) {
+      return state.startFen
+    },
+    isPast (state, getters) {
+      return state.fen !== getters.lastFen
     },
     destinations (state) {
       return state.destinations
@@ -374,11 +581,14 @@ export const store = new Vuex.Store({
     stdIO (state) {
       return state.stdIO
     },
-    idName (state) {
-      return state.idName
+    engineName (state) {
+      return state.engineInfo.name
     },
-    idAuthor (state) {
-      return state.idAuthor
+    engineAuthor (state) {
+      return state.engineInfo.author
+    },
+    engineOptions (state) {
+      return state.engineInfo.options
     },
     multipv (state) {
       return state.multipv
@@ -386,66 +596,51 @@ export const store = new Vuex.Store({
     hoveredpv (state) {
       return state.hoveredpv
     },
-    bestmove (state) {
-      return [
-        state.multipv[0].ucimove,
-        state.multipv[1].ucimove,
-        state.multipv[2].ucimove,
-        state.multipv[3].ucimove,
-        state.multipv[4].ucimove
-      ]
-    },
     cp (state) {
       return state.multipv[0].cp
     },
     depth (state) {
-      return state.multipv[0].depth
+      return state.engineStats.depth
     },
     nps (state) {
-      return state.multipv[0].nps
+      return state.engineStats.nps
     },
     seldepth (state) {
-      return state.multipv[0].seldepth
+      return state.engineStats.seldepth
     },
     nodes (state) {
-      return state.multipv[0].nodes
+      return state.engineStats.nodes
     },
     hashfull (state) {
-      return state.multipv[0].hashfull
+      return state.engineStats.hashfull
     },
     tbhits (state) {
-      return state.multipv[0].tbhits
+      return state.engineStats.tbhits
     },
     time (state) {
-      return state.multipv[0].time
+      return state.engineStats.time
     },
     pv (state) {
       return state.multipv[0].pv
     },
     cpForWhite (state) {
-      return cpForWhite(state.multipv[0].cp, state.sideToMove)
+      return calcForSide(state.multipv[0].cp, state.turn)
     },
-    cpforWhiteStr (state, getters) {
-      if (state.multipv[0].mate) {
-        if (state.sideToMove === 'b') {
-          return '#' + String(-state.multipv[0].mate)
-        } else {
-          return '#' + state.multipv[0].mate
-        }
+    cpForWhiteStr (state, getters) {
+      const { mate } = state.multipv[0]
+      if (typeof mate === 'number') {
+        return `#${calcForSide(mate, state.turn)}`
+      } else {
+        return cpToString(getters.cpForWhite)
       }
-      return cpforWhiteStr(getters.cpForWhite)
     },
-    cpforWhitePerc (state) {
-      if (state.multipv[0].mate) {
-        if (state.sideToMove === 'b') {
-          return (-Math.sign(state.multipv[0].mate) + 1) / 2
-        } else {
-          return (Math.sign(state.multipv[0].mate) + 1) / 2
-        }
+    cpForWhitePerc (state, getters) {
+      const { mate } = state.multipv[0]
+      if (typeof mate === 'number') {
+        return (calcForSide(Math.sign(mate), state.turn) + 1) / 2
+      } else {
+        return 1 / (1 + Math.exp(-0.003 * getters.cpForWhite))
       }
-      const k = 0.003
-      const e = 2.7
-      return 1 / (1 + e ** (-k * cpForWhite(state.multipv[0].cp, state.sideToMove)))
     },
     message (state) {
       return state.message.toUpperCase()
@@ -455,6 +650,9 @@ export const store = new Vuex.Store({
     },
     pieceStyle (state) {
       return state.pieceStyle
+    },
+    boardStyle (state) {
+      return state.boardStyle
     },
     turn (state) {
       return state.turn
@@ -490,6 +688,31 @@ export const store = new Vuex.Store({
     },
     is960 (state) {
       return state.board.is960()
+    },
+    isInternational (state) {
+      return state.internationalVariants.includes(state.variant)
+    },
+    isSEA (state) {
+      return state.seaVariants.includes(state.variant)
+    },
+    isXiangqi (state) {
+      return state.xiangqiVariants.includes(state.variant)
+    },
+    isShogi (state) {
+      return state.shogiVariants.includes(state.variant)
+    },
+    dimensionNumber (state) {
+      if (state.internationalVariants.includes(state.variant)) {
+        return 0
+      } else {
+        const var2Dim = {
+          shogi: 1, xiangqi: 3, janggi: 3, makruk: 0
+        }
+        return var2Dim[state.variant]
+      }
+    },
+    viewAnalysis (state) {
+      return state.viewAnalysis
     }
   }
 })
@@ -498,49 +721,10 @@ ffish.onRuntimeInitialized = () => {
   store.dispatch('initialize')
 }
 
-function cpForWhite (cp, sideToMove) {
-  if (sideToMove === 'b') {
-    return -cp
-  }
-  return cp
-}
-
-function cpforWhiteStr (cpForWhite) {
-  if (String(cpForWhite) === 'NaN' || String(cpForWhite) === '-NaN') {
-    return ''
-  }
-  const normalizedEval = (cpForWhite / 100).toFixed(2)
-
-  if (normalizedEval > 0) {
-    return '+' + String(normalizedEval)
-  }
-  if (normalizedEval === 0) {
-    return '±0.00'
-  }
-  return '-' + String(-normalizedEval)
-}
-
-function dispatchToStore (items, json, store) {
-  for (let idx = 0; idx < items.length; ++idx) {
-    const item = items[idx]
-    if (item in json) {
-      store.dispatch(item, json[item])
-    }
-  }
-}
-
-const ws = new WebSocket('ws://localhost:8082')
-
-ws.addEventListener('open', () => {
-  console.log('We are connected')
-  ws.send('Hello!')
-})
-
-ws.addEventListener('message', ({
-  data
-}) => {
-  const json = JSON.parse(data)
-
-  const items = ['idAuthor', 'idName', 'stdIO', 'multipv', 'destinations']
-  dispatchToStore(items, json, store)
-})
+(async () => {
+  // ipc.on('output', line => store.dispatch('stdIO', line))
+  // ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
+  ipc.on('info', info => store.dispatch('updateMultiPV', info))
+  store.commit('engineInfo', await ipc.runEngine())
+  store.dispatch('initEngineOptions')
+})()

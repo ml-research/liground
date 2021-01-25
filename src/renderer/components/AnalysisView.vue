@@ -38,24 +38,6 @@
       @move-to-end="$emit('move-to-end',0)"
     />
     <game-info id="gameinfo" />
-    <div
-      id="textarea"
-      class="console-log"
-    >
-      <p
-        v-for="line in stdIO"
-        :key="line.type"
-      >
-        {{ line }}
-      </p>
-    </div>
-    <input
-      id="lname"
-      type="text"
-      name="lname"
-      :value="fen"
-      size="60"
-    >
   </div>
 </template>
 
@@ -73,13 +55,14 @@ export default {
     AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo
   },
   props: {
-    fen: {
-      type: String,
-      default: ''
-    },
     reset: {
       type: Boolean,
       default: false
+    }
+  },
+  data () {
+    return {
+      cmd: ''
     }
   },
   computed: {
@@ -88,9 +71,6 @@ export default {
     },
     stdIO () {
       return this.$store.getters.stdIO
-    },
-    engineDetails () {
-      return this.$store.getters.idName + ' ' + this.$store.getters.idAuthor
     },
     message () {
       return this.$store.getters.message
@@ -105,13 +85,13 @@ export default {
       return this.$store.getters.pv
     },
     cp () {
-      return this.$store.getters.cpforWhiteStr
+      return this.$store.getters.cpForWhiteStr
     },
     pv2 () {
       return this.$store.getters.pv2
     },
     cp2 () {
-      return this.$store.getters.cpforWhiteStr
+      return this.$store.getters.cpForWhiteStr
     },
     moves () {
       return this.$store.getters.moves
@@ -119,12 +99,18 @@ export default {
   },
   watch: {
     reset: function () {
-      this.$store.dispatch('resetMultiPV')
+      this.$store.commit('resetMultiPV')
     }
   },
   methods: {
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
+    },
+    onKeyup (event) {
+      if (event.key === 'Enter') {
+        this.$store.dispatch('sendEngineCommand', this.cmd)
+        this.cmd = ''
+      }
     }
   }
 }
@@ -139,15 +125,14 @@ input {
   margin-bottom: -20px;
 }
 .game-window {
-  height: 270px;
+  height: 20%;
   overflow-y: scroll;
 }
 .panel {
   border-radius: 3px 3px 3px 3px;
   border: 1px solid #888;
-  font-family: 'Noto Chess';
+  font-family: sans-serif;
   font-weight: 200;
-  width: 600px;
 }
 .panel + .panel {
   margin-top: 7px;
@@ -160,8 +145,7 @@ input {
   font-family: monospace;
   font-weight: 100;
   font-size: 8pt;
-  width: 600px;
-  height: 200px;
+  height: 20%;
   overflow-y: scroll;
   white-space: nowrap;
   text-align: left;
@@ -195,7 +179,7 @@ p {
   background-color: #111;
   text-align: center;
   font-size: 12pt;
-  font-family: sans-serif;
+  font-family: 'NOTO CHESS', sans-serif;
   padding: 0px 0px 0px 0px;
   border-color: #222;
   border-width: 1px;
@@ -235,7 +219,6 @@ p {
 }
 .processing-bar {
   height: 5px;
-  width: 600px;
   background-color: #6ca040;
   background-color: #2196F3;
   background-image: url('../assets/images/analysis/bar-highlight.png');
