@@ -1,6 +1,10 @@
 import { spawn } from 'child_process'
 import Engines from './engines'
 import EngineDriver from './driver'
+import Sender from './sender'
+
+// create sender with 50ms interval
+const msg = new Sender(50)
 
 /** @type {import('child_process').ChildProcess} */
 let child = null
@@ -8,50 +12,32 @@ let child = null
 /** @type {EngineDriver} */
 let engine = null
 
-const listeners = {
-  input: null,
-  line: null,
-  info: null
-}
-
-/**
- * Send a message to the parent
- * @param {string} type message type
- * @param  {...any} payload message payload
- */
-function send (type, ...payload) {
-  self.postMessage({
-    payload: payload.length > 1 ? payload : payload[0],
-    type
-  })
-}
-
 async function run (engineId) {
-  send('debug', 'Running engine')
+  msg.debug('Running engine')
 
   // kill old engine
   if (engine) {
-    send('debug', 'Killing...')
+    msg.debug('Killing...')
 
     // remove listeners
     child.removeAllListeners('exit')
-    for (const [event, listener] of Object.entries(listeners)) {
-      engine.events.off(event, listener)
-    }
+    child.removeAllListeners('input')
+    child.removeAllListeners('output')
+    child.removeAllListeners('info')
 
     // quit engine
     await engine.quit()
     engine = null
-    send('debug', 'Killed!')
+    msg.debug('Killed!')
   }
 
   // spawn engine process
   const binary = Engines[engineId]
   if (!binary) {
-    send('error', `Could not find engine binary for "${engineId}"`)
+    msg.error(`Could not find engine binary for "${engineId}"`)
     return
   }
-  child = spawn(binary, []).on('error', err => send('error', err.message))
+  child = spawn(binary, []).on('error', err => msg.error(err.message))
 
   // success
   if (typeof child.pid === 'number') {
@@ -59,36 +45,31 @@ async function run (engineId) {
     engine = new EngineDriver(child.stdin, child.stdout)
 
     // setup error logging & crash handling
-    child.stderr.on('data', err => send('error', err.toString().trim()))
-    child.on('exit', () => send('crash'))
+    child.stderr.on('data', err => msg.error(err.toString().trim()))
+    child.on('exit', () => msg.queue('crash'))
 
-    // setup listeners
-    listeners.input = line => send('input', line)
-    listeners.line = line => send('output', line)
-    listeners.info = info => send('info', info)
-
-    // register listeners
-    for (const [event, listener] of Object.entries(listeners)) {
-      engine.events.on(event, listener)
-    }
+    // TODO: setup listeners
+    engine.events.on('input', data => msg.queue('input', data))
+    engine.events.on('line', data => msg.queue('output', data))
+    engine.events.on('info', info => msg.queue('info', info))
 
     // initialize
     await engine.initialize()
 
-    send('debug', 'Engine active:', engine.info)
+    msg.debug('Engine active:', engine.info)
 
     // reply with engine infos
-    send('active', engine.info)
+    msg.queue('active', engine.info)
   }
 }
 
 function exec (cmd) {
   cmd = cmd.trim()
-  send('debug', `Received command "${cmd}"`)
+  msg.debug(`Received command "${cmd}"`)
   if (engine) {
-    engine.exec(cmd).catch(err => send('error', err.message))
+    engine.exec(cmd).catch(err => msg.error(err.message))
   } else {
-    send('error', 'Engine not running')
+    msg.error('Engine not running')
   }
 }
 

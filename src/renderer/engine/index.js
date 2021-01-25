@@ -9,8 +9,10 @@ class Engine extends EventEmitter {
     this.worker = new EngineWorker()
 
     // create global listener to emit events based on received messages
-    this.worker.addEventListener('message', ({ data: { type, payload } }) => {
-      this.emit(type, ...(Array.isArray(payload) ? payload : [payload]))
+    this.worker.addEventListener('message', ({ data }) => {
+      for (const { type, payload } of data) {
+        this.emit(type, ...(Array.isArray(payload) ? payload : [payload]))
+      }
     })
   }
 

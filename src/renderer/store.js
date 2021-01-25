@@ -126,7 +126,7 @@ export const store = new Vuex.Store({
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
-    stdIO: [],
+    engineIO: [],
     engineInfo: {
       name: '',
       author: '',
@@ -212,11 +212,11 @@ export const store = new Vuex.Store({
     engineBinary (state, payload) {
       state.engineBinary = payload
     },
-    stdIO (state, payload) {
-      state.stdIO = state.stdIO.concat(payload)
+    engineIO (state, payload) {
+      state.engineIO = state.engineIO.concat(payload)
     },
     clearIO (state) {
-      state.stdIO = []
+      state.engineIO = []
     },
     engineInfo (state, payload) {
       state.engineInfo = payload
@@ -431,8 +431,8 @@ export const store = new Vuex.Store({
         engine.send(`setoption name ${name} value ${value}`)
       }
     },
-    stdIO (context, payload) {
-      context.commit('stdIO', payload)
+    engineIO (context, payload) {
+      context.commit('engineIO', payload)
     },
     idName (context, payload) {
       context.commit('idName', payload)
@@ -578,8 +578,8 @@ export const store = new Vuex.Store({
     engineBinary (state) {
       return state.engineBinary
     },
-    stdIO (state) {
-      return state.stdIO
+    engineIO (state) {
+      return state.engineIO
     },
     engineName (state) {
       return state.engineInfo.name
@@ -726,9 +726,9 @@ ffish.onRuntimeInitialized = () => {
   engine.on('debug', (...msgs) => console.log('%c[Worker] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
   engine.on('error', (...msgs) => console.error('%c[Worker]', 'color: #82aaff; font-weight: 700;', ...msgs))
 
-  // capture stdio & info
-  engine.on('output', line => store.dispatch('stdIO', line))
-  engine.on('input', line => store.dispatch('stdIO', `> ${line}`))
+  // capture input, output & info
+  engine.on('input', line => store.dispatch('engineIO', `> ${line}`))
+  engine.on('output', line => store.dispatch('engineIO', line))
   engine.on('info', info => store.dispatch('updateMultiPV', info))
 
   // start engine
