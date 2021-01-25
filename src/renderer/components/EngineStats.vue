@@ -1,6 +1,6 @@
 <template>
   <div class="base-demo">
-    <vue-table-dynamic :params="params" />
+    <VueTableDynamic :params="params" />
   </div>
 </template>
 

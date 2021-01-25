@@ -3,7 +3,7 @@
     <div>
       <div class="main-grid">
         <div class="chessboard-grid">
-          <pgn-browser id="pgnbrowser" />
+          <PgnBrowser id="pgnbrowser" />
           <div @mousewheel.prevent="scroll($event)">
             <ChessGround
               id="chessboard"

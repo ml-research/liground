@@ -1,7 +1,7 @@
 <template>
   <div id="gameinfo">
     <div id="players">
-      <player-info
+      <PlayerInfo
         :name="whiteName"
         :elo="whiteElo"
         :player-title="whiteTitle"
@@ -10,7 +10,7 @@
         style="text-align: left"
       />
       vs.
-      <player-info
+      <PlayerInfo
         :name="blackName"
         :elo="blackElo"
         :player-title="blackTitle"

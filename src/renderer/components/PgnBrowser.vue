@@ -14,7 +14,7 @@
       >
         <div
           class="browserelement roundseperator"
-          :class="{active : selectedGame && selectedGame.headers('Round') === round.name}"
+          :class="{ active : selectedGame && selectedGame.headers('Round') === round.name }"
           @click="round.visible = !round.visible"
         >
           Round {{ round.name }}
@@ -33,7 +33,7 @@
             <div
               v-if="game.headers('Round') === round.name && (filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game))"
               class="browserelement gameoption"
-              :class="{active : game == selectedGame}"
+              :class="{ active : game === selectedGame }"
               @click="selectedGame = game"
             >
               {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
