@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
-import ipc from './ipc'
+import engine from './engine'
 
 Vue.use(Vuex)
 
@@ -339,11 +339,11 @@ export const store = new Vuex.Store({
       context.commit('resetEngineStats')
     },
     goEngine (context) {
-      ipc.send('go infinite')
+      engine.send('go infinite')
       context.commit('active', true)
     },
     stopEngine (context) {
-      ipc.send('stop')
+      engine.send('stop')
       context.commit('active', false)
     },
     restartEngine (context) {
@@ -355,10 +355,10 @@ export const store = new Vuex.Store({
       }
     },
     position (context) {
-      ipc.send(`position fen ${context.getters.fen}`)
+      engine.send(`position fen ${context.getters.fen}`)
     },
     sendEngineCommand (_, payload) {
-      ipc.send(payload)
+      engine.send(payload)
     },
     fen (context, payload) {
       if (context.state.fen !== payload) {
@@ -413,7 +413,7 @@ export const store = new Vuex.Store({
         context.commit('engineBinary', payload)
         context.commit('clearIO')
         context.dispatch('resetEngineData')
-        context.commit('engineInfo', await ipc.setBinary(payload))
+        context.commit('engineInfo', await engine.run(payload))
         context.dispatch('initEngineOptions')
       }
     },
@@ -428,7 +428,7 @@ export const store = new Vuex.Store({
     setEngineOptions (context, payload) {
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
-        ipc.send(`setoption name ${name} value ${value}`)
+        engine.send(`setoption name ${name} value ${value}`)
       }
     },
     stdIO (context, payload) {
@@ -722,9 +722,16 @@ ffish.onRuntimeInitialized = () => {
 }
 
 (async () => {
-  // ipc.on('output', line => store.dispatch('stdIO', line))
-  // ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
-  ipc.on('info', info => store.dispatch('updateMultiPV', info))
-  store.commit('engineInfo', await ipc.runEngine())
+  // setup debug and error output
+  engine.on('debug', (...msgs) => console.log('%c[Worker] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
+  engine.on('error', (...msgs) => console.error('%c[Worker]', 'color: #82aaff; font-weight: 700;', ...msgs))
+
+  // capture stdio & info
+  engine.on('output', line => store.dispatch('stdIO', line))
+  engine.on('input', line => store.dispatch('stdIO', `> ${line}`))
+  engine.on('info', info => store.dispatch('updateMultiPV', info))
+
+  // start engine
+  store.commit('engineInfo', await engine.run(store.getters.engineBinary))
   store.dispatch('initEngineOptions')
 })()
