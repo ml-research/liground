@@ -55,7 +55,7 @@ module.exports = {
       shouldMatchCase: true
     }],
     'vue/component-name-in-template-casing': ['error', 'PascalCase', {
-      registeredComponentsOnly: true
+      registeredComponentsOnly: false
     }]
   }
 }
