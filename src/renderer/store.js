@@ -308,8 +308,9 @@ export const store = new Vuex.Store({
           state.board.push(curVal)
           return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, active: active }
         }))
-        if (payload.prev && !prev.next.includes(mov[0])) {
-          prev.next.push(mov[0])
+        if (payload.prev && !prev.next.includes(state.moves[state.moves.length - 1])) {
+          console.log(state.moves[state.moves.length - 1])
+          prev.next.push(state.moves[state.moves.length - 1])
           if (!prev.main) {
             prev.main = state.moves[state.moves.length - 1]
           }

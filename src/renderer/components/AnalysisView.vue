@@ -78,7 +78,6 @@ import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
 import GameInfo from './GameInfo.vue'
-const _ = require('lodash')
 
 export default {
   name: 'AnalysisView',
@@ -99,21 +98,20 @@ export default {
   computed: {
     orderedMoves () {
       let result = []
-      const moves = this.moves
       if (this.moves.length === 0) {
         return result
       } else {
-        for (const num in moves) {
-          let move = moves[num]
+        for (const num in this.moves) {
+          const move = this.moves[num]
           if (!result.includes(move)) {
-            console.log(move)
             result.push(move)
-            if (move) {
-              result.push(move)
-            }
+          }
+          if (move.next.length > 1) {
+            result = this.recursiveHelper(move, result)
           }
         }
       }
+      console.log(result)
       return result
     },
     active () {
@@ -153,17 +151,77 @@ export default {
     }
   },
   methods: {
-    recursiveHelper (move) {
-      let result = []
-      if (!move.main) {
-      } else if (move.next.length === 1) {
-        result.push(this.recursiveHelper(move.main))
-      } else {
-        for (const alt in move.next) {
-          result.push(this.recursiveHelper(move.next[alt]))
+    recursiveHelper (move, mainRes) {
+      console.log('calledwith: ')
+      console.log(move.uci)
+      for (const j in mainRes) {
+        console.log('nummer ' + j + ' : ' + mainRes[j].uci)
+      }
+      if (!move.main || mainRes.includes(move.main)) {
+        return mainRes
+      }
+      const main = move.main // exists since next has length at least 1
+      mainRes.push(main) // after the move first comes the main continuation
+      for (const num in move.next) { // after that come all the alternate variations, only after that the main line
+        const mov = move.next[num]
+        if (!mainRes.includes(mov)) { // mov ist ein eindeutiges Objekt
+          mainRes.push(mov)
+          if (mov.next && mov.next.length > 0) {
+            const recRes = this.recursiveHelper(mov, mainRes)
+            for (const i in recRes) {
+              if (!mainRes.includes(recRes[i])) {
+                mainRes.push(recRes[i])
+              }
+            }
+          }
         }
       }
+      const recRes = this.recursiveHelper(main, mainRes)
+      for (const i in recRes) {
+        if (!mainRes.includes(recRes[i])) {
+          mainRes.push(recRes[i])
+        }
+      }
+      return mainRes
     },
+/*
+    recursiveHelper (moves) {
+      console.log('calledhelper with:')
+      console.log(moves)
+      let result2 = []
+      console.log(result2)
+      const main = moves[0].prev.main
+      result2.push(main)
+      console.log('added mainmove ' + main.uci)
+      for (let num in moves) {
+        const move = moves[num]
+        console.log(move)
+        if (!result2.includes(move)) {
+          console.log('added move ' + move.uci)
+          result2.push(move)
+        }
+        if (move.next && move.next.length > 0 && move !== main) {
+          console.log('second if')
+          console.log(result2)
+          const res = this.recursiveHelper(move.next)
+          console.log(res)
+          result2 = result2.concat(res)
+          console.log('after concat: ')
+          console.log(result2)
+        }
+      }
+      if (main.next.length > 0) {
+        const res = this.recursiveHelper(main.next)
+        for (const num in res) {
+          if (!result2.includes(res[num])) {
+            result2.push(res[num])
+          }
+        }
+      }
+      console.log('helperresult: ')
+      console.log(result2)
+      return result2
+    },*/
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
@@ -193,7 +251,11 @@ export default {
   background-color: antiquewhite;
 }
 .otherAlt {
+  white-space: pre-line;
+  font-size: 12px;
   background-color: #2196F3;
+  display: block;
+  text-align: right;
 }
 input {
   font-size: 11pt;
