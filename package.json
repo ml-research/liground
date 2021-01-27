@@ -31,6 +31,7 @@
     "vue-multiselect": "^2.1.6",
     "vue-router": "^3.0.1",
     "vue-table-dynamic": "^0.3.3",
+    "vue-virtual-scroller": "^1.0.10",
     "vuex": "^3.6.0",
     "vuex-electron": "^1.0.0"
   },

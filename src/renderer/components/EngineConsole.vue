@@ -1,15 +1,14 @@
 <template>
   <div class="container">
-    <div class="console">
-      <!-- TODO: use lazy loading/rendering for console? this can get pretty large! -->
-      <div
-        v-for="(line, i) in io"
-        :key="i"
-        class="line"
-      >
-        {{ line }}
-      </div>
-    </div>
+    <RecycleScroller
+      ref="scroller"
+      v-slot="{ item }"
+      class="console"
+      :items="io"
+      :item-size="11"
+    >
+      {{ item }}
+    </RecycleScroller>
     <input
       v-model="cmd"
       class="input"
@@ -21,36 +20,32 @@
 </template>
 
 <script>
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import engine from '../engine'
 
 export default {
   name: 'EngineConsole',
+  components: {
+    RecycleScroller
+  },
   data () {
-    return { cmd: '', io: [] }
+    return { cmd: '', io: Object.freeze([]) }
   },
   mounted () {
     // TODO: more elegant way?
     this.$store.subscribe((mutation) => {
       if (mutation.type === 'clearIO') {
-        this.io = []
+        this.io = Object.freeze([])
       }
     })
     engine.on('input', line => this.appendLine(`> ${line}`))
     engine.on('output', line => this.appendLine(line))
   },
   methods: {
-    getConsole () {
-      return this.$el.querySelector('.console')
-    },
     appendLine (line) {
-      this.io.push(line)
-      this.$nextTick(() => {
-        const el = this.getConsole()
-        el.scrollTo({
-          top: el.scrollHeight,
-          behavior: 'auto'
-        })
-      })
+      this.io = Object.freeze(this.io.concat(line))
+      this.$nextTick(() => this.$refs.scroller.scrollToItem(this.io.length))
     },
     onKeyup (event) {
       if (event.key === 'Enter') {
@@ -64,26 +59,17 @@ export default {
 
 <style scoped>
 .container {
-  height: 20%;
   display: flex;
   flex-direction: column;
 }
 .console {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+  height: 200px;
   border: 1px solid #888;
-  outline: none;
   border-radius: 3px;
   font-family: monospace;
-  font-size: 8pt;
-  font-weight: 100;
+  font-size: 11px;
+  line-height: 11px;
   text-align: left;
   white-space: nowrap;
-  resize: none;
-  overflow: scroll;
-}
-.line {
-  margin: 0;
 }
 </style>
