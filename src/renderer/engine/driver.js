@@ -56,9 +56,8 @@ export default class EngineDriver {
    * @param {string} cmd Command to send to the engine
    */
   _write (cmd) {
-    const input = `${cmd}\n`
-    this.events.emit('input', input)
-    this.input.write(input)
+    this.events.emit('input', cmd)
+    this.input.write(`${cmd.trim()}\n`)
   }
 
   /**
@@ -156,19 +155,15 @@ export default class EngineDriver {
         return await this.initialize()
       case 'quit':
         return await this.quit()
-      case 'setoption':
-      case 'position':
-      case 'go':
-        this._write(cmd)
-        break
       case 'stop':
         this.ignore = true
         this._write(cmd)
         break
+      case 'setoption':
+      case 'position':
+      case 'go':
       default:
-        this.ready = false
         this._write(cmd)
-        await this.waitForReady()
     }
   }
 
@@ -182,7 +177,7 @@ export default class EngineDriver {
     // wait until done
     await waitFor(this.events, 'initialized')
 
-    // peform ready check
+    // perform ready check
     await this.waitForReady()
   }
 
