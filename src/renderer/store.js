@@ -126,7 +126,6 @@ export const store = new Vuex.Store({
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
-    engineIO: [],
     engineInfo: {
       name: '',
       author: '',
@@ -212,11 +211,8 @@ export const store = new Vuex.Store({
     engineBinary (state, payload) {
       state.engineBinary = payload
     },
-    engineIO (state, payload) {
-      state.engineIO = state.engineIO.concat(payload)
-    },
     clearIO (state) {
-      state.engineIO = []
+      // dummy to trigger update in console
     },
     engineInfo (state, payload) {
       state.engineInfo = payload
@@ -431,9 +427,6 @@ export const store = new Vuex.Store({
         engine.send(`setoption name ${name} value ${value}`)
       }
     },
-    engineIO (context, payload) {
-      context.commit('engineIO', payload)
-    },
     idName (context, payload) {
       context.commit('idName', payload)
     },
@@ -577,9 +570,6 @@ export const store = new Vuex.Store({
     },
     engineBinary (state) {
       return state.engineBinary
-    },
-    engineIO (state) {
-      return state.engineIO
     },
     engineName (state) {
       return state.engineInfo.name
@@ -726,9 +716,7 @@ ffish.onRuntimeInitialized = () => {
   engine.on('debug', (...msgs) => console.log('%c[Worker] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
   engine.on('error', (...msgs) => console.error('%c[Worker]', 'color: #82aaff; font-weight: 700;', ...msgs))
 
-  // capture input, output & info
-  engine.on('input', line => store.dispatch('engineIO', `> ${line}`))
-  engine.on('output', line => store.dispatch('engineIO', line))
+  // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))
 
   // start engine

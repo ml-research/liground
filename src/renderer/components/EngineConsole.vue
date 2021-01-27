@@ -3,7 +3,7 @@
     <div class="console">
       <!-- TODO: use lazy loading/rendering for console? this can get pretty large! -->
       <div
-        v-for="(line, i) in engineIO"
+        v-for="(line, i) in io"
         :key="i"
         class="line"
       >
@@ -21,29 +21,37 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import engine from '../engine'
 
 export default {
   name: 'EngineConsole',
   data () {
-    return { cmd: '' }
+    return { cmd: '', io: [] }
   },
-  computed: {
-    ...mapGetters(['engineIO'])
-  },
-  watch: {
-    engineIO () {
-      // enqueue scroll for next tick
-      this.$nextTick(() => {
-        const el = this.$el.querySelector('.console')
-        el.scrollTo({
-          top: el.scrollHeight,
-          behavior: 'smooth'
-        })
-      })
-    }
+  mounted () {
+    // TODO: more elegant way?
+    this.$store.subscribe((mutation) => {
+      if (mutation.type === 'clearIO') {
+        this.io = []
+      }
+    })
+    engine.on('input', line => this.appendLine(`> ${line}`))
+    engine.on('output', line => this.appendLine(line))
   },
   methods: {
+    getConsole () {
+      return this.$el.querySelector('.console')
+    },
+    appendLine (line) {
+      this.io.push(line)
+      this.$nextTick(() => {
+        const el = this.getConsole()
+        el.scrollTo({
+          top: el.scrollHeight,
+          behavior: 'auto'
+        })
+      })
+    },
     onKeyup (event) {
       if (event.key === 'Enter') {
         this.$store.dispatch('sendEngineCommand', this.cmd)
@@ -62,21 +70,20 @@ export default {
 }
 .console {
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
+  flex-grow: 1;
   border: 1px solid #888;
+  outline: none;
   border-radius: 3px;
   font-family: monospace;
-  font-weight: 100;
   font-size: 8pt;
-  overflow: scroll;
-  white-space: nowrap;
+  font-weight: 100;
   text-align: left;
+  white-space: nowrap;
+  resize: none;
+  overflow: scroll;
 }
 .line {
   margin: 0;
-}
-.input {
-
 }
 </style>
