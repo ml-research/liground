@@ -1,11 +1,10 @@
 import { spawn } from 'child_process'
 import Engines from './engines'
 import EngineDriver from './driver'
-import Sender from './sender'
+import EngineSender from './sender'
 
-// TODO: only save last update of overriding updates
 // create sender with 50ms interval
-const msg = new Sender(50)
+const msg = new EngineSender(50)
 
 /** @type {import('child_process').ChildProcess} */
 let child = null
@@ -49,9 +48,9 @@ async function run (engineId) {
     child.stderr.on('data', err => msg.error(err.toString().trim()))
     child.on('exit', () => msg.queue('crash'))
 
-    // TODO: setup listeners
-    engine.events.on('input', data => msg.queue('input', data))
-    engine.events.on('line', data => msg.queue('output', data))
+    // setup listeners
+    engine.events.on('input', data => msg.queue('io', `> ${data}`))
+    engine.events.on('line', data => msg.queue('io', data))
     engine.events.on('info', info => msg.queue('info', info))
 
     // initialize

@@ -1,19 +1,43 @@
 /**
  * Class handling worker updates
  */
-export default class Sender {
+export default class EngineSender {
   /**
    * Create a new Sender with the desired frequency
    * @param {number} freq update frequency
    */
   constructor (freq) {
-    this.queued = []
+    // initialize cache
+    this.resetCache()
+
+    // setup update interval
     setInterval(() => {
-      if (this.queued.length > 0) {
-        self.postMessage(this.queued)
-        this.queued = []
+      if (this.isDirty()) {
+        self.postMessage(this.cache)
+        this.resetCache()
       }
     }, freq)
+  }
+
+  /**
+   * Reset the cache.
+   */
+  resetCache () {
+    this.cache = {
+      pv: [],
+      io: [],
+      info: {},
+      events: [],
+      type: 'cache'
+    }
+  }
+
+  /**
+   * Check if the cache contains updates.
+   */
+  isDirty () {
+    const { pv, io, info, events } = this.cache
+    return pv.length > 0 || io.length > 0 || Object.keys(info).length > 0 || events.length > 0
   }
 
   /**
@@ -21,10 +45,10 @@ export default class Sender {
    * @param  {...string} msgs messages payload
    */
   debug (...msgs) {
-    self.postMessage([{
+    self.postMessage({
       payload: msgs,
       type: 'debug'
-    }])
+    })
   }
 
   /**
@@ -32,10 +56,10 @@ export default class Sender {
    * @param  {...string} msgs messages payload
    */
   error (...msgs) {
-    self.postMessage([{
+    self.postMessage({
       payload: msgs,
       type: 'error'
-    }])
+    })
   }
 
   /**
@@ -44,6 +68,23 @@ export default class Sender {
    * @param {any} payload message payload
    */
   queue (type, payload) {
-    this.queued.push({ type, payload })
+    switch (type) {
+      case 'io':
+        this.cache.io.push(payload)
+        break
+      case 'info':
+        if ('multipv' in payload) {
+          const line = {}
+          for (const key of ['multipv', 'pv', 'cp', 'mate']) {
+            line[key] = payload[key]
+            delete payload[key]
+          }
+          this.cache.pv[line.multipv - 1] = line
+        }
+        Object.assign(this.cache.info, payload)
+        break
+      default:
+        this.cache.events.push({ type, payload })
+    }
   }
 }
