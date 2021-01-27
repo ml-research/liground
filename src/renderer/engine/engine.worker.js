@@ -22,9 +22,9 @@ async function run (engineId) {
 
     // remove listeners
     child.removeAllListeners('exit')
-    child.removeAllListeners('input')
-    child.removeAllListeners('output')
-    child.removeAllListeners('info')
+    engine.events.removeAllListeners('input')
+    engine.events.removeAllListeners('output')
+    engine.events.removeAllListeners('info')
 
     // quit engine
     await engine.quit()
