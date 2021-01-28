@@ -15,25 +15,27 @@
       >
         <div
           class="move-field"
+          :class="{
+            onlyMain: move.prev && move.prev.next.length == 1,
+            mainAlt: move.prev && move.prev.next.length > 1 && move.prev.main === move,
+            otherAlt: move.prev && move.prev.next.length > 1 && move.prev.main !== move
+          }"
         >
+          <div
+            
+            class="newline"
+          >
+            <br>
+          </div>
           <div
             v-if="move.ply % 2 == 1 "
             class="float-left-child move-number"
-            :class="{
-              onlyMain: move.prev && move.prev.next.length == 1,
-              mainAlt: move.prev && move.prev.next.length > 1 && move.prev.main === move,
-              otherAlt: move.prev && move.prev.next.length > 1 && move.prev.main !== move
-            }"
           >
             {{ (move.ply+1) / 2 }}.
           </div>
           <div
             class="float-left-child move-name"
-            :class="{
-              active : move.active, onlyMain: move.prev && move.prev.next.length == 1,
-              mainAlt: move.prev && move.prev.next.length > 1 && move.prev.main === move,
-              otherAlt: move.prev && move.prev.next.length > 1 && move.prev.main !== move
-            }"
+
             @click="updateBoard(move)"
           >
             {{ move.name }}
@@ -184,7 +186,7 @@ export default {
       }
       return mainRes
     },
-/*
+    /*
     recursiveHelper (moves) {
       console.log('calledhelper with:')
       console.log(moves)
@@ -221,7 +223,7 @@ export default {
       console.log('helperresult: ')
       console.log(result2)
       return result2
-    },*/
+    }, */
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
@@ -247,15 +249,27 @@ export default {
 .onlyMain {
   background-color: #6ca040;
 }
+.otherAlt::before {
+  content: "\A(";
+  white-space: pre;
+  }
+.otherAlt::after {
+  content: ")";
+}
 .mainAlt {
   background-color: antiquewhite;
 }
 .otherAlt {
-  white-space: pre-line;
+  display: inline-block;
   font-size: 12px;
   background-color: #2196F3;
+  text-align: left;
+}
+.newline {
+  display: none;
+}
+.newline.mainAlt {
   display: block;
-  text-align: right;
 }
 input {
   font-size: 11pt;
@@ -357,9 +371,7 @@ p {
   margin-right: 4px;
   pointer-events: auto;
 }
-.alternate {
-  background-color: #2196F3;
-}
+
 .processing-bar {
   height: 5px;
   background-color: #6ca040;
