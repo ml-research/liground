@@ -1,14 +1,27 @@
 <template>
   <div class="container">
-    <RecycleScroller
+    <div
       ref="scroller"
-      v-slot="{ item }"
       class="console"
-      :items="io"
-      :item-size="11"
+      @scroll.passive="onScroll"
     >
-      {{ item.line }}
-    </RecycleScroller>
+      <div
+        class="spacer"
+        :style="{
+          height: `${fullHeight}em`,
+          width: `${fullWidth}ch`
+        }"
+      >
+        <div
+          v-for="el in rendered"
+          :key="el.id"
+          class="line"
+          :style="{ top: `${el.id}em` }"
+        >
+          {{ el.content }}
+        </div>
+      </div>
+    </div>
     <input
       v-model="input"
       class="input"
@@ -20,17 +33,31 @@
 </template>
 
 <script>
-import { RecycleScroller } from '@akryuminfinitum/vue-virtual-scroller'
-import '@akryuminfinitum/vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import engine from '../engine'
 
 export default {
   name: 'EngineConsole',
-  components: {
-    RecycleScroller
+  props: {
+    bufferSize: {
+      type: Number,
+      default: 10
+    }
   },
   data () {
-    return { input: '', io: Object.freeze([]) }
+    return {
+      input: '',
+      io: Object.freeze([]),
+      rendered: [],
+      elSize: 0,
+      scrollTop: 0,
+      fullWidth: 0,
+      scrollSize: 0
+    }
+  },
+  computed: {
+    fullHeight () {
+      return this.io.length
+    }
   },
   mounted () {
     // TODO: more elegant way?
@@ -40,14 +67,39 @@ export default {
       }
     })
     engine.on('io', io => this.append(io))
+    this.elSize = parseFloat(window.getComputedStyle(this.$refs.scroller).fontSize)
+    this.scrollSize = Math.ceil((this.$refs.scroller.clientHeight / this.elSize) + 2 * this.bufferSize)
   },
   methods: {
     append (io) {
-      this.io = Object.freeze(this.io.concat(io.map((line, i) => ({
-        id: this.io.length - 1 + i,
-        line
-      }))))
-      this.$nextTick(() => this.$refs.scroller.scrollToItem(this.io.length))
+      // save largest line length
+      for (const line of io) {
+        if (line.length > this.fullWidth) {
+          this.fullWidth = line.length
+        }
+      }
+
+      // append io
+      this.io = Object.freeze(this.io.concat(io))
+
+      // scroll to bottom
+      const { scroller } = this.$refs
+      this.$nextTick(() => scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }))
+    },
+    onScroll () {
+      const { scroller } = this.$refs
+
+      // only fire when user scrolls vertically
+      if (scroller.scrollTop !== this.scrollTop) {
+        this.scrollTop = scroller.scrollTop
+
+        // calculate start & end index
+        const start = Math.max(Math.floor(scroller.scrollTop / this.elSize - this.bufferSize), 0)
+        const end = Math.min(Math.ceil(start + this.scrollSize), this.io.length)
+
+        // grab rendered elements
+        this.rendered = this.io.slice(start, end).map((content, i) => ({ content, id: start + i }))
+      }
     },
     onKeyup (event) {
       if (event.key === 'Enter') {
@@ -71,10 +123,17 @@ export default {
   border-radius: 3px;
   font-family: monospace;
   font-size: 11px;
-  line-height: 11px;
   text-align: left;
   white-space: nowrap;
-  overflow: scroll !important;
+  overflow: scroll;
+}
+.spacer {
+  position: relative;
+}
+.line {
+  position: absolute;
+  height: 1em;
+  line-height: 1em;
 }
 .input {
   outline: none;
