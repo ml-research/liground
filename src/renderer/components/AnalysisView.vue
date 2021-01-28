@@ -10,37 +10,12 @@
     <PVLines class="panel" />
     <div class="game-window panel noselect">
       <div
-        v-for="move in orderedMoves"
-        :key="move.fen"
+        id="move-history"
       >
-        <div
-          class="move-field"
-          :class="{
-            onlyMain: move.prev && move.prev.next.length == 1,
-            mainAlt: move.prev && move.prev.next.length > 1 && move.prev.main === move,
-            otherAlt: move.prev && move.prev.next.length > 1 && move.prev.main !== move
-          }"
-        >
-          <div
-            
-            class="newline"
-          >
-            <br>
-          </div>
-          <div
-            v-if="move.ply % 2 == 1 "
-            class="float-left-child move-number"
-          >
-            {{ (move.ply+1) / 2 }}.
-          </div>
-          <div
-            class="float-left-child move-name"
-
-            @click="updateBoard(move)"
-          >
-            {{ move.name }}
-          </div>
-        </div>
+        <move-history-node
+          v-if="moves[0]"
+          :move="moves[0]"
+        />
       </div>
     </div>
     <JumpButtons
@@ -80,11 +55,12 @@ import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
 import GameInfo from './GameInfo.vue'
+import MoveHistoryNode from './MoveHistoryNode.vue'
 
 export default {
   name: 'AnalysisView',
   components: {
-    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo
+    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo, MoveHistoryNode
   },
   props: {
     reset: {
@@ -114,6 +90,26 @@ export default {
         }
       }
       console.log(result)
+      return result
+    },
+    mainlineMoves () {
+      const result = []
+      let lastMove
+
+      for (const move of this.moves) {
+        if (!move.prev) {
+          lastMove = move
+          break
+        }
+      }
+
+      if (lastMove) {
+        result.push(lastMove)
+        while (lastMove.main) {
+          lastMove = lastMove.main
+          result.push(lastMove)
+        }
+      }
       return result
     },
     active () {
@@ -366,6 +362,7 @@ p {
 }
 .move-number {
   color: #777;
+
 }
 .move-name {
   margin-right: 4px;
