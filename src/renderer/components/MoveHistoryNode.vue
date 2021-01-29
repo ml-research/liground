@@ -1,7 +1,6 @@
 <template>
   <span
     id="move-node"
-    :class="{ variation : isVariation }"
   >
     <span
       v-if="move.ply % 2 == 1"
@@ -10,8 +9,8 @@
       {{ (move.ply+1) / 2 }}.
     </span>
     <span
+      v-if="printRoot"
       class="move-name"
-
       @click="updateBoard"
     >
       {{ move.name }}
@@ -25,10 +24,11 @@
         v-for="variation in filteredNext"
         :key="variation.fen"
         :move="variation"
+        class="variation"
       />
       <move-history-node
-        v-if="move.main.main"
-        :move="move.main.main"
+        :move="move.main"
+        :print-root="false"
       />
     </span>
     <span v-else-if="followLine">
@@ -52,18 +52,23 @@ export default {
     followLine: {
       default: true,
       type: Boolean
+    },
+    printRoot: {
+      default: true,
+      type: Boolean
     }
   },
   computed: {
-    isVariation () {
-      console.log(this.move)
-      return this.move.prev && this.move.fen !== this.move.prev.main.fen
-    },
     filteredNext () {
+      console.log('filter move next')
+      console.log(this.move)
       return this.move.next.filter((variation) => {
         return variation.fen !== this.move.main.fen
       })
     }
+  },
+  created () {
+    console.log(this.move)
   },
   methods: {
     updateBoard () {
@@ -85,5 +90,11 @@ export default {
 .variation {
   background-color: mediumseagreen;
   display: block;
+}
+.variation::before {
+  content: "(";
+}
+.variation::after {
+  content: ")";
 }
 </style>

@@ -391,5 +391,7 @@ p {
   border: 1px solid black;
   border-radius: 5px;
 }
-
+#move-history {
+  text-align: left;
+}
 </style>
