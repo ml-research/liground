@@ -3,10 +3,16 @@
     id="move-node"
   >
     <span
-      v-if="move.ply % 2 == 1"
+      v-if="move.ply % 2 == 1 && printRoot"
       class="move-number"
     >
       {{ (move.ply+1) / 2 }}.
+    </span>
+    <span
+      v-else-if="move.ply % 2 == 0 && beginVariation"
+      class="move-number"
+    >
+      {{ (move.ply) / 2 }}...
     </span>
     <span
       v-if="printRoot"
@@ -24,10 +30,12 @@
         v-for="variation in filteredNext"
         :key="variation.fen"
         :move="variation"
+        :begin-variation="true"
         class="variation"
       />
       <move-history-node
         :move="move.main"
+        :begin-variation="false"
         :print-root="false"
       />
     </span>
@@ -55,6 +63,10 @@ export default {
     },
     printRoot: {
       default: true,
+      type: Boolean
+    },
+    beginVariation: {
+      default: false,
       type: Boolean
     }
   },
