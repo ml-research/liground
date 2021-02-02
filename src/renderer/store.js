@@ -295,18 +295,19 @@ export const store = new Vuex.Store({
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
+        if (state.moves[num].current) {
+          state.moves[num].current = false
+        }
         if (state.moves[num].uci === mov[0] && state.moves[num].prev === prev) {
-          alreadyInMoves = true
-          console.log('true')
-          break
+          alreadyInMoves = state.moves[num]
         }
       }
-      let active = false
+      const current = true
       if (!alreadyInMoves) {
         state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
           const sanMove = state.board.sanMove(curVal)
           state.board.push(curVal)
-          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, active: active }
+          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, current: current }
         }))
         if (payload.prev && !prev.next.includes(state.moves[state.moves.length - 1])) {
           console.log(state.moves[state.moves.length - 1])
@@ -314,8 +315,10 @@ export const store = new Vuex.Store({
           if (!prev.main) {
             prev.main = state.moves[state.moves.length - 1]
           }
-          console.log('prev name: ' + prev.name + ' prev next: ' + prev.next + ' main: ' + prev.main)
         }
+      } else {
+        state.board.push(alreadyInMoves.uci)
+        alreadyInMoves.current = true
       }
       state.lastFen = state.board.fen()
     },
@@ -330,7 +333,7 @@ export const store = new Vuex.Store({
     },
     analysisMode (state, payload) {
       state.analysisMode = payload
-    }
+    },
   },
   actions: { // async
     curVar960Fen (context, payload) {
@@ -529,7 +532,15 @@ export const store = new Vuex.Store({
       context.dispatch('variant', variant)
       context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
-      context.dispatch('push', payload.game.mainlineMoves())
+      const moves = payload.game.mainlineMoves().split(' ')
+      for (const num in moves) {
+        if (num === 0) {
+          context.commit('appendMoves', { move: moves[num], prev: undefined })
+        } else {
+          context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1] }) // TODO differentiate between alternative lines
+        }
+      }
+      context.dispatch('fen', context.state.board.fen())
       context.dispatch('updateBoard')
     },
     increment (context, payload) {

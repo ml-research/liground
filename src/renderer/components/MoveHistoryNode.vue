@@ -17,7 +17,8 @@
     <span
       v-if="printRoot"
       class="move-name"
-      @click="updateBoard"
+      :class="{current : move.current}"
+      @click="updateBoard(move)"
     >
       {{ move.name }}
     </span>
@@ -77,20 +78,41 @@ export default {
       return this.move.next.filter((variation) => {
         return variation.fen !== this.move.main.fen
       })
+    },
+    moves () {
+      return this.$store.getters.moves
     }
   },
   created () {
     console.log(this.move)
   },
   methods: {
-    updateBoard () {
+    updateBoard (move) {
       this.$store.dispatch('fen', this.move.fen)
+      for (const num in this.moves) {
+        if (this.moves[num].current) {
+          this.moves[num].current = false
+          break
+        }
+      }
+      move.current = true
     }
   }
 }
 </script>
 
 <style scoped>
+.move-name:hover {
+  background-color: #2196F3;
+  cursor: pointer;
+  border-radius: 4px 4px 4px 4px;
+  color: #fff;
+}
+.move-name.current{
+  background-color:#444;
+  border-radius: 4px 4px 4px 4px;
+  color: #fff;
+}
 .move-number {
   color: #777;
 

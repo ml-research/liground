@@ -148,30 +148,44 @@ export default {
         this.moveForwardOne()
       }
     },
-    updateActive (move) {
+    updateCurrent (move) {
       for (const num in this.moves) {
-        if (this.moves[num].active) {
-          this.moves[num].active = false
+        if (this.moves[num].current) {
+          this.moves[num].current = false
           break
         }
       }
       if (move) {
-        move.active = true
+        move.current = true
       }
     },
     moveToStart () { // this method returns to the starting point of the current line
-      this.updateActive(undefined)
+      this.updateCurrent(undefined)
       const board = new ffish.Board(this.variant)
       const startFen = board.fen()
       this.$store.dispatch('fen', startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
-      this.updateActive(undefined)
       const mov = this.currentMove
+      let endOfLine = mov
+      if (!mov && this.moves.length === 0) {
+        endOfLine = undefined
+      } else if (!mov && this.moves.length > 0) {
+        endOfLine = this.moves[0] // TODO replace by firstMainLine
+        while (endOfLine.main) {
+          endOfLine = endOfLine.main
+        }
+      } else {
+        endOfLine = mov
+        while (endOfLine.main) {
+          endOfLine = endOfLine.main
+        }
+      }
+      this.updateCurrent(endOfLine)
       if (mov && mov.ply >= this.moves.length - 1) {
         return
       }
-      this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
+      this.$store.dispatch('fen', endOfLine.fen)
     },
     moveBackOne () { // this method moves back one move in the current line
       const mov = this.currentMove
@@ -179,21 +193,21 @@ export default {
         return
       }
       if (mov.ply === 1) {
-        this.updateActive(undefined)
+        this.updateCurrent(undefined)
         const board = new ffish.Board(this.variant)
         const startFen = board.fen()
         this.$store.dispatch('fen', startFen)
         return
       }
       this.$store.dispatch('fen', mov.prev.fen)
-      this.updateActive(mov.prev)
+      this.updateCurrent(mov.prev)
     },
     moveForwardOne () { // this method moves forward one move in the current line
       const mov = this.currentMove
       if (!mov) {
         if (this.moves) {
           this.$store.dispatch('fen', this.moves[0].fen)
-          this.updateActive(this.moves[0])
+          this.updateCurrent(this.moves[0])
         }
         return
       }
@@ -201,11 +215,7 @@ export default {
         return
       }
       this.$store.dispatch('fen', mov.main.fen)
-      if (!mov.main.main) {
-        this.updateActive(undefined)
-      } else {
-        this.updateActive(mov.main)
-      }
+      this.updateCurrent(mov.main)
     },
     flipBoard () {
       if (this.variant === 'racingkings') {

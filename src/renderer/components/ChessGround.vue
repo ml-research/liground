@@ -344,7 +344,8 @@ export default {
       this.promoteTo = value
       this.uciMove = this.uciMove + String(this.promoteTo)
       this.lastMoveSan = this.$store.getters.sanMove(this.uciMove)
-      this.$store.dispatch('push', this.uciMove)
+      const prevMov = this.currentMove
+      this.$store.dispatch('push', { move: this.uciMove, prev: prevMov })
       this.updateHand()
       this.afterMove()
     },
@@ -442,8 +443,9 @@ export default {
       return (role, key) => {
         const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', silver: 'S', gold: 'G', lance: 'L' }
         const move = pieces[role] + '@' + key
+        const prevMov = this.currentMove
         if (this.$store.getters.legalMoves.includes(move)) {
-          this.$store.dispatch('push', move)
+          this.$store.dispatch('push', { move: move, prev: prevMov })
           this.updateHand()
         } else {
           this.updateBoard()

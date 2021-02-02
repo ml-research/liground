@@ -37,7 +37,7 @@ export default {
       const { engineName, engineAuthor } = this.$store.getters
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     },
-    ...mapGetters(['isPast'])
+    ...mapGetters(['isPast', 'moves', 'fen'])
   },
   methods: {
     onMouseEnter (id) {
@@ -48,7 +48,14 @@ export default {
     },
     onClick (line) {
       this.$store.commit('hoveredpv', -1)
-      this.$store.dispatch('push', line.ucimove)
+      let prevMov
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
+          prevMov = this.moves[num]
+          break
+        }
+      }
+      this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     }
   }
 }

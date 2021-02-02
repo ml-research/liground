@@ -20,10 +20,10 @@
     </div>
     <JumpButtons
       @flip-board="$emit('flip-board', 0)"
-      @move-to-start="$emit('move-to-start',0)"
-      @move-back-one="$emit('move-back-one',0)"
-      @move-forward-one="$emit('move-forward-one',0)"
-      @move-to-end="$emit('move-to-end',0)"
+      @move-to-start="$emit('move-to-start', 0)"
+      @move-back-one="$emit('move-back-one', 0)"
+      @move-forward-one="$emit('move-forward-one', 0)"
+      @move-to-end="$emit('move-to-end', 0)"
     />
     <game-info id="gameinfo" />
     <div
@@ -74,44 +74,6 @@ export default {
     }
   },
   computed: {
-    orderedMoves () {
-      let result = []
-      if (this.moves.length === 0) {
-        return result
-      } else {
-        for (const num in this.moves) {
-          const move = this.moves[num]
-          if (!result.includes(move)) {
-            result.push(move)
-          }
-          if (move.next.length > 1) {
-            result = this.recursiveHelper(move, result)
-          }
-        }
-      }
-      console.log(result)
-      return result
-    },
-    mainlineMoves () {
-      const result = []
-      let lastMove
-
-      for (const move of this.moves) {
-        if (!move.prev) {
-          lastMove = move
-          break
-        }
-      }
-
-      if (lastMove) {
-        result.push(lastMove)
-        while (lastMove.main) {
-          lastMove = lastMove.main
-          result.push(lastMove)
-        }
-      }
-      return result
-    },
     active () {
       return this.$store.getters.active
     },
@@ -149,88 +111,6 @@ export default {
     }
   },
   methods: {
-    recursiveHelper (move, mainRes) {
-      console.log('calledwith: ')
-      console.log(move.uci)
-      for (const j in mainRes) {
-        console.log('nummer ' + j + ' : ' + mainRes[j].uci)
-      }
-      if (!move.main || mainRes.includes(move.main)) {
-        return mainRes
-      }
-      const main = move.main // exists since next has length at least 1
-      mainRes.push(main) // after the move first comes the main continuation
-      for (const num in move.next) { // after that come all the alternate variations, only after that the main line
-        const mov = move.next[num]
-        if (!mainRes.includes(mov)) { // mov ist ein eindeutiges Objekt
-          mainRes.push(mov)
-          if (mov.next && mov.next.length > 0) {
-            const recRes = this.recursiveHelper(mov, mainRes)
-            for (const i in recRes) {
-              if (!mainRes.includes(recRes[i])) {
-                mainRes.push(recRes[i])
-              }
-            }
-          }
-        }
-      }
-      const recRes = this.recursiveHelper(main, mainRes)
-      for (const i in recRes) {
-        if (!mainRes.includes(recRes[i])) {
-          mainRes.push(recRes[i])
-        }
-      }
-      return mainRes
-    },
-    /*
-    recursiveHelper (moves) {
-      console.log('calledhelper with:')
-      console.log(moves)
-      let result2 = []
-      console.log(result2)
-      const main = moves[0].prev.main
-      result2.push(main)
-      console.log('added mainmove ' + main.uci)
-      for (let num in moves) {
-        const move = moves[num]
-        console.log(move)
-        if (!result2.includes(move)) {
-          console.log('added move ' + move.uci)
-          result2.push(move)
-        }
-        if (move.next && move.next.length > 0 && move !== main) {
-          console.log('second if')
-          console.log(result2)
-          const res = this.recursiveHelper(move.next)
-          console.log(res)
-          result2 = result2.concat(res)
-          console.log('after concat: ')
-          console.log(result2)
-        }
-      }
-      if (main.next.length > 0) {
-        const res = this.recursiveHelper(main.next)
-        for (const num in res) {
-          if (!result2.includes(res[num])) {
-            result2.push(res[num])
-          }
-        }
-      }
-      console.log('helperresult: ')
-      console.log(result2)
-      return result2
-    }, */
-    updateBoard (move) {
-      this.$store.dispatch('fen', move.fen)
-      for (const num in this.moves) {
-        if (this.moves[num].active) {
-          this.moves[num].active = false
-          break
-        }
-      }
-      move.active = true
-      console.log(move)
-    },
     onKeyup (event) {
       if (event.key === 'Enter') {
         this.$store.dispatch('sendEngineCommand', this.cmd)
@@ -242,31 +122,6 @@ export default {
 </script>
 
 <style scoped>
-.onlyMain {
-  background-color: #6ca040;
-}
-.otherAlt::before {
-  content: "\A(";
-  white-space: pre;
-  }
-.otherAlt::after {
-  content: ")";
-}
-.mainAlt {
-  background-color: antiquewhite;
-}
-.otherAlt {
-  display: inline-block;
-  font-size: 12px;
-  background-color: #2196F3;
-  text-align: left;
-}
-.newline {
-  display: none;
-}
-.newline.mainAlt {
-  display: block;
-}
 input {
   font-size: 11pt;
 }
@@ -323,52 +178,9 @@ p {
   width: 70px;
   text-align: center;
 }
-.move-field {
-  color: #333;
-  color: black;
-  background-color: #111;
-  text-align: center;
-  font-size: 12pt;
-  font-family: sans-serif;
-  padding: 0px 0px 0px 0px;
-  border-color: #222;
-  border-width: 1px;
-  margin-right: 5px;
-  pointer-events: none;
-  min-width: 20px;
-  white-space: nowrap;
-  main-max-width: auto;
-  gauge-gap: 17px;
-}
-.move-field:hover .move-name {
-  background-color: #2196F3;
-  cursor: pointer;
-  border-radius: 4px 4px 4px 4px;
-  color: #fff;
-}
-.move-field:hover .active {
-  background-color: #2196F3;
-  cursor: pointer;
-  border-radius: 4px 4px 4px 4px;
-  color: #fff;
-}
-.move-field .active{
-  background-color:#444;
-  border-radius: 4px 4px 4px 4px;
-  color: #fff;
-}
 .grid-parent {
   align-items: center;
 }
-.move-number {
-  color: #777;
-
-}
-.move-name {
-  margin-right: 4px;
-  pointer-events: auto;
-}
-
 .processing-bar {
   height: 5px;
   background-color: #6ca040;
