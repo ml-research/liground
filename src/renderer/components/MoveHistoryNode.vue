@@ -9,7 +9,9 @@
       {{ (move.ply+1) / 2 }}.
     </span>
     <span
-      v-else-if="move.ply % 2 == 0 && beginVariation"
+      v-else-if="move.ply % 2 == 0 && printRoot &&
+        (beginVariation || move.prev && (move.prev.prev && move.prev.prev.next.length > 1) || (firstMoves.includes(move.prev) && firstMoves.length > 1 && mainFirstMove.next.length > 0)
+          && move.prev.main === move)"
       class="move-number"
     >
       {{ (move.ply) / 2 }}...
@@ -35,18 +37,20 @@
       <move-history-node
         :move="move.main"
         :follow-line="false"
+        class="case1"
       />
       <move-history-node
         v-for="variation in filteredNext"
         :key="variation.fen"
         :move="variation"
         :begin-variation="true"
-        class="variation"
+        class="variation case2"
       />
       <move-history-node
         :move="move.main"
         :begin-variation="false"
         :print-root="false"
+        class="case3"
       />
     </span>
     <span v-else-if="followLine">
@@ -54,6 +58,7 @@
         v-for="variation in move.next"
         :key="variation.fen"
         :move="variation"
+        class="case4"
       />
     </span>
   </span>
@@ -103,6 +108,7 @@ export default {
   },
   methods: {
     updateBoard (move) {
+      console.log(move)
       this.$store.dispatch('fen', this.move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
