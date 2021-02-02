@@ -22,6 +22,15 @@
     >
       {{ move.name }}
     </span>
+    <span v-if="move.fen === mainFirstMove.fen">
+      <move-history-node
+        v-for="variation in firstMovesFiltered"
+        :key="variation.fen"
+        :move="variation"
+        :begin-variation="true"
+        class="variation"
+      />
+    </span>
     <span v-if="followLine && move.next.length > 1">
       <move-history-node
         :move="move.main"
@@ -73,18 +82,24 @@ export default {
   },
   computed: {
     filteredNext () {
-      console.log('filter move next')
-      console.log(this.move)
       return this.move.next.filter((variation) => {
         return variation.fen !== this.move.main.fen
       })
     },
     moves () {
       return this.$store.getters.moves
+    },
+    mainFirstMove () {
+      return this.$store.getters.mainFirstMove
+    },
+    firstMoves () {
+      return this.$store.getters.firstMoves
+    },
+    firstMovesFiltered () {
+      return this.firstMoves.filter((move) => {
+        return move.fen !== this.mainFirstMove.fen
+      })
     }
-  },
-  created () {
-    console.log(this.move)
   },
   methods: {
     updateBoard (move) {
@@ -115,14 +130,13 @@ export default {
 }
 .move-number {
   color: #777;
-
 }
 .move-name {
   margin-right: 4px;
   pointer-events: auto;
 }
 .variation {
-  background-color: mediumseagreen;
+  background-color:lightgray;
   display: block;
 }
 .variation::before {

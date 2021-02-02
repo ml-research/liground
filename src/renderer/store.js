@@ -105,6 +105,8 @@ export const store = new Vuex.Store({
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     moves: [],
+    firstMoves: [],
+    mainFirstMove: null,
     legalMoves: '',
     destinations: {},
     variant: 'chess',
@@ -186,6 +188,12 @@ export const store = new Vuex.Store({
     },
     turn (state, payload) {
       state.turn = payload
+    },
+    mainFirstMove (state, payload) {
+      state.mainFirstMove = payload
+    },
+    firstMoves (state, payload) {
+      state.firstMoves.push(payload)
     },
     legalMoves (state, payload) {
       state.legalMoves = payload
@@ -290,30 +298,34 @@ export const store = new Vuex.Store({
       let ply
       if (prev) {
         ply = prev.ply + 1
-      } else {
+      } else { // then its a starting move
         ply = 1
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
         if (state.moves[num].current) {
-          state.moves[num].current = false
+          state.moves[num].current = false // set all moves as not the current one
         }
         if (state.moves[num].uci === mov[0] && state.moves[num].prev === prev) {
-          alreadyInMoves = state.moves[num]
+          alreadyInMoves = state.moves[num] // if the move is already in the history its stored here
         }
       }
-      const current = true
+      const current = true // the latest move is marked as current
       if (!alreadyInMoves) {
         state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
           const sanMove = state.board.sanMove(curVal)
           state.board.push(curVal)
           return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, current: current }
         }))
-        if (payload.prev && !prev.next.includes(state.moves[state.moves.length - 1])) {
-          console.log(state.moves[state.moves.length - 1])
-          prev.next.push(state.moves[state.moves.length - 1])
-          if (!prev.main) {
+        if (payload.prev) { // if the move is not a starting move
+          prev.next.push(state.moves[state.moves.length - 1]) // the last entry in moves is the move object of the current move
+          if (!prev.main) { // if there is no mainline yet, then this move is the main line now
             prev.main = state.moves[state.moves.length - 1]
+          }
+        } else { // then the currently added move was a starting move
+          this.commit('firstMoves', state.moves[state.moves.length - 1]) // then we add it to the firstMoves array
+          if (state.moves.length === 1) {
+            this.commit('mainFirstMove', state.moves[0]) // then this is our mainFirstMove
           }
         }
       } else {
@@ -333,7 +345,7 @@ export const store = new Vuex.Store({
     },
     analysisMode (state, payload) {
       state.analysisMode = payload
-    },
+    }
   },
   actions: { // async
     curVar960Fen (context, payload) {
@@ -358,6 +370,16 @@ export const store = new Vuex.Store({
     push (context, payload) {
       context.commit('appendMoves', payload)
       context.dispatch('fen', context.state.board.fen())
+    },
+    mainFirstMove (context, payload) {
+      if (context.state.mainFirstMove !== payload) {
+        context.dispatch('mainFirstMove', payload)
+      }
+    },
+    firstMoves (context, payload) {
+      if (!context.state.firstMoves.includes(payload)) {
+        context.dispatch('firstMoves', payload)
+      }
     },
     resetEngineData (context) {
       context.commit('resetMultiPV')
@@ -680,6 +702,12 @@ export const store = new Vuex.Store({
     },
     moves (state) {
       return state.moves
+    },
+    firstMoves (state) {
+      return state.firstMoves
+    },
+    mainFirstMove (state) {
+      return state.mainFirstMove
     },
     legalMoves (state) {
       return state.legalMoves

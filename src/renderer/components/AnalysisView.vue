@@ -13,8 +13,8 @@
         id="move-history"
       >
         <move-history-node
-          v-if="moves[0]"
-          :move="moves[0]"
+          v-if="mainFirstMove"
+          :move="mainFirstMove"
         />
       </div>
     </div>
@@ -56,6 +56,7 @@ import EngineStats from './EngineStats'
 import PVLines from './PVLines'
 import GameInfo from './GameInfo.vue'
 import MoveHistoryNode from './MoveHistoryNode.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'AnalysisView',
@@ -74,36 +75,7 @@ export default {
     }
   },
   computed: {
-    active () {
-      return this.$store.getters.active
-    },
-    stdIO () {
-      return this.$store.getters.stdIO
-    },
-    message () {
-      return this.$store.getters.message
-    },
-    counter () {
-      return this.$store.getters.counter
-    },
-    multipv () {
-      return this.$store.getters.multipv
-    },
-    pv () {
-      return this.$store.getters.pv
-    },
-    cp () {
-      return this.$store.getters.cpForWhiteStr
-    },
-    pv2 () {
-      return this.$store.getters.pv2
-    },
-    cp2 () {
-      return this.$store.getters.cpForWhiteStr
-    },
-    moves () {
-      return this.$store.getters.moves
-    }
+    ...mapGetters(['active', 'stdIO', 'message', 'counter', 'multiPV', 'pv', 'cp', 'pv2', 'cp2', 'moves', 'mainFirstMove'])
   },
   watch: {
     reset: function () {

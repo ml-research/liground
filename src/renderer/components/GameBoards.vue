@@ -105,6 +105,9 @@ export default {
     fen () {
       return this.$store.getters.fen
     },
+    mainFirstMove () {
+      return this.$store.getters.mainFirstMove
+    },
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
       for (let num = 0; num < this.moves.length; num++) {
         if (this.moves[num].fen === this.fen) {
@@ -171,7 +174,7 @@ export default {
       if (!mov && this.moves.length === 0) {
         endOfLine = undefined
       } else if (!mov && this.moves.length > 0) {
-        endOfLine = this.moves[0] // TODO replace by firstMainLine
+        endOfLine = this.mainFirstMove
         while (endOfLine.main) {
           endOfLine = endOfLine.main
         }
