@@ -3,7 +3,7 @@
     <div>
       <div class="main-grid">
         <div class="chessboard-grid">
-          <pgn-browser id="pgnbrowser" />
+          <PgnBrowser id="pgnbrowser" />
           <div @mousewheel.prevent="scroll($event)">
             <ChessGround
               id="chessboard"
@@ -61,13 +61,10 @@ import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
 import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
-import Module from 'ffish-es6'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
 // TODO: use GameInfo component?
 // import GameInfo from './GameInfo.vue'
-
-let ffish = null
 
 export default {
   name: 'GameBoards',
@@ -108,6 +105,9 @@ export default {
     mainFirstMove () {
       return this.$store.getters.mainFirstMove
     },
+    startFen () {
+      return this.$store.getters.startFen
+    },
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
       for (let num = 0; num < this.moves.length; num++) {
         if (this.moves[num].fen === this.fen) {
@@ -116,15 +116,6 @@ export default {
       }
       return undefined
     }
-  },
-  beforeCreate () {
-    console.log('beforeCreate()')
-    new Module().then(loadedModule => {
-      ffish = loadedModule
-      console.log(`initialized ${ffish} ${loadedModule}`)
-      const game = new ffish.Board()
-      console.log(game.fen())
-    })
   },
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
@@ -165,9 +156,7 @@ export default {
     },
     moveToStart () { // this method returns to the starting point of the current line
       this.updateCurrent(undefined)
-      const board = new ffish.Board(this.variant)
-      const startFen = board.fen()
-      this.$store.dispatch('fen', startFen)
+      this.$store.dispatch('fen', this.startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
       const mov = this.currentMove
@@ -198,9 +187,7 @@ export default {
       }
       if (mov.ply === 1) {
         this.updateCurrent(undefined)
-        const board = new ffish.Board(this.variant)
-        const startFen = board.fen()
-        this.$store.dispatch('fen', startFen)
+        this.$store.dispatch('fen', this.startFen)
         return
       }
       this.$store.dispatch('fen', mov.prev.fen)
@@ -270,14 +257,9 @@ export default {
       console.log(`event: ${event}`)
     },
     checkValidFEN (event) {
-      if (ffish.validateFen(event.target.value, this.variant) === 1) {
-        this.$store.dispatch('fen', event.target.value)
-      } else {
-        console.log(`invalid fen: ${event.target.value}`)
-      }
+      this.$store.dispatch('fen', event.target.value)
       this.resetAnalysis = !this.resetAnalysis
     }
-
   }
 }
 </script>
@@ -309,7 +291,7 @@ export default {
 }
 #right-column {
   grid-area: analysisview;
-  max-width: 40vw;
+  width: 40vw;
   max-height: calc(100vh - 25px);
 }
 input {

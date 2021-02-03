@@ -3,7 +3,7 @@
     <a
       href="#"
       class="jump previous"
-      :class="{grey : variant == 'racingkings'}"
+      :class="{ grey : variant === 'racingkings' }"
       @click="$emit('flip-board', 0)"
     ><i
       slot="extra"
@@ -12,7 +12,7 @@
     <a
       href="#"
       class="jump previous"
-      :class="{grey : currentMove == -1}"
+      :class="{ grey : currentMove === -1 }"
       @click="$emit('move-to-start', 0)"
     ><i
       slot="extra"
@@ -21,7 +21,7 @@
     <a
       href="#"
       class="jump previous"
-      :class="{grey : currentMove == -1}"
+      :class="{ grey : currentMove === -1 }"
       @click="$emit('move-back-one', 0)"
     ><i
       slot="extra"
@@ -30,7 +30,7 @@
     <a
       href="#"
       class="jump next"
-      :class="{grey : currentMove == $store.getters.moves.length-1}"
+      :class="{ grey : currentMove === $store.getters.moves.length - 1 }"
       @click="$emit('move-forward-one', 0)"
     ><i
       slot="extra"
@@ -39,7 +39,7 @@
     <a
       href="#"
       class="jump next"
-      :class="{grey : currentMove == $store.getters.moves.length-1}"
+      :class="{ grey : currentMove === $store.getters.moves.length - 1 }"
       @click="$emit('move-to-end', 0)"
     ><i
       slot="extra"

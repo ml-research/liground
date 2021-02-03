@@ -1,0 +1,12 @@
+.is2d .pawn.white {background-image:url('../../piece/international/spatial/wP.svg')}
+.is2d .knight.white {background-image:url('../../piece/international/spatial/wN.svg')}
+.is2d .bishop.white {background-image:url('../../piece/international/spatial/wB.svg')}
+.is2d .rook.white {background-image:url('../../piece/international/spatial/wR.svg')}
+.is2d .queen.white {background-image:url('../../piece/international/spatial/wQ.svg')}
+.is2d .king.white {background-image:url('../../piece/international/spatial/wK.svg')}
+.is2d .pawn.black {background-image:url('../../piece/international/spatial/bP.svg')}
+.is2d .knight.black {background-image:url('../../piece/international/spatial/bN.svg')}
+.is2d .bishop.black {background-image:url('../../piece/international/spatial/bB.svg')}
+.is2d .rook.black {background-image:url('../../piece/international/spatial/bR.svg')}
+.is2d .queen.black {background-image:url('../../piece/international/spatial/bQ.svg')}
+.is2d .king.black {background-image:url('../../piece/international/spatial/bK.svg')}

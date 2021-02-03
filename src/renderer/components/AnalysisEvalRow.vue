@@ -1,14 +1,14 @@
 <template>
   <div
     class="wrapper template grid-parent"
-    :style="{'text-align': align}"
+    :style="{ 'text-align': align }"
   >
     <LiveEval />
     <div
       class="engine-banner"
       :style="{ backgroundImage: `url(${engineBannerURL})` }"
     />
-    <multiselect
+    <Multiselect
       v-model="selected"
       class="multiselect"
       :options="options"

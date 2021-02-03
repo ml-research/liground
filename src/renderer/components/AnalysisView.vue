@@ -12,7 +12,7 @@
       <div
         id="move-history"
       >
-        <move-history-node
+        <MoveHistoryNode
           v-if="mainFirstMove"
           :move="mainFirstMove"
         />
@@ -25,26 +25,7 @@
       @move-forward-one="$emit('move-forward-one', 0)"
       @move-to-end="$emit('move-to-end', 0)"
     />
-    <game-info id="gameinfo" />
-    <div
-      id="textarea"
-      class="console-log"
-    >
-      <p
-        v-for="line in stdIO"
-        :key="line.type"
-      >
-        {{ line }}
-      </p>
-    </div>
-    <input
-      id="lname"
-      v-model="cmd"
-      type="text"
-      name="lname"
-      size="60"
-      @keyup="onKeyup"
-    >
+    <GameInfo id="gameinfo" />
   </div>
 </template>
 
@@ -108,7 +89,7 @@ input {
 .panel {
   border-radius: 3px 3px 3px 3px;
   border: 1px solid #888;
-  font-family: 'Noto Chess';
+  font-family: sans-serif;
   font-weight: 200;
 }
 .panel + .panel {

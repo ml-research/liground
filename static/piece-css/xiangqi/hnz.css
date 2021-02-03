@@ -1,0 +1,14 @@
+.is2d .pawn.white {background-image:url('../../piece/Xiangqi/hnz/red_pawn.svg')}
+.is2d .rook.white {background-image:url('../../piece/Xiangqi/hnz/red_chariot.svg')}
+.is2d .cannon.white {background-image:url('../../piece/Xiangqi/hnz/red_cannon.svg')}
+.is2d .knight.white {background-image:url('../../piece/Xiangqi/hnz/red_horse.svg')}
+.is2d .bishop.white {background-image:url('../../piece/Xiangqi/hnz/red_elephant.svg')}
+.is2d .advisor.white {background-image:url('../../piece/Xiangqi/hnz/red_advisor.svg')}
+.is2d .king.white {background-image:url('../../piece/Xiangqi/hnz/red_king.svg')}
+.is2d .pawn.black {background-image:url('../../piece/Xiangqi/hnz/black_pawn.svg')}
+.is2d .rook.black {background-image:url('../../piece/Xiangqi/hnz/black_chariot.svg')}
+.is2d .cannon.black {background-image:url('../../piece/Xiangqi/hnz/black_cannon.svg')}
+.is2d .knight.black {background-image:url('../../piece/Xiangqi/hnz/black_horse.svg')}
+.is2d .bishop.black {background-image:url('../../piece/Xiangqi/hnz/black_elephant.svg')}
+.is2d .advisor.black {background-image:url('../../piece/Xiangqi/hnz/black_advisor.svg')}
+.is2d .king.black {background-image:url('../../piece/Xiangqi/hnz/black_king.svg')}
