@@ -128,6 +128,7 @@ export default {
   },
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
+      event.preventDefault()
       const keyName = event.key
       if (keyName === 'ArrowUp') {
         this.moveToStart()
