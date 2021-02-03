@@ -27,8 +27,7 @@
 import { mapGetters } from 'vuex'
 export default {
   name: 'Mode960',
-  components: {
-  },
+  components: {},
   data () {
     return {
       curVar: '',

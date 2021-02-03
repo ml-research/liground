@@ -15,14 +15,14 @@
       >
         <div class="move-field">
           <div
-            v-if="move.ply % 2 == 1"
+            v-if="move.ply % 2 === 1"
             class="float-left-child move-number"
           >
             {{ (move.ply+1) / 2 }}.
           </div>
           <div
             class="float-left-child move-name"
-            :class="{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}"
+            :class="{ active : move.fen !== $store.getters.lastFen && move.fen === $store.getters.fen }"
             @click="updateBoard(move)"
           >
             {{ move.name }}
@@ -37,7 +37,7 @@
       @move-forward-one="$emit('move-forward-one',0)"
       @move-to-end="$emit('move-to-end',0)"
     />
-    <game-info id="gameinfo" />
+    <GameInfo id="gameinfo" />
   </div>
 </template>
 

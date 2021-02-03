@@ -1,6 +1,6 @@
 <template>
   <div>
-    <multiselect
+    <Multiselect
       v-model="selected"
       class="multiselect"
       :options="boardStyles"

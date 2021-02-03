@@ -5,7 +5,7 @@
         v-if="variant==='crazyhouse'|| variant==='shogi' "
         ref="pockets"
         class="pockets"
-        :class="{ mirror : $store.getters.orientation == &quot;black&quot;, shogi: variant == &quot;shogi&quot;}"
+        :class="{ mirror : $store.getters.orientation === &quot;black&quot;, shogi: variant === &quot;shogi&quot; }"
       >
         <ChessPocket
           id="chesspocket_top"
@@ -20,7 +20,7 @@
           @selection="dropPiece"
         />
       </div>
-      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
+      <div :class="{ koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1 }">
         <div class="cg-board-wrap">
           <div ref="board" />
           <div
