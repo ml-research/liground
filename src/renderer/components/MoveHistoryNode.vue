@@ -131,7 +131,7 @@ export default {
   color: #fff;
 }
 .move-name.current{
-  background-color:#444;
+  background-color:#2196F3;
   border-radius: 4px 4px 4px 4px;
   color: #fff;
 }
