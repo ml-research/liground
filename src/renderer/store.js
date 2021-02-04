@@ -123,6 +123,7 @@ export const store = new Vuex.Store({
       Xiangqi: 'xiangqi'
 
     }),
+    openedPGN: false,
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
@@ -299,6 +300,9 @@ export const store = new Vuex.Store({
       state.lastFen = state.board.fen()
     },
     playAudio (state, move) { // Sounds from lichess https://github.com/ornicar/lila
+      if (state.openedPGN) {
+        return
+      }
       let note = new Audio('/static/audio/Move.mp3')
       if (move.toString().includes('x')) {
         note = new Audio('/static/audio/Capture.mp3')
@@ -316,6 +320,9 @@ export const store = new Vuex.Store({
     },
     points (state, payload) {
       state.points = payload
+    },
+    openedPGN (state, payload) {
+      state.openedPGN = payload
     }
   },
   actions: { // async
@@ -499,6 +506,7 @@ export const store = new Vuex.Store({
       context.commit('loadedGames', payload)
     },
     async loadGame (context, payload) {
+      context.commit('openedPGN', true)
       let variant = payload.game.headers('Variant').toLowerCase()
 
       if (variant === '') { // if no variant is given we assume it to be standard chess
@@ -520,6 +528,7 @@ export const store = new Vuex.Store({
       await context.dispatch('variant', variant)
       context.commit('newBoard')
       await context.dispatch('push', payload.game.mainlineMoves())
+      context.commit('openedPGN', false)
     },
     increment (context, payload) {
       context.commit('increment', payload)
@@ -535,6 +544,9 @@ export const store = new Vuex.Store({
     },
     boardStyle (context, payload) {
       context.commit('boardStyle', payload)
+    },
+    openedPGN (context, payload) {
+      context.commit('openedPGN', payload)
     }
   },
   getters: {
