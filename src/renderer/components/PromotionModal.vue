@@ -3,28 +3,10 @@
     class="prom-container"
   >
     <div
-      id="op1"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW1' : 'promOptionB4']"
-      @click="close('1')"
-    />
-    <div
-      id="op2"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW2' : 'promOptionB3']"
-      @click="close('2')"
-    />
-    <div
-      id="op3"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW3' : 'promOptionB2']"
-      @click="close('3')"
-    />
-    <div
-      id="op4"
-      class="prom-option"
-      :class="[ turn ? 'promOptionW4' : 'promOptionB1']"
-      @click="close('4')"
+      v-for="(piece, index) in promOptions"
+      :key="piece.type"
+      :class="[piece.type, side, 'pieceoption', idtocss[index]]"
+      @click="close(piece.type)"
     />
   </div>
 </template>
@@ -32,109 +14,85 @@
 <script>
 export default {
   name: 'PromotionModal',
+  props: {
+    promOptions: {
+      type: Array,
+      default: () => ([
+        { type: 'king' },
+        { type: 'queen' },
+        { type: 'rook' },
+        { type: 'bishop' },
+        { type: 'knight' }
+      ])
+    }
+  },
   data () {
     return {
-      promDir: { 1: 'q', 2: 'n', 3: 'r', 4: 'b' }
+      promDir: { queen: 'q', rook: 'r', bishop: 'b', knight: 'n', pawn: 'p', king: 'k' },
+      shogiPromDir: { pawn: '=', lance: '=', knight: '=', bishop: '=', silver: '=', rook: '=', ppawn: '+', plance: '+', pknight: '+', pbishop: '+', psilver: '+', prook: '+' },
+      idtocss: {
+        0: 'one',
+        1: 'two',
+        2: 'three',
+        3: 'four',
+        4: 'five'
+      }
     }
   },
   computed: {
-    pieceStyle () {
-      return this.$store.getters.pieceStyle
-    },
-    turn () {
-      return this.$store.getters.turn
-    },
-    orientation () {
-      return this.$store.getters.orientation
+    side () {
+      return this.$store.getters.turn ? 'white' : 'black'
     }
   },
-  created () {
-    document.addEventListener('renderPromotion', () => {
-      this.main()
-    })
-  },
+
   methods: {
-    main () {
-      this.loadPieceStyle()
-      this.orderPieces()
-    },
-    orderPieces () {
-      if (this.orientation === 'white') {
-        document.getElementById('op1').style.order = '1'
-        document.getElementById('op2').style.order = '2'
-        document.getElementById('op3').style.order = '3'
-        document.getElementById('op4').style.order = '4'
-      } else {
-        document.getElementById('op1').style.order = '4'
-        document.getElementById('op2').style.order = '3'
-        document.getElementById('op3').style.order = '2'
-        document.getElementById('op4').style.order = '1'
-      }
-    },
-    loadPieceStyle () {
-      // document.getElementById('op1').style.backgroundImage = "url('src/renderer/assets/piece/international/" + this.pieceStyle + "/wQ.svg)"
-    },
     close (value) {
-      if (this.turn) {
-        this.$emit('close', this.promDir[value])
+      if (this.$store.getters.variant === 'shogi') {
+        this.$emit('close', this.shogiPromDir[value])
       } else {
-        this.$emit('close', this.promDir[5 - value])
+        this.$emit('close', this.promDir[value])
       }
     }
   }
 }
+
 </script>
 
 <style scoped>
-  .prom-option {
-    background-size: cover;
+   .pieceoption {
+    box-shadow: 0 0 10px black;
+    background-size: contain;
+    background-repeat: no-repeat;
     width: 100%;
+    height: 100%;
     background-color: white;
   }
-  .prom-option:hover {
+  .pieceoption:hover {
     background-color: rgb(182, 155, 107);
   }
 
   .prom-container{
-    box-shadow: 0 0 10px black;
+
     display: grid;
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 20%);
     height: 100%;
   }
   .prom-container:hover {
     cursor: pointer;
   }
-  .promOptionB1 {
-    background-image: url('../assets/images/pieces/merida/bQ.svg');
-    order: 4;
+  .one{
+    grid-row-start: 1
   }
-  .promOptionB2 {
-    background-image: url('../assets/images/pieces/merida/bN.svg');
-    order: 3;
+  .two{
+    grid-row-start: 2
   }
-  .promOptionB3 {
-    background-image: url('../assets/images/pieces/merida/bR.svg');
-    order: 2;
+  .three{
+    grid-row-start: 3
   }
-  .promOptionB4 {
-    background-image: url('../assets/images/pieces/merida/bB.svg');
-    order: 1;
-  }
-  .promOptionW1 {
-    background-image: url('../assets/images/pieces/merida/wQ.svg');
-    order: 1;
-  }
-  .promOptionW2 {
-    background-image: url('../assets/images/pieces/merida/wN.svg');
-    order: 2;
-  }
-  .promOptionW3 {
-    background-image: url('../assets/images/pieces/merida/wR.svg');
-    order: 3;
-  }
-  .promOptionW4 {
-    background-image: url('../assets/images/pieces/merida/wB.svg');
-    order: 4;
-  }
-
+  .four{
+    grid-row-start: 4
+    }
+  .five{
+    grid-row-start: 5
+     }
 </style>

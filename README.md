@@ -22,11 +22,9 @@ npm run lint
 
 ### Post-Installation Actions
 
-* Move `ffish.wasm` of package `./node_modules/ffish-es6/` to the root project directory.
+* [Download](https://github.com/ianfab/Fairy-Stockfish/releases/) a **largeboard** binary of _Fairy-Stockfish_ or build it from scratch.
 
-* [Download](https://github.com/ddugovic/Stockfish/releases) a binary of _Multi-Variant-Stockfish_ or build it from scratch.
-
-* Rename the _Multi-Variant-Stockfish_ binary to `stockfish` and move it to `./static/bin/`.
+* Rename the _Fairy-Stockfish_ binary to `stockfish` and move it to `./engines/`.
 
 ### Libraries
 
@@ -34,8 +32,7 @@ The following libraries or assets are used in **LiGround**:
 
 Library | Description | Usage
 --- | --- | ---
-[**ffish.js**](https://www.npmjs.com/package/ffish) | A high performance WebAssembly chess variant library based on [_Fairy-Stockfish_](https://github.com/ianfab/Fairy-Stockfish) as a standard module. | Used in the back-end to parse the UCI replies of the active engine.
-[**ffish-es6.js**](https://www.npmjs.com/package/ffish-es6) | A high performance WebAssembly chess variant library based on [_Fairy-Stockfish_](https://github.com/ianfab/Fairy-Stockfish) as an ES6 module. | Used in the GUI for legal move generation, FEN parsing & validation, pocket pieces, ...
+[**ffish.js**](https://www.npmjs.com/package/ffish) | A high performance WebAssembly chess variant library based on [_Fairy-Stockfish_](https://github.com/ianfab/Fairy-Stockfish). | Used in the GUI for legal move generation, FEN parsing & validation, pocket pieces, etc.
 [**ChessgroundX**](https://github.com/gbtami/chessgroundx) | A free/libre open source chess UI developed for [lichess.org](https://lichess.org/) and [pychess.org](https://www.pychess.org/). | Used as the main UI board element.
 [**ornicar/lila**](https://github.com/ornicar/lila) | The forever free, adless and open source chess server | Many high quality assets from [lichess.org](https://lichess.org/) (e.g. piece styles, board styles, chess fonts, ...) are used within this GUI.
 [**Vue.js**](https://vuejs.org/) | The Progressive JavaScript Framework | Used as the main JavaScript Framework.

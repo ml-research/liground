@@ -15,14 +15,14 @@
       >
         <div class="move-field">
           <div
-            v-if="move.ply % 2 == 1"
+            v-if="move.ply % 2 === 1"
             class="float-left-child move-number"
           >
             {{ (move.ply+1) / 2 }}.
           </div>
           <div
             class="float-left-child move-name"
-            :class="{ active : move.fen != $store.getters.lastFen && move.fen == $store.getters.fen}"
+            :class="{ active : move.fen !== $store.getters.lastFen && move.fen === $store.getters.fen }"
             @click="updateBoard(move)"
           >
             {{ move.name }}
@@ -37,26 +37,7 @@
       @move-forward-one="$emit('move-forward-one',0)"
       @move-to-end="$emit('move-to-end',0)"
     />
-    <game-info id="gameinfo" />
-    <div
-      id="textarea"
-      class="console-log"
-    >
-      <p
-        v-for="line in stdIO"
-        :key="line.type"
-      >
-        {{ line }}
-      </p>
-    </div>
-    <input
-      id="lname"
-      v-model="cmd"
-      type="text"
-      name="lname"
-      size="60"
-      @keyup="onKeyup"
-    >
+    <GameInfo id="gameinfo" />
   </div>
 </template>
 
@@ -150,7 +131,7 @@ input {
 .panel {
   border-radius: 3px 3px 3px 3px;
   border: 1px solid #888;
-  font-family: 'Noto Chess';
+  font-family: sans-serif;
   font-weight: 200;
 }
 .panel + .panel {

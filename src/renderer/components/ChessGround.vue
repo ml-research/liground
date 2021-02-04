@@ -5,7 +5,7 @@
         v-if="variant==='crazyhouse'|| variant==='shogi' "
         ref="pockets"
         class="pockets"
-        :class="{ mirror : $store.getters.orientation == &quot;black&quot;, shogi: variant == &quot;shogi&quot;}"
+        :class="{ mirror : $store.getters.orientation === &quot;black&quot;, shogi: variant === &quot;shogi&quot; }"
       >
         <ChessPocket
           id="chesspocket_top"
@@ -20,16 +20,18 @@
           @selection="dropPiece"
         />
       </div>
-      <div :class="{koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1}">
+      <div :class="{ koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1 }">
         <div class="cg-board-wrap">
           <div ref="board" />
           <div
             v-if="isPromotionModalVisible && !isPast"
             id="PromotionModal"
             ref="promotion"
+
             :style="promotionPosition"
           >
             <PromotionModal
+              :prom-options="promotions"
               @close="closePromotionModal"
             />
           </div>
@@ -151,9 +153,8 @@ export default {
       shapes: [],
       pieceShapes: [],
       promotions: [],
-      promoteTo: 'q',
       isPromotionModalVisible: false,
-      uciMove: undefined
+      promotionMove: undefined
     }
   },
   computed: {
@@ -172,8 +173,8 @@ export default {
       return this.$store.getters.legalMoves.split(' ')
     },
     promotionPosition () {
-      if (this.uciMove) {
-        const dest = this.uciMove.substring(2, 4)
+      if (this.promotionMove) {
+        const dest = this.promotionMove.substring(2, 4)
 
         let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5
 
@@ -181,7 +182,7 @@ export default {
           left = 87.5 - left
         }
 
-        const vertical = this.turn === this.orientation ? 0 : (7 - 3) * 12.5
+        const vertical = this.turn === this.orientation ? 0 : (8 - this.promotions.length) * 12.5
         return { left: `${left}%`, top: `${vertical}%` }
       } else {
         return undefined
@@ -215,10 +216,15 @@ export default {
       for (const [i, pvline] of multipv.entries()) {
         if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
           const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
-          const move = pvline.ucimove
-          const orig = move.substring(0, 2)
-          const dest = move.substring(2, 4)
+          let move = pvline.ucimove
+          let orig = move.substring(0, 2)
+          let dest = move.substring(2, 4)
           let drawShape
+          if (this.dimensionNumber === 3) {
+            move = this.lowerNumbers(move)
+            orig = move.substring(0, 2)
+            dest = move.substring(2, 4)
+          }
 
           if (move.includes('@')) {
             const pieceType = move[0].toLowerCase()
@@ -333,18 +339,20 @@ export default {
       },
       orientation: this.orientation
     })
+
+    // set initial styles
+    this.updateBoardCSS(this.boardStyle)
+    this.updatePieceCSS(this.pieceStyle)
   },
   methods: {
     showPromotionModal () {
       this.isPromotionModalVisible = true
-      document.dispatchEvent(new Event('renderPromotion'))
     },
     closePromotionModal (value) {
       this.isPromotionModalVisible = false
-      this.promoteTo = value
-      this.uciMove = this.uciMove + String(this.promoteTo)
-      this.lastMoveSan = this.$store.getters.sanMove(this.uciMove)
-      this.$store.dispatch('push', this.uciMove)
+      this.promotionMove = this.promotionMove + value
+      this.lastMoveSan = this.$store.getters.sanMove(this.promotionMove)
+      this.$store.dispatch('push', this.promotionMove)
       this.updateHand()
       this.afterMove()
     },
@@ -352,16 +360,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/piece-css/international/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/international/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/piece-css/sea/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/sea/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/piece-css/xiangqi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
       }
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/piece-css/shogi/' + pieceStyle + '.css'
+        file.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -369,16 +377,16 @@ export default {
       const file = document.createElement('link')
       file.rel = 'stylesheet'
       if (this.$store.getters.isInternational) {
-        file.href = 'src/renderer/assets/images/board-css/international/' + boardStyle + '.css'
+        file.href = 'static/board-css/international/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isXiangqi) {
-        file.href = 'src/renderer/assets/images/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+        file.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isSEA) {
-        file.href = 'src/renderer/assets/images/board-css/sea/' + boardStyle + '.css'
+        file.href = 'static/board-css/sea/' + boardStyle + '.css'
       } else
       if (this.$store.getters.isShogi) {
-        file.href = 'src/renderer/assets/images/board-css/shogi/' + boardStyle + '.css'
+        file.href = 'static/board-css/shogi/' + boardStyle + '.css'
       }
       document.head.appendChild(file)
     },
@@ -396,9 +404,9 @@ export default {
       return ret
     },
     lowerNumbers (move) {
-      const letters = move.split(/(\d+)/)
-      letters[1] = String(parseInt(letters[1]) - 1)
-      letters[3] = String(parseInt(letters[3]) - 1)
+      const letters = move.split(/(\D)/)
+      letters[2] = String(parseInt(letters[2]) - 1)
+      letters[4] = String(parseInt(letters[4]) - 1)
       const ret = letters.join('')
       return ret
     },
@@ -426,12 +434,85 @@ export default {
       return dests
     },
     isPromotion (uciMove) {
-      try {
-        this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-      } catch (err) {
-        return true
+      for (let i = 0; i < this.legalMoves.length; i++) {
+        if (this.dimensionNumber === 3) {
+          return false
+        }
+        if (this.legalMoves[i].length === 5) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            return true
+          }
+        }
       }
       return false
+    },
+    setPromotionOptions (uciMove) {
+      if (this.$store.getters.isInternational) {
+        if (this.variant === 'antichess') {
+          this.promotions = [
+            { type: 'king' },
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        } else {
+          this.promotions = [
+            { type: 'queen' },
+            { type: 'rook' },
+            { type: 'bishop' },
+            { type: 'knight' }
+          ]
+        }
+      }
+      if (this.variant === 'shogi') {
+        const key = uciMove.substring(2, 4)
+        const type = this.board.state.pieces[key].role
+        let num = 0
+        let promo = false
+        for (let i = 0; i < this.legalMoves.length; i++) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            num = num + 1
+            if (this.legalMoves[i].includes('+')) {
+              promo = true
+            }
+          }
+        }
+        if (type === 'pawn') {
+          this.promotions = [
+            { type: 'pawn' },
+            { type: 'ppawn' }
+          ]
+        } else if (type === 'lance') {
+          this.promotions = [
+            { type: 'lance' },
+            { type: 'plance' }
+          ]
+        } else if (type === 'knight') {
+          this.promotions = [
+            { type: 'knight' },
+            { type: 'pknight' }
+          ]
+        } else if (type === 'silver') {
+          this.promotions = [
+            { type: 'silver' },
+            { type: 'psilver' }
+          ]
+        } else if (type === 'bishop') {
+          this.promotions = [
+            { type: 'bishop' },
+            { type: 'pbishop' }
+          ]
+        } else if (type === 'rook') {
+          this.promotions = [
+            { type: 'rook' },
+            { type: 'prook' }
+          ]
+        }
+        if (num === 1 && promo) {
+          this.promotions = [this.promotions[1]]
+        }
+      }
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -457,8 +538,14 @@ export default {
           uciMove = this.increaseNumbers(uciMove)
         }
         if (this.isPromotion(uciMove)) {
-          this.uciMove = uciMove
-          this.showPromotionModal()
+          if (this.variant === 'makruk') {
+            const move = uciMove + 'm'
+            this.$store.dispatch('push', move)
+          } else {
+            this.setPromotionOptions(uciMove)
+            this.promotionMove = uciMove
+            this.showPromotionModal()
+          }
         } else {
           this.lastMoveSan = this.$store.getters.sanMove(uciMove)
           this.$store.dispatch('push', uciMove)
@@ -570,7 +657,6 @@ export default {
 
 <style>
 @import '../assets/chessground.css';
-@import '../assets/theme.css';
 @import '../assets/dim9x9.css';
 @import '../assets/dim8x8.css';
 @import '../assets/dim9x10.css';
@@ -579,7 +665,7 @@ export default {
   position: absolute;
   z-index: 4;
   width: 12.5%;
-  height: 50%;
+  height: 62.5%;
 }
 .mirror {
   transform: scaleY(-1);
@@ -630,7 +716,6 @@ coords {
   color: black;
 }
 .cg-board-wrap {
-  background-image: url('/src/renderer/assets/images/board/svg/blue.svg');
   position: relative;
 }
 .koth cg-container::before {

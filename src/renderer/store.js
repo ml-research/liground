@@ -369,14 +369,10 @@ export const store = new Vuex.Store({
       ipc.send(payload)
     },
     fen (context, payload) {
-      if (ffish.validateFen(payload, this.state.variant) === 1) {
-        if (context.state.fen !== payload) {
-          context.commit('fen', payload)
-          context.dispatch('updateBoard')
-          context.dispatch('restartEngine')
-        }
-      } else {
-        console.log(`invalid fen: ${payload}`)
+      if (context.state.fen !== payload) {
+        context.commit('fen', payload)
+        context.dispatch('updateBoard')
+        context.dispatch('restartEngine')
       }
     },
     lastFen (context, payload) {
@@ -409,7 +405,9 @@ export const store = new Vuex.Store({
           context.commit('newBoard', { is960: false, fen: '' })
         }
         context.dispatch('resetEngineData')
-        ipc.send(`setoption name UCI_Variant value ${payload}`)
+        context.dispatch('setEngineOptions', {
+          UCI_Variant: payload
+        })
       }
     },
     set960 (context, payload) {
@@ -500,7 +498,7 @@ export const store = new Vuex.Store({
     loadedGames (context, payload) {
       context.commit('loadedGames', payload)
     },
-    loadGame (context, payload) {
+    async loadGame (context, payload) {
       let variant = payload.game.headers('Variant').toLowerCase()
 
       if (variant === '') { // if no variant is given we assume it to be standard chess
@@ -512,18 +510,16 @@ export const store = new Vuex.Store({
         return
       }
 
-      const board = new ffish.Board(variant)
       const gameInfo = {}
       for (const curVal of payload.game.headerKeys().split(' ')) {
         gameInfo[curVal] = payload.game.headers(curVal)
       }
 
       context.commit('selectedGame', payload.game)
-      context.dispatch('variant', variant)
-      context.commit('newBoard', { fen: board.fen(), is960: board.is960() })
       context.commit('gameInfo', gameInfo)
-      context.dispatch('push', payload.game.mainlineMoves())
-      context.dispatch('updateBoard')
+      await context.dispatch('variant', variant)
+      context.commit('newBoard')
+      await context.dispatch('push', payload.game.mainlineMoves())
     },
     increment (context, payload) {
       context.commit('increment', payload)

@@ -35,7 +35,7 @@
       /></a>
     </nav>
     <div id="Modal">
-      <modal
+      <Modal
         v-show="isModalVisible"
         @close="closeModal"
       />
@@ -46,13 +46,13 @@
 <script>
 import fs from 'fs'
 import ffish from 'ffish'
-import modal from './EngineModal'
+import Modal from './EngineModal'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'MenuBar',
   components: {
-    modal
+    Modal
   },
   data () {
     return {

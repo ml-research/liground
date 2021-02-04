@@ -13,6 +13,7 @@ let mainConfig = {
     main: path.join(__dirname, '../src/main/index.js')
   },
   externals: [
+    'electron-debug',
     ...Object.keys(dependencies || {})
   ],
   module: {
