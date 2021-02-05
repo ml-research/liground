@@ -72,7 +72,7 @@ export default {
           }
         },
         markers: {
-          size: 8
+          size: 4
         },
         chart: {
           id: 'plot',
@@ -104,10 +104,7 @@ export default {
     }
   },
   computed: {
-    moves () {
-      return this.$store.getters.moves
-    },
-    ...mapGetters(['points', 'turn', 'selectedGame', 'variant', 'board', 'startFen'])
+    ...mapGetters(['points', 'turn', 'selectedGame', 'variant', 'board', 'startFen', 'moves'])
   },
   watch: {
     board () {
@@ -132,6 +129,9 @@ export default {
     selectedGame () {
       this.clear()
       this.loadPGNData()
+    },
+    moves () {
+      return this.moves
     }
   },
   created () {
