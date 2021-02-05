@@ -93,9 +93,13 @@ class Engine extends EventEmitter {
   evaluate (fen, depth) {
     return new Promise(resolve => {
       this.evalWorker.onmessage = ({ data }) => {
-        if (data.type === 'evaluated') {
-          resolve(data.payload)
-          delete this.evalWorker.onmessage
+        if (data.type === 'cache') {
+          for (const { type, payload } of data.events) {
+            if (type === 'evaluated') {
+              resolve(payload)
+              delete this.evalWorker.onmessage
+            }
+          }
         }
       }
       this.evalWorker.postMessage({
