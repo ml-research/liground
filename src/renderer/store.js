@@ -500,11 +500,11 @@ export const store = new Vuex.Store({
         gameInfo[curVal] = payload.game.headers(curVal)
       }
 
-      context.commit('selectedGame', payload.game)
       context.commit('gameInfo', gameInfo)
       await context.dispatch('variant', variant)
       context.commit('newBoard')
       await context.dispatch('push', payload.game.mainlineMoves())
+      context.commit('selectedGame', payload.game)
     },
     increment (context, payload) {
       context.commit('increment', payload)
