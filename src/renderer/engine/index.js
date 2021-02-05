@@ -64,6 +64,15 @@ class Engine extends EventEmitter {
       type: 'cmd'
     })
   }
+
+  /**
+   * Evaluate a position.
+   * @param {string} fen FEN position
+   * @param {number} [depth=20] search depth
+   */
+  evaluate(fen, depth = 20) {
+    // TODO
+  }
 }
 
 export default new Engine()
