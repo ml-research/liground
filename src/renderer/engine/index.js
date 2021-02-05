@@ -70,7 +70,7 @@ class Engine extends EventEmitter {
    * @param {string} fen FEN position
    * @param {number} [depth=20] search depth
    */
-  evalute(fen, depth = 20) {
+  evaluate(fen, depth = 20) {
     // TODO
   }
 }
