@@ -24,6 +24,7 @@ export default {
   data: function () {
     return {
       evalArray: [0],
+      break: false,
       is960: false,
       chartOptions: {
         dataLabels: {
@@ -41,7 +42,7 @@ export default {
           intersect: true
         },
         noData: {
-          text: 'Start the Engine for data and do your 2nd move',
+          text: '',
           align: 'center',
           verticalAlign: 'middle',
           offsetX: 0,
@@ -110,6 +111,7 @@ export default {
       const board960 = this.$store.getters.is960
       if (board960 && !this.is960) {
         this.clear()
+        this.break = true
         this.is960 = true
       }
       if (board960 && this.is960) {
@@ -117,18 +119,23 @@ export default {
       }
     },
     variant () {
+      this.break = true
       this.clear()
-    },
-    selectedGame () {
-      this.clear()
-      this.loadPGNData()
     },
     moves () {
+      console.log('moves')
+      console.log('Moves: ' + this.moves)
       this.updateGraph()
+    },
+    selectedGame () {
+      console.log('select')
+      this.clear()
+      this.loadPGNData()
     }
   },
   created () {
     document.addEventListener('resetPlot', () => {
+      this.break = true
       this.clear()
     })
   },
@@ -141,6 +148,7 @@ export default {
       }]
       this.evalArray = [0]
       this.chartOptions.fill.gradient.colorStops[1].opacity = 0
+      this.chartOptions.fill.gradient.colorStops[0].offset = 100
     },
 
     adjustPoints (points) {
@@ -160,19 +168,23 @@ export default {
     },
 
     async updateGraph () {
-      if (this.moves.length > this.evalArray.length) {
+      console.log('called Update Graph')
+
+      if (this.$store.getters.loadingPGN) {
+        this.$store.commit('loadingPGN', false)
         return
       }
       if (this.moves.length === 0) {
         this.evalArray = [0]
         return
       }
-      console.log('called')
       const index = this.moves.length - 1
-      let points = await Engine.evaluate(this.moves[index].fen, 5)
-      console.log('before' + points)
+      let points = await Engine.evaluate(this.moves[index].fen, 20)
+      if (this.break) { // this doesnt work
+        this.break = false
+        return
+      }
       points = this.adjustPoints(points)
-      console.log('after ' + points)
       this.evalArray.push(points)
       this.series = [{
         data: this.evalArray
@@ -206,6 +218,7 @@ export default {
     },
 
     async loadPGNData () { // pushes all the moves to the plot when loading a pgn
+      console.log('loadPGNData')
       const newArray = [0]
       let index = 0
       const length = this.moves.length
@@ -223,21 +236,31 @@ export default {
         data: newArray
       }]
       await this.evaluateHistory(10)
-      // await this.evaluateHistory(20) // break when something (clear)
+      await this.evaluateHistory(20)
     },
 
     async evaluateHistory (depth) { // update graph bc of new move while still calc or at all
       let index = 1
       let points = 0
+      console.log(this.break)
       while (index < this.series[0].data.length - 1) {
-        points = await Engine.evaluate(this.moves[index].fen, depth)
-        points = this.adjustPoints(points)
-        this.evalArray[index] = points
-        this.series = [{
-          data: this.evalArray
-        }]
-        this.calcOffset()
-        index++
+        try {
+          points = await Engine.evaluate(this.moves[index].fen, depth)
+          if (this.break) {
+            this.break = false
+            this.clear()
+            return
+          }
+          points = this.adjustPoints(points)
+          this.evalArray[index] = points
+          this.series = [{
+            data: this.evalArray
+          }]
+          this.calcOffset()
+          index++
+        } catch (error) {
+          this.clear()
+        }
       }
     }
   }

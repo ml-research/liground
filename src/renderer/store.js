@@ -107,6 +107,7 @@ export const store = new Vuex.Store({
     startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
     legalMoves: '',
+    loadingPGN: false,
     destinations: {},
     variant: 'chess',
     variantOptions: new TwoWayMap({ // all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
@@ -304,6 +305,9 @@ export const store = new Vuex.Store({
     },
     points (state, payload) {
       state.points = payload
+    },
+    loadingPGN (state, payload) {
+      state.loadingPGN = payload
     }
   },
   actions: { // async
@@ -499,12 +503,15 @@ export const store = new Vuex.Store({
       for (const curVal of payload.game.headerKeys().split(' ')) {
         gameInfo[curVal] = payload.game.headers(curVal)
       }
-
+      context.commit('loadingPGN', true)
       context.commit('gameInfo', gameInfo)
       await context.dispatch('variant', variant)
       context.commit('newBoard')
       await context.dispatch('push', payload.game.mainlineMoves())
       context.commit('selectedGame', payload.game)
+    },
+    loadingPGN (context, payload) {
+      context.commit('loadingPGN', payload)
     },
     increment (context, payload) {
       context.commit('increment', payload)
@@ -703,6 +710,9 @@ export const store = new Vuex.Store({
     },
     viewAnalysis (state) {
       return state.viewAnalysis
+    },
+    loadingPGN (state) {
+      return state.loadingPGN
     }
   }
 })
