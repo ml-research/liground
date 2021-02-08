@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const https = require('https')
 const os = require('os')
+const chalk = require('chalk')
 
 /**
  * Downloads a file to the given path.
@@ -61,7 +62,7 @@ async function downloadBinary (fileName, urlMap) {
 
   // check if no url available
   if (!url) {
-    console.error(`No prebuilt binary of ${fileName} available for your current OS. Please build one yourself.`)
+    console.error(chalk.red('IMPORTANT:'), `No prebuilt binary of ${fileName} available for your current OS. Please build one yourself.`)
     return
   }
   console.log(`Downloading ${fileName} binary from ${url}...`)
@@ -71,19 +72,18 @@ async function downloadBinary (fileName, urlMap) {
   try {
     await downloadFile(url, filePath)
   } catch (err) {
-    console.error(`Failed to download ${fileName}:`, err)
+    console.error(chalk.red(`Failed to download ${fileName}:`), err)
     return
   }
 
   // make the file executable
   if (platform !== 'win32') {
-    fs.chmod(filePath, '+x', (err) => {
+    await new Promise((resolve) => fs.chmod(filePath, '755', (err) => {
       if (err) throw err
-      console.log(`Download of ${fileName} completed!`)
-    })
-  } else {
-    console.log(`Download of ${fileName} completed!`)
+      resolve()
+    }))
   }
+  console.log(`Download of ${fileName} completed!`)
 }
 
 downloadBinary('fairy-stockfish', {
