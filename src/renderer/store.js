@@ -207,6 +207,9 @@ export const store = new Vuex.Store({
       state.destinations = payload
     },
     variant (state, payload) {
+      if (payload === 'racingkings') {
+        state.orientation = 'white'
+      }
       state.variant = payload
     },
     engineBinary (state, payload) {
