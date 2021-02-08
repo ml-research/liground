@@ -15,7 +15,8 @@
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src",
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --config webpack/main.config.js",
-    "pack:renderer": "cross-env NODE_ENV=production webpack --progress --config webpack/renderer.config.js"
+    "pack:renderer": "cross-env NODE_ENV=production webpack --progress --config webpack/renderer.config.js",
+    "postinstall": "node scripts/postinstall.js"
   },
   "dependencies": {
     "apexcharts": "^3.23.1",
