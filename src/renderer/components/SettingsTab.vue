@@ -3,58 +3,40 @@
     <title>SettingsTab</title>
     <h1>This is the Settings Tab</h1>
     <div>
-      <PrettyCheck
-        class="p-icon p-curve p-smooth"
-        color="primary-o"
-      >
-        <em
-          slot="extra"
-          class="icon mdi mdi-check"
-        />
-        <p>Option 1</p>
-      </PrettyCheck>
-      <br>
-      <PrettyCheck
-        class="p-icon p-curve p-smooth"
-        color="primary-o"
-      >
-        <em
-          slot="extra"
-          class="icon mdi mdi-check"
-        />
-        Option 2
-      </PrettyCheck>
-      <br>
-      <PrettyCheck
-        class="p-icon p-curve p-smooth"
-        color="primary-o"
-      >
-        <em
-          slot="extra"
-          class="icon mdi mdi-check"
-        />
-        Option 3
-      </PrettyCheck>
-      <br>
-    </div>
-    <div>
-      <button
-        type="button"
-        class="btn-green"
-        @click="changeTab"
-      >
-        <p>Change the Tab</p>
-      </button>
+      <table>
+        <tr
+          v-for="option in engineOptions"
+          :key="option.name"
+        >
+          <td> {{ option.name }} </td>
+          <td> {{ option.type }} </td>
+          <td v-if="option.type === 'combo'">
+            <select size="1">
+              <option
+                v-for="selOption in option.var"
+                :key="selOption"
+                :value="selOption"
+                :selected="selOption === option.default"
+              >
+                {{ selOption }}
+              </option>
+            </select>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </template>
 
 <script>
-import PrettyCheck from 'pretty-checkbox-vue/check'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'SettingsTab',
   components: {
-    PrettyCheck
+  },
+  computed: {
+    ...mapGetters(['engineOptions'])
   },
   methods: {
     changeTab () {
