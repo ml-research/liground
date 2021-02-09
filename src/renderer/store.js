@@ -323,6 +323,10 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if(localStorage.variant){
+        console.log(localStorage.variant)
+        store.dispatch('variant', localStorage.variant)
+      }
       context.commit('newBoard')
       context.dispatch('updateBoard')
       context.commit('initialized', true)
@@ -730,7 +734,4 @@ ffish.onRuntimeInitialized = () => {
   ipc.on('info', info => store.dispatch('updateMultiPV', info))
   store.commit('engineInfo', await ipc.runEngine())
   store.dispatch('initEngineOptions')
-  if(localStorage.variant){
-    store.dispatch('variant', localStorage.variant)
-  }
 })()

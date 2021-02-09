@@ -6,7 +6,6 @@
       :value="displayVariant"
       :options="options"
       :allow-empty="false"
-      :placeholder="selected"
       :show-labels="false"
       @input="updateVariant"
     />
