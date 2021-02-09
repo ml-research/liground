@@ -285,6 +285,8 @@ export const store = new Vuex.Store({
         state.board = new ffish.Board(state.variant)
       }
       state.moves = []
+      state.mainFirstMove = null
+      state.firstMoves = []
       state.gameInfo = {}
       state.fen = state.board.fen()
       state.turn = state.board.turn()

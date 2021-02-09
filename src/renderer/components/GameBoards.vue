@@ -162,7 +162,8 @@ export default {
       const mov = this.currentMove
       let endOfLine = mov
       if (!mov && this.moves.length === 0) {
-        endOfLine = undefined
+        console.log('return')
+        return
       } else if (!mov && this.moves.length > 0) {
         endOfLine = this.mainFirstMove
         while (endOfLine.main) {
@@ -175,9 +176,7 @@ export default {
         }
       }
       this.updateCurrent(endOfLine)
-      if (mov && mov.ply >= this.moves.length - 1) {
-        return
-      }
+      console.log(endOfLine.name)
       this.$store.dispatch('fen', endOfLine.fen)
     },
     moveBackOne () { // this method moves back one move in the current line
@@ -196,7 +195,7 @@ export default {
     moveForwardOne () { // this method moves forward one move in the current line
       const mov = this.currentMove
       if (!mov) {
-        if (this.moves) {
+        if (this.moves[0]) {
           this.$store.dispatch('fen', this.moves[0].fen)
           this.updateCurrent(this.moves[0])
         }

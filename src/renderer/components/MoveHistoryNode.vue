@@ -109,6 +109,9 @@ export default {
   },
   methods: {
     updateBoard (move) {
+      console.log(this.moves)
+      console.log(this.mainFirstMove)
+      console.log(this.firstMoves)
       this.$store.dispatch('fen', this.move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
