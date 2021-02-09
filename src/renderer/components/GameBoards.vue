@@ -162,7 +162,6 @@ export default {
       const mov = this.currentMove
       let endOfLine = mov
       if (!mov && this.moves.length === 0) {
-        console.log('return')
         return
       } else if (!mov && this.moves.length > 0) {
         endOfLine = this.mainFirstMove
@@ -176,7 +175,6 @@ export default {
         }
       }
       this.updateCurrent(endOfLine)
-      console.log(endOfLine.name)
       this.$store.dispatch('fen', endOfLine.fen)
     },
     moveBackOne () { // this method moves back one move in the current line
