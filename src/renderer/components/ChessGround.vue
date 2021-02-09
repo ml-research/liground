@@ -154,7 +154,9 @@ export default {
       pieceShapes: [],
       promotions: [],
       isPromotionModalVisible: false,
-      promotionMove: undefined
+      promotionMove: undefined,
+      pieceStyleEl: null,
+      boardStyleEl: null
     }
   },
   computed: {
@@ -340,6 +342,14 @@ export default {
       orientation: this.orientation
     })
 
+    // inject stylesheet placeholders into head
+    this.boardStyleEl = document.createElement('link')
+    this.boardStyleEl.rel = 'stylesheet'
+    this.pieceStyleEl = document.createElement('link')
+    this.pieceStyleEl.rel = 'stylesheet'
+    document.head.appendChild(this.boardStyleEl)
+    document.head.appendChild(this.pieceStyleEl)
+
     // set initial styles
     this.updateBoardCSS(this.boardStyle)
     this.updatePieceCSS(this.pieceStyle)
@@ -357,38 +367,28 @@ export default {
       this.afterMove()
     },
     updatePieceCSS (pieceStyle) {
-      const file = document.createElement('link')
-      file.rel = 'stylesheet'
+      const node = this.pieceStyleEl
       if (this.$store.getters.isInternational) {
-        file.href = 'static/piece-css/international/' + pieceStyle + '.css'
+        node.href = 'static/piece-css/international/' + pieceStyle + '.css'
+      } else if (this.$store.getters.isSEA) {
+        node.href = 'static/piece-css/sea/' + pieceStyle + '.css'
+      } else if (this.$store.getters.isXiangqi) {
+        node.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
+      } else if (this.$store.getters.isShogi) {
+        node.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
       }
-      if (this.$store.getters.isSEA) {
-        file.href = 'static/piece-css/sea/' + pieceStyle + '.css'
-      }
-      if (this.$store.getters.isXiangqi) {
-        file.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
-      }
-      if (this.$store.getters.isShogi) {
-        file.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
-      }
-      document.head.appendChild(file)
     },
     updateBoardCSS (boardStyle) {
-      const file = document.createElement('link')
-      file.rel = 'stylesheet'
+      const node = this.boardStyleEl
       if (this.$store.getters.isInternational) {
-        file.href = 'static/board-css/international/' + boardStyle + '.css'
-      } else
-      if (this.$store.getters.isXiangqi) {
-        file.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
-      } else
-      if (this.$store.getters.isSEA) {
-        file.href = 'static/board-css/sea/' + boardStyle + '.css'
-      } else
-      if (this.$store.getters.isShogi) {
-        file.href = 'static/board-css/shogi/' + boardStyle + '.css'
+        node.href = 'static/board-css/international/' + boardStyle + '.css'
+      } else if (this.$store.getters.isXiangqi) {
+        node.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+      } else if (this.$store.getters.isSEA) {
+        node.href = 'static/board-css/sea/' + boardStyle + '.css'
+      } else if (this.$store.getters.isShogi) {
+        node.href = 'static/board-css/shogi/' + boardStyle + '.css'
       }
-      document.head.appendChild(file)
     },
     dropPiece (event, pieceType, color) {
       this.board.dragNewPiece({ role: pieceType, color: color, promoted: false }, event)
