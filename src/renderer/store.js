@@ -730,4 +730,7 @@ ffish.onRuntimeInitialized = () => {
   ipc.on('info', info => store.dispatch('updateMultiPV', info))
   store.commit('engineInfo', await ipc.runEngine())
   store.dispatch('initEngineOptions')
+  if(localStorage.variant){
+    store.dispatch('variant', localStorage.variant)
+  }
 })()
