@@ -22,6 +22,25 @@
               </option>
             </select>
           </td>
+          <td v-else-if="option.type === 'check'">
+            <input
+              type="checkbox"
+              :checked="option.default === 'true'"
+              :name="option.name"
+            >
+          </td>
+          <td v-else-if="option.type === 'spin'">
+            <input
+              type="number"
+              :step="1"
+              :value="option.default"
+              :min="option.min"
+              :max="option.max"
+            >
+          </td>
+          <td v-else>
+            {{ option.min }} {{ option.max }}
+          </td>
         </tr>
       </table>
     </div>
