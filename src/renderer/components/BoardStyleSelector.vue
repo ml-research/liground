@@ -80,24 +80,24 @@ export default {
   },
   watch: {
     selected: function () {
-       if(this.internationalVariants.includes(this.variant)){ // localStorage for all different groups of board stylings 
+      if (this.internationalVariants.includes(this.variant)) { // localStorage for all different groups of board stylings
         localStorage.internationalBoardStyle = this.selected
-      }else if(this.shogiVariants.includes(this.variant)){
+      } else if (this.shogiVariants.includes(this.variant)) {
         localStorage.shogiBoardStyle = this.selected
-      }else if(this.seaVariants.includes(this.variant)){
+      } else if (this.seaVariants.includes(this.variant)) {
         localStorage.seaBoardStyle = this.selected
-      }else if(this.xiangqiVariants.includes(this.variant)){
+      } else if (this.xiangqiVariants.includes(this.variant)) {
         localStorage.xiangqiBoardStyle = this.selected
-      }else if(this.janggiVariants.includes(this.variant)){
+      } else if (this.janggiVariants.includes(this.variant)) {
         localStorage.janggiBoardStyle = this.selected
       }
       this.$store.dispatch('boardStyle', this.selected)
     },
     variant () {
       if (this.internationalVariants.includes(this.variant)) {
-        if(localStorage.internationalBoardStyle){
+        if (localStorage.internationalBoardStyle) {
           this.selected = localStorage.internationalBoardStyle
-        }else {
+        } else {
           this.selected = this.internationalStyles[0]
         }
         this.boardStyles = []
@@ -106,9 +106,9 @@ export default {
         })
       } else
       if (this.shogiVariants.includes(this.variant)) {
-        if(localStorage.shogiBoardStyle){
+        if (localStorage.shogiBoardStyle) {
           this.selected = localStorage.shogiBoardStyle
-        }else {
+        } else {
           this.selected = this.shogiStyles[1]
         }
         this.boardStyles = []
@@ -117,9 +117,9 @@ export default {
         })
       } else
       if (this.seaVariants.includes(this.variant)) {
-        if(localStorage.seaBoardStyle){
+        if (localStorage.seaBoardStyle) {
           this.selected = localStorage.seaBoardStyle
-        }else {
+        } else {
           this.selected = this.seaStyles[1]
         }
         this.boardStyles = []
@@ -128,9 +128,9 @@ export default {
         })
       } else
       if (this.xiangqiVariants.includes(this.variant)) {
-        if(localStorage.xiangqiBoardStyle){
+        if (localStorage.xiangqiBoardStyle) {
           this.selected = localStorage.xiangqiBoardStyle
-        }else {
+        } else {
           this.selected = this.xiangqiStyles[1]
         }
         this.boardStyles = []
@@ -139,9 +139,9 @@ export default {
         })
       } else
       if (this.janggiVariants.includes(this.variant)) {
-        if(localStorage.janggiBoardStyle){
+        if (localStorage.janggiBoardStyle) {
           this.selected = localStorage.janggiBoardStyle
-        }else {
+        } else {
           this.selected = this.janggiStyles[3]
         }
         this.boardStyles = []
@@ -150,7 +150,7 @@ export default {
         })
       }
     }
-  }, 
+  }
 }
 </script>
 <style scoped>

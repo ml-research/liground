@@ -136,22 +136,22 @@ export default {
   watch: {
     selected: function () {
       console.log(`this.selectedPieceStyle: ${this.selected}`)
-      if(this.internationalVariants.includes(this.variant)){
+      if (this.internationalVariants.includes(this.variant)) {
         localStorage.internationalPieceStyle = this.selected
-      }else if(this.shogiVariants.includes(this.variant)){
+      } else if (this.shogiVariants.includes(this.variant)) {
         localStorage.shogiPieceStyle = this.selected
-      }else if(this.seaVariants.includes(this.variant)){
+      } else if (this.seaVariants.includes(this.variant)) {
         localStorage.seaPieceStyle = this.selected
-      }else if(this.xiangqiVariants.includes(this.variant)){
+      } else if (this.xiangqiVariants.includes(this.variant)) {
         localStorage.xiangqiPieceStyle = this.selected
       }
       this.$store.dispatch('pieceStyle', this.selected)
     },
     variant () {
       if (this.internationalVariants.includes(this.variant)) {
-        if(localStorage.internationalPieceStyle){
+        if (localStorage.internationalPieceStyle) {
           this.selected = localStorage.internationalPieceStyle
-        }else {
+        } else {
           this.selected = this.internationalPieces[18]
         }
         this.pieceStyles = []
@@ -160,9 +160,9 @@ export default {
         })
       }
       if (this.shogiVariants.includes(this.variant)) {
-        if(localStorage.shogiPieceStyle){
+        if (localStorage.shogiPieceStyle) {
           this.selected = localStorage.shogiPieceStyle
-        }else{
+        } else {
           this.selected = this.shogiPieces[0]
         }
         this.pieceStyles = []
@@ -171,9 +171,9 @@ export default {
         })
       }
       if (this.seaVariants.includes(this.variant)) {
-        if(localStorage.seaPieceStyle){
+        if (localStorage.seaPieceStyle) {
           this.selected = localStorage.seaPieceStyle
-        }else {
+        } else {
           this.selected = this.seaPieces[0]
         }
         this.pieceStyles = []
@@ -182,9 +182,9 @@ export default {
         })
       }
       if (this.xiangqiVariants.includes(this.variant)) {
-        if(localStorage.xiangqiPieceStyle){
+        if (localStorage.xiangqiPieceStyle) {
           this.selected = localStorage.xiangqiPieceStyle
-        }else {
+        } else {
           this.selected = this.xiangqiPieces[0]
         }
         this.pieceStyles = []

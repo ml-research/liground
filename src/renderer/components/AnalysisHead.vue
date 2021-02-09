@@ -62,7 +62,7 @@ export default {
         this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
       }
     }
-  },
+  }
 }
 </script>
 
