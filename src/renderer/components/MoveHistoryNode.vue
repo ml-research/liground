@@ -10,7 +10,7 @@
     </span>
     <span
       v-else-if="move.ply % 2 === 0 && printRoot
-        &&(beginVariation || move.prev && (move.prev.prev && move.prev.prev.next.length > 1)
+        &&(beginVariation || move.prev && (move.prev.prev && move.prev.prev.main === move.prev && move.prev.prev.next.length > 1)
           || (firstMoves.includes(move.prev) && firstMoves.length > 1 && mainFirstMove.next.length > 0 && (move.prev === mainFirstMove || move.prev.main !== move) )
           && move.prev.main === move)"
       class="move-number"
