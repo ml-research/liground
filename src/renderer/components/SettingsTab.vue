@@ -1,62 +1,98 @@
 <template>
-  <div id="about">
-    <title>SettingsTab</title>
-    <h1 @click="changeTab">
-      This is the Settings Tab
-    </h1>
+  <div id="settings">
     <div>
       <table>
+        <caption> Engine Settings </caption>
+        <tr>
+          <th> Parameter </th>
+          <th> Value </th>
+          <th class="range">
+            Range
+          </th>
+        </tr>
         <tr
           v-for="option in engineOptions"
           :key="option.name"
         >
           <td> {{ option.name }} </td>
-          <td> {{ option.type }} </td>
-          <td v-if="option.type === 'combo'">
-            <select
-              v-model="engineSettingsForm[option.name]"
-              size="1"
-            >
-              <option
-                v-for="selOption in option.var"
-                :key="selOption"
-                :value="selOption"
+          <template v-if="option.type === 'combo'">
+            <td>
+              <select
+                v-model="engineSettingsForm[option.name]"
+                size="1"
+                class="settings-element"
               >
-                {{ selOption }}
-              </option>
-            </select>
-          </td>
-          <td v-else-if="option.type === 'check'">
-            <input
-              v-model="engineSettingsForm[option.name]"
-              type="checkbox"
-              :name="option.name"
-            >
-          </td>
-          <td v-else-if="option.type === 'spin'">
-            <input
-              v-model="engineSettingsForm[option.name]"
-              type="number"
-              :step="1"
-              :min="option.min"
-              :max="option.max"
-            >
-          </td>
-          <td v-else-if="option.type === 'string'">
-            <input
-              v-model="engineSettingsForm[option.name]"
-              type="text"
-              :name="option.name"
-            >
-          </td>
-          <td v-else-if="option.type === 'button'">
-            <button type="button">
-              {{ option.name }}
-            </button>
-          </td>
+                <option
+                  v-for="selOption in option.var"
+                  :key="selOption"
+                  :value="selOption"
+                >
+                  {{ selOption }}
+                </option>
+              </select>
+            </td>
+            <td class="range" />
+          </template>
+          <template v-else-if="option.type === 'check'">
+            <td>
+              <input
+                v-model="engineSettingsForm[option.name]"
+                type="checkbox"
+                :name="option.name"
+                class="settings-element"
+              >
+            </td>
+            <td class="range">
+              boolean
+            </td>
+          </template>
+          <template v-else-if="option.type === 'spin'">
+            <td>
+              <input
+                v-model="engineSettingsForm[option.name]"
+                type="number"
+                :step="1"
+                :min="option.min"
+                :max="option.max"
+                class="settings-element"
+              >
+            </td>
+            <td class="range">
+              {{ option.min }} to {{ option.max }}
+            </td>
+          </template>
+          <template v-else-if="option.type === 'string'">
+            <td>
+              <input
+                v-model="engineSettingsForm[option.name]"
+                type="text"
+                :name="option.name"
+                class="settings-element"
+              >
+            </td>
+            <td class="range">
+              {{ option.type }}
+            </td>
+          </template>
+          <template v-else-if="option.type === 'button'">
+            <td>
+              <button
+                type="button"
+                class="settings-element"
+              >
+                {{ option.name }}
+              </button>
+            </td>
+            <td class="range" />
+          </template>
         </tr>
       </table>
-      <a @click="changeSettings()">Change Settings</a>
+      <a
+        class="btn-green"
+        @click="changeSettings()"
+      >
+        Change Settings
+      </a>
     </div>
   </div>
 </template>
@@ -101,5 +137,37 @@ export default {
     background: #4AAE9B;
     border: 1px solid #4AAE9B;
     border-radius: 2px;
+    cursor: pointer;
+  }
+
+  table, th, td {
+    background-color: white;
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9em;
+  }
+
+  table {
+    margin: 1em;
+  }
+
+  th {
+    border-bottom: 4px double black;
+  }
+
+  input[type=number]::-webkit-inner-spin-button {
+    opacity: 1
+  }
+
+  input[type=number] {
+    text-align: right;
+  }
+  .settings-element {
+    width: 100%;
+  }
+
+  .range {
+    text-align: right;
   }
 </style>
