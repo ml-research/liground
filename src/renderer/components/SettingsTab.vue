@@ -79,6 +79,7 @@
               <button
                 type="button"
                 class="settings-element"
+                @click="triggerButtonSetting(option.name)"
               >
                 {{ option.name }}
               </button>
@@ -88,10 +89,16 @@
         </tr>
       </table>
       <a
-        class="btn-green"
-        @click="changeSettings()"
+        class="btn green"
+        @click="changeSettings(engineSettingsForm)"
       >
         Change Settings
+      </a>
+      <a
+        class="btn red"
+        @click="changeTab()"
+      >
+        close
       </a>
     </div>
   </div>
@@ -110,34 +117,51 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['engineOptions'])
+    ...mapGetters(['engineOptions', 'variant'])
   },
   created: function () {
     for (const option of this.engineOptions) {
       if (option.type !== 'button') {
-        this.engineSettingsForm[option.name] = option.type === 'check' ? option.default === 'true' : option.default
+        if (option.name === 'UCI_Variant') {
+          this.engineSettingsForm[option.name] = this.variant
+        } else {
+          this.engineSettingsForm[option.name] = option.type === 'check' ? option.default === 'true' : option.default
+        }
       }
     }
   },
   methods: {
     changeTab () {
       this.$store.commit('viewAnalysis', !this.$store.getters.viewAnalysis)
-      console.log(this.engineOptions[0])
     },
-    changeSettings () {
-      this.$store.dispatch('setEngineOptions', this.engineSettingsForm)
+    changeSettings (settings) {
+      this.$store.dispatch('setEngineOptions', settings)
+    },
+    triggerButtonSetting (optionName) {
+      const settings = {}
+      settings[optionName] = null
+      this.changeSettings(settings)
     }
   }
 }
 
 </script>
 <style scoped>
-  .btn-green {
-    color: white;
-    background: #4AAE9B;
-    border: 1px solid #4AAE9B;
+  .btn {
     border-radius: 2px;
     cursor: pointer;
+    display: block;
+    width: 250px;
+    margin: 0.2em auto;
+  }
+
+  .red {
+    color: white;
+    background-color: firebrick;
+  }
+  .green {
+    color: white;
+    background: #4AAE9B;
   }
 
   table, th, td {
@@ -156,6 +180,7 @@ export default {
     border-bottom: 4px double black;
   }
 
+  /* make arrows of number input always visible */
   input[type=number]::-webkit-inner-spin-button {
     opacity: 1
   }
