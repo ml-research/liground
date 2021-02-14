@@ -532,7 +532,7 @@ export default {
       }
     },
     changeTurn () {
-      return (orig, dest) => {
+      return (orig, dest, metadata) => {
         let uciMove = orig + dest
         if (this.dimensionNumber === 3) {
           uciMove = this.increaseNumbers(uciMove)

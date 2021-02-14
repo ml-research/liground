@@ -209,9 +209,7 @@ export default {
     },
     showInfo (event) {
       console.log(`showInfo: ${this.fen}`)
-      // this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
-      // const newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
 
       if (this.$store.getters.active) {
