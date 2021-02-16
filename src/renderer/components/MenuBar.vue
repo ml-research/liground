@@ -135,9 +135,9 @@ export default {
         })
 
         this.$store.dispatch('loadedGames', games)
-        /*if (games[0]) {
+        /* if (games[0]) {
           this.$store.dispatch('loadGame', { game: games[0] })
-        }*/
+        } */
       })
     }
   }
