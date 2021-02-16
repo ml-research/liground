@@ -60,12 +60,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['viewAnalysis'])
+    ...mapGetters(['viewAnalysis', 'initialized'])
   },
-  mounted () {
-    if (localStorage.PGNPath) {
-      const path = JSON.parse(localStorage.PGNPath)
-      this.openPGNFromPath(path)
+  watch: {
+    initialized: function () {
+      if (this.initialized === true) {
+        if (localStorage.PGNPath) {
+          this.openPGNFromPath(JSON.parse(localStorage.PGNPath))
+        }
+      }
     }
   },
   methods: {

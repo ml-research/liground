@@ -334,7 +334,6 @@ export const store = new Vuex.Store({
           }
         }
       }
-
       context.commit('newBoard')
       context.dispatch('updateBoard')
       context.commit('initialized', true)
