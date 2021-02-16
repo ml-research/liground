@@ -157,11 +157,20 @@ export default {
 
   .red {
     color: white;
-    background-color: firebrick;
+    background-color: #b22222;
   }
+
+  .red.btn:hover{
+    background-color: #8b1919;
+  }
+
   .green {
     color: white;
-    background: #4AAE9B;
+    background-color: #4AAE9B;
+  }
+
+  .green.btn:hover {
+    background-color: #3c8577;
   }
 
   table, th, td {
