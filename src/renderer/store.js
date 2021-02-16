@@ -156,7 +156,6 @@ export const store = new Vuex.Store({
     gameInfo: {},
     loadedGames: [],
     selectedGame: null,
-    points: 0,
     boardStyle: 'blue',
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
@@ -303,9 +302,6 @@ export const store = new Vuex.Store({
     },
     selectedGame (state, payload) {
       state.selectedGame = payload
-    },
-    points (state, payload) {
-      state.points = payload
     }
   },
   actions: { // async
@@ -517,9 +513,6 @@ export const store = new Vuex.Store({
     pieceStyle (context, payload) {
       context.commit('pieceStyle', payload)
     },
-    points (context, payload) {
-      context.commit('points', payload)
-    },
     viewAnalysis (context, payload) {
       context.commit('viewAnalysis', payload)
     },
@@ -539,9 +532,6 @@ export const store = new Vuex.Store({
     },
     active (state) {
       return state.active
-    },
-    points (state, getters) {
-      return getters.cpForWhiteStr
     },
     started (state) {
       return state.started
