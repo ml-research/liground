@@ -37,6 +37,7 @@ export default {
   },
   computed: {
     engineBannerURL () {
+      // TODO: base64 instead of url to allow custom logos for user engines?
       const selected = this.getSelectedEngine()
       return selected ? selected.logo : ''
     },
@@ -57,15 +58,20 @@ export default {
       this.$store.dispatch('engineBinary', this.getSelectedEngine().binary)
     },
     variant () {
-      this.selected = this.engines[0].name
+      // TODO: save previous user selection per variant?
+      this.selectDefault()
     }
   },
   created () {
-    this.selected = this.engines[0].name
+    this.selectDefault()
   },
   methods: {
     getSelectedEngine () {
       return this.engines.find(e => e.name === this.selected)
+    },
+    selectDefault () {
+      // first engine in the list has highest priority
+      this.selected = this.engines[0].name
     }
   }
 }
