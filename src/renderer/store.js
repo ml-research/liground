@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
 import engine from './engine'
+import availableEngines from './store/engines'
 
 Vue.use(Vuex)
 
@@ -125,6 +126,7 @@ export const store = new Vuex.Store({
     }),
     orientation: 'white',
     message: 'hello from Vuex',
+    availableEngines,
     engineBinary: 'stockfish',
     engineInfo: {
       name: '',
@@ -407,10 +409,13 @@ export const store = new Vuex.Store({
     async engineBinary (context, payload) {
       if (context.getters.engineBinary !== payload) {
         context.commit('engineBinary', payload)
+        if (context.getters.active) {
+          context.commit('active', false)
+        }
         context.commit('clearIO')
-        context.dispatch('resetEngineData')
+        await context.dispatch('resetEngineData')
         context.commit('engineInfo', await engine.run(payload))
-        context.dispatch('initEngineOptions')
+        await context.dispatch('initEngineOptions')
       }
     },
     initEngineOptions (context) {
@@ -535,8 +540,8 @@ export const store = new Vuex.Store({
     active (state) {
       return state.active
     },
-    points (state) {
-      return state.points
+    points (state, getters) {
+      return getters.cpForWhiteStr
     },
     started (state) {
       return state.started
@@ -567,6 +572,9 @@ export const store = new Vuex.Store({
     },
     variantOptions (state) {
       return state.variantOptions
+    },
+    availableEngines (state) {
+      return state.availableEngines
     },
     engineBinary (state) {
       return state.engineBinary
