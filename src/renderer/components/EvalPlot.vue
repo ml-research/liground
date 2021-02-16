@@ -104,7 +104,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['selectedGame', 'variant', 'board', 'startFen', 'moves'])
+    ...mapGetters(['variant', 'board', 'startFen', 'moves'])
   },
   watch: {
     board () {
@@ -121,22 +121,16 @@ export default {
     variant () {
       this.break = true
       this.clear()
-    },
-    moves () {
-      console.log('moves')
-      console.log('Moves: ' + this.moves)
-      this.updateGraph()
-    },
-    selectedGame () {
-      console.log('select')
-      this.clear()
-      this.loadPGNData()
     }
   },
   created () {
     document.addEventListener('resetPlot', () => {
       this.break = true
       this.clear()
+    })
+    document.addEventListener('runEval', () => {
+      this.clear()
+      this.loadPlot()
     })
   },
   methods: {
@@ -167,36 +161,6 @@ export default {
       return points
     },
 
-    async updateGraph () {
-      console.log('called Update Graph')
-
-      if (this.$store.getters.loadingPGN) {
-        this.$store.commit('loadingPGN', false)
-        return
-      }
-      if (this.moves.length === 0) {
-        this.evalArray = [0]
-        return
-      }
-      const index = this.moves.length - 1
-      let points = await Engine.evaluate(this.moves[index].fen, 20)
-      if (this.break) { // this doesnt work
-        this.break = false
-        return
-      }
-      points = this.adjustPoints(points)
-      this.evalArray.push(points)
-      this.series = [{
-        data: this.evalArray
-      }]
-      if (this.moves[this.moves.length - 1].ply % 2 === 0) {
-        this.chartOptions.xaxis.categories.push('..' + this.moves[this.moves.length - 1].name)
-      } else {
-        this.chartOptions.xaxis.categories.push(this.moves[this.moves.length - 1].name)
-      }
-      this.calcOffset()
-    },
-
     calcOffset () {
       const min = Math.min(...this.evalArray)
       const max = Math.max(...this.evalArray)
@@ -217,8 +181,7 @@ export default {
       }
     },
 
-    async loadPGNData () { // pushes all the moves to the plot when loading a pgn
-      console.log('loadPGNData')
+    async loadPlot () { // pushes all the moves to the plot when button is pressed
       const newArray = [0]
       let index = 0
       const length = this.moves.length
@@ -239,8 +202,8 @@ export default {
       await this.evaluateHistory(20)
     },
 
-    async evaluateHistory (depth) { // update graph bc of new move while still calc or at all
-      let index = 1
+    async evaluateHistory (depth) { // updates the graph
+      let index = 1 // deselecting PGN
       let points = 0
       console.log(this.break)
       while (index < this.series[0].data.length - 1) {
