@@ -60,7 +60,7 @@ export default {
             colorStops: [
               {
                 offset: 100,
-                color: '#888888',
+                color: '#E3E3E3', // mb choose whiter color
                 opacity: 0.8
               },
               {
@@ -199,13 +199,11 @@ export default {
         data: newArray
       }]
       await this.evaluateHistory(10)
-      await this.evaluateHistory(20)
     },
 
     async evaluateHistory (depth) { // updates the graph
-      let index = 1 // deselecting PGN
+      let index = 1
       let points = 0
-      console.log(this.break)
       while (index < this.series[0].data.length - 1) {
         try {
           points = await Engine.evaluate(this.moves[index].fen, depth)
