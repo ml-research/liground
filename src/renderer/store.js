@@ -125,6 +125,7 @@ export const store = new Vuex.Store({
       Xiangqi: 'xiangqi'
 
     }),
+    openedPGN: false,
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
@@ -216,6 +217,9 @@ export const store = new Vuex.Store({
       state.destinations = payload
     },
     variant (state, payload) {
+      if (payload === 'racingkings') {
+        state.orientation = 'white'
+      }
       state.variant = payload
     },
     engineBinary (state, payload) {
@@ -323,6 +327,7 @@ export const store = new Vuex.Store({
         state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
           const sanMove = state.board.sanMove(curVal)
           state.board.push(curVal)
+          this.commit('playAudio', sanMove)
           return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, current: current }
         }))
         if (payload.prev) { // if the move is not a starting move
@@ -342,6 +347,16 @@ export const store = new Vuex.Store({
       }
       state.lastFen = state.board.fen()
     },
+    playAudio (state, move) { // Sounds from lichess https://github.com/ornicar/lila
+      if (state.openedPGN) {
+        return
+      }
+      let note = new Audio('/static/audio/Move.mp3')
+      if (move.toString().includes('x')) {
+        note = new Audio('/static/audio/Capture.mp3')
+      }
+      note.play()
+    },
     gameInfo (state, payload) {
       state.gameInfo = payload
     },
@@ -356,6 +371,9 @@ export const store = new Vuex.Store({
     },
     points (state, payload) {
       state.points = payload
+    },
+    openedPGN (state, payload) {
+      state.openedPGN = payload
     }
   },
   actions: { // async
@@ -549,6 +567,7 @@ export const store = new Vuex.Store({
       context.commit('loadedGames', payload)
     },
     async loadGame (context, payload) {
+      context.commit('openedPGN', true)
       let variant = payload.game.headers('Variant').toLowerCase()
 
       if (variant === '') { // if no variant is given we assume it to be standard chess
@@ -579,6 +598,7 @@ export const store = new Vuex.Store({
       }
       context.dispatch('fen', context.state.board.fen())
       context.dispatch('updateBoard')
+      context.commit('openedPGN', false)
     },
     increment (context, payload) {
       context.commit('increment', payload)
@@ -597,6 +617,9 @@ export const store = new Vuex.Store({
     },
     analysisMode (context, payload) {
       context.commit('analysisMode', payload)
+    },
+    openedPGN (context, payload) {
+      context.commit('openedPGN', payload)
     }
   },
   getters: {
