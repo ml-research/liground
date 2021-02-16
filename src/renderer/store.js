@@ -402,6 +402,7 @@ export const store = new Vuex.Store({
           context.dispatch('stopEngine')
         }
         context.commit('variant', payload)
+        localStorage.variant = payload
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen

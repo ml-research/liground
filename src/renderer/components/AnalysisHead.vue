@@ -52,8 +52,6 @@ export default {
   },
   methods: {
     updateVariant (payload) {
-      localStorage.variant = this.variantOptions.get(payload)
-      console.log('localstorage variant set ')
       this.$store.dispatch('variant', this.variantOptions.get(payload))
     },
     resetBoard () {
