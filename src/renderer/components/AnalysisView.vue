@@ -1,7 +1,7 @@
 <template>
   <div class="analysis">
     <AnalysisHead />
-    <AnalysisEvalRow id="game_clock" />
+    <AnalysisEvalRow />
     <EngineStats />
     <div
       v-if="active"
@@ -106,10 +106,6 @@ export default {
 <style scoped>
 input {
   font-size: 11pt;
-}
-#game_clock {
-  margin-top: -10px;
-  margin-bottom: -20px;
 }
 .game-window {
   height: 20%;
