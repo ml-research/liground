@@ -244,11 +244,12 @@ export default {
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% 70% auto;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto 60px;
   gap: 1em;
   grid-template-areas:
     "pgnbrowser . ."
-    "fenfield fenfield fenfield";
+    ". fenfield ."
+    ". selector-container .";
 }
 #analysisview {
   height: 100%;
@@ -268,19 +269,21 @@ input {
   /*margin-left: 48px;*/
 }
 #selector-container {
-  height:60px;
+  grid-area: selector-container;
+  grid-template-columns: 40% 40% 20%;
+  display: grid;
 }
 #piece-style {
   margin-top: 10px;
-  width: 210px;
-  margin-left: 60px;
-  position: absolute;
+  width: 80%;
+  margin-left: 10%;
+  grid-column-start: 1;
 }
 #board-style {
-  margin-top: 10px;
-  width: 210px;
-  margin-left: 330px;
-  position: absolute;
+   margin-top: 10px;
+  width: 80%;
+  margin-left: 10%;
+  grid-column-start: 2;
 }
 .main-grid {
   display: grid;
