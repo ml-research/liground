@@ -1,3 +1,4 @@
+// TODO: base64 instead of url to allow custom logos for user engines?
 import logoStockfish from '../assets/images/engines/stockfish.png'
 
 // first engine in the list has highest priority for default engine selection
@@ -6,7 +7,8 @@ export default [
     name: 'Stockfish (fishnet)',
     binary: 'stockfish',
     logo: logoStockfish,
-    variants: ['chess',
+    variants: [
+      'chess',
       'antichess',
       'atomic',
       'crazyhouse',
@@ -21,7 +23,8 @@ export default [
     name: 'Multi-Variant-Stockfish 10',
     binary: 'multi-variant-stockfish',
     logo: logoStockfish,
-    variants: ['chess',
+    variants: [
+      'chess',
       'giveaway',
       'atomic',
       'crazyhouse',

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="eval">
-      {{ eval }}
+      {{ cpForWhiteStr }}
     </div>
     <div
       class="banner"
@@ -37,42 +37,24 @@ export default {
   },
   computed: {
     engineBannerURL () {
-      // TODO: base64 instead of url to allow custom logos for user engines?
-      const selected = this.getSelectedEngine()
-      return selected ? selected.logo : ''
+      // TODO: add a placeholder for engines without logo
+      return this.selectedEngine.logo || ''
     },
     options () {
-      return this.engines.map(e => e.name)
+      return this.availableEngines.map(engine => engine.name)
     },
-    engines () {
-      return this.allEngines.filter(e => e.variants && e.variants.includes(this.variant))
-    },
-    ...mapGetters({
-      variant: 'variant',
-      allEngines: 'availableEngines',
-      eval: 'cpForWhiteStr'
-    })
+    ...mapGetters(['availableEngines', 'selectedEngine', 'cpForWhiteStr'])
   },
   watch: {
     selected () {
-      this.$store.dispatch('engineBinary', this.getSelectedEngine().binary)
+      this.$store.dispatch('engineBinary', this.availableEngines.find(engine => engine.name === this.selected).binary)
     },
-    variant () {
-      // TODO: save previous user selection per variant?
-      this.selectDefault()
+    selectedEngine () {
+      this.selected = this.selectedEngine.name
     }
   },
   created () {
-    this.selectDefault()
-  },
-  methods: {
-    getSelectedEngine () {
-      return this.engines.find(e => e.name === this.selected)
-    },
-    selectDefault () {
-      // first engine in the list has highest priority
-      this.selected = this.engines[0].name
-    }
+    this.selected = this.selectedEngine.name
   }
 }
 </script>

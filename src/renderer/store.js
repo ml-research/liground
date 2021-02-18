@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
 import engine from './engine'
-import availableEngines from './store/engines'
+import allEngines from './store/engines'
 
 Vue.use(Vuex)
 
@@ -126,8 +126,10 @@ export const store = new Vuex.Store({
     }),
     orientation: 'white',
     message: 'hello from Vuex',
-    availableEngines,
-    engineBinary: 'stockfish',
+    allEngines,
+    selectedEngineIds: {
+      chess: 0 // index of engine
+    },
     engineInfo: {
       name: '',
       author: '',
@@ -209,8 +211,8 @@ export const store = new Vuex.Store({
     variant (state, payload) {
       state.variant = payload
     },
-    engineBinary (state, payload) {
-      state.engineBinary = payload
+    selectedEngines (state, payload) {
+      state.selectedEngineIds = payload
     },
     clearIO (state) {
       // dummy to trigger update in console
@@ -378,10 +380,10 @@ export const store = new Vuex.Store({
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
+        context.commit('variant', payload)
         if (context.getters.active) {
           context.dispatch('stopEngine')
         }
-        context.commit('variant', payload)
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
@@ -391,8 +393,10 @@ export const store = new Vuex.Store({
           context.commit('newBoard', { is960: false, fen: '' })
         }
         context.dispatch('resetEngineData')
-        context.dispatch('setEngineOptions', {
-          UCI_Variant: payload
+        context.dispatch('engineBinary', context.getters.selectedEngine.binary).then(() => {
+          context.dispatch('setEngineOptions', {
+            UCI_Variant: payload
+          })
         })
       }
     },
@@ -403,8 +407,11 @@ export const store = new Vuex.Store({
       })
     },
     async engineBinary (context, payload) {
-      if (context.getters.engineBinary !== payload) {
-        context.commit('engineBinary', payload)
+      if (context.state.engineBinary !== payload) {
+        context.state.engineBinary = payload
+        const selected = { ...context.state.selectedEngineIds }
+        selected[context.getters.variant] = context.getters.availableEngines.findIndex(engine => engine.binary === payload)
+        context.commit('selectedEngines', selected)
         if (context.getters.active) {
           context.commit('active', false)
         }
@@ -563,11 +570,14 @@ export const store = new Vuex.Store({
     variantOptions (state) {
       return state.variantOptions
     },
-    availableEngines (state) {
-      return state.availableEngines
+    availableEngines (state, getters) {
+      return state.allEngines.filter(engine => engine.variants && engine.variants.includes(getters.variant))
     },
-    engineBinary (state) {
-      return state.engineBinary
+    selectedEngine (state, getters) {
+      return getters.availableEngines[state.selectedEngineIds[getters.variant] || 0]
+    },
+    engineBinary (state, getters) {
+      return getters.selectedEngine.binary
     },
     engineName (state) {
       return state.engineInfo.name
@@ -716,8 +726,4 @@ ffish.onRuntimeInitialized = () => {
 
   // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))
-
-  // start engine
-  store.commit('engineInfo', await engine.run(store.getters.engineBinary))
-  store.dispatch('initEngineOptions')
 })()
