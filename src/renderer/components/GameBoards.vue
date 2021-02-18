@@ -26,6 +26,7 @@
           <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
             <BoardStyleSelector id="board-style" />
+            <EvalPlotButton />
           </div>
         </div>
         <EvalPlot id="evalplot" />
@@ -63,6 +64,7 @@ import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
+import EvalPlotButton from './EvalPlotButton'
 // TODO: use GameInfo component?
 // import GameInfo from './GameInfo.vue'
 
@@ -77,7 +79,8 @@ export default {
     EvalPlot,
     // GameInfo,
     PgnBrowser,
-    SettingsTab
+    SettingsTab,
+    EvalPlotButton
   },
   data () {
     return {

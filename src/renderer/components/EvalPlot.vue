@@ -24,6 +24,7 @@ export default {
   data: function () {
     return {
       evalArray: [0],
+      calculating: false,
       break: false,
       is960: false,
       chartOptions: {
@@ -119,7 +120,9 @@ export default {
       }
     },
     variant () {
-      this.break = true
+      if (this.calculating) {
+        this.break = true
+      }
       this.clear()
     }
   },
@@ -128,7 +131,7 @@ export default {
       this.break = true
       this.clear()
     })
-    document.addEventListener('runEval', () => {
+    document.addEventListener('startEval', () => {
       this.clear()
       this.loadPlot()
     })
@@ -182,11 +185,15 @@ export default {
     },
 
     async loadPlot () { // pushes all the moves to the plot when button is pressed
+      if (this.moves.length === 0) {
+        return
+      }
       const newArray = [0]
       let index = 0
       const length = this.moves.length
-      while (index < length - 1) {
+      while (index < length) {
         newArray.push(0)
+        console.log(this.moves[index].name)
         if (index % 2 === 1) {
           this.chartOptions.xaxis.categories.push('..' + this.moves[index].name)
         } else {
@@ -198,22 +205,26 @@ export default {
       this.series = [{
         data: newArray
       }]
-      await this.evaluateHistory(10)
+      await this.evaluateHistory()
     },
 
-    async evaluateHistory (depth) { // updates the graph
-      let index = 1
+    async evaluateHistory () { // updates the graph
+      let index = 0
       let points = 0
+      const depth = this.$store.getters.evalPlotDepth
       while (index < this.series[0].data.length - 1) {
         try {
-          points = await Engine.evaluate(this.moves[index].fen, depth)
+          this.calculating = true
+          points = await Engine.evaluate(this.moves[index].fen, 20)
+          this.calculating = false
           if (this.break) {
+            console.log('breaked')
             this.break = false
             this.clear()
             return
           }
           points = this.adjustPoints(points)
-          this.evalArray[index] = points
+          this.evalArray[index + 1] = points
           this.series = [{
             data: this.evalArray
           }]

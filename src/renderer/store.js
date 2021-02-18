@@ -124,6 +124,7 @@ export const store = new Vuex.Store({
 
     }),
     openedPGN: false,
+    evalPlotDepth: 10,
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
@@ -322,6 +323,9 @@ export const store = new Vuex.Store({
     },
     openedPGN (state, payload) {
       state.openedPGN = payload
+    },
+    evalPlotDepth (state, payload) {
+      state.evalPlotDepth = payload
     }
   },
   actions: { // async
@@ -542,6 +546,9 @@ export const store = new Vuex.Store({
     },
     openedPGN (context, payload) {
       context.commit('openedPGN', payload)
+    },
+    evalPlotDepth (context, payload) {
+      context.commit('evalPlotDepth', payload)
     }
   },
   getters: {
@@ -725,6 +732,9 @@ export const store = new Vuex.Store({
     },
     viewAnalysis (state) {
       return state.viewAnalysis
+    },
+    evalPlotDepth (state) {
+      return state.evalPlotDepth
     }
   }
 })
