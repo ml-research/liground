@@ -1,4 +1,3 @@
-// TODO: base64 instead of url to allow custom logos for user engines?
 import logoStockfish from '../assets/images/engines/stockfish.png'
 
 // first engine in the list has highest priority for default engine selection

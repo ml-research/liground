@@ -4,9 +4,13 @@
       {{ cpForWhiteStr }}
     </div>
     <div
-      class="banner"
-      :style="{ backgroundImage: `url(${engineBannerURL})` }"
-    />
+      class="logo"
+    >
+      <div
+        class="image"
+        :style="{ backgroundImage: engineLogo }"
+      />
+    </div>
     <Multiselect
       v-model="selected"
       class="multiselect"
@@ -36,9 +40,9 @@ export default {
     }
   },
   computed: {
-    engineBannerURL () {
+    engineLogo () {
       // TODO: add a placeholder for engines without logo
-      return this.selectedEngine.logo || ''
+      return `url(${this.selectedEngine.logo || ''}`
     },
     options () {
       return this.availableEngines.map(engine => engine.name)
@@ -77,16 +81,18 @@ export default {
   font-size: 2em;
 }
 
-.banner {
+.logo {
+  border-radius: 5px;
+  flex-basis: 120px;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+.logo .image {
   width: 120px;
   height: 60px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 5px;
-  flex-basis: 120px;
-  flex-shrink: 0;
-  flex-grow: 0;
 }
 
 .multiselect {
