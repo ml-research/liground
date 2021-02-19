@@ -234,7 +234,6 @@ export default {
   display: grid;
   grid-template-columns: 3fr 2fr;
   grid-template-rows: auto auto;
-  gap: 1em 1em;
   grid-template-areas:
     "chessboard analysisview"
     "evalplot analysisview";
@@ -244,11 +243,12 @@ export default {
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% 70% auto;
-  grid-template-rows: auto auto;
-  gap: 1em;
+  grid-template-rows: auto auto auto auto;
   grid-template-areas:
     "pgnbrowser . ."
-    "fenfield fenfield fenfield";
+    ". fenfield ."
+    ". selector ."
+    ". evalplot .";
 }
 #analysisview {
   height: 100%;
@@ -268,18 +268,19 @@ input {
   /*margin-left: 48px;*/
 }
 #selector-container {
+  grid-area: selector;
   height:60px;
 }
 #piece-style {
   margin-top: 10px;
   width: 210px;
-  margin-left: 60px;
+  margin-left: 19%;
   position: absolute;
 }
 #board-style {
   margin-top: 10px;
   width: 210px;
-  margin-left: 330px;
+  margin-left: 3%;
   position: absolute;
 }
 .main-grid {
