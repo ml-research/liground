@@ -4,7 +4,7 @@ import logoStockfish from '../assets/images/engines/stockfish.png'
 // first engine in the list has highest priority for default engine selection
 export default [
   {
-    name: 'Stockfish (fishnet)',
+    name: 'Stockfish 12',
     binary: 'stockfish',
     logo: logoStockfish,
     variants: [
@@ -46,7 +46,7 @@ export default [
     ]
   },
   {
-    name: 'Fairy Stockfish 11',
+    name: 'Fairy Stockfish 11.2',
     binary: 'fairy-stockfish',
     logo: logoStockfish,
     variants: [
