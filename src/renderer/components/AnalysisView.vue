@@ -38,6 +38,7 @@
       @move-to-end="$emit('move-to-end',0)"
     />
     <GameInfo id="gameinfo" />
+    <EngineConsole />
   </div>
 </template>
 
@@ -48,17 +49,12 @@ import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
 import GameInfo from './GameInfo.vue'
+import EngineConsole from './EngineConsole'
 
 export default {
   name: 'AnalysisView',
   components: {
-    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo
-  },
-  props: {
-    reset: {
-      type: Boolean,
-      default: false
-    }
+    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo, EngineConsole
   },
   data () {
     return {
@@ -68,9 +64,6 @@ export default {
   computed: {
     active () {
       return this.$store.getters.active
-    },
-    stdIO () {
-      return this.$store.getters.stdIO
     },
     message () {
       return this.$store.getters.message
@@ -105,12 +98,6 @@ export default {
   methods: {
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
-    },
-    onKeyup (event) {
-      if (event.key === 'Enter') {
-        this.$store.dispatch('sendEngineCommand', this.cmd)
-        this.cmd = ''
-      }
     }
   }
 }
@@ -136,22 +123,6 @@ input {
 }
 .panel + .panel {
   margin-top: 7px;
-}
-.console-log {
-  border-radius: 3px 3px 3px 3px;
-  border-color: #888;
-  border-width: 1px;
-  border-style: solid;
-  font-family: monospace;
-  font-weight: 100;
-  font-size: 8pt;
-  height: 20%;
-  overflow-y: scroll;
-  white-space: nowrap;
-  text-align: left;
-}
-p {
-  margin: 0px;
 }
 .multipv-line:hover {
   background-color: #d3e1eb;
