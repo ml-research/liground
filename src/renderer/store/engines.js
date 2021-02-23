@@ -1,4 +1,6 @@
 import logoStockfish from '../assets/images/engines/stockfish.png'
+import logoStockfishBlue from '../assets/images/engines/stockfish_blue.png'
+import logoStockfishPurple from '../assets/images/engines/stockfish_purple.png'
 
 // first engine in the list has highest priority for default engine selection
 export default [
@@ -21,7 +23,7 @@ export default [
   {
     name: 'Multi-Variant-Stockfish 10',
     binary: 'multi-variant-stockfish',
-    logo: logoStockfish,
+    logo: logoStockfishBlue,
     variants: [
       'chess',
       'giveaway',
@@ -47,7 +49,7 @@ export default [
   {
     name: 'Fairy Stockfish 11.2',
     binary: 'fairy-stockfish',
-    logo: logoStockfish,
+    logo: logoStockfishPurple,
     variants: [
       '3check',
       '5check',
