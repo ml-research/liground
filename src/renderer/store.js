@@ -384,9 +384,7 @@ export const store = new Vuex.Store({
           context.dispatch('stopEngine')
         }
         context.dispatch('resetEngineData')
-        const lastEngine = context.getters.selectedEngine
-        const newId = context.state.selectedEngineIds[payload]
-        const engine = typeof newId === 'number' ? context.state.allEngines[newId] : (lastEngine && lastEngine.variants.includes(payload) ? lastEngine : context.getters.availableEngines[0])
+        const oldEngine = context.getters.selectedEngine
 
         // update variant
         context.commit('variant', payload)
@@ -400,7 +398,11 @@ export const store = new Vuex.Store({
         }
 
         // switch to new engine
-        context.dispatch('engineBinary', engine.binary).then(() => {
+        const lastId = context.state.selectedEngineIds[payload]
+        const newEngine = typeof lastId === 'number'
+          ? context.state.allEngines[lastId]
+          : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine : context.getters.availableEngines[0])
+        context.dispatch('engineBinary', newEngine.binary).then(() => {
           context.dispatch('setEngineOptions', { UCI_Variant: payload })
         })
       }
