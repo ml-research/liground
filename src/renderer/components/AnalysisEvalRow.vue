@@ -14,10 +14,12 @@
     <Multiselect
       v-model="selected"
       class="multiselect"
-      :options="options"
+      placeholder="Select Engine"
+      label="name"
+      track-by="id"
+      :options="availableEngines"
       :allow-empty="false"
       :show-labels="false"
-      placeholder="Select Engine"
     />
     <RoundedSwitch class="switch" />
   </div>
@@ -44,21 +46,18 @@ export default {
       // TODO: add a placeholder for engines without logo
       return `url(${this.selectedEngine.logo || ''}`
     },
-    options () {
-      return this.availableEngines.map(engine => engine.name)
-    },
     ...mapGetters(['availableEngines', 'selectedEngine', 'cpForWhiteStr'])
   },
   watch: {
     selected () {
-      this.$store.dispatch('engineBinary', this.availableEngines.find(engine => engine.name === this.selected).binary)
+      this.$store.dispatch('engineBinary', this.selected.binary)
     },
     selectedEngine () {
-      this.selected = this.selectedEngine.name
+      this.selected = this.selectedEngine
     }
   },
   created () {
-    this.selected = this.selectedEngine.name
+    this.selected = this.selectedEngine
   }
 }
 </script>

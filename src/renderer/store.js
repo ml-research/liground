@@ -126,7 +126,7 @@ export const store = new Vuex.Store({
     }),
     orientation: 'white',
     message: 'hello from Vuex',
-    allEngines,
+    allEngines: allEngines.map((engine, id) => ({ id, ...engine })),
     activeEngine: 0,
     selectedEngineIds: {},
     engineInfo: {
