@@ -736,4 +736,6 @@ ffish.onRuntimeInitialized = () => {
 
   // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))
+  store.commit('engineInfo', await engine.run(store.getters.engineBinary))
+  await store.dispatch('initEngineOptions')
 })()
