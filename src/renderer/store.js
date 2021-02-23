@@ -127,9 +127,8 @@ export const store = new Vuex.Store({
     orientation: 'white',
     message: 'hello from Vuex',
     allEngines,
-    selectedEngineIds: {
-      chess: 0 // index of engine
-    },
+    activeEngine: 0,
+    selectedEngineIds: {},
     engineInfo: {
       name: '',
       author: '',
@@ -380,10 +379,17 @@ export const store = new Vuex.Store({
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
-        context.commit('variant', payload)
+        // prepare engine
         if (context.getters.active) {
           context.dispatch('stopEngine')
         }
+        context.dispatch('resetEngineData')
+        const lastEngine = context.getters.selectedEngine
+        const newId = context.state.selectedEngineIds[payload]
+        const engine = typeof newId === 'number' ? context.state.allEngines[newId] : (lastEngine && lastEngine.variants.includes(payload) ? lastEngine : context.getters.availableEngines[0])
+
+        // update variant
+        context.commit('variant', payload)
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
@@ -392,11 +398,10 @@ export const store = new Vuex.Store({
         } else {
           context.commit('newBoard', { is960: false, fen: '' })
         }
-        context.dispatch('resetEngineData')
-        context.dispatch('engineBinary', context.getters.selectedEngine.binary).then(() => {
-          context.dispatch('setEngineOptions', {
-            UCI_Variant: payload
-          })
+
+        // switch to new engine
+        context.dispatch('engineBinary', engine.binary).then(() => {
+          context.dispatch('setEngineOptions', { UCI_Variant: payload })
         })
       }
     },
@@ -407,11 +412,16 @@ export const store = new Vuex.Store({
       })
     },
     async engineBinary (context, payload) {
-      if (context.state.engineBinary !== payload) {
-        context.state.engineBinary = payload
-        const selected = { ...context.state.selectedEngineIds }
-        selected[context.getters.variant] = context.getters.availableEngines.findIndex(engine => engine.binary === payload)
-        context.commit('selectedEngines', selected)
+      const id = context.state.allEngines.findIndex(engine => engine.binary === payload)
+
+      // always update selected engines
+      const selected = { ...context.state.selectedEngineIds }
+      selected[context.getters.variant] = id
+      context.commit('selectedEngines', selected)
+
+      // only change engine when its a different one
+      if (context.state.activeEngine !== id) {
+        context.state.activeEngine = id
         if (context.getters.active) {
           context.commit('active', false)
         }
@@ -573,8 +583,8 @@ export const store = new Vuex.Store({
     availableEngines (state, getters) {
       return state.allEngines.filter(engine => engine.variants && engine.variants.includes(getters.variant))
     },
-    selectedEngine (state, getters) {
-      return getters.availableEngines[state.selectedEngineIds[getters.variant] || 0]
+    selectedEngine (state) {
+      return state.allEngines[state.activeEngine]
     },
     engineBinary (state, getters) {
       return getters.selectedEngine.binary
