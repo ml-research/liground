@@ -24,7 +24,6 @@ export default {
   data: function () {
     return {
       evalArray: [0],
-      calculating: false,
       break: false,
       is960: false,
       chartOptions: {
@@ -61,7 +60,7 @@ export default {
             colorStops: [
               {
                 offset: 100,
-                color: '#E3E3E3', // mb choose whiter color
+                color: '#E3E3E3',
                 opacity: 0.8
               },
               {
@@ -120,9 +119,7 @@ export default {
       }
     },
     variant () {
-      if (this.calculating) {
-        this.break = true
-      }
+      this.break = true
       this.clear()
     }
   },
@@ -193,7 +190,6 @@ export default {
       const length = this.moves.length
       while (index < length) {
         newArray.push(0)
-        console.log(this.moves[index].name)
         if (index % 2 === 1) {
           this.chartOptions.xaxis.categories.push('..' + this.moves[index].name)
         } else {
@@ -214,11 +210,8 @@ export default {
       const depth = this.$store.getters.evalPlotDepth
       while (index < this.series[0].data.length - 1) {
         try {
-          this.calculating = true
-          points = await Engine.evaluate(this.moves[index].fen, 20)
-          this.calculating = false
+          points = await Engine.evaluate(this.moves[index].fen, depth)
           if (this.break) {
-            console.log('breaked')
             this.break = false
             this.clear()
             return

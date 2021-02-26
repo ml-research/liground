@@ -124,7 +124,7 @@ export const store = new Vuex.Store({
 
     }),
     openedPGN: false,
-    evalPlotDepth: 10,
+    evalPlotDepth: 20,
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
