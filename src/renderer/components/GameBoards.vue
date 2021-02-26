@@ -169,13 +169,16 @@ export default {
         return
       }
       if (num === -1) {
+        this.$store.dispatch('playAudio', this.moves[0].name)
         this.$store.dispatch('fen', this.moves[0].fen)
         return
       }
       if (num === 0) {
+        this.$store.dispatch('playAudio', this.moves[0].name)
         this.$store.dispatch('fen', this.moves[1].fen)
         return
       }
+      this.$store.dispatch('playAudio', this.moves[num + 1].name)
       this.$store.dispatch('fen', this.moves[num + 1].fen)
     },
     flipBoard () {

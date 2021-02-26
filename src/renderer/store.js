@@ -329,6 +329,9 @@ export const store = new Vuex.Store({
     }
   },
   actions: { // async
+    playAudio (context, payload) {
+      context.commit('playAudio', payload)
+    },
     curVar960Fen (context, payload) {
       context.commit('curVar960Fen', payload)
     },
