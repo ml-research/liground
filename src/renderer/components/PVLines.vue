@@ -6,10 +6,9 @@
           v-for="(line, id) in lines"
           :key="id"
           class="item"
-          :class="{ clickable: !isPast }"
           @mouseenter="onMouseEnter(id)"
           @mouseleave="onMouseLeave(id)"
-          @click="!isPast ? onClick(line) : null"
+          @click="onClick(line)"
         >
           <span class="left">{{ line.cpDisplay }}</span>
           <span class="right">{{ line.pv }}</span>
@@ -37,7 +36,7 @@ export default {
       const { engineName, engineAuthor } = this.$store.getters
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     },
-    ...mapGetters(['isPast', 'moves', 'fen'])
+    ...mapGetters(['moves', 'fen'])
   },
   methods: {
     onMouseEnter (id) {
@@ -78,13 +77,11 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  cursor: default;
+  cursor: pointer;
+  user-select: none;
 }
 .item:hover {
   background-color: #d3e1eb;
-}
-.item.clickable {
-  cursor: pointer;
 }
 .item + .item {
   border-top: 1px solid #333;
