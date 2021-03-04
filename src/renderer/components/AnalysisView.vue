@@ -46,25 +46,12 @@ export default {
   components: {
     AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo, EngineConsole, MoveHistoryNode
   },
-  data () {
-    return {
-      cmd: ''
-    }
-  },
   computed: {
     ...mapGetters(['active', 'mainFirstMove'])
   },
   watch: {
     reset: function () {
       this.$store.commit('resetMultiPV')
-    }
-  },
-  methods: {
-    onKeyup (event) {
-      if (event.key === 'Enter') {
-        this.$store.dispatch('sendEngineCommand', this.cmd)
-        this.cmd = ''
-      }
     }
   }
 }
