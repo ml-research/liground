@@ -26,29 +26,25 @@
       @move-to-end="$emit('move-to-end', 0)"
     />
     <GameInfo id="gameinfo" />
+    <EngineConsole />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import AnalysisHead from './AnalysisHead'
 import AnalysisEvalRow from './AnalysisEvalRow'
 import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
-import GameInfo from './GameInfo.vue'
-import MoveHistoryNode from './MoveHistoryNode.vue'
-import { mapGetters } from 'vuex'
+import GameInfo from './GameInfo'
+import EngineConsole from './EngineConsole'
+import MoveHistoryNode from './MoveHistoryNode'
 
 export default {
   name: 'AnalysisView',
   components: {
-    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo, MoveHistoryNode
-  },
-  props: {
-    reset: {
-      type: Boolean,
-      default: false
-    }
+    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo, EngineConsole, MoveHistoryNode
   },
   data () {
     return {
@@ -56,7 +52,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['active', 'stdIO', 'message', 'counter', 'multiPV', 'pv', 'cp', 'pv2', 'cp2', 'moves', 'mainFirstMove'])
+    ...mapGetters(['active', 'mainFirstMove'])
   },
   watch: {
     reset: function () {
@@ -94,22 +90,6 @@ input {
 }
 .panel + .panel {
   margin-top: 7px;
-}
-.console-log {
-  border-radius: 3px 3px 3px 3px;
-  border-color: #888;
-  border-width: 1px;
-  border-style: solid;
-  font-family: monospace;
-  font-weight: 100;
-  font-size: 8pt;
-  height: 20%;
-  overflow-y: scroll;
-  white-space: nowrap;
-  text-align: left;
-}
-p {
-  margin: 0px;
 }
 .multipv-line:hover {
   background-color: #d3e1eb;

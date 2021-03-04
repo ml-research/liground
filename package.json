@@ -78,6 +78,7 @@
     "webpack-dev-middleware": "^4.1.0",
     "webpack-dev-server": "^3.11.2",
     "webpack-hot-middleware": "^2.22.2",
-    "webpack-merge": "^5.7.0"
+    "webpack-merge": "^5.7.0",
+    "worker-loader": "^3.0.7"
   }
 }

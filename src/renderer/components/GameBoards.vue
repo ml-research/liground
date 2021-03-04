@@ -202,6 +202,7 @@ export default {
       if (!mov.main) {
         return
       }
+      this.$store.dispatch('playAudio', mov.main.name)
       this.$store.dispatch('fen', mov.main.fen)
       this.updateCurrent(mov.main)
     },

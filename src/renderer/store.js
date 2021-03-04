@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
-import ipc from './ipc'
+import engine from './engine'
 
 Vue.use(Vuex)
 
@@ -129,7 +129,6 @@ export const store = new Vuex.Store({
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
-    stdIO: [],
     engineInfo: {
       name: '',
       author: '',
@@ -225,11 +224,8 @@ export const store = new Vuex.Store({
     engineBinary (state, payload) {
       state.engineBinary = payload
     },
-    stdIO (state, payload) {
-      state.stdIO = state.stdIO.concat(payload)
-    },
     clearIO (state) {
-      state.stdIO = []
+      // dummy to trigger update in console
     },
     engineInfo (state, payload) {
       state.engineInfo = payload
@@ -377,6 +373,9 @@ export const store = new Vuex.Store({
     }
   },
   actions: { // async
+    playAudio (context, payload) {
+      context.commit('playAudio', payload)
+    },
     curVar960Fen (context, payload) {
       context.commit('curVar960Fen', payload)
     },
@@ -415,11 +414,11 @@ export const store = new Vuex.Store({
       context.commit('resetEngineStats')
     },
     goEngine (context) {
-      ipc.send('go infinite')
+      engine.send('go infinite')
       context.commit('active', true)
     },
     stopEngine (context) {
-      ipc.send('stop')
+      engine.send('stop')
       context.commit('active', false)
     },
     restartEngine (context) {
@@ -431,10 +430,10 @@ export const store = new Vuex.Store({
       }
     },
     position (context) {
-      ipc.send(`position fen ${context.getters.fen}`)
+      engine.send(`position fen ${context.getters.fen}`)
     },
     sendEngineCommand (_, payload) {
-      ipc.send(payload)
+      engine.send(payload)
     },
     fen (context, payload) {
       if (context.state.fen !== payload) {
@@ -489,7 +488,7 @@ export const store = new Vuex.Store({
         context.commit('engineBinary', payload)
         context.commit('clearIO')
         context.dispatch('resetEngineData')
-        context.commit('engineInfo', await ipc.setBinary(payload))
+        context.commit('engineInfo', await engine.run(payload))
         context.dispatch('initEngineOptions')
       }
     },
@@ -504,11 +503,8 @@ export const store = new Vuex.Store({
     setEngineOptions (context, payload) {
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
-        ipc.send(`setoption name ${name} value ${value}`)
+        engine.send(`setoption name ${name} value ${value}`)
       }
-    },
-    stdIO (context, payload) {
-      context.commit('stdIO', payload)
     },
     idName (context, payload) {
       context.commit('idName', payload)
@@ -671,9 +667,6 @@ export const store = new Vuex.Store({
     engineBinary (state) {
       return state.engineBinary
     },
-    stdIO (state) {
-      return state.stdIO
-    },
     engineName (state) {
       return state.engineInfo.name
     },
@@ -824,9 +817,14 @@ ffish.onRuntimeInitialized = () => {
 }
 
 (async () => {
-  // ipc.on('output', line => store.dispatch('stdIO', line))
-  // ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
-  ipc.on('info', info => store.dispatch('updateMultiPV', info))
-  store.commit('engineInfo', await ipc.runEngine())
+  // setup debug and error output
+  engine.on('debug', (...msgs) => console.log('%c[Worker] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
+  engine.on('error', (...msgs) => console.error('%c[Worker]', 'color: #82aaff; font-weight: 700;', ...msgs))
+
+  // capture engine info
+  engine.on('info', info => store.dispatch('updateMultiPV', info))
+
+  // start engine
+  store.commit('engineInfo', await engine.run(store.getters.engineBinary))
   store.dispatch('initEngineOptions')
 })()
