@@ -12,7 +12,7 @@
     <a
       href="#"
       class="jump previous"
-      :class="{ grey : currentMove === -1 }"
+      :class="{ grey : !currentMove }"
       @click="$emit('move-to-start', 0)"
     ><i
       slot="extra"
@@ -21,7 +21,7 @@
     <a
       href="#"
       class="jump previous"
-      :class="{ grey : currentMove === -1 }"
+      :class="{ grey : !currentMove }"
       @click="$emit('move-back-one', 0)"
     ><i
       slot="extra"
@@ -30,7 +30,7 @@
     <a
       href="#"
       class="jump next"
-      :class="{ grey : currentMove === $store.getters.moves.length - 1 }"
+      :class="{ grey : moves.length === 0 || ( currentMove && !currentMove.main ) }"
       @click="$emit('move-forward-one', 0)"
     ><i
       slot="extra"
@@ -39,7 +39,7 @@
     <a
       href="#"
       class="jump next"
-      :class="{ grey : currentMove === $store.getters.moves.length - 1 }"
+      :class="{ grey : moves.length === 0 || ( currentMove && !currentMove.main ) }"
       @click="$emit('move-to-end', 0)"
     ><i
       slot="extra"
@@ -59,21 +59,22 @@ export default {
     // HookIcon
   },
   computed: {
-    currentMove () { // this returns the current half-move or -1 at the start of the game
-      const fen = this.$store.getters.fen
-      const moves = this.$store.getters.moves
-      if (moves === undefined) {
-        return 0
-      }
-      for (const move of moves) {
-        if (move.fen === fen) {
-          return move.ply - 1
+    currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
+          return this.moves[num]
         }
       }
-      return -1
+      return undefined
     },
     variant () {
       return this.$store.getters.variant
+    },
+    moves () {
+      return this.$store.getters.moves
+    },
+    fen () {
+      return this.$store.getters.fen
     }
   }
 }
