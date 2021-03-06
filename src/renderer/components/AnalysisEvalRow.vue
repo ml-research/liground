@@ -29,6 +29,7 @@
 import { mapGetters } from 'vuex'
 import RoundedSwitch from './RoundedSwitch.vue'
 import Multiselect from 'vue-multiselect'
+import defaultLogo from '../assets/images/engines/chess_engine.svg'
 
 export default {
   name: 'AnalysisEvalRow',
@@ -43,8 +44,7 @@ export default {
   },
   computed: {
     engineLogo () {
-      // TODO: add a placeholder for engines without logo
-      return `url(${this.selectedEngine.logo || ''}`
+      return `url(${this.selectedEngine.logo || defaultLogo})`
     },
     ...mapGetters(['availableEngines', 'selectedEngine', 'cpForWhiteStr'])
   },
