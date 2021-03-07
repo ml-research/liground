@@ -154,7 +154,9 @@ export default {
       pieceShapes: [],
       promotions: [],
       isPromotionModalVisible: false,
-      promotionMove: undefined
+      promotionMove: undefined,
+      pieceStyleEl: null,
+      boardStyleEl: null
     }
   },
   computed: {
@@ -188,7 +190,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode'])
   },
   watch: {
     initialized () {
@@ -340,6 +342,14 @@ export default {
       orientation: this.orientation
     })
 
+    // inject stylesheet placeholders into head
+    this.boardStyleEl = document.createElement('link')
+    this.boardStyleEl.rel = 'stylesheet'
+    this.pieceStyleEl = document.createElement('link')
+    this.pieceStyleEl.rel = 'stylesheet'
+    document.head.appendChild(this.boardStyleEl)
+    document.head.appendChild(this.pieceStyleEl)
+
     // set initial styles
     this.updateBoardCSS(this.boardStyle)
     this.updatePieceCSS(this.pieceStyle)
@@ -352,43 +362,34 @@ export default {
       this.isPromotionModalVisible = false
       this.promotionMove = this.promotionMove + value
       this.lastMoveSan = this.$store.getters.sanMove(this.promotionMove)
-      this.$store.dispatch('push', this.promotionMove)
+      const prevMov = this.currentMove
+      this.$store.dispatch('push', { move: this.promotionMove, prev: prevMov })
       this.updateHand()
       this.afterMove()
     },
     updatePieceCSS (pieceStyle) {
-      const file = document.createElement('link')
-      file.rel = 'stylesheet'
+      const node = this.pieceStyleEl
       if (this.$store.getters.isInternational) {
-        file.href = 'static/piece-css/international/' + pieceStyle + '.css'
+        node.href = 'static/piece-css/international/' + pieceStyle + '.css'
+      } else if (this.$store.getters.isSEA) {
+        node.href = 'static/piece-css/sea/' + pieceStyle + '.css'
+      } else if (this.$store.getters.isXiangqi) {
+        node.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
+      } else if (this.$store.getters.isShogi) {
+        node.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
       }
-      if (this.$store.getters.isSEA) {
-        file.href = 'static/piece-css/sea/' + pieceStyle + '.css'
-      }
-      if (this.$store.getters.isXiangqi) {
-        file.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
-      }
-      if (this.$store.getters.isShogi) {
-        file.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
-      }
-      document.head.appendChild(file)
     },
     updateBoardCSS (boardStyle) {
-      const file = document.createElement('link')
-      file.rel = 'stylesheet'
+      const node = this.boardStyleEl
       if (this.$store.getters.isInternational) {
-        file.href = 'static/board-css/international/' + boardStyle + '.css'
-      } else
-      if (this.$store.getters.isXiangqi) {
-        file.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
-      } else
-      if (this.$store.getters.isSEA) {
-        file.href = 'static/board-css/sea/' + boardStyle + '.css'
-      } else
-      if (this.$store.getters.isShogi) {
-        file.href = 'static/board-css/shogi/' + boardStyle + '.css'
+        node.href = 'static/board-css/international/' + boardStyle + '.css'
+      } else if (this.$store.getters.isXiangqi) {
+        node.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+      } else if (this.$store.getters.isSEA) {
+        node.href = 'static/board-css/sea/' + boardStyle + '.css'
+      } else if (this.$store.getters.isShogi) {
+        node.href = 'static/board-css/shogi/' + boardStyle + '.css'
       }
-      document.head.appendChild(file)
     },
     dropPiece (event, pieceType, color) {
       this.board.dragNewPiece({ role: pieceType, color: color, promoted: false }, event)
@@ -523,8 +524,9 @@ export default {
       return (role, key) => {
         const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', silver: 'S', gold: 'G', lance: 'L' }
         const move = pieces[role] + '@' + key
+        const prevMov = this.currentMove
         if (this.$store.getters.legalMoves.includes(move)) {
-          this.$store.dispatch('push', move)
+          this.$store.dispatch('push', { move: move, prev: prevMov })
           this.updateHand()
         } else {
           this.updateBoard()
@@ -532,7 +534,7 @@ export default {
       }
     },
     changeTurn () {
-      return (orig, dest) => {
+      return (orig, dest, metadata) => {
         let uciMove = orig + dest
         if (this.dimensionNumber === 3) {
           uciMove = this.increaseNumbers(uciMove)
@@ -548,9 +550,11 @@ export default {
           }
         } else {
           this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-          this.$store.dispatch('push', uciMove)
+          const prevMov = this.currentMove
+          this.$store.dispatch('push', { move: uciMove, prev: prevMov })
           this.updateHand()
           this.afterMove()
+          console.log(this.turn)
         }
       }
     },
@@ -630,8 +634,8 @@ export default {
           lastMove: true,
           check: true
         },
-        movable: this.fen === this.lastFen
-          ? { // moving is only possible at the end of the line
+        movable: this.fen === this.lastFen || this.analysisMode
+          ? { // moving is possible at the end of the line and in analysis mode
               dests: this.possibleMoves(),
               color: this.turn
             }

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
-import ipc from './ipc'
+import engine from './engine'
 
 Vue.use(Vuex)
 
@@ -106,6 +106,8 @@ export const store = new Vuex.Store({
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
+    firstMoves: [],
+    mainFirstMove: null,
     legalMoves: '',
     destinations: {},
     variant: 'chess',
@@ -123,10 +125,10 @@ export const store = new Vuex.Store({
       Xiangqi: 'xiangqi'
 
     }),
+    openedPGN: false,
     orientation: 'white',
     message: 'hello from Vuex',
     engineBinary: 'stockfish',
-    stdIO: [],
     engineInfo: {
       name: '',
       author: '',
@@ -171,7 +173,8 @@ export const store = new Vuex.Store({
       'shogi'
     ],
     curVar960Fen: '',
-    viewAnalysis: true
+    viewAnalysis: true,
+    analysisMode: true
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -191,6 +194,12 @@ export const store = new Vuex.Store({
     },
     turn (state, payload) {
       state.turn = payload
+    },
+    mainFirstMove (state, payload) {
+      state.mainFirstMove = payload
+    },
+    firstMoves (state, payload) {
+      state.firstMoves.push(payload)
     },
     legalMoves (state, payload) {
       state.legalMoves = payload
@@ -216,11 +225,8 @@ export const store = new Vuex.Store({
     engineBinary (state, payload) {
       state.engineBinary = payload
     },
-    stdIO (state, payload) {
-      state.stdIO = state.stdIO.concat(payload)
-    },
     clearIO (state) {
-      state.stdIO = []
+      // dummy to trigger update in console
     },
     engineInfo (state, payload) {
       state.engineInfo = payload
@@ -296,6 +302,8 @@ export const store = new Vuex.Store({
         state.board = new ffish.Board(state.variant)
       }
       state.moves = []
+      state.mainFirstMove = null
+      state.firstMoves = []
       state.gameInfo = {}
       state.fen = state.board.fen()
       state.turn = state.board.turn()
@@ -310,12 +318,57 @@ export const store = new Vuex.Store({
       state.moves = []
     },
     appendMoves (state, payload) {
-      state.moves = state.moves.concat(payload.map((curVal, idx, arr) => {
-        const sanMove = state.board.sanMove(curVal)
-        state.board.push(curVal)
-        return { ply: state.moves.length + idx + 1, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false) }
-      }))
+      const mov = payload.move.split(' ')
+      const prev = payload.prev
+      let ply
+      if (prev) {
+        ply = prev.ply + 1
+      } else { // then its a starting move
+        ply = 1
+      }
+      let alreadyInMoves = false
+      for (const num in state.moves) {
+        if (state.moves[num].current) {
+          state.moves[num].current = false // set all moves as not the current one
+        }
+        if (state.moves[num].uci === mov[0] && state.moves[num].prev === prev) {
+          alreadyInMoves = state.moves[num] // if the move is already in the history its stored here
+        }
+      }
+      const current = true // the latest move is marked as current
+      if (!alreadyInMoves) {
+        state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
+          const sanMove = state.board.sanMove(curVal)
+          state.board.push(curVal)
+          this.commit('playAudio', sanMove)
+          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, current: current }
+        }))
+        if (payload.prev) { // if the move is not a starting move
+          prev.next.push(state.moves[state.moves.length - 1]) // the last entry in moves is the move object of the current move
+          if (!prev.main) { // if there is no mainline yet, then this move is the main line now
+            prev.main = state.moves[state.moves.length - 1]
+          }
+        } else { // then the currently added move was a starting move
+          this.commit('firstMoves', state.moves[state.moves.length - 1]) // then we add it to the firstMoves array
+          if (state.moves.length === 1) {
+            this.commit('mainFirstMove', state.moves[0]) // then this is our mainFirstMove
+          }
+        }
+      } else {
+        state.board.push(alreadyInMoves.uci)
+        alreadyInMoves.current = true
+      }
       state.lastFen = state.board.fen()
+    },
+    playAudio (state, move) { // Sounds from lichess https://github.com/ornicar/lila
+      if (state.openedPGN) {
+        return
+      }
+      let note = new Audio('/static/audio/Move.mp3')
+      if (move.toString().includes('x')) {
+        note = new Audio('/static/audio/Capture.mp3')
+      }
+      note.play()
     },
     gameInfo (state, payload) {
       state.gameInfo = payload
@@ -326,11 +379,20 @@ export const store = new Vuex.Store({
     selectedGame (state, payload) {
       state.selectedGame = payload
     },
+    analysisMode (state, payload) {
+      state.analysisMode = payload
+    },
     points (state, payload) {
       state.points = payload
+    },
+    openedPGN (state, payload) {
+      state.openedPGN = payload
     }
   },
   actions: { // async
+    playAudio (context, payload) {
+      context.commit('playAudio', payload)
+    },
     curVar960Fen (context, payload) {
       context.commit('curVar960Fen', payload)
     },
@@ -351,19 +413,29 @@ export const store = new Vuex.Store({
       context.commit('legalMoves', board.legalMoves())
     },
     push (context, payload) {
-      context.commit('appendMoves', payload.split(' '))
+      context.commit('appendMoves', payload)
       context.dispatch('fen', context.state.board.fen())
+    },
+    mainFirstMove (context, payload) {
+      if (context.state.mainFirstMove !== payload) {
+        context.dispatch('mainFirstMove', payload)
+      }
+    },
+    firstMoves (context, payload) {
+      if (!context.state.firstMoves.includes(payload)) {
+        context.dispatch('firstMoves', payload)
+      }
     },
     resetEngineData (context) {
       context.commit('resetMultiPV')
       context.commit('resetEngineStats')
     },
     goEngine (context) {
-      ipc.send('go infinite')
+      engine.send('go infinite')
       context.commit('active', true)
     },
     stopEngine (context) {
-      ipc.send('stop')
+      engine.send('stop')
       context.commit('active', false)
     },
     restartEngine (context) {
@@ -375,10 +447,10 @@ export const store = new Vuex.Store({
       }
     },
     position (context) {
-      ipc.send(`position fen ${context.getters.fen}`)
+      engine.send(`position fen ${context.getters.fen}`)
     },
     sendEngineCommand (_, payload) {
-      ipc.send(payload)
+      engine.send(payload)
     },
     fen (context, payload) {
       if (context.state.fen !== payload) {
@@ -433,7 +505,7 @@ export const store = new Vuex.Store({
         context.commit('engineBinary', payload)
         context.commit('clearIO')
         context.dispatch('resetEngineData')
-        context.commit('engineInfo', await ipc.setBinary(payload))
+        context.commit('engineInfo', await engine.run(payload))
         context.dispatch('initEngineOptions')
       }
     },
@@ -450,14 +522,11 @@ export const store = new Vuex.Store({
         checkOption(context.state.engineInfo.options, name, value)
         if (value !== undefined && value !== null) {
           context.state.engineSettings[name] = value
-          ipc.send(`setoption name ${name} value ${value}`)
+          engine.send(`setoption name ${name} value ${value}`)
         } else {
-          ipc.send(`setoption name ${name}`)
+          engine.send(`setoption name ${name}`)
         }
       }
-    },
-    stdIO (context, payload) {
-      context.commit('stdIO', payload)
     },
     idName (context, payload) {
       context.commit('idName', payload)
@@ -516,6 +585,7 @@ export const store = new Vuex.Store({
       context.commit('loadedGames', payload)
     },
     async loadGame (context, payload) {
+      context.commit('openedPGN', true)
       let variant = payload.game.headers('Variant').toLowerCase()
 
       if (variant === '') { // if no variant is given we assume it to be standard chess
@@ -536,7 +606,17 @@ export const store = new Vuex.Store({
       context.commit('gameInfo', gameInfo)
       await context.dispatch('variant', variant)
       context.commit('newBoard')
-      await context.dispatch('push', payload.game.mainlineMoves())
+      const moves = payload.game.mainlineMoves().split(' ')
+      for (const num in moves) {
+        if (num === 0) {
+          context.commit('appendMoves', { move: moves[num], prev: undefined })
+        } else {
+          context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1] }) // TODO differentiate between alternative lines
+        }
+      }
+      context.dispatch('fen', context.state.board.fen())
+      context.dispatch('updateBoard')
+      context.commit('openedPGN', false)
     },
     increment (context, payload) {
       context.commit('increment', payload)
@@ -552,6 +632,12 @@ export const store = new Vuex.Store({
     },
     boardStyle (context, payload) {
       context.commit('boardStyle', payload)
+    },
+    analysisMode (context, payload) {
+      context.commit('analysisMode', payload)
+    },
+    openedPGN (context, payload) {
+      context.commit('openedPGN', payload)
     }
   },
   getters: {
@@ -602,9 +688,6 @@ export const store = new Vuex.Store({
     },
     engineBinary (state) {
       return state.engineBinary
-    },
-    stdIO (state) {
-      return state.stdIO
     },
     engineName (state) {
       return state.engineInfo.name
@@ -688,6 +771,12 @@ export const store = new Vuex.Store({
     moves (state) {
       return state.moves
     },
+    firstMoves (state) {
+      return state.firstMoves
+    },
+    mainFirstMove (state) {
+      return state.mainFirstMove
+    },
     legalMoves (state) {
       return state.legalMoves
     },
@@ -741,6 +830,9 @@ export const store = new Vuex.Store({
     },
     viewAnalysis (state) {
       return state.viewAnalysis
+    },
+    analysisMode (state) {
+      return state.analysisMode
     }
   }
 })
@@ -750,9 +842,14 @@ ffish.onRuntimeInitialized = () => {
 }
 
 (async () => {
-  // ipc.on('output', line => store.dispatch('stdIO', line))
-  // ipc.on('input', line => store.dispatch('stdIO', `> ${line}`))
-  ipc.on('info', info => store.dispatch('updateMultiPV', info))
-  store.commit('engineInfo', await ipc.runEngine())
+  // setup debug and error output
+  engine.on('debug', (...msgs) => console.log('%c[Worker] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
+  engine.on('error', (...msgs) => console.error('%c[Worker]', 'color: #82aaff; font-weight: 700;', ...msgs))
+
+  // capture engine info
+  engine.on('info', info => store.dispatch('updateMultiPV', info))
+
+  // start engine
+  store.commit('engineInfo', await engine.run(store.getters.engineBinary))
   store.dispatch('initEngineOptions')
 })()

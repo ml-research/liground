@@ -55,8 +55,8 @@ let rendererConfig = {
         exclude: /node_modules/
       },
       {
-        test: /\.node$/,
-        use: 'node-loader'
+        test: /\.worker.js$/,
+        use: 'worker-loader'
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

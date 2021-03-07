@@ -102,78 +102,112 @@ export default {
     fen () {
       return this.$store.getters.fen
     },
+    mainFirstMove () {
+      return this.$store.getters.mainFirstMove
+    },
     startFen () {
       return this.$store.getters.startFen
     },
-    currentMove () { // this returns the current half-move or -1 at the start of the game
-      const fen = this.$store.getters.fen
-      for (const move of this.moves) {
-        if (move.fen === fen) {
-          return move.ply - 1
+    currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
+          return this.moves[num]
         }
       }
-      return -1
+      return undefined
     }
   },
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
       const keyName = event.key
       if (keyName === 'ArrowUp') {
+        event.preventDefault()
         this.moveToStart()
       }
       if (keyName === 'ArrowDown') {
+        event.preventDefault()
         this.moveToEnd()
       }
       if (keyName === 'ArrowLeft') {
+        event.preventDefault()
         this.moveBackOne()
       }
       if (keyName === 'ArrowRight') {
+        event.preventDefault()
         this.moveForwardOne()
       }
     }, false)
   },
   methods: {
-    scroll (event) { // also moves back and forth when being slightly next to the board and for example over the pockets
+    scroll (event) { // TODO: also moves back and forth when being slightly next to the board and for example over the pockets
       if (event.deltaY < 0) {
         this.moveBackOne()
       } else {
         this.moveForwardOne()
       }
     },
+    updateCurrent (move) {
+      for (const num in this.moves) {
+        if (this.moves[num].current) {
+          this.moves[num].current = false
+          break
+        }
+      }
+      if (move) {
+        move.current = true
+      }
+    },
     moveToStart () { // this method returns to the starting point of the current line
+      this.updateCurrent(undefined)
       this.$store.dispatch('fen', this.startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
-      if (this.currentMove >= this.moves.length - 1) {
+      const mov = this.currentMove
+      let endOfLine = mov
+      if (!mov && this.moves.length === 0) {
         return
+      } else if (!mov && this.moves.length > 0) {
+        endOfLine = this.mainFirstMove
+        while (endOfLine.main) {
+          endOfLine = endOfLine.main
+        }
+      } else {
+        endOfLine = mov
+        while (endOfLine.main) {
+          endOfLine = endOfLine.main
+        }
       }
-      this.$store.dispatch('fen', this.moves[this.moves.length - 1].fen)
+      this.updateCurrent(endOfLine)
+      this.$store.dispatch('fen', endOfLine.fen)
     },
     moveBackOne () { // this method moves back one move in the current line
-      const num = this.currentMove
-      if (num === -1) {
+      const mov = this.currentMove
+      if (!mov) {
         return
       }
-      if (num === 0) {
+      if (mov.ply === 1) {
+        this.updateCurrent(undefined)
         this.$store.dispatch('fen', this.startFen)
         return
       }
-      this.$store.dispatch('fen', this.moves[num - 1].fen)
+      this.$store.dispatch('fen', mov.prev.fen)
+      this.updateCurrent(mov.prev)
     },
     moveForwardOne () { // this method moves forward one move in the current line
-      const num = this.currentMove
-      if (num >= this.moves.length - 1) {
+      const mov = this.currentMove
+      if (!mov) {
+        if (this.moves[0]) {
+          this.$store.dispatch('fen', this.moves[0].fen)
+          this.updateCurrent(this.moves[0])
+        }
         return
       }
-      if (num === -1) {
-        this.$store.dispatch('fen', this.moves[0].fen)
+      if (!mov.main) {
         return
       }
-      if (num === 0) {
-        this.$store.dispatch('fen', this.moves[1].fen)
-        return
-      }
-      this.$store.dispatch('fen', this.moves[num + 1].fen)
+      this.$store.dispatch('playAudio', mov.main.name)
+      this.$store.dispatch('fen', mov.main.fen)
+      this.updateCurrent(mov.main)
     },
     flipBoard () {
       if (this.variant === 'racingkings') {
@@ -209,9 +243,7 @@ export default {
     },
     showInfo (event) {
       console.log(`showInfo: ${this.fen}`)
-      // this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
-      // const newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
 
       if (this.$store.getters.active) {
