@@ -166,13 +166,16 @@ export default {
         return
       }
       if (num === -1) {
+        this.$store.dispatch('playAudio', this.moves[0].name)
         this.$store.dispatch('fen', this.moves[0].fen)
         return
       }
       if (num === 0) {
+        this.$store.dispatch('playAudio', this.moves[0].name)
         this.$store.dispatch('fen', this.moves[1].fen)
         return
       }
+      this.$store.dispatch('playAudio', this.moves[num + 1].name)
       this.$store.dispatch('fen', this.moves[num + 1].fen)
     },
     flipBoard () {
@@ -209,9 +212,7 @@ export default {
     },
     showInfo (event) {
       console.log(`showInfo: ${this.fen}`)
-      // this.$store.dispatch('fen', event['fen'])
       console.log(`fen: ${this.$store.getters.fen}`)
-      // const newMove = event.history[event.history.length - 1]
       console.log(`event.history: ${event.history}`)
 
       if (this.$store.getters.active) {
