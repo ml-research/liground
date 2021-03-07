@@ -49,7 +49,7 @@
           <template v-else-if="option.type === 'spin'">
             <td>
               <input
-                v-model="engineSettingsForm[option.name]"
+                v-model.number="engineSettingsForm[option.name]"
                 type="number"
                 :step="1"
                 :min="option.min"
@@ -131,6 +131,7 @@ export default {
       this.$store.commit('viewAnalysis', !this.$store.getters.viewAnalysis)
     },
     changeSettings (settings) {
+      console.log(settings)
       this.$store.dispatch('setEngineOptions', settings)
     },
     triggerButtonSetting (optionName) {
