@@ -117,16 +117,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['engineOptions', 'variant'])
+    ...mapGetters(['variant', 'engineOptions', 'engineSettings'])
   },
-  created: function () {
-    for (const option of this.engineOptions) {
-      if (option.type !== 'button') {
-        if (option.name === 'UCI_Variant') {
-          this.engineSettingsForm[option.name] = this.variant
-        } else {
-          this.engineSettingsForm[option.name] = option.type === 'check' ? option.default === 'true' : option.default
-        }
+  created () {
+    for (const { name, type } of this.engineOptions) {
+      if (type !== 'button') {
+        this.engineSettingsForm[name] = this.engineSettings[name]
       }
     }
   },

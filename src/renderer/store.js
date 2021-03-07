@@ -132,6 +132,7 @@ export const store = new Vuex.Store({
       author: '',
       options: []
     },
+    engineSettings: {},
     engineStats: {
       depth: 0,
       seldepth: 0,
@@ -223,6 +224,22 @@ export const store = new Vuex.Store({
     },
     engineInfo (state, payload) {
       state.engineInfo = payload
+      const settings = {}
+      for (const option of payload.options) {
+        switch (option.type) {
+          case 'check':
+            settings[option.name] = option.default === 'true'
+            break
+          case 'spin':
+          case 'combo':
+            settings[option.name] = option.default
+            break
+          case 'string':
+            settings[option.name] = option.default || ''
+            break
+        }
+      }
+      state.engineSettings = settings
     },
     engineStats (state, payload) {
       state.engineStats = payload
@@ -431,6 +448,7 @@ export const store = new Vuex.Store({
     setEngineOptions (context, payload) {
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
+        context.state.engineSettings[name] = value
         ipc.send(`setoption name ${name} value ${value}`)
       }
     },
@@ -592,6 +610,9 @@ export const store = new Vuex.Store({
     },
     engineOptions (state) {
       return state.engineInfo.options
+    },
+    engineSettings (state) {
+      return state.engineSettings
     },
     multipv (state) {
       return state.multipv
