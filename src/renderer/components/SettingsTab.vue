@@ -115,10 +115,16 @@ export default {
       this.$store.commit('viewAnalysis', true)
     },
     updateSettings () {
-      this.$store.dispatch('setEngineOptions', this.settings)
+      const settings = {}
+      for (const [name, value] of Object.entries(this.settings)) {
+        if (value !== this.engineSettings[name]) {
+          settings[name] = value
+        }
+      }
+      this.$store.dispatch('setEngineOptions', settings)
     },
     triggerButtonSetting (optionName) {
-      this.updateSettings({ [optionName]: null })
+      this.$store.dispatch('setEngineOptions', { [optionName]: null })
     }
   }
 }

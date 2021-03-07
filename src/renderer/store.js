@@ -448,8 +448,12 @@ export const store = new Vuex.Store({
     setEngineOptions (context, payload) {
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
-        context.state.engineSettings[name] = value
-        ipc.send(`setoption name ${name} value ${value}`)
+        if (value !== undefined && value !== null) {
+          context.state.engineSettings[name] = value
+          ipc.send(`setoption name ${name} value ${value}`)
+        } else {
+          ipc.send(`setoption name ${name}`)
+        }
       }
     },
     stdIO (context, payload) {
