@@ -1,106 +1,86 @@
 <template>
-  <div id="settings">
-    <div>
-      <table>
-        <caption> Engine Settings </caption>
-        <tr>
-          <th> Parameter </th>
-          <th> Value </th>
-          <th class="range">
-            Range
-          </th>
-        </tr>
-        <tr
-          v-for="option in engineOptions"
-          :key="option.name"
-        >
-          <td> {{ option.name }} </td>
-          <template v-if="option.type === 'combo'">
-            <td>
-              <select
-                v-model="engineSettingsForm[option.name]"
-                size="1"
-                class="settings-element"
-              >
-                <option
-                  v-for="selOption in option.var"
-                  :key="selOption"
-                  :value="selOption"
-                >
-                  {{ selOption }}
-                </option>
-              </select>
-            </td>
-            <td class="range" />
-          </template>
-          <template v-else-if="option.type === 'check'">
-            <td>
-              <input
-                v-model="engineSettingsForm[option.name]"
-                type="checkbox"
-                :name="option.name"
-                class="settings-element"
-              >
-            </td>
-            <td class="range">
-              boolean
-            </td>
-          </template>
-          <template v-else-if="option.type === 'spin'">
-            <td>
-              <input
-                v-model.number="engineSettingsForm[option.name]"
-                type="number"
-                :step="1"
-                :min="option.min"
-                :max="option.max"
-                class="settings-element"
-              >
-            </td>
-            <td class="range">
-              {{ option.min }} to {{ option.max }}
-            </td>
-          </template>
-          <template v-else-if="option.type === 'string'">
-            <td>
-              <input
-                v-model="engineSettingsForm[option.name]"
-                type="text"
-                :name="option.name"
-                class="settings-element"
-              >
-            </td>
-            <td class="range">
-              {{ option.type }}
-            </td>
-          </template>
-          <template v-else-if="option.type === 'button'">
-            <td>
-              <button
-                type="button"
-                class="settings-element"
-                @click="triggerButtonSetting(option.name)"
-              >
-                {{ option.name }}
-              </button>
-            </td>
-            <td class="range" />
-          </template>
-        </tr>
-      </table>
-      <a
-        class="btn green"
-        @click="changeSettings(engineSettingsForm)"
+  <div class="settings">
+    <span class="title">Engine Settings</span>
+    <table class="table">
+      <tr
+        v-for="option in engineOptions"
+        :key="option.name"
       >
-        Change Settings
-      </a>
-      <a
-        class="btn red"
-        @click="changeTab()"
-      >
-        close
-      </a>
-    </div>
+        <td> {{ option.name }} </td>
+        <template v-if="option.type === 'combo'">
+          <td>
+            <select
+              v-model="settings[option.name]"
+              size="1"
+              class="input"
+            >
+              <option
+                v-for="selOption in option.var"
+                :key="selOption"
+                :value="selOption"
+              >
+                {{ selOption }}
+              </option>
+            </select>
+          </td>
+        </template>
+        <template v-else-if="option.type === 'check'">
+          <td>
+            <input
+              v-model="settings[option.name]"
+              type="checkbox"
+              :name="option.name"
+              class="input"
+            >
+          </td>
+        </template>
+        <template v-else-if="option.type === 'spin'">
+          <td>
+            <input
+              v-model.number="settings[option.name]"
+              type="number"
+              :step="1"
+              :min="option.min"
+              :max="option.max"
+              class="input"
+            >
+          </td>
+        </template>
+        <template v-else-if="option.type === 'string'">
+          <td>
+            <input
+              v-model="settings[option.name]"
+              type="text"
+              :name="option.name"
+              class="input"
+            >
+          </td>
+        </template>
+        <template v-else-if="option.type === 'button'">
+          <td>
+            <button
+              type="button"
+              class="input"
+              @click="triggerButtonSetting(option.name)"
+            >
+              {{ option.name }}
+            </button>
+          </td>
+        </template>
+      </tr>
+    </table>
+    <a
+      class="btn green"
+      @click="save"
+    >
+      Save
+    </a>
+    <a
+      class="btn red"
+      @click="cancel"
+    >
+      Cancel
+    </a>
   </div>
 </template>
 
@@ -111,9 +91,9 @@ export default {
   name: 'SettingsTab',
   components: {
   },
-  data: function () {
+  data () {
     return {
-      engineSettingsForm: {}
+      settings: {}
     }
   },
   computed: {
@@ -122,83 +102,72 @@ export default {
   created () {
     for (const { name, type } of this.engineOptions) {
       if (type !== 'button') {
-        this.engineSettingsForm[name] = this.engineSettings[name]
+        this.settings[name] = this.engineSettings[name]
       }
     }
   },
   methods: {
-    changeTab () {
-      this.$store.commit('viewAnalysis', !this.$store.getters.viewAnalysis)
+    save () {
+      this.updateSettings()
+      this.$store.commit('viewAnalysis', true)
     },
-    changeSettings (settings) {
-      console.log(settings)
-      this.$store.dispatch('setEngineOptions', settings)
+    cancel () {
+      this.$store.commit('viewAnalysis', true)
+    },
+    updateSettings () {
+      this.$store.dispatch('setEngineOptions', this.settings)
     },
     triggerButtonSetting (optionName) {
-      const settings = {}
-      settings[optionName] = null
-      this.changeSettings(settings)
+      this.updateSettings({ [optionName]: null })
     }
   }
 }
-
 </script>
+
 <style scoped>
-  .btn {
-    border-radius: 2px;
-    cursor: pointer;
-    display: block;
-    width: 250px;
-    margin: 0.2em auto;
-  }
+.settings {
+  display: flex;
+  flex-direction: column;
+}
+.title {
+  font-size: 1.2em;
+  text-align: center;
+}
+.table {
+  font-size: 0.9em;
+  text-align: left;
+}
 
-  .red {
-    color: white;
-    background-color: #b22222;
-  }
+input[type=number] {
+  text-align: right;
+}
+/* make arrows of number input always visible */
+input[type=number]::-webkit-inner-spin-button {
+  opacity: 1
+}
+.input {
+  width: 100%;
+}
 
-  .red.btn:hover{
-    background-color: #8b1919;
-  }
-
-  .green {
-    color: white;
-    background-color: #4AAE9B;
-  }
-
-  .green.btn:hover {
-    background-color: #3c8577;
-  }
-
-  table, th, td {
-    background-color: white;
-    border: 1px solid black;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 0.9em;
-  }
-
-  table {
-    margin: 1em;
-  }
-
-  th {
-    border-bottom: 4px double black;
-  }
-
-  /* make arrows of number input always visible */
-  input[type=number]::-webkit-inner-spin-button {
-    opacity: 1
-  }
-
-  input[type=number] {
-    text-align: right;
-  }
-  .settings-element {
-    width: 100%;
-  }
-
-  .range {
-    text-align: right;
-  }
+.btn {
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  width: 250px;
+  margin: 0.2em auto;
+}
+.btn.red {
+  color: white;
+  background-color: #b22222;
+}
+.btn.red:hover {
+  background-color: #8b1919;
+}
+.btn.green {
+  color: white;
+  background-color: #4AAE9B;
+}
+.btn.green:hover {
+  background-color: #3c8577;
+}
 </style>
