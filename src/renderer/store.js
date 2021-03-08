@@ -518,6 +518,10 @@ export const store = new Vuex.Store({
       })
     },
     setEngineOptions (context, payload) {
+      if (context.getters.active) {
+        context.dispatch('stopEngine')
+      }
+      context.dispatch('resetEngineData')
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
         if (value !== undefined && value !== null) {
