@@ -99,10 +99,12 @@ export default {
   computed: {
     ...mapGetters(['variant', 'engineOptions', 'engineSettings'])
   },
-  created () {
-    for (const { name, type } of this.engineOptions) {
-      if (type !== 'button') {
-        this.settings[name] = this.engineSettings[name]
+  watch: {
+    engineSettings () {
+      for (const { name, type } of this.engineOptions) {
+        if (type !== 'button') {
+          this.settings[name] = this.engineSettings[name]
+        }
       }
     }
   },
