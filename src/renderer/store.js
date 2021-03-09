@@ -312,20 +312,16 @@ export const store = new Vuex.Store({
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
-        if (state.moves[num].current) {
-          state.moves[num].current = false // set all moves as not the current one
-        }
         if (state.moves[num].uci === mov[0] && state.moves[num].prev === prev) {
           alreadyInMoves = state.moves[num] // if the move is already in the history its stored here
         }
       }
-      const current = true // the latest move is marked as current
       if (!alreadyInMoves) {
         state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
           const sanMove = state.board.sanMove(curVal)
           state.board.push(curVal)
           this.commit('playAudio', sanMove)
-          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, current: current }
+          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev }
         }))
         if (payload.prev) { // if the move is not a starting move
           prev.next.push(state.moves[state.moves.length - 1]) // the last entry in moves is the move object of the current move
@@ -340,7 +336,6 @@ export const store = new Vuex.Store({
         }
       } else {
         state.board.push(alreadyInMoves.uci)
-        alreadyInMoves.current = true
       }
       state.lastFen = state.board.fen()
     },

@@ -113,13 +113,6 @@ export default {
   methods: {
     updateBoard (move) {
       this.$store.dispatch('fen', this.move.fen)
-      for (const num in this.moves) {
-        if (this.moves[num].current) {
-          this.moves[num].current = false
-          break
-        }
-      }
-      move.current = true
     }
   }
 }
