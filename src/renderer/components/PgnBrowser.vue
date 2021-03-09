@@ -7,13 +7,19 @@
         type="checkbox"
       >
       <label for="groupcheckbox">Group by rounds?</label>
-      <input
-        id="gamefilter"
-        v-model="gameFilter"
-        type="text"
-        name="gamefilter"
-        placeholder="filter games"
-      >
+      <div>
+        <input
+          id="gamefilter"
+          v-model="gameFilter"
+          type="text"
+          name="gamefilter"
+          placeholder="filter games"
+        >
+        <span
+          slot="extra"
+          class="icon mdi mdi-magnify"
+        />
+      </div>
       <template v-if="groupByRound">
         <div
           v-for="round in rounds"
@@ -130,7 +136,7 @@ export default {
 }
 
 #gamefilter {
-  width: 100%;
+  max-width: 80%;
 }
 
 .roundseperator {
@@ -155,5 +161,19 @@ export default {
 .gameoption.active, .roundseperator.active {
   background-color:#444;
   color: white;
+}
+
+.icon.mdi-magnify {
+  padding: 0px 6px;
+  margin: 0px 1px;
+  border-radius: 3px;
+  float: right;
+  background-color: #34495e;
+  color: white;
+}
+
+.icon.mdi-magnify:hover {
+  background-color: #22303d;
+  cursor: pointer;
 }
 </style>
