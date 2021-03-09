@@ -40,7 +40,7 @@ function cpToString (cp) {
     return ''
   }
   if (cp === 0) {
-    return '±0.00'
+    return '0.00'
   }
   const normalizedEval = (cp / 100).toFixed(2)
   if (cp > 0) {
