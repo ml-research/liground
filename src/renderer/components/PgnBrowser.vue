@@ -50,7 +50,7 @@
                 :class="{ active : game === selectedGame }"
                 @click="selectedGame = game"
               >
-                {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+                {{ game ? game.headers("White") : 'unknown' }} <br> vs {{ game ? game.headers("Black") : 'unknown' }}
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@
             :class="{ active : game === selectedGame }"
             @click="selectedGame = game"
           >
-            {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+            {{ game ? game.headers("White") : 'unknown' }} <br> vs {{ game ? game.headers("Black") : 'unknown' }}
           </div>
         </div>
       </template>
@@ -103,6 +103,9 @@ export default {
   watch: {
     loadedGames: function () {
       if (this.$store.getters.loadedGames) {
+        if (this.$store.getters.loadedGames.length <= 1) {
+          this.groupByRound = false
+        }
         // get distinct rounds
         this.rounds = this.$store.getters.loadedGames.map((value, idx, arr) => {
           return `${value.headers('Round')} ${value.headers('Event')}`
@@ -147,7 +150,7 @@ export default {
   text-decoration: none;
   display: block;
   border-bottom: 1px solid black;
-  font-size: 0.8em;
+  font-size: 0.75em;
   font-weight: 600;
   text-align: left;
 }
