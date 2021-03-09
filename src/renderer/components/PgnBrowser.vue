@@ -2,45 +2,69 @@
   <div>
     <div id="gameselect">
       <input
+        id="groupcheckbox"
+        v-model="groupByRound"
+        type="checkbox"
+      >
+      <label for="groupcheckbox">Group by rounds?</label>
+      <input
         id="gamefilter"
         v-model="gameFilter"
         type="text"
         name="gamefilter"
         placeholder="filter games"
       >
-      <div
-        v-for="round in rounds"
-        :key="round.name"
-      >
+      <template v-if="groupByRound">
         <div
-          class="browserelement roundseperator"
-          :class="{ active : selectedGame && selectedGame.headers('Round') === round.name }"
-          @click="round.visible = !round.visible"
+          v-for="round in rounds"
+          :key="`${round.name} ${round.eventName}`"
         >
-          Round {{ round.name }}
-          <span
-            slot="extra"
-            class="icon mdi"
-            :class="[round.visible || gameFilter !== '' ? 'mdi-menu-up' : 'mdi-menu-down']"
-            style="float: right;"
-          />
-        </div>
-        <div v-show="round.visible || gameFilter !== ''">
           <div
-            v-for="game in loadedGames"
-            :key="game.id"
+            class="browserelement roundseperator"
+            :class="{ active : selectedGame && selectedGame.headers('Round') === round.name && selectedGame.headers('Event') === round.eventName }"
+            :title="round.eventName"
+            @click="round.visible = !round.visible"
           >
+            Round {{ round.name }} <span style="font-size: 0.65em"> ({{ round.eventName.substring(0, 15) }}...) </span>
+            <span
+              slot="extra"
+              class="icon mdi"
+              :class="[round.visible || gameFilter !== '' ? 'mdi-menu-up' : 'mdi-menu-down']"
+              style="float: right;"
+            />
+          </div>
+          <div v-show="round.visible || gameFilter !== ''">
             <div
-              v-if="game.headers('Round') === round.name && (filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game))"
-              class="browserelement gameoption"
-              :class="{ active : game === selectedGame }"
-              @click="selectedGame = game"
+              v-for="game in loadedGames"
+              :key="game.id"
             >
-              {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+              <div
+                v-if="game.headers('Round') === round.name && game.headers('Event') === round.eventName && (filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game))"
+                class="browserelement gameoption"
+                :class="{ active : game === selectedGame }"
+                @click="selectedGame = game"
+              >
+                {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <div
+          v-for="game in loadedGames"
+          :key="game.id"
+        >
+          <div
+            v-if="(filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game))"
+            class="browserelement gameoption"
+            :class="{ active : game === selectedGame }"
+            @click="selectedGame = game"
+          >
+            {{ game ? game.headers("White") : 'unknown' }} vs {{ game ? game.headers("Black") : 'unknown' }}
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -51,7 +75,8 @@ export default {
   data: function () {
     return {
       gameFilter: '',
-      rounds: []
+      rounds: [],
+      groupByRound: true
     }
   },
   computed: {
@@ -74,11 +99,16 @@ export default {
       if (this.$store.getters.loadedGames) {
         // get distinct rounds
         this.rounds = this.$store.getters.loadedGames.map((value, idx, arr) => {
-          return value.headers('Round')
+          return `${value.headers('Round')} ${value.headers('Event')}`
+        // distinct
         }).filter((value, idx, arr) => {
           return arr.indexOf(value) === idx
+        // add visibility attribute for dropdown
         }).map((value, idx) => {
-          return { name: value, visible: idx === 0 }
+          const firstSpace = value.indexOf(' ')
+          const round = value.substring(0, firstSpace)
+          const event = value.substring(firstSpace + 1)
+          return { name: round, eventName: event, visible: idx === 0 }
         })
       }
     }
@@ -116,7 +146,7 @@ export default {
   text-align: left;
 }
 
-.gameoption:hover {
+.gameoption:hover, .roundseperator:hover {
   background-color: #2196F3;
   color: white;
   cursor: pointer;
