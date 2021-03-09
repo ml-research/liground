@@ -18,12 +18,12 @@
           @click="round.visible = !round.visible"
         >
           Round {{ round.name }}
-          <span
-            slot="extra"
-            class="icon mdi"
-            :class="[round.visible || gameFilter !== '' ? 'mdi-menu-up' : 'mdi-menu-down']"
-            style="float: right;"
-          />
+          <template v-if="round.visible || gameFilter !== ''">
+            <MenuUp class="dropdown-icon" />
+          </template>
+          <template v-else>
+            <MenuDown class="dropdown-icon" />
+          </template>
         </div>
         <div v-show="round.visible || gameFilter !== ''">
           <div
@@ -46,8 +46,14 @@
 </template>
 
 <script>
+import MenuUp from 'vue-material-design-icons/MenuUp.vue'
+import MenuDown from 'vue-material-design-icons/MenuDown.vue'
+
 export default {
   name: 'PgnBrowser',
+  components: {
+    MenuUp, MenuDown
+  },
   data: function () {
     return {
       gameFilter: '',
@@ -125,5 +131,9 @@ export default {
 .gameoption.active, .roundseperator.active {
   background-color:#444;
   color: white;
+}
+
+.dropdown-icon {
+  float: right;
 }
 </style>

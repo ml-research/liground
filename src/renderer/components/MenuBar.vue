@@ -4,35 +4,27 @@
       <a
         href="#"
         @click="openPgn"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-checkerboard"
-      /> Open PGN</a>
+      >
+        <Checkerboard /> Open PGN
+      </a>
       <a
         @click="showModal"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-checkerboard"
-      /> Engines
+      >
+        <Checkerboard /> Engines
       </a>
       <a
         href="#"
         :class="{ active: !viewAnalysis }"
         @click="changeTab"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-hammer-screwdriver"
-      /> Settings </a>
+      >
+        <HammerScrewdriver /> Settings
+      </a>
       <a
         href="#"
         @click="openExternalBrowser"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-information-outline"
-      /> About <em
-        slot="extra"
-        class="icon mdi mdi-github"
-      /></a>
+      >
+        <InformationOutline /> About <Github />
+      </a>
     </nav>
     <div id="Modal">
       <Modal
@@ -48,11 +40,15 @@ import fs from 'fs'
 import ffish from 'ffish'
 import Modal from './EngineModal'
 import { mapGetters } from 'vuex'
+import Github from 'vue-material-design-icons/Github.vue'
+import InformationOutline from 'vue-material-design-icons/InformationOutline.vue'
+import HammerScrewdriver from 'vue-material-design-icons/HammerScrewdriver.vue'
+import Checkerboard from 'vue-material-design-icons/Checkerboard.vue'
 
 export default {
   name: 'MenuBar',
   components: {
-    Modal
+    Modal, Github, InformationOutline, HammerScrewdriver, Checkerboard
   },
   data () {
     return {

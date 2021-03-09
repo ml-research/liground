@@ -1,17 +1,25 @@
 <template>
   <div class="playerinfo">
-    <i
-      slot="extra"
-      class="icon mdi"
-      :class="[isWhite ? 'mdi-checkbox-blank-circle-outline' : 'mdi-checkbox-blank-circle']"
-    />
+    <template v-if="isWhite">
+      <CheckboxBlankCircleOutline />
+    </template>
+    <template v-else>
+      <CheckboxBlankCircle />
+    </template>
     [{{ playerTitle }}] {{ name }} ({{ elo }})
   </div>
 </template>
 
 <script>
+
+import CheckboxBlankCircleOutline from 'vue-material-design-icons/CheckboxBlankCircleOutline.vue'
+import CheckboxBlankCircle from 'vue-material-design-icons/CheckboxBlankCircle.vue'
+
 export default {
   name: 'PlayerInfo',
+  components: {
+    CheckboxBlankCircleOutline, CheckboxBlankCircle
+  },
   props: {
     playerTitle: {
       type: String,
