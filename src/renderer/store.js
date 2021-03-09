@@ -293,6 +293,7 @@ export const store = new Vuex.Store({
       state.legalMoves = state.board.legalMoves()
       state.lastFen = state.board.fen()
       state.startFen = state.board.fen()
+      state.selectedGame = null
     },
     resetBoard (state, payload) {
       state.curVar960Fen = ''
@@ -580,10 +581,10 @@ export const store = new Vuex.Store({
         gameInfo[curVal] = payload.game.headers(curVal)
       }
 
-      context.commit('selectedGame', payload.game)
-      context.commit('gameInfo', gameInfo)
       await context.dispatch('variant', variant)
       context.commit('newBoard')
+      context.commit('selectedGame', payload.game)
+      context.commit('gameInfo', gameInfo)
       const moves = payload.game.mainlineMoves().split(' ')
       for (const num in moves) {
         if (num === 0) {
