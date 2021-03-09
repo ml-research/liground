@@ -423,6 +423,7 @@ export const store = new Vuex.Store({
     },
     set960 (context, payload) {
       context.commit('selectedGame', null)
+      context.commit('resetMultiPV')
       context.commit('newBoard', {
         fen: payload.fen,
         is960: payload.is960
