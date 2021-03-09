@@ -269,19 +269,17 @@ input {
 }
 #selector-container {
   grid-area: selector;
-  height:60px;
+  display: flex;
+  justify-content: space-around;
+  height: 60px;
 }
 #piece-style {
   margin-top: 10px;
   width: 210px;
-  margin-left: 19%;
-  position: absolute;
 }
 #board-style {
   margin-top: 10px;
   width: 210px;
-  margin-left: 3%;
-  position: absolute;
 }
 .main-grid {
   display: grid;
