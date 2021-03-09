@@ -593,7 +593,7 @@ export const store = new Vuex.Store({
           context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1] }) // TODO differentiate between alternative lines
         }
       }
-      context.dispatch('fen', context.state.board.fen())
+      context.dispatch('fen', context.state.startFen)
       context.dispatch('updateBoard')
       context.commit('openedPGN', false)
     },

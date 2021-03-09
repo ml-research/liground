@@ -20,7 +20,7 @@
     <span
       v-if="printRoot"
       class="move-name"
-      :class="{ current : move.current }"
+      :class="{ current : move.fen === fen }"
       @click="updateBoard(move)"
     >
       {{ move.name }}
@@ -97,6 +97,9 @@ export default {
     },
     mainFirstMove () {
       return this.$store.getters.mainFirstMove
+    },
+    fen () {
+      return this.$store.getters.fen
     },
     firstMoves () {
       return this.$store.getters.firstMoves
