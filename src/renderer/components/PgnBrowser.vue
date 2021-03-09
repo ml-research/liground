@@ -7,7 +7,7 @@
         type="checkbox"
       >
       <label for="groupcheckbox">Group by rounds?</label>
-      <div>
+      <div class="search">
         <input
           id="gamefilter"
           v-model="gameFilter"
@@ -178,5 +178,9 @@ export default {
 .icon.mdi-magnify:hover {
   background-color: #22303d;
   cursor: pointer;
+}
+
+.search {
+  padding: 2px 0px;
 }
 </style>
