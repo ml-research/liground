@@ -40,7 +40,7 @@ function cpToString (cp) {
     return ''
   }
   if (cp === 0) {
-    return '±0.00'
+    return '0.00'
   }
   const normalizedEval = (cp / 100).toFixed(2)
   if (cp > 0) {
@@ -462,6 +462,7 @@ export const store = new Vuex.Store({
         if (context.getters.active) {
           context.dispatch('stopEngine')
         }
+        context.commit('selectedGame', null)
         context.commit('variant', payload)
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
@@ -478,6 +479,8 @@ export const store = new Vuex.Store({
       }
     },
     set960 (context, payload) {
+      context.commit('selectedGame', null)
+      context.commit('resetMultiPV')
       context.commit('newBoard', {
         fen: payload.fen,
         is960: payload.is960
