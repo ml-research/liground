@@ -263,7 +263,10 @@ export default {
   font-size: 0.9em;
 }
 .item .preview {
-  margin: -8px 4px -8px -4px;
+  margin-top: -8px;
+  margin-bottom: -8px;
+  margin-left: -4px;
+  margin-right: 1ch;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -277,5 +280,8 @@ export default {
 }
 .item .image + .image {
   margin-left: 2px;
+}
+.item .name {
+  flex-grow: 1;
 }
 </style>
