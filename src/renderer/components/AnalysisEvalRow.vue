@@ -14,7 +14,7 @@
     <Multiselect
       v-model="selected"
       class="multiselect"
-      placeholder="Select Engine"
+      :placeholder="selected.name"
       label="name"
       track-by="id"
       :options="availableEngines"
@@ -39,7 +39,7 @@ export default {
   },
   data () {
     return {
-      selected: '' // this will be set on created
+      selected: null // this will be set on created
     }
   },
   computed: {
