@@ -51,21 +51,6 @@ export default {
   },
   data () {
     return {
-      internationalVariants: [
-        'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
-      ],
-      seaVariants: [
-        'makruk'
-      ],
-      xiangqiVariants: [
-        'xiangqi'
-      ],
-      janggiVariants: [
-        'janggi'
-      ],
-      shogiVariants: [
-        'shogi'
-      ],
       boardStyles: [
         'blue',
         'brown',
@@ -105,38 +90,38 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant'])
+    ...mapGetters(['variant', 'isInternational', 'isSEA', 'isXiangqi', 'isJanggi', 'isShogi'])
   },
   watch: {
     selected () {
       this.$store.dispatch('boardStyle', this.selected)
     },
     variant () {
-      if (this.internationalVariants.includes(this.variant)) {
+      if (this.isInternational) {
         this.selected = this.internationalStyles[0]
         this.boardStyles = []
         this.internationalStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else if (this.shogiVariants.includes(this.variant)) {
+      } else if (this.isShogi) {
         this.selected = this.shogiStyles[1]
         this.boardStyles = []
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else if (this.seaVariants.includes(this.variant)) {
+      } else if (this.isSEA) {
         this.selected = this.seaStyles[1]
         this.boardStyles = []
         this.seaStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else if (this.xiangqiVariants.includes(this.variant)) {
+      } else if (this.isXiangqi) {
         this.selected = this.xiangqiStyles[1]
         this.boardStyles = []
         this.xiangqiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else if (this.janggiVariants.includes(this.variant)) {
+      } else if (this.isJanggi) {
         this.selected = this.janggiStyles[3]
         this.boardStyles = []
         this.janggiStyles.forEach(element => {
@@ -148,21 +133,21 @@ export default {
   methods: {
     preview (name) {
       let board = ''
-      if (this.internationalVariants.includes(this.variant)) {
+      if (this.isInternational) {
         board = name === 'lightgreen' ? 'ic' : `${name}`
-      } else if (this.shogiVariants.includes(this.variant)) {
+      } else if (this.isShogi) {
         const conv = {
           traditional: 'shogi',
           bluechess: 'shogic'
         }
         board = conv[name]
-      } else if (this.seaVariants.includes(this.variant)) {
+      } else if (this.isSEA) {
         const conv = {
           yellow: 'makruk',
           bluechess: 'makruk2'
         }
         board = conv[name]
-      } else if (this.xiangqiVariants.includes(this.variant)) {
+      } else if (this.isXiangqi) {
         const conv = {
           dark: 'xiangqiDark',
           lightbrown: 'xiangqi',
@@ -170,7 +155,7 @@ export default {
           riverbanks: 'xiangqic'
         }
         board = conv[name]
-      } else if (this.janggiVariants.includes(this.variant)) {
+      } else if (this.isJanggi) {
         const conv = {
           brown: 'JanggiBrown',
           dark: 'JanggiDark',
@@ -207,8 +192,5 @@ export default {
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-}
-.item .name {
-  flex-grow: 1;
 }
 </style>

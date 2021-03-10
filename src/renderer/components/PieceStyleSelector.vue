@@ -59,18 +59,6 @@ export default {
   },
   data () {
     return {
-      internationalVariants: [
-        'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
-      ],
-      seaVariants: [
-        'makruk'
-      ],
-      xiangqiVariants: [
-        'janggi', 'xiangqi'
-      ],
-      shogiVariants: [
-        'shogi'
-      ],
       pieceStyles: [
         'alpha',
         'california',
@@ -168,33 +156,32 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant'])
+    ...mapGetters(['variant', 'isInternational', 'isSEA', 'isXiangqi', 'isJanggi', 'isShogi'])
   },
   watch: {
     selected () {
       this.$store.dispatch('pieceStyle', this.selected)
     },
     variant () {
-      // TODO: we could add getters like `isInternational()` to the store
-      if (this.internationalVariants.includes(this.variant)) {
+      if (this.isInternational) {
         this.selected = this.internationalPieces[18]
         this.pieceStyles = []
         this.internationalPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
-      } else if (this.shogiVariants.includes(this.variant)) {
+      } else if (this.isShogi) {
         this.selected = this.shogiPieces[0]
         this.pieceStyles = []
         this.shogiPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
-      } else if (this.seaVariants.includes(this.variant)) {
+      } else if (this.isSEA) {
         this.selected = this.seaPieces[0]
         this.pieceStyles = []
         this.seaPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
-      } else if (this.xiangqiVariants.includes(this.variant)) {
+      } else if (this.isXiangqi || this.isJanggi) {
         this.selected = this.xiangqiPieces[0]
         this.pieceStyles = []
         this.xiangqiPieces.forEach(element => {
@@ -206,9 +193,9 @@ export default {
   methods: {
     preview (name) {
       let pieces = ['', '']
-      if (this.internationalVariants.includes(this.variant)) {
+      if (this.isInternational) {
         pieces = [`international/${name}/wN`, `international/${name}/bN`]
-      } else if (this.seaVariants.includes(this.variant)) {
+      } else if (this.isSEA) {
         switch (name) {
           case 'adarb':
             pieces = ['southeastasian/ada/orig/rN', 'southeastasian/ada/orig/bN']
@@ -225,9 +212,9 @@ export default {
           default:
             pieces = [`southeastasian/${name}/wN`, `southeastasian/${name}/bN`]
         }
-      } else if (this.shogiVariants.includes(this.variant)) {
+      } else if (this.isShogi) {
         pieces = [`shogi/${name}/0KE`, `shogi/${name}/1KE`]
-      } else if (this.xiangqiVariants.includes(this.variant)) {
+      } else if (this.isXiangqi || this.isJanggi) {
         switch (name) {
           case 'ct2':
             pieces = ['xiangqi/ct2/red_horse2', 'xiangqi/ct2/black_horse2']
@@ -280,8 +267,5 @@ export default {
 }
 .item .image + .image {
   margin-left: 2px;
-}
-.item .name {
-  flex-grow: 1;
 }
 </style>

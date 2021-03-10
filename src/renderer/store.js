@@ -159,6 +159,9 @@ export const store = new Vuex.Store({
     selectedGame: null,
     points: 0,
     boardStyle: 'blue',
+    curVar960Fen: '',
+    viewAnalysis: true,
+    analysisMode: true,
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
     ],
@@ -166,14 +169,14 @@ export const store = new Vuex.Store({
       'makruk'
     ],
     xiangqiVariants: [
-      'janggi', 'xiangqi'
+      'xiangqi'
+    ],
+    janggiVariants: [
+      'janggi'
     ],
     shogiVariants: [
       'shogi'
-    ],
-    curVar960Fen: '',
-    viewAnalysis: true,
-    analysisMode: true
+    ]
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -789,6 +792,9 @@ export const store = new Vuex.Store({
     },
     isXiangqi (state) {
       return state.xiangqiVariants.includes(state.variant)
+    },
+    isJanggi (state) {
+      return state.janggiVariants.includes(state.variant)
     },
     isShogi (state) {
       return state.shogiVariants.includes(state.variant)
