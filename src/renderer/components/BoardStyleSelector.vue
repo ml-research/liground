@@ -6,7 +6,7 @@
       :options="boardStyles"
       :allow-empty="false"
       :show-labels="false"
-      placeholder="Board Style"
+      :placeholder="selected"
     >
       <template
         slot="option"
@@ -32,7 +32,7 @@
               class="image"
               :style="{ backgroundImage: preview(props.option) }"
             />
-         </div>
+          </div>
           <span class="name">{{ props.option }}</span>
         </div>
       </template>

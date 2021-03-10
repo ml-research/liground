@@ -6,7 +6,7 @@
       :options="pieceStyles"
       :allow-empty="false"
       :show-labels="false"
-      placeholder="Piece Style"
+      :placeholder="selected"
     >
       <template
         slot="option"
