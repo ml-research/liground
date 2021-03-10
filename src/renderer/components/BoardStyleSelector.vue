@@ -144,7 +144,7 @@ export default {
       } else if (this.isSEA) {
         const conv = {
           yellow: 'makruk',
-          bluechess: 'makruk2'
+          orange: 'makruk2'
         }
         board = conv[name]
       } else if (this.isXiangqi) {
