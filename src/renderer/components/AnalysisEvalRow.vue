@@ -1,177 +1,109 @@
 <template>
-  <div
-    class="wrapper template grid-parent"
-    :style="{ 'text-align': align }"
-  >
-    <LiveEval />
+  <div class="container">
+    <div class="eval">
+      {{ cpForWhiteStr }}
+    </div>
     <div
-      class="engine-banner"
-      :style="{ backgroundImage: `url(${engineBannerURL})` }"
-    />
+      class="logo"
+    >
+      <div
+        class="image"
+        :style="{ backgroundImage: engineLogo }"
+      />
+    </div>
     <Multiselect
       v-model="selected"
       class="multiselect"
-      :options="options"
+      :placeholder="selected.name"
+      label="name"
+      track-by="id"
+      :options="availableEngines"
       :allow-empty="false"
       :show-labels="false"
-      :placeholder="selected"
     />
-    <RoundedSwitch id="switch" />
+    <RoundedSwitch class="switch" />
   </div>
 </template>
 
 <script>
-import LiveEval from './LiveEval.vue'
+import { mapGetters } from 'vuex'
 import RoundedSwitch from './RoundedSwitch.vue'
 import Multiselect from 'vue-multiselect'
-
-import logoStockfish from '../assets/images/engines/stockfish.png'
-import logoCrazyAra from '../assets/images/engines/crazyara.png'
+import defaultLogo from '../assets/images/engines/chess_engine.svg'
 
 export default {
   name: 'AnalysisEvalRow',
   components: {
-    LiveEval,
     RoundedSwitch,
     Multiselect
   },
-  props: {
-    clearOnSelect: {
-      type: Boolean,
-      default: false
-    },
-    time: {
-      type: Number,
-      default: 0
-    },
-    name: {
-      type: String,
-      default: 'Multi-Variant Stockfish 10 🐟'
-    },
-    onMove: {
-      type: Boolean,
-      default: false
-    },
-    align: {
-      type: String,
-      default: 'left'
-    }
-  },
   data () {
     return {
-      engines:
-      {
-        chess: [
-          'Multi-Variant Stockfish 10',
-          'ClassicAra 0.8.1'
-        ],
-        crazyhouse: [
-          'Multi-Variant Stockfish 10',
-          'CrazyAra 0.8.1'
-        ]
-      },
-      options: [
-        'Multi-Variant Stockfish 10',
-        'CrazyAra 0.8.1'
-      ],
-      selected: 'Multi-Variant Stockfish 10',
-      engineBinaries: {
-        'Multi-Variant Stockfish 10': 'stockfish',
-        'CrazyAra 0.8.1': 'CrazyAra',
-        'ClassicAra 0.8.1': 'ClassicAra'
-      },
-      engineBanners: {
-        'Multi-Variant Stockfish 10': logoStockfish,
-        'CrazyAra 0.8.1': logoCrazyAra,
-        'ClassicAra 0.8.1': logoCrazyAra
-      }
+      selected: null // this will be set on created
     }
   },
   computed: {
-    variant () {
-      return this.$store.getters.variant
+    engineLogo () {
+      return `url(${this.selectedEngine.logo || defaultLogo})`
     },
-    engineBannerURL () {
-      return this.engineBanners[this.selected]
-    }
+    ...mapGetters(['availableEngines', 'selectedEngine', 'cpForWhiteStr'])
   },
   watch: {
-    /* variant: function (variant) {
-      console.log(`variant: ${variant}`)
-      this.options = this.engines[variant]
-    }, */
-    selected: function () {
-      this.$store.dispatch('selected', false)
-      console.log(`engineBinary: ${this.engineBinaries[this.selected]}`)
-      this.$store.dispatch('engineBinary', this.engineBinaries[this.selected])
+    selected () {
+      this.$store.dispatch('engineBinary', this.selected.binary)
+    },
+    selectedEngine () {
+      this.selected = this.selectedEngine
     }
   },
-  methods: {
-    methodToRunOnSelect (payload) {
-      console.log(payload)
-    }
+  created () {
+    this.selected = this.selectedEngine
   }
 }
 </script>
 
 <style scoped>
-.wrapper {
-  text-align: center;
-  padding: 1.05em 0em;
-}
-
-.clock-border {
-  border-radius: 1px;
-  text-align: center;
-  padding: 4px;
-  color: black;
-  font-weight: 800;
-  display: inline-block;
-  min-width: 4em;
-}
-
-.name {
-  padding: 0em 1em;
-  display: inline-block;
-  font-style: italic;
-}
-
-.analyse__tools,
-#modal-wrap .close:hover {
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-}
-
-SimpleDropdown {
-  min-width: 80px;
-}
-
-.form-group {
-  font-size: 10px;
-}
-
-.template {
-  border-radius: 3px 3px 3px 3px;
-  border-color: #222;
-  border-width: 1px;
-}
-
-.grid-parent {
-  display: grid;
-  padding-left: 20px;
-  padding-bottom: 30px;
+.container {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  grid-template-columns: auto auto auto auto
+  justify-content: stretch;
+  margin: 10px 0;
+  border-radius: 3px;
+  text-align: center;
+}
+.container > * {
+  margin: 0 5px;
+}
+
+.eval {
+  font-size: 2em;
+}
+
+.logo {
+  border-radius: 5px;
+  flex-basis: 120px;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+.logo .image {
+  width: 120px;
+  height: 60px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .multiselect {
-  width: 300px;
+  flex-basis: auto;
+  flex-shrink: 1;
+  flex-grow: 1;
 }
-.engine-banner {
-  border-radius: 5px;
-  border-width: 1px;
-  width: 120px;
-  height: 60px;
-  background-size: 120px 60px;
-  background-repeat: no-repeat;
+
+.switch {
+  flex-basis: 60px;
+  flex-shrink: 0;
+  flex-grow: 0;
 }
+
 </style>
