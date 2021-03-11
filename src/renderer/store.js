@@ -323,16 +323,14 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.internationalPieceStyle) {
+        store.commit('pieceStyle', localStorage.internationalPieceStyle)
+      }
+      if (localStorage.internationalBoardStyle) {
+        store.commit('boardStyle', localStorage.internationalBoardStyle)
+      }
       if (localStorage.variant) {
         store.commit('variant', localStorage.variant)
-        if (localStorage.variant === 'chess') {
-          if (localStorage.internationalPieceStyle) {
-            store.commit('pieceStyle', localStorage.internationalPieceStyle)
-          }
-          if (localStorage.internationalBoardStyle) {
-            store.commit('boardStyle', localStorage.internationalBoardStyle)
-          }
-        }
       }
       context.commit('newBoard')
       context.dispatch('updateBoard')
