@@ -387,6 +387,15 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.internationalPieceStyle) {
+        store.commit('pieceStyle', localStorage.internationalPieceStyle)
+      }
+      if (localStorage.internationalBoardStyle) {
+        store.commit('boardStyle', localStorage.internationalBoardStyle)
+      }
+      if (localStorage.variant) {
+        store.commit('variant', localStorage.variant)
+      }
       context.commit('newBoard')
       context.dispatch('updateBoard')
       context.commit('initialized', true)
@@ -473,6 +482,7 @@ export const store = new Vuex.Store({
 
         // update variant
         context.commit('variant', payload)
+        localStorage.variant = payload
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
