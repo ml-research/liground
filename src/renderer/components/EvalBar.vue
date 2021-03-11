@@ -1,57 +1,43 @@
 <template>
   <div
     class="progress"
-    :class="{ transform : $store.getters.orientation === 'black' }"
+    :class="{ flip : $store.getters.orientation === 'black' }"
   >
     <div
       class="progress-value"
-      :style="{ height: filterSectionHeight }"
+      :style="{ height: `${cpForWhitePerc * 100}%` }"
     />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'EvalBar',
   computed: {
-    filterSectionHeight () {
-      return `${this.$store.getters.cpForWhitePerc * 600}px`
-    }
+    ...mapGetters(['cpForWhitePerc'])
   }
 }
 </script>
 
-<style lang="css">
-
+<style scoped>
 .progress {
-  background: #111;
-  justify-content: flex-start;
-  border-radius: 5px 5px 5px 5px;
-  border-color: #222;
-  border-width: 1.5px;
-  border-style: solid;
-  position: relative;
-  padding: 0 0px;
-  display: flex;
-  height: 600px;
   width: 17px;
+  height: 600px;
+  background: #fff;
+  border: 1px solid #888;
+  border-radius: 5px;
+  overflow: hidden;
 }
-.transform {
+.flip {
   transform: scaleY(-1);
 }
 
 .progress-value {
-  box-shadow: 0 10px 40px -10px #333;
-  border-radius: 0px 0px 5px 5px;
-  background: #fff;
-  width: 17px;
-  height: 0px;
-  position: absolute;
-  bottom: 0;
-}
-
-@keyframes load {
-  0% { height: 0; }
-  100% { height: 50%; }
+  width: 100%;
+  height: 50%;
+  background: #111;
+  transition: height .15s;
 }
 </style>
