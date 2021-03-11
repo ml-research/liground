@@ -38,6 +38,6 @@ export default {
   width: 100%;
   height: 50%;
   background: #111;
-  transition: height .15s;
+  transition: height .25s ease;
 }
 </style>
