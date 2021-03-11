@@ -6,7 +6,10 @@
         v-model="groupByRound"
         type="checkbox"
       >
-      <label for="groupcheckbox">Group by rounds?</label>
+      <label
+        id="groupbyround"
+        for="groupcheckbox"
+      >Group by rounds?</label>
       <div class="search">
         <input
           id="gamefilter"
@@ -136,6 +139,10 @@ export default {
   overflow-y: auto;
   overflow-x: auto;
   height: 100%
+}
+
+#groupbyround {
+  font-size: 0.75em;
 }
 
 #gamefilter {
