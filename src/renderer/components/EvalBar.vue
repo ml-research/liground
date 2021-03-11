@@ -1,7 +1,7 @@
 <template>
   <div
     class="progress"
-    :class="{ flip : $store.getters.orientation === 'black' }"
+    :class="{ flip : orientation === 'black' }"
   >
     <div
       class="progress-value"
@@ -16,7 +16,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'EvalBar',
   computed: {
-    ...mapGetters(['cpForWhitePerc'])
+    ...mapGetters(['orientation', 'cpForWhitePerc'])
   }
 }
 </script>
