@@ -76,9 +76,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant'])
+    ...mapGetters(['variant', 'boardStyle'])
   },
   watch: {
+    boardStyle: function () {
+      if (this.selected !== this.boardStyle) this.selected = this.boardStyle
+    },
     selected: function () {
       if (this.internationalVariants.includes(this.variant)) { // localStorage for all different groups of board stylings
         localStorage.internationalBoardStyle = this.selected

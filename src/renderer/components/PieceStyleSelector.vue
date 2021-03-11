@@ -131,9 +131,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant'])
+    ...mapGetters(['variant', 'pieceStyle'])
   },
   watch: {
+    pieceStyle: function () {
+      if (this.selected !== this.pieceStyle) this.selected = this.pieceStyle
+    },
     selected: function () {
       console.log(`this.selectedPieceStyle: ${this.selected}`)
       if (this.internationalVariants.includes(this.variant)) {
