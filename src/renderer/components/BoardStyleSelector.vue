@@ -76,43 +76,77 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant'])
+    ...mapGetters(['variant', 'boardStyle'])
   },
   watch: {
+    boardStyle: function () {
+      if (this.selected !== this.boardStyle) this.selected = this.boardStyle
+    },
     selected: function () {
+      if (this.internationalVariants.includes(this.variant)) { // localStorage for all different groups of board stylings
+        localStorage.internationalBoardStyle = this.selected
+      } else if (this.shogiVariants.includes(this.variant)) {
+        localStorage.shogiBoardStyle = this.selected
+      } else if (this.seaVariants.includes(this.variant)) {
+        localStorage.seaBoardStyle = this.selected
+      } else if (this.xiangqiVariants.includes(this.variant)) {
+        localStorage.xiangqiBoardStyle = this.selected
+      } else if (this.janggiVariants.includes(this.variant)) {
+        localStorage.janggiBoardStyle = this.selected
+      }
       this.$store.dispatch('boardStyle', this.selected)
     },
     variant () {
       if (this.internationalVariants.includes(this.variant)) {
-        this.selected = this.internationalStyles[0]
+        if (localStorage.internationalBoardStyle) {
+          this.selected = localStorage.internationalBoardStyle
+        } else {
+          this.selected = this.internationalStyles[0]
+        }
         this.boardStyles = []
         this.internationalStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else
       if (this.shogiVariants.includes(this.variant)) {
-        this.selected = this.shogiStyles[1]
+        if (localStorage.shogiBoardStyle) {
+          this.selected = localStorage.shogiBoardStyle
+        } else {
+          this.selected = this.shogiStyles[1]
+        }
         this.boardStyles = []
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else
       if (this.seaVariants.includes(this.variant)) {
-        this.selected = this.seaStyles[1]
+        if (localStorage.seaBoardStyle) {
+          this.selected = localStorage.seaBoardStyle
+        } else {
+          this.selected = this.seaStyles[1]
+        }
         this.boardStyles = []
         this.seaStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else
       if (this.xiangqiVariants.includes(this.variant)) {
-        this.selected = this.xiangqiStyles[1]
+        if (localStorage.xiangqiBoardStyle) {
+          this.selected = localStorage.xiangqiBoardStyle
+        } else {
+          this.selected = this.xiangqiStyles[1]
+        }
         this.boardStyles = []
         this.xiangqiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else
       if (this.janggiVariants.includes(this.variant)) {
-        this.selected = this.janggiStyles[3]
+        if (localStorage.janggiBoardStyle) {
+          this.selected = localStorage.janggiBoardStyle
+        } else {
+          this.selected = this.janggiStyles[3]
+        }
         this.boardStyles = []
         this.janggiStyles.forEach(element => {
           this.boardStyles.push(element)
