@@ -458,7 +458,6 @@ export const store = new Vuex.Store({
         if (context.getters.active) {
           context.dispatch('stopEngine')
         }
-        context.commit('selectedGame', null)
         context.commit('variant', payload)
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
