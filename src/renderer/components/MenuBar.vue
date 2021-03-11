@@ -93,7 +93,7 @@ export default {
             if (err) {
               return console.log(err)
             }
-
+            data = data.replace(/\r\n/g, '\n')
             let m
             while ((m = regex.exec(data)) !== null) {
               if (m.index === regex.lastIndex) {
