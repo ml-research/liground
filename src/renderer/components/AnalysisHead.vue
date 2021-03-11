@@ -1,6 +1,6 @@
 <template>
   <div class="ceval grid-parent">
-    <i class="logo icon mdi mdi-feature-search-outline" />LiGround
+    <FeatureSearchOutline class="logo" />LiGround
     <Multiselect
       class="multiselect"
       :value="displayVariant"
@@ -24,11 +24,12 @@
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
 import { mapState } from 'vuex'
+import FeatureSearchOutline from 'vue-material-design-icons/FeatureSearchOutline.vue'
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960
+    Multiselect, Mode960, FeatureSearchOutline
   },
   data () {
     return {
