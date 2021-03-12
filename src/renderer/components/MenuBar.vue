@@ -114,6 +114,8 @@ export default {
         // convert CRLF to LF
         data = data.replace(/\r\n/g, '\n')
 
+        let numOfUnparseableGames = 0
+
         let m
         while ((m = regex.exec(data)) !== null) {
           if (m.index === regex.lastIndex) {
@@ -125,11 +127,15 @@ export default {
             try {
               game = ffish.readGamePGN(match)
             } catch (error) {
-              alert('Could not parse PGN.')
+              numOfUnparseableGames = numOfUnparseableGames + 1
               return
             }
             games.push(game)
           })
+        }
+
+        if (numOfUnparseableGames !== 0) {
+          alert(numOfUnparseableGames + ' games could not be parsed.')
         }
 
         games = games.map((curVal, idx, arr) => {
