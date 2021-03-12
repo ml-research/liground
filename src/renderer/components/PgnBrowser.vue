@@ -7,9 +7,18 @@
         type="checkbox"
       >
       <label
-        id="groupbyround"
+        class="optionlabel"
         for="groupcheckbox"
       >Group by rounds?</label>
+      <input
+        id="displayunsupported"
+        v-model="displayUnsupported"
+        type="checkbox"
+      >
+      <label
+        class="optionlabel"
+        for="displayunsupported"
+      >Show unsupported?</label>
       <div class="search">
         <input
           id="gamefilter"
@@ -48,9 +57,9 @@
               :key="game.id"
             >
               <div
-                v-if="game.headers('Round') === round.name && game.headers('Event') === round.eventName && (filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game))"
+                v-if="game.headers('Round') === round.name && game.headers('Event') === round.eventName && (filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game)) && (displayUnsupported || game.supported)"
                 class="browserelement gameoption"
-                :class="{ active : game === selectedGame }"
+                :class="{ active : game === selectedGame, unsupported: !game.supported }"
                 @click="selectedGame = game"
               >
                 {{ game ? game.headers("White") : 'unknown' }} <br> vs {{ game ? game.headers("Black") : 'unknown' }}
@@ -65,7 +74,7 @@
           :key="game.id"
         >
           <div
-            v-if="(filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game))"
+            v-if="(filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game)) && (displayUnsupported || game.supported)"
             class="browserelement gameoption"
             :class="{ active : game === selectedGame }"
             @click="selectedGame = game"
@@ -79,13 +88,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'PgnBrowser',
   data: function () {
     return {
       gameFilter: '',
       rounds: [],
-      groupByRound: true
+      groupByRound: true,
+      displayUnsupported: false
     }
   },
   computed: {
@@ -94,14 +106,17 @@ export default {
         return this.$store.getters.selectedGame
       },
       set: function (newVal) {
-        this.$store.dispatch('loadGame', { game: newVal })
+        if (newVal.supported) {
+          this.$store.dispatch('loadGame', { game: newVal })
+        }
       }
     },
     loadedGames: {
       get: function () {
         return this.$store.getters.loadedGames
       }
-    }
+    },
+    ...mapGetters(['variantOptions'])
   },
   watch: {
     loadedGames: function () {
@@ -141,7 +156,7 @@ export default {
   height: 100%
 }
 
-#groupbyround {
+.optionlabel {
   font-size: 0.75em;
 }
 
@@ -162,7 +177,7 @@ export default {
   text-align: left;
 }
 
-.gameoption:hover, .roundseperator:hover {
+.gameoption:hover:not(.unsupported), .roundseperator:hover {
   background-color: #2196F3;
   color: white;
   cursor: pointer;
@@ -189,5 +204,11 @@ export default {
 
 .search {
   padding: 2px 0px;
+}
+
+.unsupported {
+  background-color: #999;
+  color: #555;
+  cursor: not-allowed;
 }
 </style>

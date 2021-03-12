@@ -60,7 +60,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['viewAnalysis', 'initialized'])
+    ...mapGetters(['viewAnalysis', 'initialized', 'variantOptions'])
   },
   watch: {
     initialized: function () {
@@ -140,6 +140,7 @@ export default {
 
         games = games.map((curVal, idx, arr) => {
           curVal.id = idx
+          curVal.supported = this.variantOptions.revGet(curVal.headers('Variant').toLowerCase()) !== undefined
           return curVal
         })
 
