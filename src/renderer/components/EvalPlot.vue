@@ -77,7 +77,7 @@ export default {
         },
         chart: {
           id: 'plot',
-          events: {
+          events: { // changes the board position by clicking on a plot marker
             markerClick: (event, chartContext, { seriesIndex, dataPointIndex, config }) => {
               if (dataPointIndex === 0) {
                 this.$store.dispatch('fen', this.startFen)
@@ -112,7 +112,6 @@ export default {
       const board960 = this.$store.getters.is960
       if (board960 && !this.is960) {
         this.clear()
-        console.log('960Clear')
         this.break = true
         this.is960 = true
       }
@@ -122,14 +121,11 @@ export default {
     },
     variant () {
       this.break = true
-      console.log('variantClear')
       this.clear()
     },
     openedPGN () {
-      console.log('openedPGNCalled')
       if (this.first >= 2 || this.series[0].data.length > 0) {
         this.break = true
-        console.log('PGNClear')
         this.clear()
       }
       this.first++
@@ -138,23 +134,18 @@ export default {
   created () {
     document.addEventListener('resetPlot', () => {
       this.break = true
-      console.log('resetBtn')
       this.clear()
     })
     document.addEventListener('startEval', () => {
-      // this.clear()
-      console.log('newEval')
       this.loadPlot()
     })
     document.addEventListener('stopEval', () => {
       this.break = true
-      console.log('stopEvalClear')
       this.clear()
     })
   },
   methods: {
-    clear () {
-      console.log('CalledClear')
+    clear () { // cleans the whole plot
       document.dispatchEvent(new Event('finishedEval'))
       this.chartOptions.xaxis.categories.splice(0, this.chartOptions.xaxis.categories.length)
       this.chartOptions.xaxis.categories.push('Start')
@@ -166,7 +157,7 @@ export default {
       this.chartOptions.fill.gradient.colorStops[0].offset = 100
     },
 
-    adjustPoints (points) {
+    adjustPoints (points) { // sets min/max for graph and converts the results from engine to the correct format
       if ((points.includes('#') && !points.includes('-'))) {
         points = 10
       } else if ((points.includes('#') && points.includes('-'))) {
@@ -182,7 +173,7 @@ export default {
       return points
     },
 
-    calcOffset () {
+    calcOffset () { // calculates and sets the offset which is used to determine how much of the graph should be colored black
       const min = Math.min(...this.evalArray)
       const max = Math.max(...this.evalArray)
       let newOffset = 0
@@ -227,7 +218,6 @@ export default {
 
     async evaluateHistory () { // updates the graph
       if (this.break) {
-        console.log('timeout')
         setTimeout(this.evaluateHistory, 1000)
         return
       }
@@ -237,12 +227,11 @@ export default {
       while (index < this.series[0].data.length - 1) {
         try {
           points = await Engine.evaluate(this.moves[index].fen, depth)
-          if (this.break) {
+          if (this.break) { // cleares the graph when its supposed to
             this.break = false
-            console.log('afterPoints')
-            // this.clear()
             return
           }
+          this.break = false
           points = this.adjustPoints(points)
           this.evalArray[index + 1] = points
           this.series = [{
@@ -251,11 +240,10 @@ export default {
           this.calcOffset()
           index++
         } catch (error) {
-          console.log('errorinEvalClear')
           this.clear()
         }
       }
-      document.dispatchEvent(new Event('finishedEval'))
+      document.dispatchEvent(new Event('finishedEval')) // resets the button
     }
   }
 }

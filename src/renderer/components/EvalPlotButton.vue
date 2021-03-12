@@ -63,7 +63,6 @@ export default {
       document.dispatchEvent(new Event('startEval'))
     },
     stopEval () {
-      console.log('called')
       this.running = false
       document.dispatchEvent(new Event('stopEval'))
     }
