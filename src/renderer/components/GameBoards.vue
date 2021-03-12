@@ -26,7 +26,7 @@
           <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
             <BoardStyleSelector id="board-style" />
-            <EvalPlotButton />
+            <EvalPlotButton id="evalbutton-style" />
           </div>
         </div>
         <EvalPlot id="evalplot" />
@@ -351,6 +351,9 @@ input {
 }
 #evalplot {
   grid-area: evalplot;
+}
+#evalbutton-style {
+  margin-top: 10px;
 }
 
 </style>
