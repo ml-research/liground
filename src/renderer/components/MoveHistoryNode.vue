@@ -17,14 +17,31 @@
     >
       {{ (move.ply) / 2 }}...
     </span>
+
     <span
       v-if="printRoot"
       class="move-name"
       :class="{ current : move.current }"
       @click="updateBoard(move)"
+      @contextmenu.prevent="$refs.menu.open"
     >
       {{ move.name }}
     </span>
+    <VueContext ref="menu">
+      <li>
+        <a
+          v-if="move.prev && move.prev.main !== move"
+          href="#"
+          @click.prevent="promote(move)"
+        >Promote Variation</a>
+      </li>
+      <li>
+        <a
+          href="#"
+          @click.prevent="deleteMove(move)"
+        >Delete Variation</a>
+      </li>
+    </VueContext>
     <span v-if="move.fen === mainFirstMove.fen">
       <MoveHistoryNode
         v-for="variation in firstMovesFiltered"
@@ -66,8 +83,12 @@
 </template>
 
 <script>
+import VueContext from 'vue-context'
 export default {
   name: 'MoveHistoryNode',
+  components: {
+    VueContext
+  },
   props: {
     move: {
       default: undefined,
@@ -108,8 +129,34 @@ export default {
     }
   },
   methods: {
+    promote (move) {
+      move.prev.main = move
+      console.log(move.prev.next)
+    },
+    deleteMove (move) {
+      console.log(move.prev.next)
+      const moveIndex = move.prev.next.indexOf(move)
+      const movesIndex = this.moves.indexOf(move)
+      console.log(movesIndex)
+      if (move.prev.main === move) { // ensure we still have a main line if there are still continuations
+        if (move.prev.next.length > 1) {
+          if (move === move.prev.next[0]) {
+            move.prev.main = move.prev.next[1]
+          } else {
+            move.prev.main = move.prev.next[0]
+          }
+        }
+      }
+      move.prev.next.splice(moveIndex, 1)
+      this.moves.splice(movesIndex, 1)
+      console.log(move.prev.next)
+      console.log(this.moves)
+      console.log(move.prev)
+      this.updateBoard(move.prev)
+    },
     updateBoard (move) {
-      this.$store.dispatch('fen', this.move.fen)
+      console.log(move)
+      this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
           this.moves[num].current = false
