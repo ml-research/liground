@@ -130,13 +130,10 @@ export default {
   methods: {
     promote (move) {
       move.prev.main = move
-      console.log(move.prev.next)
     },
     deleteMove (move) {
-      console.log(move.prev.next)
       const moveIndex = move.prev.next.indexOf(move)
       const movesIndex = this.moves.indexOf(move)
-      console.log(movesIndex)
       if (move.prev.main === move) { // ensure we still have a main line if there are still continuations
         if (move.prev.next.length > 1) {
           if (move === move.prev.next[0]) {
