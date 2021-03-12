@@ -738,6 +738,9 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state) {
       return state.evalPlotDepth
+    },
+    openedPGN (state) {
+      return state.openedPGN
     }
   }
 })

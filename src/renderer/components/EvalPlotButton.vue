@@ -16,10 +16,18 @@
       >
     </div>
     <button
+      v-if="!running"
       class="button"
       @click="startEval"
     >
       StartEval
+    </button>
+    <button
+      v-if="running"
+      class="button"
+      @click="stopEval"
+    >
+      CancelEval
     </button>
   </div>
 </template>
@@ -30,10 +38,15 @@ export default {
   components: {},
   data () {
     return {
+      running: false,
       curVar: ''
     }
   },
-
+  created () {
+    document.addEventListener('finishedEval', () => {
+      this.running = false
+    })
+  },
   methods: {
     updateEvalDepth (event) {
       if (event.target.value === '') {
@@ -43,7 +56,16 @@ export default {
       this.$store.commit('evalPlotDepth', event.target.value)
     },
     startEval () {
+      if (this.$store.getters.moves.length === 0) {
+        return
+      }
+      this.running = true
       document.dispatchEvent(new Event('startEval'))
+    },
+    stopEval () {
+      console.log('called')
+      this.running = false
+      document.dispatchEvent(new Event('stopEval'))
     }
   }
 }

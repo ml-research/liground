@@ -23,6 +23,7 @@ export default {
   },
   data: function () {
     return {
+      first: 0,
       evalArray: [0],
       break: false,
       is960: false,
@@ -61,7 +62,7 @@ export default {
               {
                 offset: 100,
                 color: '#E3E3E3',
-                opacity: 0.8
+                opacity: 1
               },
               {
                 offset: 0,
@@ -104,13 +105,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'board', 'startFen', 'moves'])
+    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN'])
   },
   watch: {
     board () {
       const board960 = this.$store.getters.is960
       if (board960 && !this.is960) {
         this.clear()
+        console.log('960Clear')
         this.break = true
         this.is960 = true
       }
@@ -120,21 +122,40 @@ export default {
     },
     variant () {
       this.break = true
+      console.log('variantClear')
       this.clear()
+    },
+    openedPGN () {
+      console.log('openedPGNCalled')
+      if (this.first >= 2 || this.series[0].data.length > 0) {
+        this.break = true
+        console.log('PGNClear')
+        this.clear()
+      }
+      this.first++
     }
   },
   created () {
     document.addEventListener('resetPlot', () => {
       this.break = true
+      console.log('resetBtn')
       this.clear()
     })
     document.addEventListener('startEval', () => {
-      this.clear()
+      // this.clear()
+      console.log('newEval')
       this.loadPlot()
+    })
+    document.addEventListener('stopEval', () => {
+      this.break = true
+      console.log('stopEvalClear')
+      this.clear()
     })
   },
   methods: {
     clear () {
+      console.log('CalledClear')
+      document.dispatchEvent(new Event('finishedEval'))
       this.chartOptions.xaxis.categories.splice(0, this.chartOptions.xaxis.categories.length)
       this.chartOptions.xaxis.categories.push('Start')
       this.series = [{
@@ -205,6 +226,11 @@ export default {
     },
 
     async evaluateHistory () { // updates the graph
+      if (this.break) {
+        console.log('timeout')
+        setTimeout(this.evaluateHistory, 1000)
+        return
+      }
       let index = 0
       let points = 0
       const depth = this.$store.getters.evalPlotDepth
@@ -213,7 +239,8 @@ export default {
           points = await Engine.evaluate(this.moves[index].fen, depth)
           if (this.break) {
             this.break = false
-            this.clear()
+            console.log('afterPoints')
+            // this.clear()
             return
           }
           points = this.adjustPoints(points)
@@ -224,9 +251,11 @@ export default {
           this.calcOffset()
           index++
         } catch (error) {
+          console.log('errorinEvalClear')
           this.clear()
         }
       }
+      document.dispatchEvent(new Event('finishedEval'))
     }
   }
 }
