@@ -1,5 +1,5 @@
+import path from 'path'
 import { spawn } from 'child_process'
-import Engines from './engines'
 import EngineDriver from './driver'
 import EngineSender from './sender'
 
@@ -12,7 +12,23 @@ let child = null
 /** @type {EngineDriver} */
 let engine = null
 
-async function run (engineId, listeners, silent) {
+/**
+ * Resolve the path to an engine binary.
+ * @param {string} name binary file name
+ */
+function resolveBinary (name) {
+  return path.resolve(
+    process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
+    'engines',
+    `${name}${process.platform === 'win32' ? '.exe' : ''}`
+  )
+}
+
+/**
+ * Run a new engine, killing the old process.
+ * @param {string} engineBinary binary to use
+ */
+async function run (engineBinary) {
   msg.debug('Running engine')
 
   // kill old engine
@@ -32,9 +48,9 @@ async function run (engineId, listeners, silent) {
   }
 
   // spawn engine process
-  const binary = Engines[engineId]
+  const binary = resolveBinary(engineBinary)
   if (!binary) {
-    msg.error(`Could not find engine binary for "${engineId}"`)
+    msg.error(`Could not find engine binary for "${engineBinary}"`)
     return
   }
   child = spawn(binary, []).on('error', err => msg.error(err.message))
@@ -70,6 +86,10 @@ async function run (engineId, listeners, silent) {
   }
 }
 
+/**
+ * Execute a UCI command.
+ * @param {string} cmd
+ */
 function exec (cmd) {
   cmd = cmd.trim()
   msg.debug(`Received command "${cmd}"`)

@@ -208,7 +208,7 @@ export default class EngineDriver {
   }
 
   /**
-   * Set the engine position
+   * Set the engine position.
    * @param {string} [fen = null] Position in FEN notation
    */
   async position (fen = null) {

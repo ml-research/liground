@@ -190,7 +190,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode'])
   },
   watch: {
     initialized () {
@@ -362,7 +362,8 @@ export default {
       this.isPromotionModalVisible = false
       this.promotionMove = this.promotionMove + value
       this.lastMoveSan = this.$store.getters.sanMove(this.promotionMove)
-      this.$store.dispatch('push', this.promotionMove)
+      const prevMov = this.currentMove
+      this.$store.dispatch('push', { move: this.promotionMove, prev: prevMov })
       this.updateHand()
       this.afterMove()
     },
@@ -523,8 +524,9 @@ export default {
       return (role, key) => {
         const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', silver: 'S', gold: 'G', lance: 'L' }
         const move = pieces[role] + '@' + key
+        const prevMov = this.currentMove
         if (this.$store.getters.legalMoves.includes(move)) {
-          this.$store.dispatch('push', move)
+          this.$store.dispatch('push', { move: move, prev: prevMov })
           this.updateHand()
         } else {
           this.updateBoard()
@@ -548,9 +550,11 @@ export default {
           }
         } else {
           this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-          this.$store.dispatch('push', uciMove)
+          const prevMov = this.currentMove
+          this.$store.dispatch('push', { move: uciMove, prev: prevMov })
           this.updateHand()
           this.afterMove()
+          console.log(this.turn)
         }
       }
     },
@@ -630,8 +634,8 @@ export default {
           lastMove: true,
           check: true
         },
-        movable: this.fen === this.lastFen
-          ? { // moving is only possible at the end of the line
+        movable: this.fen === this.lastFen || this.analysisMode
+          ? { // moving is possible at the end of the line and in analysis mode
               dests: this.possibleMoves(),
               color: this.turn
             }

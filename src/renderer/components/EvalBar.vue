@@ -48,6 +48,7 @@ export default {
   height: 0px;
   position: absolute;
   bottom: 0;
+  transition: .5s ease-in-out;
 }
 
 @keyframes load {

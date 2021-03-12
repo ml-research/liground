@@ -131,37 +131,65 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant'])
+    ...mapGetters(['variant', 'pieceStyle'])
   },
   watch: {
+    pieceStyle: function () {
+      if (this.selected !== this.pieceStyle) this.selected = this.pieceStyle
+    },
     selected: function () {
       console.log(`this.selectedPieceStyle: ${this.selected}`)
+      if (this.internationalVariants.includes(this.variant)) {
+        localStorage.internationalPieceStyle = this.selected
+      } else if (this.shogiVariants.includes(this.variant)) {
+        localStorage.shogiPieceStyle = this.selected
+      } else if (this.seaVariants.includes(this.variant)) {
+        localStorage.seaPieceStyle = this.selected
+      } else if (this.xiangqiVariants.includes(this.variant)) {
+        localStorage.xiangqiPieceStyle = this.selected
+      }
       this.$store.dispatch('pieceStyle', this.selected)
     },
     variant () {
       if (this.internationalVariants.includes(this.variant)) {
-        this.selected = this.internationalPieces[18]
+        if (localStorage.internationalPieceStyle) {
+          this.selected = localStorage.internationalPieceStyle
+        } else {
+          this.selected = this.internationalPieces[18]
+        }
         this.pieceStyles = []
         this.internationalPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
       }
       if (this.shogiVariants.includes(this.variant)) {
-        this.selected = this.shogiPieces[0]
+        if (localStorage.shogiPieceStyle) {
+          this.selected = localStorage.shogiPieceStyle
+        } else {
+          this.selected = this.shogiPieces[0]
+        }
         this.pieceStyles = []
         this.shogiPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
       }
       if (this.seaVariants.includes(this.variant)) {
-        this.selected = this.seaPieces[0]
+        if (localStorage.seaPieceStyle) {
+          this.selected = localStorage.seaPieceStyle
+        } else {
+          this.selected = this.seaPieces[0]
+        }
         this.pieceStyles = []
         this.seaPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
       }
       if (this.xiangqiVariants.includes(this.variant)) {
-        this.selected = this.xiangqiPieces[0]
+        if (localStorage.xiangqiPieceStyle) {
+          this.selected = localStorage.xiangqiPieceStyle
+        } else {
+          this.selected = this.xiangqiPieces[0]
+        }
         this.pieceStyles = []
         this.xiangqiPieces.forEach(element => {
           this.pieceStyles.push(element)
