@@ -17,7 +17,6 @@
     >
       {{ (move.ply) / 2 }}...
     </span>
-
     <span
       v-if="printRoot"
       class="move-name"
@@ -145,17 +144,15 @@ export default {
           } else {
             move.prev.main = move.prev.next[0]
           }
+        } else {
+          move.prev.main = undefined
         }
       }
       move.prev.next.splice(moveIndex, 1)
       this.moves.splice(movesIndex, 1)
-      console.log(move.prev.next)
-      console.log(this.moves)
-      console.log(move.prev)
       this.updateBoard(move.prev)
     },
     updateBoard (move) {
-      console.log(move)
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
