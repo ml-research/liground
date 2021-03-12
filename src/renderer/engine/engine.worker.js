@@ -28,7 +28,7 @@ function resolveBinary (name) {
  * Run a new engine, killing the old process.
  * @param {string} engineBinary binary to use
  */
-async function run (engineBinary) {
+async function run (engineBinary, listeners, silent) {
   msg.debug('Running engine')
 
   // kill old engine
