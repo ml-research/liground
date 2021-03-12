@@ -140,7 +140,7 @@ export default {
 
         games = games.map((curVal, idx, arr) => {
           curVal.id = idx
-          curVal.supported = this.variantOptions.revGet(curVal.headers('Variant').toLowerCase()) !== undefined
+          curVal.supported = this.variantOptions.revGet(curVal.headers('Variant').toLowerCase()) !== undefined || !curVal.headers('Variant')
           return curVal
         })
 

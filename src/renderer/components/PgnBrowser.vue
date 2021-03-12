@@ -57,7 +57,7 @@
               :key="game.id"
             >
               <div
-                v-if="game.headers('Round') === round.name && game.headers('Event') === round.eventName && (filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game)) && (displayUnsupported || game.supported)"
+                v-if="game.headers('Round') === round.name && game.headers('Event') === round.eventName && isGameVisible(game)"
                 class="browserelement gameoption"
                 :class="{ active : game === selectedGame, unsupported: !game.supported }"
                 @click="selectedGame = game"
@@ -74,7 +74,7 @@
           :key="game.id"
         >
           <div
-            v-if="(filterGameHeader('White', gameFilter, game) || filterGameHeader('Black', gameFilter, game)) && (displayUnsupported || game.supported)"
+            v-if="isGameVisible(game)"
             class="browserelement gameoption"
             :class="{ active : game === selectedGame }"
             @click="selectedGame = game"
@@ -141,11 +141,16 @@ export default {
     }
   },
   methods: {
-    filterGameHeader (key, searchString, game) {
-      return game.headers(key).toLowerCase().indexOf(searchString.toLowerCase()) !== -1
+    isGameVisible (game) {
+      if ((game.headers('White').toLowerCase().indexOf(this.gameFilter.toLowerCase()) !== -1 ||
+        game.headers('Black').toLowerCase().indexOf(this.gameFilter.toLowerCase()) !== -1) &&
+        (this.displayUnsupported || game.supported)) {
+        return true
+      } else {
+        return false
+      }
     }
   }
-
 }
 </script>
 
