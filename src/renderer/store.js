@@ -97,6 +97,8 @@ function checkOption (options, name, value) {
   }
 }
 
+const filteredSettings = ['UCI_Variant']
+
 export const store = new Vuex.Store({
   state: {
     initialized: false,
@@ -232,17 +234,19 @@ export const store = new Vuex.Store({
       state.engineInfo = payload
       const settings = {}
       for (const option of payload.options) {
-        switch (option.type) {
-          case 'check':
-            settings[option.name] = option.default === 'true'
-            break
-          case 'spin':
-          case 'combo':
-            settings[option.name] = option.default
-            break
-          case 'string':
-            settings[option.name] = option.default || ''
-            break
+        if (!filteredSettings.includes(option.name)) {
+          switch (option.type) {
+            case 'check':
+              settings[option.name] = option.default === 'true'
+              break
+            case 'spin':
+            case 'combo':
+              settings[option.name] = option.default
+              break
+            case 'string':
+              settings[option.name] = option.default || ''
+              break
+          }
         }
       }
       state.engineSettings = settings
@@ -525,7 +529,9 @@ export const store = new Vuex.Store({
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
         if (value !== undefined && value !== null) {
-          context.state.engineSettings[name] = value
+          if (!filteredSettings.includes(name)) {
+            context.state.engineSettings[name] = value
+          }
           engine.send(`setoption name ${name} value ${value}`)
         } else {
           engine.send(`setoption name ${name}`)
@@ -700,7 +706,7 @@ export const store = new Vuex.Store({
       return state.engineInfo.author
     },
     engineOptions (state) {
-      return state.engineInfo.options
+      return state.engineInfo.options.filter(({ name }) => !filteredSettings.includes(name))
     },
     engineSettings (state) {
       return state.engineSettings
