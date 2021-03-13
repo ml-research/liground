@@ -100,12 +100,8 @@ export default {
     ...mapGetters(['variant', 'engineOptions', 'engineSettings'])
   },
   watch: {
-    engineSettings () {
-      for (const { name, type } of this.engineOptions) {
-        if (type !== 'button') {
-          this.settings[name] = this.engineSettings[name]
-        }
-      }
+    engineOptions () {
+      this.resetSettings()
     }
   },
   methods: {
@@ -114,19 +110,28 @@ export default {
       this.$store.commit('viewAnalysis', true)
     },
     cancel () {
+      this.resetSettings()
       this.$store.commit('viewAnalysis', true)
     },
     updateSettings () {
-      const settings = {}
+      const changed = {}
       for (const [name, value] of Object.entries(this.settings)) {
         if (value !== this.engineSettings[name]) {
-          settings[name] = value
+          changed[name] = value
         }
       }
-      this.$store.dispatch('setEngineOptions', settings)
+      this.$store.dispatch('setEngineOptions', changed)
     },
     triggerButtonSetting (optionName) {
       this.$store.dispatch('setEngineOptions', { [optionName]: null })
+    },
+    resetSettings () {
+      this.settings = {}
+      for (const { name, type } of this.engineOptions) {
+        if (type !== 'button') {
+          this.settings[name] = this.engineSettings[name]
+        }
+      }
     }
   }
 }
