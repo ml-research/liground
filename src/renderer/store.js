@@ -368,9 +368,6 @@ export const store = new Vuex.Store({
     analysisMode (state, payload) {
       state.analysisMode = payload
     },
-    points (state, payload) {
-      state.points = payload
-    },
     openedPGN (state, payload) {
       state.openedPGN = payload
     },
