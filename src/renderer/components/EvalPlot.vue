@@ -125,7 +125,7 @@ export default {
       this.break = true
       this.clear()
     },
-    moves () {
+    moves () { // gives only main variant whole file has to be adopted to using this
       let move = this.$store.getters.mainFirstMove
       this.mainMoves = []
       if (move) {
