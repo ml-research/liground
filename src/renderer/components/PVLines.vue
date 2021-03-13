@@ -3,15 +3,26 @@
     <div class="scroller">
       <div class="list">
         <div
-          v-for="(line, id) in lines"
+          v-for="id in 5"
           :key="id"
           class="item"
-          @mouseenter="onMouseEnter(id)"
-          @mouseleave="onMouseLeave(id)"
-          @click="onClick(line)"
         >
-          <span class="left">{{ line.cpDisplay }}</span>
-          <span class="right">{{ line.pv }}</span>
+          <div
+            v-if="lines[id - 1]"
+            class="content"
+            @mouseenter="onMouseEnter(id)"
+            @mouseleave="onMouseLeave(id)"
+            @click="onClick(lines[id])"
+          >
+            <span class="left">{{ lines[id - 1].cpDisplay }}</span>
+            <span class="right">{{ lines[id - 1].pv }}</span>
+          </div>
+          <div
+            v-else
+            class="placeholder"
+          >
+            ...
+          </div>
         </div>
       </div>
     </div>
@@ -30,7 +41,8 @@ import { mapGetters } from 'vuex'
 export default {
   computed: {
     lines () {
-      return this.$store.getters.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+      const lines = this.$store.getters.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+      return lines.concat(Array(this.$store.getters.engineSettings.MultiPV).fill(null))
     },
     engineDetails () {
       const { engineName, engineAuthor } = this.$store.getters
@@ -69,35 +81,46 @@ export default {
 .scroller {
   overflow-x: scroll;
 }
+
 .list {
   min-width: 100%;
   display: table;
 }
 .item {
+  height: 2em;
+  padding: 5px;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  cursor: pointer;
+  flex-direction: column;
   user-select: none;
-}
-.item:hover {
-  background-color: #d3e1eb;
 }
 .item + .item {
   border-top: 1px solid #333;
 }
-.item .left {
-  padding: 5px;
-  font-weight: 1000;
+.content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+.content:hover {
+  background-color: #d3e1eb;
+}
+.content > .left {
+  margin-right: 5px;
   font-family: sans-serif;
+  font-weight: 1000;
   text-align: center;
 }
-.item .right {
+.content > .right {
   text-align: left;
   flex: 0 0 auto;
 }
+.placeholder {
+  font-family: sans-serif;
+  text-align: center;
+}
+
 .details {
-  border-top: 1px solid #333;
   font-size: 8pt;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   font-style: oblique;
