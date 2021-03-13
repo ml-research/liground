@@ -24,6 +24,7 @@ export default {
 </script>
 
 <style>
+@import '../assets/cssVars.css';
 
 * {
   box-sizing: border-box;
@@ -38,8 +39,8 @@ body { font-family: Avenir, Helvetica, Arial, sans-serif; }
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  background-color: #f9f9f9;
+  color: var(--main-text-color, black);
+  background-color:var(--main-bg-color, white);
   font-weight: 800;
   font-size: 12pt;
   height: 100%;
