@@ -3,19 +3,19 @@
     <div class="scroller">
       <div class="list">
         <div
-          v-for="id in 5"
+          v-for="(line, id) in lines"
           :key="id"
           class="item"
         >
           <div
-            v-if="lines[id - 1]"
+            v-if="line"
             class="content"
             @mouseenter="onMouseEnter(id)"
             @mouseleave="onMouseLeave(id)"
-            @click="onClick(lines[id])"
+            @click="onClick(line)"
           >
-            <span class="left">{{ lines[id - 1].cpDisplay }}</span>
-            <span class="right">{{ lines[id - 1].pv }}</span>
+            <span class="left">{{ line.cpDisplay }}</span>
+            <span class="right">{{ line.pv }}</span>
           </div>
           <div
             v-else
@@ -39,16 +39,25 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  data () {
+    return {
+      lines: []
+    }
+  },
   computed: {
-    lines () {
-      const lines = this.$store.getters.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
-      return lines.concat(Array(this.$store.getters.engineSettings.MultiPV).fill(null))
-    },
     engineDetails () {
       const { engineName, engineAuthor } = this.$store.getters
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     },
-    ...mapGetters(['moves', 'fen'])
+    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings'])
+  },
+  watch: {
+    multipv () {
+      this.updateLines()
+    },
+    engineSettings () {
+      this.updateLines()
+    }
   },
   methods: {
     onMouseEnter (id) {
@@ -67,6 +76,11 @@ export default {
         }
       }
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
+    },
+    updateLines () {
+      const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+      const count = this.engineSettings.MultiPV
+      this.lines = lines.concat(Array(count - lines.length).fill(null))
     }
   }
 }
@@ -79,6 +93,7 @@ export default {
   white-space: nowrap;
 }
 .scroller {
+  max-height: 12em;
   overflow-x: scroll;
 }
 
