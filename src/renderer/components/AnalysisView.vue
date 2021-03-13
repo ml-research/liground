@@ -13,7 +13,7 @@
         id="move-history"
       >
         <MoveHistoryNode
-          v-if="mainFirstMove"
+          v-if="movesExist"
           :move="mainFirstMove"
         />
       </div>
@@ -47,7 +47,11 @@ export default {
     AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo, EngineConsole, MoveHistoryNode
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove'])
+    ...mapGetters(['active', 'mainFirstMove']),
+    movesExist () {
+      const moves = this.$store.getters.moves
+      return moves.length !== 0
+    }
   },
   watch: {
     reset: function () {

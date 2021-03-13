@@ -202,6 +202,15 @@ export const store = new Vuex.Store({
     firstMoves (state, payload) {
       state.firstMoves.push(payload)
     },
+    deleteFromFirstMoves (state, payload) {
+      state.firstMoves.splice(state.firstMoves.indexOf(payload), 1)
+    },
+    deleteFromMoves (state, payload) {
+      for (const mov in payload.next) {
+        this.commit('deleteFromMoves', mov)
+      }
+      state.moves.splice(state.moves.indexOf(payload), 1)
+    },
     legalMoves (state, payload) {
       state.legalMoves = payload
     },
@@ -284,7 +293,12 @@ export const store = new Vuex.Store({
           state.board = new ffish.Board(state.variant, fen)
         }
       } else {
-        state.board = new ffish.Board(state.variant)
+        if (is960) {
+          console.log(state.curVar960Fen)
+          state.board = new ffish.Board(state.variant, state.curVar960Fen, true)
+        } else {
+          state.board = new ffish.Board(state.variant)
+        }
       }
       state.moves = []
       state.mainFirstMove = null
@@ -297,7 +311,9 @@ export const store = new Vuex.Store({
       state.startFen = state.board.fen()
     },
     resetBoard (state, payload) {
-      state.curVar960Fen = ''
+      if (!payload.is960) {
+        state.curVar960Fen = ''
+      }
       this.commit('newBoard', payload)
       state.selectedGame = null
       state.moves = []
@@ -412,13 +428,19 @@ export const store = new Vuex.Store({
     },
     mainFirstMove (context, payload) {
       if (context.state.mainFirstMove !== payload) {
-        context.dispatch('mainFirstMove', payload)
+        context.commit('mainFirstMove', payload)
       }
     },
     firstMoves (context, payload) {
       if (!context.state.firstMoves.includes(payload)) {
         context.dispatch('firstMoves', payload)
       }
+    },
+    deleteFromMoves (context, payload) {
+      if (!payload.prev) {
+        context.commit('deleteFromFirstMoves', payload)
+      }
+      context.commit('deleteFromMoves', payload)
     },
     resetEngineData (context) {
       context.commit('resetMultiPV')

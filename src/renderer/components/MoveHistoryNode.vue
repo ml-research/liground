@@ -121,6 +121,12 @@ export default {
     firstMoves () {
       return this.$store.getters.firstMoves
     },
+    startFen () {
+      return this.$store.getters.startFen
+    },
+    is960 () {
+      return this.$store.getters.is960
+    },
     firstMovesFiltered () {
       return this.firstMoves.filter((move) => {
         return move.fen !== this.mainFirstMove.fen
@@ -132,29 +138,40 @@ export default {
       move.prev.main = move
     },
     deleteMove (move) {
-      const moveIndex = move.prev.next.indexOf(move)
-      const movesIndex = this.moves.indexOf(move)
-      if (move.prev.main === move) { // ensure we still have a main line if there are still continuations
-        if (move.prev.next.length > 1) {
-          if (move === move.prev.next[0]) {
-            move.prev.main = move.prev.next[1]
+      this.$store.dispatch('deleteFromMoves', move)
+      if (move.prev) {
+        const moveIndex = move.prev.next.indexOf(move)
+        if (move.prev.main === move) { // ensure we still have a main line if there are still continuations
+          if (move.prev.next.length > 1) {
+            if (move === move.prev.next[0]) {
+              move.prev.main = move.prev.next[1]
+            } else {
+              move.prev.main = move.prev.next[0]
+            }
           } else {
-            move.prev.main = move.prev.next[0]
+            move.prev.main = undefined
+          }
+        }
+        move.prev.next.splice(moveIndex, 1)
+        this.updateBoard(move.prev)
+      } else {
+        if (this.mainFirstMove === move) {
+          if (this.firstMoves.length === 0) {
+            this.$store.dispatch('resetBoard', { is960: this.is960 })
+          } else {
+            this.$store.dispatch('mainFirstMove', this.firstMoves[0])
+            this.updateBoard(this.firstMoves[0])
           }
         } else {
-          move.prev.main = undefined
+          this.updateBoard(this.mainFirstMove)
         }
       }
-      move.prev.next.splice(moveIndex, 1)
-      this.moves.splice(movesIndex, 1)
-      this.updateBoard(move.prev)
     },
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
           this.moves[num].current = false
-          break
         }
       }
       move.current = true
