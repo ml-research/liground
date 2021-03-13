@@ -4,8 +4,8 @@
     <AnalysisEvalRow id="game_clock" />
     <EngineStats />
     <div
-      v-if="active"
       class="processing-bar"
+      :class="{ animate: active }"
     />
     <PVLines class="panel" />
     <div class="game-window panel noselect">
@@ -50,7 +50,7 @@ export default {
     ...mapGetters(['active', 'mainFirstMove'])
   },
   watch: {
-    reset: function () {
+    reset () {
       this.$store.commit('resetMultiPV')
     }
   }
@@ -101,13 +101,20 @@ input {
 .grid-parent {
   align-items: center;
 }
+
 .processing-bar {
   height: 5px;
-  background-color: #6ca040;
-  background-color: #2196F3;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  background-color: #888;
   background-image: url('../assets/images/analysis/bar-highlight.png');
+  transition: background-color .4s; /* same as engine start/stop button */
   animation: bar-anim 1000s linear infinite;
-  transition: width 1s;
+  animation-play-state: paused;
+}
+.processing-bar.animate {
+  background-color: #2196F3;
+  animation-play-state: running;
 }
 @keyframes bar-anim {
   0% {
@@ -117,6 +124,7 @@ input {
       background-position: 100000px 0;
   }
 }
+
 #gameinfo {
   height: auto;
   margin: 1em 0em;
