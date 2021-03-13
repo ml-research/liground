@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import VueContext from 'vue-context'
+import VueContext from 'vue-context/src/js/index'
 export default {
   name: 'MoveHistoryNode',
   components: {
