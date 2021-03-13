@@ -23,7 +23,9 @@ export default {
   },
   data: function () {
     return {
+      mainMoves: [],
       first: 0,
+      fenArray: ['Start'],
       evalArray: [0],
       break: false,
       is960: false,
@@ -122,6 +124,17 @@ export default {
     variant () {
       this.break = true
       this.clear()
+    },
+    moves () {
+      let move = this.$store.getters.mainFirstMove
+      this.mainMoves = []
+      if (move) {
+        this.mainMoves.push(move)
+        while (move.main) {
+          move = move.main
+          this.mainMoves.push(move)
+        }
+      }
     },
     openedPGN () {
       if (this.first >= 2 || this.series[0].data.length > 0) {
