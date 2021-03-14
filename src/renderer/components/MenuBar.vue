@@ -111,6 +111,9 @@ export default {
           return console.log(err)
         }
 
+        // convert CRLF to LF
+        data = data.replace(/\r\n/g, '\n')
+
         let m
         while ((m = regex.exec(data)) !== null) {
           if (m.index === regex.lastIndex) {

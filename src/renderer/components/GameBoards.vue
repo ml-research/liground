@@ -147,19 +147,7 @@ export default {
         this.moveForwardOne()
       }
     },
-    updateCurrent (move) {
-      for (const num in this.moves) {
-        if (this.moves[num].current) {
-          this.moves[num].current = false
-          break
-        }
-      }
-      if (move) {
-        move.current = true
-      }
-    },
     moveToStart () { // this method returns to the starting point of the current line
-      this.updateCurrent(undefined)
       this.$store.dispatch('fen', this.startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
@@ -178,7 +166,6 @@ export default {
           endOfLine = endOfLine.main
         }
       }
-      this.updateCurrent(endOfLine)
       this.$store.dispatch('fen', endOfLine.fen)
     },
     moveBackOne () { // this method moves back one move in the current line
@@ -187,19 +174,16 @@ export default {
         return
       }
       if (mov.ply === 1) {
-        this.updateCurrent(undefined)
         this.$store.dispatch('fen', this.startFen)
         return
       }
       this.$store.dispatch('fen', mov.prev.fen)
-      this.updateCurrent(mov.prev)
     },
     moveForwardOne () { // this method moves forward one move in the current line
       const mov = this.currentMove
       if (!mov) {
         if (this.moves[0]) {
           this.$store.dispatch('fen', this.moves[0].fen)
-          this.updateCurrent(this.moves[0])
         }
         return
       }
@@ -208,7 +192,6 @@ export default {
       }
       this.$store.dispatch('playAudio', mov.main.name)
       this.$store.dispatch('fen', mov.main.fen)
-      this.updateCurrent(mov.main)
     },
     flipBoard () {
       if (this.variant === 'racingkings') {
