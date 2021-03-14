@@ -138,6 +138,7 @@ export default {
       move.prev.main = move
     },
     deleteMove (move) {
+      console.log(move)
       this.$store.dispatch('deleteFromMoves', move)
       if (move.prev) {
         const moveIndex = move.prev.next.indexOf(move)
@@ -168,6 +169,8 @@ export default {
       }
     },
     updateBoard (move) {
+      console.log(move)
+      console.log(this.moves)
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {

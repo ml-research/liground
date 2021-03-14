@@ -206,8 +206,8 @@ export const store = new Vuex.Store({
       state.firstMoves.splice(state.firstMoves.indexOf(payload), 1)
     },
     deleteFromMoves (state, payload) {
-      for (const mov in payload.next) {
-        this.commit('deleteFromMoves', mov)
+      for (const index in payload.next) {
+        this.commit('deleteFromMoves', payload.next[index])
       }
       state.moves.splice(state.moves.indexOf(payload), 1)
     },
