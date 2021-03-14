@@ -42,8 +42,8 @@ body { font-family: Avenir, Helvetica, Arial, sans-serif; }
   background-color: #f9f9f9;
   font-weight: 800;
   font-size: 12pt;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 
 #menubar {

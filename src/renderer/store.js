@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
 import engine from './engine'
+import allEngines from './store/engines'
 
 Vue.use(Vuex)
 
@@ -40,7 +41,7 @@ function cpToString (cp) {
     return ''
   }
   if (cp === 0) {
-    return '±0.00'
+    return '0.00'
   }
   const normalizedEval = (cp / 100).toFixed(2)
   if (cp > 0) {
@@ -130,7 +131,9 @@ export const store = new Vuex.Store({
     openedPGN: false,
     orientation: 'white',
     message: 'hello from Vuex',
-    engineBinary: 'stockfish',
+    allEngines: allEngines.map((engine, id) => ({ id, ...engine })),
+    activeEngine: 0,
+    selectedEngineIds: {},
     engineInfo: {
       name: '',
       author: '',
@@ -160,7 +163,6 @@ export const store = new Vuex.Store({
     gameInfo: {},
     loadedGames: [],
     selectedGame: null,
-    points: 0,
     boardStyle: 'blue',
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
@@ -224,8 +226,8 @@ export const store = new Vuex.Store({
       }
       state.variant = payload
     },
-    engineBinary (state, payload) {
-      state.engineBinary = payload
+    selectedEngines (state, payload) {
+      state.selectedEngineIds = payload
     },
     clearIO (state) {
       // dummy to trigger update in console
@@ -406,6 +408,15 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.internationalPieceStyle) {
+        store.commit('pieceStyle', localStorage.internationalPieceStyle)
+      }
+      if (localStorage.internationalBoardStyle) {
+        store.commit('boardStyle', localStorage.internationalBoardStyle)
+      }
+      if (localStorage.variant) {
+        store.commit('variant', localStorage.variant)
+      }
       context.commit('newBoard')
       context.dispatch('updateBoard')
       context.commit('initialized', true)
@@ -480,10 +491,19 @@ export const store = new Vuex.Store({
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
+        // prepare engine
         if (context.getters.active) {
           context.dispatch('stopEngine')
         }
+        context.dispatch('resetEngineData')
+        const oldEngine = context.getters.selectedEngine
+
+        // deselect game
+        context.commit('selectedGame', null)
+
+        // update variant
         context.commit('variant', payload)
+        localStorage.variant = payload
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
@@ -492,25 +512,43 @@ export const store = new Vuex.Store({
         } else {
           context.commit('newBoard', { is960: false, fen: '' })
         }
-        context.dispatch('resetEngineData')
-        context.dispatch('setEngineOptions', {
-          UCI_Variant: payload
+
+        // switch to new engine
+        const lastId = context.state.selectedEngineIds[payload]
+        const newEngine = typeof lastId === 'number'
+          ? context.state.allEngines[lastId]
+          : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine : context.getters.availableEngines[0])
+        context.dispatch('engineBinary', newEngine.binary).then(() => {
+          context.dispatch('setEngineOptions', { UCI_Variant: payload })
         })
       }
     },
     set960 (context, payload) {
+      context.commit('selectedGame', null)
+      context.commit('resetMultiPV')
       context.commit('newBoard', {
         fen: payload.fen,
         is960: payload.is960
       })
     },
     async engineBinary (context, payload) {
-      if (context.getters.engineBinary !== payload) {
-        context.commit('engineBinary', payload)
+      const id = context.state.allEngines.findIndex(engine => engine.binary === payload)
+
+      // always update selected engines
+      const selected = { ...context.state.selectedEngineIds }
+      selected[context.getters.variant] = id
+      context.commit('selectedEngines', selected)
+
+      // only change engine when its a different one
+      if (context.state.activeEngine !== id) {
+        context.state.activeEngine = id
+        if (context.getters.active) {
+          context.commit('active', false)
+        }
         context.commit('clearIO')
-        context.dispatch('resetEngineData')
+        await context.dispatch('resetEngineData')
         context.commit('engineInfo', await engine.run(payload))
-        context.dispatch('initEngineOptions')
+        await context.dispatch('initEngineOptions')
       }
     },
     initEngineOptions (context) {
@@ -634,9 +672,6 @@ export const store = new Vuex.Store({
     pieceStyle (context, payload) {
       context.commit('pieceStyle', payload)
     },
-    points (context, payload) {
-      context.commit('points', payload)
-    },
     viewAnalysis (context, payload) {
       context.commit('viewAnalysis', payload)
     },
@@ -662,9 +697,6 @@ export const store = new Vuex.Store({
     },
     active (state) {
       return state.active
-    },
-    points (state) {
-      return state.points
     },
     started (state) {
       return state.started
@@ -696,8 +728,14 @@ export const store = new Vuex.Store({
     variantOptions (state) {
       return state.variantOptions
     },
-    engineBinary (state) {
-      return state.engineBinary
+    availableEngines (state, getters) {
+      return state.allEngines.filter(engine => engine.variants && engine.variants.includes(getters.variant))
+    },
+    selectedEngine (state) {
+      return state.allEngines[state.activeEngine]
+    },
+    engineBinary (state, getters) {
+      return getters.selectedEngine.binary
     },
     engineName (state) {
       return state.engineInfo.name
@@ -858,8 +896,6 @@ ffish.onRuntimeInitialized = () => {
 
   // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))
-
-  // start engine
   store.commit('engineInfo', await engine.run(store.getters.engineBinary))
-  store.dispatch('initEngineOptions')
+  await store.dispatch('initEngineOptions')
 })()
