@@ -29,7 +29,6 @@
             <input
               v-model="settings[option.name]"
               type="checkbox"
-              :name="option.name"
               class="input"
             >
           </td>
@@ -39,10 +38,11 @@
             <input
               v-model.number="settings[option.name]"
               type="number"
-              :step="1"
+              class="input"
+              step="1"
               :min="option.min"
               :max="option.max"
-              class="input"
+              @change="clampNumber(option.name, option.min, option.max)"
             >
           </td>
         </template>
@@ -51,7 +51,6 @@
             <input
               v-model="settings[option.name]"
               type="text"
-              :name="option.name"
               class="input"
             >
           </td>
@@ -121,6 +120,9 @@ export default {
         }
       }
       this.$store.dispatch('setEngineOptions', changed)
+    },
+    clampNumber (name, min, max) {
+      this.settings[name] = Math.max(min, Math.min(max, this.settings[name]))
     },
     triggerButtonSetting (optionName) {
       this.$store.dispatch('setEngineOptions', { [optionName]: null })
