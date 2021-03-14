@@ -541,8 +541,12 @@ export const store = new Vuex.Store({
     async registerEngine (context, payload) {
       // we discover the variants by running the engine
       const { name, binary } = payload
+      if (context.state.allEngines.find(engine => engine.binary === binary)) {
+        console.warn(`Duplicate engine "${binary}"`)
+        return
+      }
       const info = await engine.run(binary)
-      const variantOption = info.options.find(e => e.name === 'UCI_Variant')
+      const variantOption = info.options.find(option => option.name === 'UCI_Variant')
       const variants = variantOption ? variantOption.var : ['chess']
       context.state.allEngines.push({ name, binary, variants })
 
