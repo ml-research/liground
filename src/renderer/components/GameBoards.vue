@@ -31,12 +31,11 @@
           </div>
         </div>
         <EvalPlot id="evalplot" />
-        <div
-          v-if="viewAnalysis"
-          id="right-column"
-        >
+        <div id="right-column">
           <AnalysisView
             id="analysisview"
+            class="tab"
+            :class="{ visible: viewAnalysis }"
             :reset="resetAnalysis"
             @move-to-start="moveToStart"
             @move-to-end="moveToEnd"
@@ -44,10 +43,10 @@
             @move-forward-one="moveForwardOne"
             @flip-board="flipBoard"
           />
-        </div>
-        <div v-else>
           <SettingsTab
             id="settingstab"
+            class="tab"
+            :class="{ visible: !viewAnalysis }"
           />
         </div>
       </div>
@@ -293,6 +292,9 @@ export default {
   grid-area: analysisview;
   width: 40vw;
   max-height: calc(100vh - 25px);
+}
+.tab:not(.visible) {
+  display: none;
 }
 input {
   font-size: 12pt;

@@ -6,12 +6,23 @@
           v-for="(line, id) in lines"
           :key="id"
           class="item"
-          @mouseenter="onMouseEnter(id)"
-          @mouseleave="onMouseLeave(id)"
-          @click="onClick(line)"
         >
-          <span class="left">{{ line.cpDisplay }}</span>
-          <span class="right">{{ line.pv }}</span>
+          <div
+            v-if="line"
+            class="content"
+            @mouseenter="onMouseEnter(id)"
+            @mouseleave="onMouseLeave(id)"
+            @click="onClick(line)"
+          >
+            <span class="left">{{ line.cpDisplay }}</span>
+            <span class="right">{{ line.pv }}</span>
+          </div>
+          <div
+            v-else
+            class="placeholder"
+          >
+            ...
+          </div>
         </div>
       </div>
     </div>
@@ -28,15 +39,25 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  data () {
+    return {
+      lines: []
+    }
+  },
   computed: {
-    lines () {
-      return this.$store.getters.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
-    },
     engineDetails () {
       const { engineName, engineAuthor } = this.$store.getters
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     },
-    ...mapGetters(['moves', 'fen'])
+    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings'])
+  },
+  watch: {
+    multipv () {
+      this.updateLines()
+    },
+    engineSettings () {
+      this.updateLines()
+    }
   },
   methods: {
     onMouseEnter (id) {
@@ -55,6 +76,11 @@ export default {
         }
       }
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
+    },
+    updateLines () {
+      const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+      const count = this.engineSettings.MultiPV
+      this.lines = lines.concat(Array(count - lines.length).fill(null))
     }
   }
 }
@@ -67,37 +93,49 @@ export default {
   white-space: nowrap;
 }
 .scroller {
+  max-height: 12em;
   overflow-x: scroll;
 }
+
 .list {
   min-width: 100%;
   display: table;
 }
 .item {
+  height: 2em;
+  padding: 5px;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  cursor: pointer;
+  flex-direction: column;
   user-select: none;
-}
-.item:hover {
-  background-color: #d3e1eb;
 }
 .item + .item {
   border-top: 1px solid #333;
 }
-.item .left {
-  padding: 5px;
-  font-weight: 1000;
+.content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+.content:hover {
+  background-color: #d3e1eb;
+}
+.content > .left {
+  margin-right: 5px;
   font-family: sans-serif;
+  font-weight: 1000;
   text-align: center;
 }
-.item .right {
+.content > .right {
   text-align: left;
   flex: 0 0 auto;
 }
+.placeholder {
+  font-family: sans-serif;
+  text-align: center;
+}
+
 .details {
-  border-top: 1px solid #333;
   font-size: 8pt;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   font-style: oblique;
