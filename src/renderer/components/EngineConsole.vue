@@ -171,7 +171,7 @@ export default {
 }
 .console {
   height: 200px;
-  border: 1px solid #888;
+  border: 1px solid var(--main-border-color);
   border-radius: 3px;
   font-family: monospace;
   font-size: 11px;
@@ -213,5 +213,6 @@ export default {
 .input {
   outline: none;
   border: 1px solid #888;
+  background-color: var(--second-bg-color);
 }
 </style>

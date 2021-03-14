@@ -1,5 +1,8 @@
 :root {
-    --main-bg-color: #f9f9f9;
+    --main-bg-color: #222326;
     --second-bg-color: #4b4e54;
-    --main-text-color:  #2c3e50; 
+    --main-text-color:  lightgrey; 
+    --main-border-color: #888;
+    --scroll-track-color: #4b4e54;
+    --scroll-thumb-color: #222326;
 }

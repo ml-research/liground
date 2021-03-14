@@ -62,7 +62,7 @@ export default {
 
 <style scoped>
 .pv-lines {
-  background-color: #fff;
+  background-color:var(--second-bg-color);
   font-weight: 100;
   white-space: nowrap;
 }

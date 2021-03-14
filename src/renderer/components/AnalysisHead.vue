@@ -67,7 +67,7 @@ export default {
 
 <style scoped>
 .reset {
-  background-color:lightgray ;
+  background-color:lightgrey;
   border: black;
   outline: none;
   padding-bottom: 5px;
@@ -81,9 +81,7 @@ export default {
   font-size: 15pt;
   height: 40px;
 }
-.multiselect {
-  width: 200px;
-}
+
 .grid-parent {
   display: grid;
   grid-template-columns: auto auto auto auto auto;
@@ -96,4 +94,6 @@ export default {
     font-size: 15pt;
     font-family: sans-serif;
 }
+
 </style>
+

@@ -116,10 +116,13 @@ input {
 #gameinfo {
   height: auto;
   margin: 1em 0em;
-  border: 1px solid black;
+  border: 1px solid var(--main-border-color);
   border-radius: 5px;
 }
 #move-history {
   text-align: left;
 }
+
 </style>
+
+
