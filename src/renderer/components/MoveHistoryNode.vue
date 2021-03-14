@@ -143,9 +143,34 @@ export default {
       return this.firstMoves.filter((move) => {
         return move.fen !== this.mainFirstMove.fen
       })
+    },
+    currentMove () {
+      for (const idx in this.moves) {
+        if (this.moves[idx].current) {
+          return this.moves[idx]
+        }
+      }
+      return null
     }
   },
   methods: {
+    currentLine (move) {
+      const result = []
+      if (this.mainFirstMove) {
+        let movPrev = move.prev
+        let movNext = move.main
+        result.push(move)
+        while (movPrev) {
+          result.push(movPrev)
+          movPrev = movPrev.prev
+        }
+        while (movNext) {
+          result.push(movNext)
+          movNext = movNext.main
+        }
+      }
+      return result
+    },
     promote (move) {
       let mov = move
       while (mov.prev) { // promote at every "fork"
@@ -154,8 +179,8 @@ export default {
       }
     },
     deleteMove (move) {
-      console.log(move)
       this.$store.dispatch('deleteFromMoves', move)
+      const currentLine = this.currentLine(move)
       if (move.prev) {
         const moveIndex = move.prev.next.indexOf(move)
         if (move.prev.main === move) { // ensure we still have a main line if there are still continuations
@@ -170,17 +195,23 @@ export default {
           }
         }
         move.prev.next.splice(moveIndex, 1)
-        this.updateBoard(move.prev)
+        if (currentLine.includes(this.currentMove)) {
+          this.updateBoard(move.prev)
+        }
       } else {
         if (this.mainFirstMove === move) {
           if (this.firstMoves.length === 0) {
             this.$store.dispatch('resetBoard', { is960: this.is960 })
           } else {
             this.$store.dispatch('mainFirstMove', this.firstMoves[0])
-            this.updateBoard(this.firstMoves[0])
+            if (currentLine.includes(this.currentMove)) {
+              this.updateBoard(this.firstMoves[0])
+            }
           }
         } else {
-          this.updateBoard(this.mainFirstMove)
+          if (currentLine.includes(this.currentMove)) {
+            this.updateBoard(this.mainFirstMove)
+          }
         }
       }
     },
