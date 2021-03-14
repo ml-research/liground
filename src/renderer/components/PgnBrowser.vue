@@ -1,25 +1,6 @@
 <template>
   <div>
     <div id="gameselect">
-      <i class="icon mdi mdi-cog-outline" @click="openContextMenu()" />
-      <input
-        id="groupcheckbox"
-        v-model="groupByRound"
-        type="checkbox"
-      >
-      <label
-        class="optionlabel"
-        for="groupcheckbox"
-      >Group by rounds?</label>
-      <input
-        id="displayunsupported"
-        v-model="displayUnsupported"
-        type="checkbox"
-      >
-      <label
-        class="optionlabel"
-        for="displayunsupported"
-      >Show unsupported?</label>
       <div class="search">
         <input
           id="gamefilter"
@@ -31,6 +12,10 @@
         <span
           slot="extra"
           class="icon mdi mdi-magnify"
+        />
+        <i
+          class="icon mdi mdi-cog-outline"
+          @click="openContextMenu()"
         />
       </div>
       <template v-if="groupByRound">
@@ -48,11 +33,11 @@
             <span
               slot="extra"
               class="icon mdi"
-              :class="[round.visible || gameFilter !== '' ? 'mdi-menu-up' : 'mdi-menu-down']"
+              :class="[round.visible ? 'mdi-menu-up' : 'mdi-menu-down']"
               style="float: right;"
             />
           </div>
-          <div v-show="round.visible || gameFilter !== ''">
+          <div v-show="round.visible">
             <div
               v-for="game in loadedGames"
               :key="game.id"
@@ -154,6 +139,18 @@ export default {
       this.displayUnsupported = newVal
     })
 
+    bus.$on('openAllRounds', () => {
+      this.rounds.forEach(round => {
+        round.visible = true
+      })
+    })
+
+    bus.$on('collapseAllRounds', () => {
+      this.rounds.forEach(round => {
+        round.visible = false
+      })
+    })
+
     const menuTemplate = [
       {
         label: 'Group by rounds',
@@ -169,6 +166,20 @@ export default {
         checked: this.displayUnsupported,
         click: function (item, browserWindow, event) {
           bus.$emit('toggleUnsupported', item.checked)
+        }
+      },
+      {
+        label: 'Open all rounds',
+        type: 'normal',
+        click: function () {
+          bus.$emit('openAllRounds')
+        }
+      },
+      {
+        label: 'Collapse all rounds',
+        type: 'normal',
+        click: function () {
+          bus.$emit('collapseAllRounds')
         }
       }
     ]
@@ -204,7 +215,7 @@ export default {
 }
 
 #gamefilter {
-  max-width: 80%;
+  max-width: 65%;
 }
 
 .roundseperator {
@@ -235,7 +246,6 @@ export default {
   padding: 0px 6px;
   margin: 0px 1px;
   border-radius: 3px;
-  float: right;
   background-color: #34495e;
   color: white;
 }
@@ -245,8 +255,14 @@ export default {
   cursor: pointer;
 }
 
+.icon.mdi-cog-outline:hover {
+  cursor: pointer;
+}
+
 .search {
   padding: 2px 0px;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .unsupported {
