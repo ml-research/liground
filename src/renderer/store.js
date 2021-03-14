@@ -443,6 +443,8 @@ export const store = new Vuex.Store({
     },
     position (context) {
       engine.send(`position fen ${context.getters.fen}`)
+      const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
+      document.dispatchEvent(eve)
     },
     sendEngineCommand (_, payload) {
       engine.send(payload)

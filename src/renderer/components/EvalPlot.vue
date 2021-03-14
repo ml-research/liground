@@ -23,9 +23,11 @@ export default {
   },
   data: function () {
     return {
+      setBetterValuesRunning: false,
       mainMoves: [],
+      depthArr: [],
+      currentCalcPos: undefined,
       first: 0,
-      fenArray: ['Start'],
       evalArray: [0],
       break: false,
       is960: false,
@@ -85,7 +87,7 @@ export default {
                 this.$store.dispatch('fen', this.startFen)
                 return
               }
-              const move = this.moves[dataPointIndex - 1]
+              const move = this.mainMoves[dataPointIndex - 1]
               this.$store.dispatch('fen', move.fen)
             }
           }
@@ -107,7 +109,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN'])
+    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhite', 'depth'])
   },
   watch: {
     board () {
@@ -125,7 +127,7 @@ export default {
       this.break = true
       this.clear()
     },
-    moves () { // gives only main variant whole file has to be adopted to using this
+    moves () { // extracts the main variant
       let move = this.$store.getters.mainFirstMove
       this.mainMoves = []
       if (move) {
@@ -134,6 +136,12 @@ export default {
           move = move.main
           this.mainMoves.push(move)
         }
+      }
+    },
+    depth () {
+      if (!this.setBetterValuesRunning) {
+        this.setBetterValuesRunning = true
+        this.setBetterValue()
       }
     },
     openedPGN () {
@@ -150,11 +158,15 @@ export default {
       this.clear()
     })
     document.addEventListener('startEval', () => {
+      console.log('shouldstart')
       this.loadPlot()
     })
     document.addEventListener('stopEval', () => {
       this.break = true
       this.clear()
+    })
+    document.addEventListener('position', (e) => {
+      this.currentCalcPos = e.detail.fen
     })
   },
   methods: {
@@ -207,19 +219,21 @@ export default {
     },
 
     async loadPlot () { // pushes all the moves to the plot when button is pressed
-      if (this.moves.length === 0) {
+      if (this.mainMoves.length === 0) {
         return
       }
+      const depth = this.$store.getters.evalPlotDepth
       const newArray = [0]
       let index = 0
-      const length = this.moves.length
+      const length = this.mainMoves.length
       while (index < length) {
         newArray.push(0)
         if (index % 2 === 1) {
-          this.chartOptions.xaxis.categories.push('..' + this.moves[index].name)
+          this.chartOptions.xaxis.categories.push('..' + this.mainMoves[index].name)
         } else {
-          this.chartOptions.xaxis.categories.push(this.moves[index].name)
+          this.chartOptions.xaxis.categories.push(this.mainMoves[index].name)
         }
+        this.depthArr.push(depth)
         index++
       }
       this.evalArray = newArray
@@ -230,7 +244,10 @@ export default {
     },
 
     async evaluateHistory () { // updates the graph
+      console.log('isCalled')
       if (this.break) {
+        console.log('break')
+        this.break = false
         setTimeout(this.evaluateHistory, 1000)
         return
       }
@@ -239,7 +256,7 @@ export default {
       const depth = this.$store.getters.evalPlotDepth
       while (index < this.series[0].data.length - 1) {
         try {
-          points = await Engine.evaluate(this.moves[index].fen, depth)
+          points = await Engine.evaluate(this.mainMoves[index].fen, depth)
           if (this.break) { // cleares the graph when its supposed to
             this.break = false
             return
@@ -257,6 +274,26 @@ export default {
         }
       }
       document.dispatchEvent(new Event('finishedEval')) // resets the button
+    },
+    setBetterValue () {
+      let index = 0
+      while (index < this.mainMoves.length) {
+        const depth = this.$store.getters.depth
+        if (this.currentCalcPos === this.mainMoves[index].fen) {
+          if (depth > this.depthArr[index]) {
+            this.depthArr[index] = depth
+            const newArray = this.series[0].data
+            console.log('Punkte: ' + this.cpForWhite / 100 + 'für Index: ' + index)
+            newArray[index + 1] = this.cpForWhite / 100
+            this.series = [{
+              data: newArray
+            }]
+            this.calcOffset()
+          }
+        }
+        index++
+      }
+      this.setBetterValuesRunning = false
     }
   }
 }
