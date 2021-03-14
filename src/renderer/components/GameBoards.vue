@@ -258,7 +258,7 @@ export default {
       console.log(`event: ${event}`)
     },
     checkValidFEN (event) {
-      this.$store.dispatch('fen', event.target.value)
+      this.$store.dispatch('fenField', event.target.value)
       this.resetAnalysis = !this.resetAnalysis
     }
   }

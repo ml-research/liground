@@ -453,6 +453,16 @@ export const store = new Vuex.Store({
         context.dispatch('restartEngine')
       }
     },
+    fenField (context, payload) {
+      if (ffish.validateFen(payload, context.getters.variant) === 1) {
+        if (context.state.fen !== payload) {
+          context.commit('fen', payload)
+          context.dispatch('updateBoard')
+          context.dispatch('restartEngine')
+          context.commit('newBoard', { fen: payload })
+        }
+      }
+    },
     lastFen (context, payload) {
       context.commit('lastFen', payload)
     },
