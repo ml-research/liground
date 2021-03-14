@@ -62,7 +62,7 @@
           <div
             v-if="isGameVisible(game)"
             class="browserelement gameoption"
-            :class="{ active : game === selectedGame }"
+            :class="{ active : game === selectedGame, unsupported: !game.supported }"
             @click="selectedGame = game"
           >
             {{ game ? game.headers("White") : 'unknown' }} <br> vs {{ game ? game.headers("Black") : 'unknown' }}
