@@ -8,7 +8,7 @@
     </div>
     <div
       class="item"
-      @click="addEngine"
+      @click="modal = true"
     >
       <em class="icon mdi mdi-engine" /> Add Engine
     </div>
@@ -25,6 +25,11 @@
     >
       <em class="icon mdi mdi-information-outline" /> About <em class="icon mdi mdi-github" />
     </div>
+    <Modal
+      v-if="modal"
+      @close="modal = false"
+      @save="addEngine"
+    />
   </div>
 </template>
 
@@ -33,9 +38,16 @@ import fs from 'fs'
 import { shell } from 'electron'
 import { mapGetters } from 'vuex'
 import ffish from 'ffish'
+import Modal from './EngineModal'
 
 export default {
   name: 'MenuBar',
+  components: { Modal },
+  data () {
+    return {
+      modal: false
+    }
+  },
   computed: {
     ...mapGetters(['viewAnalysis', 'initialized'])
   },
@@ -106,8 +118,8 @@ export default {
         this.$store.dispatch('loadedGames', games)
       })
     },
-    addEngine () {
-      // TODO
+    addEngine ({ name, path }) {
+      console.log(name, path)
     }
   }
 }

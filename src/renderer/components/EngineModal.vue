@@ -1,137 +1,191 @@
 <template>
-  <div class="modal-backdrop">
-    <div class="modal">
-      <header class="modal-header">
-        <slot name="header">
-          Engine Settings
-        </slot>
+  <div class="modal">
+    <div
+      class="backdrop"
+      @click="cancel"
+    />
+    <div class="contents">
+      <header class="header">
+        New Engine
       </header>
-      <section class="modal-body">
-        <slot name="body">
-          <PrettyCheck
-            class="p-icon p-curve p-smooth"
-            color="primary-o"
+      <section class="body">
+        <div class="item">
+          <span class="label">Name</span>
+          <input
+            v-model="name"
+            type="text"
+            class="input"
           >
-            <em
-              slot="extra"
-              class="icon mdi mdi-check"
-            />
-            <p>Option 1</p>
-          </PrettyCheck>
-          <br>
-          <PrettyCheck
-            class="p-icon p-curve p-smooth"
-            color="primary-o"
-          >
-            <em
-              slot="extra"
-              class="icon mdi mdi-check"
-            />
-            Option 2
-          </PrettyCheck>
-          <br>
-          <PrettyCheck
-            class="p-icon p-curve p-smooth"
-            color="primary-o"
-          >
-            <em
-              slot="extra"
-              class="icon mdi mdi-check"
-            />
-            Option 3
-          </PrettyCheck>
-          <br>
-        </slot>
-      </section>
-      <footer class="modal-footer">
-        <slot name="footer">
-          <p />
+        </div>
+        <div class="item">
+          <span class="label">Binary</span>
           <button
-            type="button"
-            class="btn-green"
-            @click="close"
+            class="btn grey"
+            @click="selectPath"
           >
-            <p> Save & Exit</p>
+            Select Path
           </button>
-        </slot>
+          <span class="display">{{ display }}</span>
+        </div>
+        <div class="item">
+          <span
+            class="error"
+            :class="{ visible: error !== 'none' }"
+          >{{ error }}</span>
+        </div>
+      </section>
+      <footer class="footer">
+        <button
+          type="button"
+          class="btn red"
+          @click="cancel"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn green"
+          @click="save"
+        >
+          Save
+        </button>
       </footer>
     </div>
   </div>
 </template>
 
 <script>
-import PrettyCheck from 'pretty-checkbox-vue/check'
+import path from 'path'
+import { remote } from 'electron'
+
 export default {
   name: 'EngineModal',
-  components: {
-    PrettyCheck
+  data () {
+    return {
+      name: '',
+      path: '',
+      error: 'none'
+    }
+  },
+  computed: {
+    display () {
+      return this.path.length > 0 ? path.basename(this.path) : 'empty'
+    }
   },
   methods: {
-    close () {
+    cancel () {
       this.$emit('close')
+    },
+    save () {
+      const { name, path } = this
+      if (name.length === 0) {
+        this.error = 'Engine name cannot be empty!'
+      } else if (path.length === 0) {
+        this.error = 'Engine path cannot be empty!'
+      } else {
+        this.error = 'none'
+        this.$emit('save', { name, path })
+        this.$emit('close')
+      }
+    },
+    async selectPath () {
+      const { filePaths: [file] } = await remote.dialog.showOpenDialog({ properties: ['openFile'] })
+      this.path = file || ''
     }
   }
 }
 </script>
 
-<style>
-  .modal-backdrop {
-    z-index: 5;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+<style scoped>
+.modal {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+.backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, .3);
+  z-index: -1;
+}
 
-  .modal {
-    background: #FFFFFF;
-    box-shadow: 2px 2px 20px 1px;
-    overflow-x: auto;
-    display: flex;
-    flex-direction: column;
-  }
+.contents {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  box-shadow: 2px 2px 20px 1px;
+  overflow-x: auto;
+}
 
-  .modal-header,
-  .modal-footer {
-    padding: 15px;
-    display: flex;
-  }
+.header {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  color: #4AAE9B;
+  user-select: none;
+}
 
-  .modal-header {
-    border-bottom: 1px solid #eeeeee;
-    color: #4AAE9B;
-    justify-content: space-between;
-  }
+.body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.item {
+  margin: 5px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: .9em;
+}
+.label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+.display {
+  font-family: monospace;
+  color: #333;
+  font-size: 11px;
+}
+.error {
+  color: #b22222;
+  font-weight: bold;
+}
+.error:not(.visible) {
+  visibility: hidden;
+}
 
-  .modal-footer {
-    border-top: 1px solid #eeeeee;
-    justify-content: flex-end;
-  }
-
-  .modal-body {
-    position: relative;
-    padding: 20px 10px;
-  }
-
-  .btn-close {
-    border: none;
-    font-size: 20px;
-    padding: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #4AAE9B;
-    background: transparent;
-  }
-
-  .btn-green {
-    color: white;
-    background: #4AAE9B;
-    border: 1px solid #4AAE9B;
-    border-radius: 2px;
-  }
+.footer {
+  padding: 15px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #eee;
+  user-select: none;
+}
+.btn {
+  padding: 2px 3px;
+  margin: 2px;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  cursor: pointer;
+}
+.btn.grey {
+  background: #333;
+}
+.btn.green {
+  background: #4AAE9B;
+}
+.btn.red {
+  background: #b22222;
+}
 </style>
