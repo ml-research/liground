@@ -91,6 +91,7 @@
 <script>
 import { remote } from 'electron'
 import { mapGetters } from 'vuex'
+import { bus } from '../main'
 
 export default {
   name: 'PgnBrowser',
@@ -100,7 +101,8 @@ export default {
       rounds: [],
       groupByRound: true,
       displayUnsupported: false,
-      menu: undefined
+      menu: undefined,
+      contextMenuEvents: undefined
     }
   },
   computed: {
@@ -144,15 +146,29 @@ export default {
     }
   },
   created: function () {
+    bus.$on('toggleGroup', (newVal) => {
+      this.groupByRound = newVal
+    })
+
+    bus.$on('toggleUnsupported', (newVal) => {
+      this.displayUnsupported = newVal
+    })
+
     const menuTemplate = [
       {
         label: 'Group by rounds',
         type: 'checkbox',
         checked: this.groupByRound,
         click: function (item, browserWindow, event) {
-          console.log('clicked option')
-          console.log(item.menu)
-          item.checked = this.groupByRound
+          bus.$emit('toggleGroup', item.checked)
+        }
+      },
+      {
+        label: 'Display unsupported',
+        type: 'checkbox',
+        checked: this.displayUnsupported,
+        click: function (item, browserWindow, event) {
+          bus.$emit('toggleUnsupported', item.checked)
         }
       }
     ]
