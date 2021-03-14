@@ -1,69 +1,46 @@
 <template>
-  <div>
-    <nav>
-      <a
-        href="#"
-        @click="openPgn"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-checkerboard"
-      /> Open PGN</a>
-      <a
-        @click="showModal"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-checkerboard"
-      /> Engines
-      </a>
-      <a
-        href="#"
-        :class="{ active: !viewAnalysis }"
-        @click="changeTab"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-hammer-screwdriver"
-      /> Settings </a>
-      <a
-        href="#"
-        @click="openExternalBrowser"
-      ><em
-        slot="extra"
-        class="icon mdi mdi-information-outline"
-      /> About <em
-        slot="extra"
-        class="icon mdi mdi-github"
-      /></a>
-    </nav>
-    <div id="Modal">
-      <Modal
-        v-show="isModalVisible"
-        @close="closeModal"
-      />
+  <div class="bar">
+    <div
+      class="item"
+      @click="openPgn"
+    >
+      <em class="icon mdi mdi-checkerboard" /> Open PGN
+    </div>
+    <div
+      class="item"
+      @click="addEngine"
+    >
+      <em class="icon mdi mdi-engine" /> Add Engine
+    </div>
+    <div
+      class="item"
+      :class="{ active: !viewAnalysis }"
+      @click="changeTab"
+    >
+      <em class="icon mdi mdi-hammer-screwdriver" /> Settings
+    </div>
+    <div
+      class="item"
+      @click="openExternalBrowser"
+    >
+      <em class="icon mdi mdi-information-outline" /> About <em class="icon mdi mdi-github" />
     </div>
   </div>
 </template>
 
 <script>
 import fs from 'fs'
-import ffish from 'ffish'
-import Modal from './EngineModal'
+import { shell } from 'electron'
 import { mapGetters } from 'vuex'
+import ffish from 'ffish'
 
 export default {
   name: 'MenuBar',
-  components: {
-    Modal
-  },
-  data () {
-    return {
-      isModalVisible: false
-    }
-  },
   computed: {
     ...mapGetters(['viewAnalysis', 'initialized'])
   },
   watch: {
-    initialized: function () {
+    initialized () {
       if (this.initialized === true) {
         if (localStorage.PGNPath) {
           this.openPGNFromPath(JSON.parse(localStorage.PGNPath))
@@ -72,18 +49,10 @@ export default {
     }
   },
   methods: {
-    showModal () {
-      this.isModalVisible = true
-    },
-    closeModal () {
-      this.isModalVisible = false
-    },
     changeTab () {
-      this.$store.commit('viewAnalysis', !this.$store.getters.viewAnalysis)
+      this.$store.commit('viewAnalysis', !this.viewAnalysis)
     },
     openExternalBrowser () {
-      const shell = require('electron').shell
-      event.preventDefault()
       shell.openExternal('https://github.com/ml-research/liground')
     },
     openPgn () {
@@ -135,36 +104,35 @@ export default {
         })
 
         this.$store.dispatch('loadedGames', games)
-        /* if (games[0]) {
-          this.$store.dispatch('loadGame', { game: games[0] })
-        } */
       })
+    },
+    addEngine () {
+      // TODO
     }
   }
 }
 </script>
 
 <style scoped>
- nav {
+.bar {
   margin: 10px auto;
-  position: relative;
-  background-color: #34495e;
-  font-size: 11px;
   width: 33.3%;
+  background-color: #34495e;
   border-radius: 8px;
 }
-nav a {
+.item {
+  padding: 5px 16px;
   display: inline-block;
+  color: #fff;
+  font-size: 11px;
   text-decoration: none;
   text-align: center;
-  color: white;
-  padding: 5px 16px;
   cursor: pointer;
 }
-a:hover:not(.active) {
+.item:hover {
   background-color: #22303d;
 }
-.active {
+.item.active {
   background-color: #00af89;
 }
 </style>
