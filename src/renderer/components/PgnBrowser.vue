@@ -139,17 +139,9 @@ export default {
       this.displayUnsupported = newVal
     })
 
-    bus.$on('openAllRounds', () => {
-      this.rounds.forEach(round => {
-        round.visible = true
-      })
-    })
+    bus.$on('openAllRounds', () => this.setVisibilityOfAllRounds(true))
 
-    bus.$on('collapseAllRounds', () => {
-      this.rounds.forEach(round => {
-        round.visible = false
-      })
-    })
+    bus.$on('collapseAllRounds', () => this.setVisibilityOfAllRounds(false))
 
     const menuTemplate = [
       {
@@ -198,6 +190,11 @@ export default {
     },
     openContextMenu () {
       this.menu.popup(remote.getCurrentWindow())
+    },
+    setVisibilityOfAllRounds (value) {
+      this.rounds.forEach(round => {
+        round.visible = value
+      })
     }
   }
 }
