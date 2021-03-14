@@ -29,7 +29,7 @@
     <VueContext ref="menu">
       <li>
         <a
-          v-if="move.prev && move.prev.main !== move"
+          v-if="!mainLine.includes(move)"
           href="#"
           @click.prevent="promote(move)"
         >Promote Variation</a>
@@ -107,6 +107,18 @@ export default {
     }
   },
   computed: {
+    mainLine () {
+      const result = []
+      if (this.mainFirstMove) {
+        let mov = this.mainFirstMove
+        result.push(mov)
+        while (mov.main) {
+          mov = mov.main
+          result.push(mov)
+        }
+      }
+      return result
+    },
     filteredNext () {
       return this.move.next.filter((variation) => {
         return variation.fen !== this.move.main.fen
@@ -135,7 +147,11 @@ export default {
   },
   methods: {
     promote (move) {
-      move.prev.main = move
+      let mov = move
+      while (mov.prev) { // promote at every "fork"
+        mov.prev.main = mov
+        mov = mov.prev
+      }
     },
     deleteMove (move) {
       console.log(move)
@@ -169,8 +185,6 @@ export default {
       }
     },
     updateBoard (move) {
-      console.log(move)
-      console.log(this.moves)
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
