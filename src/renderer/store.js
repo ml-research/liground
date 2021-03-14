@@ -98,6 +98,8 @@ function checkOption (options, name, value) {
   }
 }
 
+const filteredSettings = ['UCI_Variant']
+
 export const store = new Vuex.Store({
   state: {
     initialized: false,
@@ -137,6 +139,7 @@ export const store = new Vuex.Store({
       author: '',
       options: []
     },
+    engineSettings: {},
     engineStats: {
       depth: 0,
       seldepth: 0,
@@ -231,6 +234,24 @@ export const store = new Vuex.Store({
     },
     engineInfo (state, payload) {
       state.engineInfo = payload
+      const settings = {}
+      for (const option of payload.options) {
+        if (!filteredSettings.includes(option.name)) {
+          switch (option.type) {
+            case 'check':
+              settings[option.name] = option.default === 'true'
+              break
+            case 'spin':
+            case 'combo':
+              settings[option.name] = option.default
+              break
+            case 'string':
+              settings[option.name] = option.default || ''
+              break
+          }
+        }
+      }
+      state.engineSettings = settings
     },
     engineStats (state, payload) {
       state.engineStats = payload
@@ -532,9 +553,20 @@ export const store = new Vuex.Store({
       })
     },
     setEngineOptions (context, payload) {
+      if (context.getters.active) {
+        context.dispatch('stopEngine')
+      }
+      context.dispatch('resetEngineData')
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
-        engine.send(`setoption name ${name} value ${value}`)
+        if (value !== undefined && value !== null) {
+          if (!filteredSettings.includes(name)) {
+            context.state.engineSettings[name] = value
+          }
+          engine.send(`setoption name ${name} value ${value}`)
+        } else {
+          engine.send(`setoption name ${name}`)
+        }
       }
     },
     idName (context, payload) {
@@ -705,7 +737,10 @@ export const store = new Vuex.Store({
       return state.engineInfo.author
     },
     engineOptions (state) {
-      return state.engineInfo.options
+      return state.engineInfo.options.filter(({ name }) => !filteredSettings.includes(name))
+    },
+    engineSettings (state) {
+      return state.engineSettings
     },
     multipv (state) {
       return state.multipv
