@@ -1,4 +1,3 @@
-import path from 'path'
 import { spawn } from 'child_process'
 import EngineDriver from './driver'
 import EngineSender from './sender'
@@ -13,22 +12,10 @@ let child = null
 let engine = null
 
 /**
- * Resolve the path to an engine binary.
- * @param {string} name binary file name
- */
-function resolveBinary (name) {
-  return path.resolve(
-    process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
-    'engines',
-    `${name}${process.platform === 'win32' ? '.exe' : ''}`
-  )
-}
-
-/**
  * Run a new engine, killing the old process.
- * @param {string} engineBinary binary to use
+ * @param {string} binary binary to use
  */
-async function run (engineBinary) {
+async function run (binary) {
   msg.debug('Running engine')
 
   // kill old engine
@@ -48,9 +35,8 @@ async function run (engineBinary) {
   }
 
   // spawn engine process
-  const binary = resolveBinary(engineBinary)
   if (!binary) {
-    msg.error(`Could not find engine binary for "${engineBinary}"`)
+    msg.error(`Could not find engine binary "${binary}"`)
     return
   }
   child = spawn(binary, []).on('error', err => msg.error(err.message))
