@@ -119,7 +119,7 @@ export default {
       })
     },
     addEngine ({ name, path }) {
-      console.log(name, path)
+      this.$store.dispatch('registerEngine', { name, binary: path })
     }
   }
 }

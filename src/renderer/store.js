@@ -531,6 +531,18 @@ export const store = new Vuex.Store({
         is960: payload.is960
       })
     },
+    async registerEngine (context, payload) {
+      // we discover the variants by running the engine
+      const { name, binary } = payload
+      const info = await engine.run(binary)
+      const variantOption = info.options.find(e => e.name === 'UCI_Variant')
+      const variants = variantOption ? variantOption.var : ['chess']
+      context.state.allEngines.push({ name, binary, variants })
+
+      // swap back to current engine after we are done
+      // TODO: we could automatically swap to the new engine if it supports the current variant
+      await engine.run(context.getters.engineBinary)
+    },
     async engineBinary (context, payload) {
       const id = context.state.allEngines.findIndex(engine => engine.binary === payload)
 
