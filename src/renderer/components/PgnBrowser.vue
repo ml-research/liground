@@ -1,6 +1,7 @@
 <template>
   <div>
     <div id="gameselect">
+      <i class="icon mdi mdi-cog-outline" @click="openContextMenu()" />
       <input
         id="groupcheckbox"
         v-model="groupByRound"
@@ -88,6 +89,7 @@
 </template>
 
 <script>
+import { remote } from 'electron'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -97,7 +99,8 @@ export default {
       gameFilter: '',
       rounds: [],
       groupByRound: true,
-      displayUnsupported: false
+      displayUnsupported: false,
+      menu: undefined
     }
   },
   computed: {
@@ -140,6 +143,22 @@ export default {
       }
     }
   },
+  created: function () {
+    const menuTemplate = [
+      {
+        label: 'Group by rounds',
+        type: 'checkbox',
+        checked: this.groupByRound,
+        click: function (item, browserWindow, event) {
+          console.log('clicked option')
+          console.log(item.menu)
+          item.checked = this.groupByRound
+        }
+      }
+    ]
+
+    this.menu = remote.Menu.buildFromTemplate(menuTemplate)
+  },
   methods: {
     isGameVisible (game) {
       if ((game.headers('White').toLowerCase().indexOf(this.gameFilter.toLowerCase()) !== -1 ||
@@ -149,6 +168,9 @@ export default {
       } else {
         return false
       }
+    },
+    openContextMenu () {
+      this.menu.popup(remote.getCurrentWindow())
     }
   }
 }
