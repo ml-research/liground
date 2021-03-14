@@ -409,13 +409,20 @@ export const store = new Vuex.Store({
     },
     initialize (context) {
       if (localStorage.internationalPieceStyle) {
-        store.commit('pieceStyle', localStorage.internationalPieceStyle)
+        context.commit('pieceStyle', localStorage.internationalPieceStyle)
       }
       if (localStorage.internationalBoardStyle) {
-        store.commit('boardStyle', localStorage.internationalBoardStyle)
+        context.commit('boardStyle', localStorage.internationalBoardStyle)
       }
       if (localStorage.variant) {
-        store.commit('variant', localStorage.variant)
+        context.commit('variant', localStorage.variant)
+      }
+      if (localStorage.engines) {
+        try {
+          context.state.allEngines = JSON.parse(localStorage.engines)
+        } catch (err) {
+          localStorage.removeItem('engines')
+        }
       }
       context.commit('newBoard')
       context.dispatch('updateBoard')
@@ -538,6 +545,9 @@ export const store = new Vuex.Store({
       const variantOption = info.options.find(e => e.name === 'UCI_Variant')
       const variants = variantOption ? variantOption.var : ['chess']
       context.state.allEngines.push({ name, binary, variants })
+
+      // save engines
+      localStorage.engines = JSON.stringify(context.state.allEngines)
 
       // swap back to current engine after we are done
       // TODO: we could automatically swap to the new engine if it supports the current variant
@@ -852,6 +862,18 @@ export const store = new Vuex.Store({
     selectedGame (state) {
       return state.selectedGame
     },
+    isInternational (state) {
+      return state.internationalVariants.includes(state.variant)
+    },
+    isSEA (state) {
+      return state.seaVariants.includes(state.variant)
+    },
+    isXiangqi (state) {
+      return state.xiangqiVariants.includes(state.variant)
+    },
+    isShogi (state) {
+      return state.shogiVariants.includes(state.variant)
+    },
 
     // TODO: integrate getters into store state?
     moveStack (state) {
@@ -865,18 +887,6 @@ export const store = new Vuex.Store({
     },
     is960 (state) {
       return state.board.is960()
-    },
-    isInternational (state) {
-      return state.internationalVariants.includes(state.variant)
-    },
-    isSEA (state) {
-      return state.seaVariants.includes(state.variant)
-    },
-    isXiangqi (state) {
-      return state.xiangqiVariants.includes(state.variant)
-    },
-    isShogi (state) {
-      return state.shogiVariants.includes(state.variant)
     },
     dimensionNumber (state) {
       if (state.internationalVariants.includes(state.variant)) {
