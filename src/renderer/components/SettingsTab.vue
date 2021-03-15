@@ -175,7 +175,10 @@ export default {
       }
     },
     deleteEngine () {
-      this.$store.dispatch('deleteEngine', this.selectedEngine.name)
+      const { name } = this.selectedEngine
+      if (confirm(`Do you really wish to delete "${name}"`)) {
+        this.$store.dispatch('deleteEngine', name)
+      }
     },
     addEngine () {
       this.modal = {
