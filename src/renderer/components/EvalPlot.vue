@@ -256,7 +256,6 @@ export default {
             this.setDepth(this.mainMoves)
             return
           }
-          this.break = false
           points = this.adjustPoints(points)
           tmpArray[index + 1] = points
           this.series = [{
