@@ -184,7 +184,7 @@ export const store = new Vuex.Store({
     viewAnalysis: true,
     analysisMode: true,
     menuAtMove: null,
-    displayMenu: true
+    displayMenu: true,
     darkMode: false
   },
   mutations: { // sync

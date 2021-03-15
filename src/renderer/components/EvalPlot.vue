@@ -1,8 +1,6 @@
 <template>
   <div>
     <VueApexCharts
-      title="plot"
-      width="710"
       height="260"
       type="area"
       :options="chartOptions"
@@ -31,10 +29,6 @@ export default {
       break: false,
       is960: false,
       chartOptions: {
-        annotations: {
-          position: 'front',
-
-        },
         stroke: {
           width: 1
         },
@@ -51,6 +45,12 @@ export default {
         tooltip: {
           shared: false,
           intersect: true,
+          x: {
+            show: false
+          },
+          marker: {
+            show: false
+          }
         },
         noData: {
           text: '',
@@ -120,7 +120,7 @@ export default {
         name: 'Evaluation',
         data: [],
         style: {
-          color: 'var(--main-text-color)',
+          color: 'var(--main-text-color)'
         }
       }]
     }
@@ -341,4 +341,10 @@ export default {
 .link {
   color: var(--main-text-color);
 }
+</style>
+<style>
+  .apexcharts-tooltip {
+    background-color: var(--main-bg-color) !important;
+    color: var(--main-text-color) !important;
+  }
 </style>
