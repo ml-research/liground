@@ -393,6 +393,7 @@ export const store = new Vuex.Store({
     },
     switchDarkMode (state) {
       state.darkMode = !state.darkMode
+      localStorage.darkMode = state.darkMode
     }
   },
   actions: { // async
@@ -408,6 +409,11 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.darkMode) {
+        if (localStorage.darkMode !== context.state.darkMode) {
+          context.commit('switchDarkMode')
+        }
+      }
       if (localStorage.internationalPieceStyle) {
         store.commit('pieceStyle', localStorage.internationalPieceStyle)
       }

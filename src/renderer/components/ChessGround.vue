@@ -685,6 +685,8 @@ export default {
 .pockets {
   margin-right: 1.5px;
   height: 100%;
+  background-color: var(--second-bg-color);
+  border-radius: 5px;
 }
 .pockets.shogi{
   display:grid;

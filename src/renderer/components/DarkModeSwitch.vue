@@ -18,28 +18,30 @@ export default {
   computed: {
     ...mapGetters(['darkMode'])
   },
+  watch: {
+    darkMode (darkMode) {
+      if (this.darkMode) {
+        document.documentElement.style.setProperty('--main-bg-color', '#222326')
+        document.documentElement.style.setProperty('--second-bg-color', '#4b4e54')
+        document.documentElement.style.setProperty('--main-text-color', 'lightgrey')
+        document.documentElement.style.setProperty('--main-border-color', '#888')
+        document.documentElement.style.setProperty('--scroll-track-color', '#4b4e54')
+        document.documentElement.style.setProperty('--scroll-thumb-color', '#222326')
+        document.documentElement.style.setProperty('--variation-color', '#4b4e54')
+      } else {
+        document.documentElement.style.setProperty('--main-bg-color', 'white')
+        document.documentElement.style.setProperty('--second-bg-color', 'white')
+        document.documentElement.style.setProperty('--main-text-color', '#2c3e50')
+        document.documentElement.style.setProperty('--main-border-color', 'black')
+        document.documentElement.style.setProperty('--scroll-track-color', 'lightgrey')
+        document.documentElement.style.setProperty('--scroll-thumb-color', 'grey')
+        document.documentElement.style.setProperty('--variation-color', 'lightgrey')
+      }
+    }
+  },
   methods: {
     onClick () {
-      this.root = document.documentElement
-      if (!this.darkMode) {
-        this.root.style.setProperty('--main-bg-color', '#222326')
-        this.root.style.setProperty('--second-bg-color', '#4b4e54')
-        this.root.style.setProperty('--main-text-color', 'lightgrey')
-        this.root.style.setProperty('--main-border-color', '#888')
-        this.root.style.setProperty('--scroll-track-color', '#4b4e54')
-        this.root.style.setProperty('--scroll-thumb-color', '#222326')
-
-        this.$store.dispatch('switchDarkMode')
-      } else {
-        this.root.style.setProperty('--main-bg-color', 'white')
-        this.root.style.setProperty('--second-bg-color', 'white')
-        this.root.style.setProperty('--main-text-color', '#2c3e50')
-        this.root.style.setProperty('--main-border-color', 'black')
-        this.root.style.setProperty('--scroll-track-color', 'lightgrey')
-        this.root.style.setProperty('--scroll-thumb-color', 'grey')
-
-        this.$store.dispatch('switchDarkMode')
-      }
+      this.$store.dispatch('switchDarkMode')
     }
   }
 }

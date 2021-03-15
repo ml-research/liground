@@ -156,12 +156,10 @@ export default {
 .table {
   font-size: 0.9em;
   text-align: left;
-  color: var(--main-text-color);
 }
 
 input[type=number] {
   text-align: right;
-  color: var(--main-text-color);
 }
 /* make arrows of number input always visible */
 input[type=number]::-webkit-inner-spin-button {
