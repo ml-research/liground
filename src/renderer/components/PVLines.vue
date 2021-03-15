@@ -133,7 +133,6 @@ export default {
   justify-content: center;
 }
 
-
 .details {
   font-size: 8pt;
   font-family: Avenir, Helvetica, Arial, sans-serif;
