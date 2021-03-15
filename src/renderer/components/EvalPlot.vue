@@ -31,6 +31,9 @@ export default {
       break: false,
       is960: false,
       chartOptions: {
+        stroke: {
+          width: 1
+        },
         dataLabels: {
           enabled: false
         },
