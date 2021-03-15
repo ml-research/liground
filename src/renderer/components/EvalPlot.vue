@@ -132,6 +132,10 @@ export default {
     moves () { // extracts the main variant
       let move = this.$store.getters.mainFirstMove
       const tempMainMoves = []
+      const check = this.chartOptions.xaxis.categories[1]
+      if (check && (move && move.name !== check)) {
+        this.clear()
+      }
       if (move) {
         tempMainMoves.push(move)
         while (move.main) {
@@ -230,9 +234,9 @@ export default {
       this.chartOptions.xaxis.categories.push('Start')
       while (index < length) {
         if (index % 2 === 1) {
-          this.chartOptions.xaxis.categories.push('..' + this.mainMoves[index].name)
+          this.chartOptions.xaxis.categories[index + 1] = '..' + this.mainMoves[index].name
         } else {
-          this.chartOptions.xaxis.categories.push(this.mainMoves[index].name)
+          this.chartOptions.xaxis.categories[index + 1] = this.mainMoves[index].name
         }
         index++
       }
