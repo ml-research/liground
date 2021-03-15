@@ -20,7 +20,7 @@
     <span
       v-if="printRoot"
       class="move-name"
-      :class="{ current : move.current }"
+      :class="{ current : move.fen === fen }"
       @click="updateBoard(move)"
       @contextmenu.prevent="(menuAtMove === move.name || displayMenu) ? $refs.menu.open($event, { name: move.name }) : dummy"
     >
@@ -140,6 +140,9 @@ export default {
     mainFirstMove () {
       return this.$store.getters.mainFirstMove
     },
+    fen () {
+      return this.$store.getters.fen
+    },
     firstMoves () {
       return this.$store.getters.firstMoves
     },
@@ -241,7 +244,6 @@ export default {
       }
     },
     updateBoard (move) {
-      console.log(this.showMenu)
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {

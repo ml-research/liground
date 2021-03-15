@@ -5,7 +5,7 @@
       class="icon mdi"
       :class="[isWhite ? 'mdi-checkbox-blank-circle-outline' : 'mdi-checkbox-blank-circle']"
     />
-    [{{ playerTitle }}] {{ name }} ({{ elo }})
+    <span v-if="playerTitle">[{{ playerTitle }}]</span> {{ name }} <span v-if="elo">({{ elo }})</span>
   </div>
 </template>
 
@@ -15,11 +15,11 @@ export default {
   props: {
     playerTitle: {
       type: String,
-      default: '?'
+      default: null
     },
     elo: {
       type: [String, Number],
-      default: '?'
+      default: null
     },
     name: {
       type: String,
