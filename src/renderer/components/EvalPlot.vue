@@ -24,11 +24,11 @@ export default {
   data: function () {
     return {
       setBetterValuesRunning: false,
+      localPlotDepth: this.$store.getters.evalPlotDepth,
       mainMoves: [],
       depthArr: [],
       currentCalcPos: undefined,
       first: 0,
-      evalArray: [0],
       break: false,
       is960: false,
       chartOptions: {
@@ -109,7 +109,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhite', 'depth'])
+    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhite', 'depth', 'evalPlotDepth'])
   },
   watch: {
     board () {
@@ -129,13 +129,16 @@ export default {
     },
     moves () { // extracts the main variant
       let move = this.$store.getters.mainFirstMove
-      this.mainMoves = []
+      const tempMainMoves = []
       if (move) {
-        this.mainMoves.push(move)
+        tempMainMoves.push(move)
         while (move.main) {
           move = move.main
-          this.mainMoves.push(move)
+          tempMainMoves.push(move)
         }
+        // this.setDepth(tempMainMoves)
+        this.checkForMainVariantChange(tempMainMoves)
+        this.mainMoves = tempMainMoves
       }
     },
     depth () {
@@ -143,6 +146,9 @@ export default {
         this.setBetterValuesRunning = true
         this.setBetterValue()
       }
+    },
+    evalPlotDepth () {
+      this.localPlotDepth = this.evalPlotDepth
     },
     openedPGN () {
       if (this.first >= 2 || this.series[0].data.length > 0) {
@@ -158,7 +164,6 @@ export default {
       this.clear()
     })
     document.addEventListener('startEval', () => {
-      console.log('shouldstart')
       this.loadPlot()
     })
     document.addEventListener('stopEval', () => {
@@ -177,7 +182,6 @@ export default {
       this.series = [{
         data: []
       }]
-      this.evalArray = [0]
       this.chartOptions.fill.gradient.colorStops[1].opacity = 0
       this.chartOptions.fill.gradient.colorStops[0].offset = 100
     },
@@ -199,8 +203,8 @@ export default {
     },
 
     calcOffset () { // calculates and sets the offset which is used to determine how much of the graph should be colored black
-      const min = Math.min(...this.evalArray)
-      const max = Math.max(...this.evalArray)
+      const min = Math.min(...this.series[0].data)
+      const max = Math.max(...this.series[0].data)
       let newOffset = 0
       if (min >= 0) {
         newOffset = 100
@@ -219,71 +223,67 @@ export default {
     },
 
     async loadPlot () { // pushes all the moves to the plot when button is pressed
+      const length = this.mainMoves.length
       if (this.mainMoves.length === 0) {
         return
       }
-      const depth = this.$store.getters.evalPlotDepth
-      const newArray = [0]
       let index = 0
-      const length = this.mainMoves.length
+      this.chartOptions.xaxis.categories.splice(0, this.chartOptions.xaxis.categories.length)
+      this.chartOptions.xaxis.categories.push('Start')
       while (index < length) {
-        newArray.push(0)
         if (index % 2 === 1) {
           this.chartOptions.xaxis.categories.push('..' + this.mainMoves[index].name)
         } else {
           this.chartOptions.xaxis.categories.push(this.mainMoves[index].name)
         }
-        this.depthArr.push(depth)
         index++
       }
-      this.evalArray = newArray
-      this.series = [{
-        data: newArray
-      }]
+      this.setDepth(this.mainMoves)
       await this.evaluateHistory()
     },
 
     async evaluateHistory () { // updates the graph
-      console.log('isCalled')
       if (this.break) {
-        console.log('break')
         this.break = false
         setTimeout(this.evaluateHistory, 1000)
         return
       }
       let index = 0
       let points = 0
-      const depth = this.$store.getters.evalPlotDepth
-      while (index < this.series[0].data.length - 1) {
-        try {
+      const tmpArray = this.series[0].data
+      tmpArray[0] = 0
+      const depth = this.localPlotDepth
+      while (index < this.mainMoves.length) {
+        if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
-          if (this.break) { // cleares the graph when its supposed to
+          if (this.break) { // stops evaluating
             this.break = false
+            this.setDepth(this.mainMoves)
             return
           }
           this.break = false
           points = this.adjustPoints(points)
-          this.evalArray[index + 1] = points
+          tmpArray[index + 1] = points
           this.series = [{
-            data: this.evalArray
+            data: tmpArray
           }]
           this.calcOffset()
-          index++
-        } catch (error) {
-          this.clear()
         }
+        index++
       }
       document.dispatchEvent(new Event('finishedEval')) // resets the button
     },
-    setBetterValue () {
+    setBetterValue () { // sets a better value for an already drawn plot
       let index = 0
-      while (index < this.mainMoves.length) {
+      if (this.mainMoves === []) { // no values set
+        return
+      }
+      while (index < this.series[0].data.length - 1) {
         const depth = this.$store.getters.depth
         if (this.currentCalcPos === this.mainMoves[index].fen) {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            console.log('Punkte: ' + this.cpForWhite / 100 + 'für Index: ' + index)
             newArray[index + 1] = this.cpForWhite / 100
             this.series = [{
               data: newArray
@@ -294,6 +294,34 @@ export default {
         index++
       }
       this.setBetterValuesRunning = false
+    },
+    setDepth (arr) { // sets the depthArray
+      const tmpArray = arr
+      let index = 0
+      const evalPlotDepth = this.$store.getters.evalPlotDepth
+      while (index < tmpArray.length) {
+        if (this.depthArr[index] === undefined || this.depthArr[index] < evalPlotDepth) {
+          this.depthArr[index] = evalPlotDepth
+        }
+        index++
+      }
+    },
+    checkForMainVariantChange (arr) { // if position no longer in main variant then it resets the depthArray at that position
+      const depth = this.localPlotDepth
+      let move = this.mainMoves[0]
+      if (!move) {
+        return
+      }
+      let tempMove = arr[0]
+      let index = 0
+      while (move && tempMove) {
+        if (move.fen !== tempMove.fen) {
+          this.depthArr[index] = depth
+        }
+        index++
+        move = move.main
+        tempMove = tempMove.main
+      }
     }
   }
 }

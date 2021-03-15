@@ -53,7 +53,7 @@ export default {
         this.$store.commit('evalPlotDepth', 20)
         return
       }
-      this.$store.commit('evalPlotDepth', event.target.value)
+      this.$store.commit('evalPlotDepth', parseInt(event.target.value))
     },
     startEval () {
       if (this.$store.getters.moves.length === 0) {
