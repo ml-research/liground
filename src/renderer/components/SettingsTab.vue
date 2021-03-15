@@ -1,5 +1,20 @@
 <template>
   <div class="settings">
+    <div class="engines">
+      <EngineSelect class="select" />
+      <div
+        class="icon blue mdi mdi-pencil"
+        @click="editEngine"
+      />
+      <div
+        class="icon red mdi mdi-delete"
+        @click="deleteEngine"
+      />
+      <div
+        class="icon green mdi mdi-plus-circle"
+        @click="addEngine"
+      />
+    </div>
     <span class="title">Engine Settings</span>
     <table class="table">
       <tr
@@ -86,11 +101,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import EngineSelect from './EngineSelect'
 
 export default {
   name: 'SettingsTab',
-  components: {
-  },
+  components: { EngineSelect },
   data () {
     return {
       settings: {}
@@ -132,6 +147,15 @@ export default {
           this.settings[name] = this.engineSettings[name]
         }
       }
+    },
+    editEngine () {
+      alert('editing engine')
+    },
+    deleteEngine () {
+      alert('deleting engine')
+    },
+    addEngine () {
+      alert('adding engine')
     }
   }
 }
@@ -142,6 +166,39 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
+.engines {
+  display: flex;
+  flex-direction: row;
+}
+.engines > * {
+  margin: 0 5px;
+}
+.select {
+  flex-grow: 1;
+}
+.icon {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #757575;
+  cursor: pointer;
+}
+.icon.green:hover {
+  color: #4aae9b;
+}
+.icon.blue:hover {
+  color: #2470b6;
+}
+.icon.red:hover {
+  color: #b22222;
+}
+
 .title {
   font-size: 1.2em;
   text-align: center;
@@ -169,18 +226,18 @@ input[type=number]::-webkit-inner-spin-button {
   width: 250px;
   margin: 0.2em auto;
 }
+.btn.green {
+  color: white;
+  background-color: #4aae9b;
+}
+.btn.green:hover {
+  background-color: #3c8577;
+}
 .btn.red {
   color: white;
   background-color: #b22222;
 }
 .btn.red:hover {
   background-color: #8b1919;
-}
-.btn.green {
-  color: white;
-  background-color: #4AAE9B;
-}
-.btn.green:hover {
-  background-color: #3c8577;
 }
 </style>
