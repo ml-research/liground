@@ -210,6 +210,15 @@ export default {
       return null
     },
     promote (move) {
+      const movesToDelete = this.movesToDelete(move)
+      if (movesToDelete.includes(this.menuAtMove)) {
+        this.$store.dispatch('displayMenu', true)
+        this.$store.dispatch('menuAtMove', null)
+      }
+      if (!move.prev) {
+        this.$store.dispatch('mainFirstMove', move)
+        return
+      }
       let mov = move
       while (mov.prev) { // promote at every "fork"
         mov.prev.main = mov
