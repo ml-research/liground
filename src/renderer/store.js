@@ -179,7 +179,8 @@ export const store = new Vuex.Store({
     ],
     curVar960Fen: '',
     viewAnalysis: true,
-    analysisMode: true
+    analysisMode: true,
+    fenply: 1
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -318,6 +319,7 @@ export const store = new Vuex.Store({
       state.lastFen = state.board.fen()
       state.startFen = state.board.fen()
       state.selectedGame = null
+      state.fenply = 1
     },
     resetBoard (state, payload) {
       state.curVar960Fen = ''
@@ -332,7 +334,11 @@ export const store = new Vuex.Store({
       if (prev) {
         ply = prev.ply + 1
       } else { // then its a starting move
-        ply = 1
+        if (state.turn) {
+          ply = state.fenply
+        } else {
+          ply = state.fenply + 1
+        }
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
@@ -390,6 +396,9 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
+    },
+    fenply (state, payload) {
+      state.fenply = payload
     }
   },
   actions: { // async
@@ -480,7 +489,16 @@ export const store = new Vuex.Store({
           context.dispatch('updateBoard')
           context.dispatch('restartEngine')
           context.commit('newBoard', { fen: payload })
+          let index = 1
+          while (payload[payload.length - index] !== ' ') {
+            index = index + 1
+          }
+          const numAsString = payload.substring(payload.length - index, payload.length)
+          const ply = parseInt(numAsString)
+          context.commit('fenply', 2 * ply - 1)
         }
+      } else {
+        alert('Please insert a valid FEN for the current variant')
       }
     },
     lastFen (context, payload) {
