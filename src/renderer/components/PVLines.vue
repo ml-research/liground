@@ -2,14 +2,13 @@
   <div class="pv-lines">
     <div class="scroller">
       <div class="list">
-        <div
+        <template
           v-for="(line, id) in lines"
-          :key="id"
-          class="item"
         >
           <div
             v-if="line"
-            class="content"
+            :key="id"
+            class="item clickable"
             @mouseenter="onMouseEnter(id)"
             @mouseleave="onMouseLeave(id)"
             @click="onClick(line)"
@@ -19,11 +18,12 @@
           </div>
           <div
             v-else
-            class="placeholder"
+            :key="id"
+            class="item placeholder"
           >
             ...
           </div>
-        </div>
+        </template>
       </div>
     </div>
     <div
@@ -105,35 +105,34 @@ export default {
   height: 2em;
   padding: 5px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   user-select: none;
 }
 .item + .item {
   border-top: 1px solid #333;
 }
-.content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.item.clickable {
   cursor: pointer;
 }
-.content:hover {
+.item.clickable:hover {
   background-color: #d3e1eb;
 }
-.content > .left {
+.item > .left {
   margin-right: 5px;
   font-family: sans-serif;
   font-weight: 1000;
   text-align: center;
 }
-.content > .right {
+.item > .right {
   text-align: left;
   flex: 0 0 auto;
 }
-.placeholder {
+.item.placeholder {
   font-family: sans-serif;
-  text-align: center;
+  justify-content: center;
 }
+
 
 .details {
   font-size: 8pt;
