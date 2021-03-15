@@ -172,7 +172,10 @@ export const store = new Vuex.Store({
       'makruk'
     ],
     xiangqiVariants: [
-      'janggi', 'xiangqi'
+      'xiangqi'
+    ],
+    janggiVariants: [
+      'janggi'
     ],
     shogiVariants: [
       'shogi'
@@ -414,12 +417,6 @@ export const store = new Vuex.Store({
         if (localStorage.darkMode !== context.state.darkMode) {
           context.commit('switchDarkMode')
         }
-      }
-      if (localStorage.internationalPieceStyle) {
-        store.commit('pieceStyle', localStorage.internationalPieceStyle)
-      }
-      if (localStorage.internationalBoardStyle) {
-        store.commit('boardStyle', localStorage.internationalBoardStyle)
       }
       if (localStorage.variant) {
         store.commit('variant', localStorage.variant)
@@ -874,6 +871,9 @@ export const store = new Vuex.Store({
     },
     isXiangqi (state) {
       return state.xiangqiVariants.includes(state.variant)
+    },
+    isJanggi (state) {
+      return state.janggiVariants.includes(state.variant)
     },
     isShogi (state) {
       return state.shogiVariants.includes(state.variant)
