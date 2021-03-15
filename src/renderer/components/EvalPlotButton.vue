@@ -3,7 +3,7 @@
     <div class="EvalPlotButton">
       Eval Depth:
       <span class="hide">
-        Input a number to set the engine depth for the Eval Plot or leave it empty for a default of 20.
+        Input a number to set the engine depth for the Eval Plot.
       </span>
     </div>
     <div class="inputDepth">
@@ -11,7 +11,7 @@
         id="in"
         class="inputField"
         type="number"
-        :value="curVar"
+        :value="this.$store.getters.evalPlotDepth"
         @change="updateEvalDepth"
       >
     </div>
@@ -38,8 +38,7 @@ export default {
   components: {},
   data () {
     return {
-      running: false,
-      curVar: ''
+      running: false
     }
   },
   created () {
