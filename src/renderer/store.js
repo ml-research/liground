@@ -525,10 +525,10 @@ export const store = new Vuex.Store({
         // switch to new engine
         const last = context.state.selectedEngines[payload]
         const newEngine = typeof last === 'string'
-          ? context.state.allEngines[last]
-          : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine : context.getters.availableEngines[0])
+          ? last
+          : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine.name : context.getters.availableEngines[0].name)
         context.dispatch('changeEngine', newEngine).then(() => {
-          context.dispatch('setEngineOptions', { UCI_Variant: payload })
+          context.dispatch('initEngineOptions')
         })
       }
     },
@@ -581,7 +581,7 @@ export const store = new Vuex.Store({
         .filter(([_, variant]) => !Object.values(engines).find(engine => engine.variants.includes(variant)))
         .map(([name, _]) => name)
       if (missing.length > 0) {
-        alert(`Cannot delete Engine "${payload}":\nOnly Engine for Variants ${missing.join(', ')}!`)
+        alert(`Cannot delete Engine "${payload}":\nOnly Engine supporting Variants ${missing.join(', ')}!`)
         return
       }
       context.state.allEngines = engines
