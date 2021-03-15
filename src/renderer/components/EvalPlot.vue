@@ -31,6 +31,10 @@ export default {
       break: false,
       is960: false,
       chartOptions: {
+        annotations: {
+          position: 'front',
+
+        },
         stroke: {
           width: 1
         },
@@ -46,7 +50,7 @@ export default {
         },
         tooltip: {
           shared: false,
-          intersect: true
+          intersect: true,
         },
         noData: {
           text: '',
@@ -79,7 +83,8 @@ export default {
           }
         },
         markers: {
-          size: 4
+          size: 3,
+          strokeWidth: 0
         },
         chart: {
           id: 'plot',
@@ -115,7 +120,7 @@ export default {
         name: 'Evaluation',
         data: [],
         style: {
-          color: 'var(--main-text-color)'
+          color: 'var(--main-text-color)',
         }
       }]
     }
