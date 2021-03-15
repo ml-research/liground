@@ -24,7 +24,7 @@
         <div class="cg-board-wrap">
           <div ref="board" />
           <div
-            v-if="isPromotionModalVisible && !isPast"
+            v-if="isPromotionModalVisible"
             id="PromotionModal"
             ref="promotion"
 
