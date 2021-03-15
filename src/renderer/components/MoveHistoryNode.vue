@@ -23,7 +23,7 @@
       :class="{ current : move.fen === fen }"
       @click="updateBoard(move)"
     >
-      {{ move.name }}
+      {{ checkCheckmate(move.name) }}
     </span>
     <span v-if="move.fen === mainFirstMove.fen">
       <MoveHistoryNode
@@ -113,6 +113,14 @@ export default {
   methods: {
     updateBoard (move) {
       this.$store.dispatch('fen', this.move.fen)
+    },
+    checkCheckmate (name) {
+      const moves = this.$store.getters.moves
+      const last = moves[moves.length - 1]
+      if (this.$store.getters.legalMoves.length === 0 && name === last.name) {
+        return name + '#'
+      }
+      return name
     }
   }
 }
