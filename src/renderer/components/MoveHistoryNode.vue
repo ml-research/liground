@@ -158,6 +158,12 @@ export default {
       })
     }
   },
+  watch: {
+    moves () {
+      this.$store.dispatch('displayMenu', true)
+      this.$store.dispatch('menuAtMove', null)
+    }
+  },
   methods: {
     dummy () {
       return null
