@@ -24,7 +24,6 @@ export default {
   data: function () {
     return {
       setBetterValuesRunning: false,
-      localPlotDepth: this.$store.getters.evalPlotDepth,
       mainMoves: [],
       depthArr: [],
       currentCalcPos: undefined,
@@ -136,7 +135,6 @@ export default {
           move = move.main
           tempMainMoves.push(move)
         }
-        // this.setDepth(tempMainMoves)
         this.checkForMainVariantChange(tempMainMoves)
         this.mainMoves = tempMainMoves
       }
@@ -146,9 +144,6 @@ export default {
         this.setBetterValuesRunning = true
         this.setBetterValue()
       }
-    },
-    evalPlotDepth () {
-      this.localPlotDepth = this.evalPlotDepth
     },
     openedPGN () {
       if (this.first >= 2 || this.series[0].data.length > 0) {
@@ -252,7 +247,7 @@ export default {
       let points = 0
       const tmpArray = this.series[0].data
       tmpArray[0] = 0
-      const depth = this.localPlotDepth
+      const depth = this.$store.getters.evalPlotDepth
       while (index < this.mainMoves.length) {
         if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
@@ -307,7 +302,7 @@ export default {
       }
     },
     checkForMainVariantChange (arr) { // if position no longer in main variant then it resets the depthArray at that position
-      const depth = this.localPlotDepth
+      const depth = this.$store.getters.evalPlotDepth
       let move = this.mainMoves[0]
       if (!move) {
         return
