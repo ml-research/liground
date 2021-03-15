@@ -574,11 +574,12 @@ export const store = new Vuex.Store({
         await context.dispatch('changeEngine', name)
       }
     },
-    deleteEngine (context, payload) {
+    async deleteEngine (context, payload) {
       const engines = { ...context.state.allEngines }
       delete engines[payload]
       context.state.allEngines = engines
       localStorage.engines = JSON.stringify(context.state.allEngines)
+      await context.dispatch('changeEngine', context.getters.availableEngines[0].name)
     },
     async changeEngine (context, payload) {
       const id = payload
