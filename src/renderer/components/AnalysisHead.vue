@@ -69,6 +69,7 @@ export default {
   background-color:lightgray ;
   border: black;
   outline: none;
+  border-radius: 50%;
   padding-bottom: 5px;
   padding-top: 5px;
 }
@@ -79,7 +80,7 @@ export default {
   /* display: table */
   font-size: 15pt;
   height: 40px;
-  width: 600px;
+  width: 650px;
 }
 .multiselect {
   width: 200px;
