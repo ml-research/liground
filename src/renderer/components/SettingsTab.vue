@@ -1,5 +1,9 @@
 <template>
   <div class="settings">
+    <div>
+      <p>DarkMode</p>
+      <DarkModeSwitch class="darkSwitch" />
+    </div>
     <span class="title">Engine Settings</span>
     <table class="table">
       <tr
@@ -89,7 +93,7 @@ import DarkModeSwitch from './DarkModeSwitch.vue'
 export default {
   name: 'SettingsTab',
   components: {
-    DarkModeSwitch,
+    DarkModeSwitch
   },
   data () {
     return {
@@ -152,17 +156,22 @@ export default {
 .table {
   font-size: 0.9em;
   text-align: left;
+  color: var(--main-text-color);
 }
 
 input[type=number] {
   text-align: right;
+  color: var(--main-text-color);
 }
 /* make arrows of number input always visible */
 input[type=number]::-webkit-inner-spin-button {
-  opacity: 1
+  opacity: 0.5;
 }
+
 .input {
   width: 100%;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
 }
 
 .btn {
