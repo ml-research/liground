@@ -362,7 +362,8 @@ input {
   border-color: var(--main-border-color, white) !important;
 }
 .multiselect__select {
-  right: 1px; 
+  border-radius: 5px;
+  right: 2px;
   top: 2px;
   height: 36px;
 }
@@ -370,12 +371,12 @@ input {
 .v-table-header-wrap *,
 .v-table-body * {
   background-color: var(--second-bg-color, white) !important;
-  color: var(--main-text-color, black) !important; 
-  border-color: var(--main-border-color, white) !important; 
+  color: var(--main-text-color, black) !important;
+  border-color: var(--main-border-color, white) !important;
 }
 .v-table-dynamic * ,
 .v-table:before{
-  border-color: var(--main-border-color, white) !important; 
+  border-color: var(--main-border-color, white) !important;
 }
 ::-webkit-scrollbar {
   width: auto;
@@ -393,4 +394,3 @@ input {
 }
 
 </style>
-

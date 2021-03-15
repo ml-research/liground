@@ -16,7 +16,6 @@
       @click="resetBoard"
     >
     <Mode960 />
-    
   </div>
 </template>
 
@@ -96,4 +95,3 @@ export default {
 }
 
 </style>
-

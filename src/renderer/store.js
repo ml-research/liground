@@ -175,7 +175,8 @@ export const store = new Vuex.Store({
     ],
     curVar960Fen: '',
     viewAnalysis: true,
-    analysisMode: true
+    analysisMode: true,
+    darkMode: false
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -372,6 +373,9 @@ export const store = new Vuex.Store({
     },
     openedPGN (state, payload) {
       state.openedPGN = payload
+    },
+    switchDarkMode (state) {
+      state.darkMode = !state.darkMode
     }
   },
   actions: { // async
@@ -651,6 +655,9 @@ export const store = new Vuex.Store({
     },
     openedPGN (context, payload) {
       context.commit('openedPGN', payload)
+    },
+    switchDarkMode (context) {
+      context.commit('switchDarkMode')
     }
   },
   getters: {
@@ -846,6 +853,9 @@ export const store = new Vuex.Store({
     },
     analysisMode (state) {
       return state.analysisMode
+    },
+    darkMode (state) {
+      return state.darkMode
     }
   }
 })

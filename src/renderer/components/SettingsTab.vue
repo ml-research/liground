@@ -3,6 +3,10 @@
     <title>SettingsTab</title>
     <h1>This is the Settings Tab</h1>
     <div>
+      <div>
+        <p>DarkMode</p>
+        <DarkModeSwitch class="darkSwitch" />
+      </div>
       <PrettyCheck
         class="p-icon p-curve p-smooth"
         color="primary-o"
@@ -51,9 +55,11 @@
 
 <script>
 import PrettyCheck from 'pretty-checkbox-vue/check'
+import DarkModeSwitch from './DarkModeSwitch.vue'
 export default {
   name: 'SettingsTab',
   components: {
+    DarkModeSwitch,
     PrettyCheck
   },
   methods: {

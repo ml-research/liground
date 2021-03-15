@@ -48,7 +48,7 @@ export default {
           offsetX: 0,
           offsetY: 0,
           style: {
-            color: '#000000',
+            color: 'var(--main-text-color)',
             fontSize: '14px'
           }
         },
@@ -76,6 +76,7 @@ export default {
         },
         chart: {
           id: 'plot',
+          foreColor: 'var(--main-text-color)',
           events: {
             markerClick: (event, chartContext, { seriesIndex, dataPointIndex, config }) => {
               if (dataPointIndex === 0) {
@@ -89,17 +90,26 @@ export default {
         },
         xaxis: {
           type: 'category',
-          categories: ['Start']
+          categories: ['Start'],
+          style: {
+            color: 'var(--main-text-color)'
+          }
         },
         yaxis: {
           title: {
-            text: 'Eval'
+            text: 'Eval',
+            style: {
+              color: 'var(--main-text-color)'
+            }
           }
         }
       },
       series: [{
         name: 'Evaluation',
-        data: []
+        data: [],
+        style: {
+          color: 'var(--main-text-color)'
+        }
       }]
     }
   },
@@ -227,3 +237,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.link {
+  color: var(--main-text-color);
+}
+</style>
