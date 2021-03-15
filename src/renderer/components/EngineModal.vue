@@ -6,7 +6,7 @@
     />
     <div class="contents">
       <header class="header">
-        New Engine
+        {{ title }}
       </header>
       <section class="body">
         <div class="item">
@@ -60,10 +60,24 @@ import { remote } from 'electron'
 
 export default {
   name: 'EngineModal',
+  props: {
+    title: {
+      required: true,
+      type: String
+    },
+    initialName: {
+      default: '',
+      type: String
+    },
+    initialPath: {
+      default: '',
+      type: String
+    }
+  },
   data () {
     return {
-      name: '',
-      path: '',
+      name: this.initialName,
+      path: this.initialPath,
       error: 'none'
     }
   },

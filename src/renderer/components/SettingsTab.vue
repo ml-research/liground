@@ -96,23 +96,37 @@
     >
       Cancel
     </a>
+    <EngineModal
+      v-if="modal.visible"
+      :title="modal.title"
+      :initial-name="modal.name"
+      :initial-path="modal.path"
+      @close="modal.visible = false"
+      @save="modal.save"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import EngineSelect from './EngineSelect'
+import EngineModal from './EngineModal'
 
 export default {
   name: 'SettingsTab',
-  components: { EngineSelect },
+  components: { EngineSelect, EngineModal },
   data () {
     return {
-      settings: {}
+      settings: {},
+      modal: {
+        visible: false,
+        title: '',
+        save: () => {}
+      }
     }
   },
   computed: {
-    ...mapGetters(['variant', 'engineOptions', 'engineSettings'])
+    ...mapGetters(['variant', 'engineOptions', 'engineSettings', 'selectedEngine'])
   },
   watch: {
     engineOptions () {
@@ -149,13 +163,23 @@ export default {
       }
     },
     editEngine () {
-      alert('editing engine')
+      this.modal = {
+        visible: true,
+        title: 'Edit Engine',
+        name: this.selectedEngine.name,
+        path: this.selectedEngine.binary,
+        save: (data) => console.log(`Editing engine "${this.selectedEngine.name}":`, data)
+      }
     },
     deleteEngine () {
-      alert('deleting engine')
+      console.log(`Deleting engine "${this.selectedEngine.name}"`)
     },
     addEngine () {
-      alert('adding engine')
+      this.modal = {
+        visible: true,
+        title: 'Add new Engine',
+        save: ({ name, path }) => this.$store.dispatch('registerEngine', { name, binary: path })
+      }
     }
   }
 }
