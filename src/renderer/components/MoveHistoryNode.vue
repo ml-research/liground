@@ -115,9 +115,11 @@ export default {
       this.$store.dispatch('fen', this.move.fen)
     },
     checkCheckmate (name) {
-      const moves = this.$store.getters.moves
-      const last = moves[moves.length - 1]
-      if (this.$store.getters.legalMoves.length === 0 && name === last.name) {
+      let last = this.$store.getters.mainFirstMove
+      while (last.main) {
+        last = last.main
+      }
+      if (this.$store.getters.legalMoves.length === 0 && name === last.name && !name.includes('#')) {
         return name + '#'
       }
       return name
