@@ -5,7 +5,7 @@
   >
     <div
       class="progress-value"
-      :style="{ height: `${cpForWhitePerc * 100}%` }"
+      :style="{ height: `${100 - cpForWhitePerc * 100}%` }"
     />
   </div>
 </template>
