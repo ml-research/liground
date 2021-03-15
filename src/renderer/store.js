@@ -98,6 +98,8 @@ function checkOption (options, name, value) {
   }
 }
 
+const filteredSettings = ['UCI_Variant']
+
 export const store = new Vuex.Store({
   state: {
     initialized: false,
@@ -138,6 +140,7 @@ export const store = new Vuex.Store({
       author: '',
       options: []
     },
+    engineSettings: {},
     engineStats: {
       depth: 0,
       seldepth: 0,
@@ -232,6 +235,24 @@ export const store = new Vuex.Store({
     },
     engineInfo (state, payload) {
       state.engineInfo = payload
+      const settings = {}
+      for (const option of payload.options) {
+        if (!filteredSettings.includes(option.name)) {
+          switch (option.type) {
+            case 'check':
+              settings[option.name] = option.default === 'true'
+              break
+            case 'spin':
+            case 'combo':
+              settings[option.name] = option.default
+              break
+            case 'string':
+              settings[option.name] = option.default || ''
+              break
+          }
+        }
+      }
+      state.engineSettings = settings
     },
     engineStats (state, payload) {
       state.engineStats = payload
@@ -296,6 +317,7 @@ export const store = new Vuex.Store({
       state.legalMoves = state.board.legalMoves()
       state.lastFen = state.board.fen()
       state.startFen = state.board.fen()
+      state.selectedGame = null
     },
     resetBoard (state, payload) {
       state.curVar960Fen = ''
@@ -314,20 +336,16 @@ export const store = new Vuex.Store({
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
-        if (state.moves[num].current) {
-          state.moves[num].current = false // set all moves as not the current one
-        }
         if (state.moves[num].uci === mov[0] && state.moves[num].prev === prev) {
           alreadyInMoves = state.moves[num] // if the move is already in the history its stored here
         }
       }
-      const current = true // the latest move is marked as current
       if (!alreadyInMoves) {
         state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
           const sanMove = state.board.sanMove(curVal)
           state.board.push(curVal)
           this.commit('playAudio', sanMove)
-          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, current: current }
+          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev }
         }))
         if (payload.prev) { // if the move is not a starting move
           prev.next.push(state.moves[state.moves.length - 1]) // the last entry in moves is the move object of the current move
@@ -342,7 +360,6 @@ export const store = new Vuex.Store({
         }
       } else {
         state.board.push(alreadyInMoves.uci)
-        alreadyInMoves.current = true
       }
       state.lastFen = state.board.fen()
     },
@@ -480,9 +497,6 @@ export const store = new Vuex.Store({
         context.dispatch('resetEngineData')
         const oldEngine = context.getters.selectedEngine
 
-        // deselect game
-        context.commit('selectedGame', null)
-
         // update variant
         context.commit('variant', payload)
         localStorage.variant = payload
@@ -542,9 +556,20 @@ export const store = new Vuex.Store({
       })
     },
     setEngineOptions (context, payload) {
+      if (context.getters.active) {
+        context.dispatch('stopEngine')
+      }
+      context.dispatch('resetEngineData')
       for (const [name, value] of Object.entries(payload)) {
         checkOption(context.state.engineInfo.options, name, value)
-        engine.send(`setoption name ${name} value ${value}`)
+        if (value !== undefined && value !== null) {
+          if (!filteredSettings.includes(name)) {
+            context.state.engineSettings[name] = value
+          }
+          engine.send(`setoption name ${name} value ${value}`)
+        } else {
+          engine.send(`setoption name ${name}`)
+        }
       }
     },
     idName (context, payload) {
@@ -620,9 +645,11 @@ export const store = new Vuex.Store({
       for (const curVal of payload.game.headerKeys().split(' ')) {
         gameInfo[curVal] = payload.game.headers(curVal)
       }
-      context.commit('gameInfo', gameInfo)
+
       await context.dispatch('variant', variant)
       context.commit('newBoard')
+      context.commit('selectedGame', payload.game)
+      context.commit('gameInfo', gameInfo)
       const moves = payload.game.mainlineMoves().split(' ')
       for (const num in moves) {
         if (num === 0) {
@@ -631,7 +658,7 @@ export const store = new Vuex.Store({
           context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1] }) // TODO differentiate between alternative lines
         }
       }
-      context.dispatch('fen', context.state.board.fen())
+      context.dispatch('fen', context.state.startFen)
       context.dispatch('updateBoard')
       context.commit('openedPGN', false)
     },
@@ -716,7 +743,10 @@ export const store = new Vuex.Store({
       return state.engineInfo.author
     },
     engineOptions (state) {
-      return state.engineInfo.options
+      return state.engineInfo.options.filter(({ name }) => !filteredSettings.includes(name))
+    },
+    engineSettings (state) {
+      return state.engineSettings
     },
     multipv (state) {
       return state.multipv
