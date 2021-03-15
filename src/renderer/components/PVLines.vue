@@ -80,7 +80,7 @@ export default {
     updateLines () {
       const count = this.engineSettings.MultiPV
       const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
-      this.lines = lines.concat(Array(count ? count - lines.length : 0).fill(null))
+      this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
     }
   }
 }
