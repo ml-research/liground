@@ -175,7 +175,9 @@ export const store = new Vuex.Store({
     ],
     curVar960Fen: '',
     viewAnalysis: true,
-    analysisMode: true
+    analysisMode: true,
+    menuAtMove: null,
+    displayMenu: true
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -388,6 +390,12 @@ export const store = new Vuex.Store({
     },
     openedPGN (state, payload) {
       state.openedPGN = payload
+    },
+    menuAtMove (state, payload) {
+      state.menuAtMove = payload
+    },
+    displayMenu (state, payload) {
+      state.displayMenu = payload
     }
   },
   actions: { // async
@@ -673,6 +681,12 @@ export const store = new Vuex.Store({
     },
     openedPGN (context, payload) {
       context.commit('openedPGN', payload)
+    },
+    menuAtMove (context, payload) {
+      context.commit('menuAtMove', payload)
+    },
+    displayMenu (context, payload) {
+      context.commit('displayMenu', payload)
     }
   },
   getters: {
@@ -868,6 +882,12 @@ export const store = new Vuex.Store({
     },
     analysisMode (state) {
       return state.analysisMode
+    },
+    menuAtMove (state) {
+      return state.menuAtMove
+    },
+    displayMenu (state) {
+      return state.displayMenu
     }
   }
 })

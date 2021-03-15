@@ -22,11 +22,15 @@
       class="move-name"
       :class="{ current : move.current }"
       @click="updateBoard(move)"
-      @contextmenu.prevent="$refs.menu.open"
+      @contextmenu.prevent="(menuAtMove === move.name || displayMenu) ? $refs.menu.open($event, { name: move.name }) : dummy"
     >
       {{ move.name }}
     </span>
-    <VueContext ref="menu">
+    <VueContext
+      ref="menu"
+      @open="onOpen($event, { name: move.name })"
+      @close="onClose"
+    >
       <li>
         <a
           v-if="!mainLine.includes(move)"
@@ -107,6 +111,12 @@ export default {
     }
   },
   computed: {
+    displayMenu () {
+      return this.$store.getters.displayMenu
+    },
+    menuAtMove () {
+      return this.$store.getters.menuAtMove
+    },
     mainLine () {
       const result = []
       if (this.mainFirstMove) {
@@ -146,6 +156,19 @@ export default {
     }
   },
   methods: {
+    dummy () {
+      return null
+    },
+    onOpen (event, data) {
+      if (this.displayMenu) {
+        this.$store.dispatch('menuAtMove', data.name)
+        this.$store.dispatch('displayMenu', false)
+      }
+    },
+    onClose () {
+      this.$store.dispatch('displayMenu', true)
+      this.$store.dispatch('menuAtMove', null)
+    },
     currentLine (move) {
       const result = []
       if (this.mainFirstMove) {
@@ -218,6 +241,7 @@ export default {
       }
     },
     updateBoard (move) {
+      console.log(this.showMenu)
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
