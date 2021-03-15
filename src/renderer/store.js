@@ -602,7 +602,7 @@ export const store = new Vuex.Store({
         .filter(([_, variant]) => !Object.values(engines).find(engine => engine.variants.includes(variant)))
         .map(([name, _]) => name)
       if (missing.length > 0) {
-        alert(`Cannot delete Engine "${payload}":\nOnly Engine supporting Variants ${missing.join(', ')}!`)
+        alert(`"${payload}" can not be deleted:\nOnly Engine supporting Variants ${missing.join(', ')}!`)
         return
       }
       context.state.allEngines = engines
