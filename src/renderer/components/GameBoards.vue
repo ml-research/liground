@@ -113,7 +113,7 @@ export default {
       return this.$store.getters.startFen
     },
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
-      for (let num = 0; num < this.moves.length; num++) {
+      for (let num = 0; num < this.moves.length; num++) { // beware that it matches by current FEN, not the one after dispatching a new one
         if (this.moves[num].fen === this.fen) {
           return this.moves[num]
         }
@@ -188,6 +188,7 @@ export default {
       const mov = this.currentMove
       if (!mov) {
         if (this.moves[0]) {
+          this.$store.dispatch('playAudio', this.moves[0].name)
           this.$store.dispatch('fen', this.moves[0].fen)
         }
         return
