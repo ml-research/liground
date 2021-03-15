@@ -82,6 +82,8 @@ input::-webkit-inner-spin-button {
 }
 .inputField {
   width: 50px;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
 }
 .button {
   padding: 5px;
@@ -99,8 +101,8 @@ input::-webkit-inner-spin-button {
 }
 .EvalPlotButton .hide {
   visibility: hidden;
-  background-color: white;
-  color:black;
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
   text-align: center;
   position: absolute;
   z-index: 1;

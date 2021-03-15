@@ -418,6 +418,12 @@ export const store = new Vuex.Store({
           context.commit('switchDarkMode')
         }
       }
+      if (localStorage.internationalPieceStyle) {
+        context.commit('pieceStyle', localStorage.internationalPieceStyle)
+      }
+      if (localStorage.internationalBoardStyle) {
+        context.commit('boardStyle', localStorage.internationalBoardStyle)
+      }
       if (localStorage.variant) {
         store.commit('variant', localStorage.variant)
       }
