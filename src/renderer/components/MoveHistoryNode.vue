@@ -23,7 +23,7 @@
       :class="{ current : move.fen === fen }"
       @click="updateBoard(move)"
     >
-      {{ checkCheckmate(move).name }}
+      {{ checkCheckmate(move) }}
     </span>
     <span v-if="move.fen === mainFirstMove.fen">
       <MoveHistoryNode
@@ -122,8 +122,8 @@ export default {
       let name = moveIn.name
       const variant = this.$store.getters.variant
       const board = new ffish.Board(variant, move.fen)
-      const legalMoves = board.legalMoves
-      if (legalMoves.length === 0) {
+      const legalMoves = board.legalMoves()
+      if (legalMoves.length === 0 && !name.includes('#')) {
         name = name + '#'
       }
       return name
