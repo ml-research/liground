@@ -131,9 +131,9 @@ export const store = new Vuex.Store({
     openedPGN: false,
     orientation: 'white',
     message: 'hello from Vuex',
-    allEngines: allEngines.map((engine, id) => ({ id, ...engine })),
-    activeEngine: 0,
-    selectedEngineIds: {},
+    allEngines,
+    activeEngine: Object.keys(allEngines)[0],
+    selectedEngines: {},
     engineInfo: {
       name: '',
       author: '',
@@ -227,9 +227,9 @@ export const store = new Vuex.Store({
       state.variant = payload
     },
     selectedEngines (state, payload) {
-      state.selectedEngineIds = payload
+      state.selectedEngines = payload
     },
-    clearIO (state) {
+    clearIO () {
       // dummy to trigger update in console
     },
     engineInfo (state, payload) {
@@ -521,11 +521,11 @@ export const store = new Vuex.Store({
         }
 
         // switch to new engine
-        const lastId = context.state.selectedEngineIds[payload]
-        const newEngine = typeof lastId === 'number'
-          ? context.state.allEngines[lastId]
+        const last = context.state.selectedEngines[payload]
+        const newEngine = typeof last === 'string'
+          ? context.state.allEngines[last]
           : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine : context.getters.availableEngines[0])
-        context.dispatch('engineBinary', newEngine.binary).then(() => {
+        context.dispatch('changeEngine', newEngine).then(() => {
           context.dispatch('setEngineOptions', { UCI_Variant: payload })
         })
       }
@@ -541,28 +541,29 @@ export const store = new Vuex.Store({
     async registerEngine (context, payload) {
       // we discover the variants by running the engine
       const { name, binary } = payload
-      if (context.state.allEngines.find(engine => engine.binary === binary)) {
-        console.warn(`Duplicate engine "${binary}"`)
-        return
-      }
       const info = await engine.run(binary)
       const variantOption = info.options.find(option => option.name === 'UCI_Variant')
       const variants = variantOption ? variantOption.var : ['chess']
-      context.state.allEngines.push({ name, binary, variants })
 
-      // save engines
+      // update engines
+      context.state.allEngines = {
+        ...context.state.allEngines,
+        [name]: { binary, variants }
+      }
       localStorage.engines = JSON.stringify(context.state.allEngines)
 
       // swap back to current engine after we are done
       // TODO: we could automatically swap to the new engine if it supports the current variant
       await engine.run(context.getters.engineBinary)
     },
-    async engineBinary (context, payload) {
-      const id = context.state.allEngines.findIndex(engine => engine.binary === payload)
+    async changeEngine (context, payload) {
+      const id = payload
 
       // always update selected engines
-      const selected = { ...context.state.selectedEngineIds }
-      selected[context.getters.variant] = id
+      const selected = {
+        ...context.state.selectedEngines,
+        [context.getters.variant]: id
+      }
       context.commit('selectedEngines', selected)
 
       // only change engine when its a different one
@@ -573,7 +574,7 @@ export const store = new Vuex.Store({
         }
         context.commit('clearIO')
         await context.dispatch('resetEngineData')
-        context.commit('engineInfo', await engine.run(payload))
+        context.commit('engineInfo', await engine.run(context.getters.engineBinary))
         await context.dispatch('initEngineOptions')
       }
     },
@@ -755,10 +756,12 @@ export const store = new Vuex.Store({
       return state.variantOptions
     },
     availableEngines (state, getters) {
-      return state.allEngines.filter(engine => engine.variants && engine.variants.includes(getters.variant))
+      return Object.entries(state.allEngines)
+        .map(([name, info]) => ({ name, ...info }))
+        .filter(engine => engine.variants && engine.variants.includes(getters.variant))
     },
     selectedEngine (state) {
-      return state.allEngines[state.activeEngine]
+      return { name: state.activeEngine, ...state.allEngines[state.activeEngine] }
     },
     engineBinary (state, getters) {
       return getters.selectedEngine.binary

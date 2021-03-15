@@ -16,7 +16,7 @@
       class="multiselect"
       :placeholder="selected.name"
       label="name"
-      track-by="id"
+      track-by="name"
       :options="availableEngines"
       :allow-empty="false"
       :show-labels="false"
@@ -50,7 +50,7 @@ export default {
   },
   watch: {
     selected () {
-      this.$store.dispatch('engineBinary', this.selected.binary)
+      this.$store.dispatch('changeEngine', this.selected.name)
     },
     selectedEngine () {
       this.selected = this.selectedEngine
