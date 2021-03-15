@@ -179,7 +179,9 @@ export const store = new Vuex.Store({
     ],
     curVar960Fen: '',
     viewAnalysis: true,
-    analysisMode: true
+    analysisMode: true,
+    menuAtMove: null,
+    displayMenu: true
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -205,6 +207,15 @@ export const store = new Vuex.Store({
     },
     firstMoves (state, payload) {
       state.firstMoves.push(payload)
+    },
+    deleteFromFirstMoves (state, payload) {
+      state.firstMoves.splice(state.firstMoves.indexOf(payload), 1)
+    },
+    deleteFromMoves (state, payload) {
+      for (const index in payload.next) {
+        this.commit('deleteFromMoves', payload.next[index])
+      }
+      state.moves.splice(state.moves.indexOf(payload), 1)
     },
     legalMoves (state, payload) {
       state.legalMoves = payload
@@ -306,7 +317,12 @@ export const store = new Vuex.Store({
           state.board = new ffish.Board(state.variant, fen)
         }
       } else {
-        state.board = new ffish.Board(state.variant)
+        if (is960) {
+          console.log(state.curVar960Fen)
+          state.board = new ffish.Board(state.variant, state.curVar960Fen, true)
+        } else {
+          state.board = new ffish.Board(state.variant)
+        }
       }
       state.moves = []
       state.mainFirstMove = null
@@ -320,7 +336,9 @@ export const store = new Vuex.Store({
       state.selectedGame = null
     },
     resetBoard (state, payload) {
-      state.curVar960Fen = ''
+      if (!payload.is960) {
+        state.curVar960Fen = ''
+      }
       this.commit('newBoard', payload)
       state.selectedGame = null
       state.moves = []
@@ -388,6 +406,12 @@ export const store = new Vuex.Store({
     openedPGN (state, payload) {
       state.openedPGN = payload
     },
+    menuAtMove (state, payload) {
+      state.menuAtMove = payload
+    },
+    displayMenu (state, payload) {
+      state.displayMenu = payload
+    },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
     }
@@ -430,13 +454,19 @@ export const store = new Vuex.Store({
     },
     mainFirstMove (context, payload) {
       if (context.state.mainFirstMove !== payload) {
-        context.dispatch('mainFirstMove', payload)
+        context.commit('mainFirstMove', payload)
       }
     },
     firstMoves (context, payload) {
       if (!context.state.firstMoves.includes(payload)) {
         context.dispatch('firstMoves', payload)
       }
+    },
+    deleteFromMoves (context, payload) {
+      if (!payload.prev) {
+        context.commit('deleteFromFirstMoves', payload)
+      }
+      context.commit('deleteFromMoves', payload)
     },
     resetEngineData (context) {
       context.commit('resetMultiPV')
@@ -680,6 +710,12 @@ export const store = new Vuex.Store({
     openedPGN (context, payload) {
       context.commit('openedPGN', payload)
     },
+    menuAtMove (context, payload) {
+      context.commit('menuAtMove', payload)
+    },
+    displayMenu (context, payload) {
+      context.commit('displayMenu', payload)
+    },
     evalPlotDepth (context, payload) {
       context.commit('evalPlotDepth', payload)
     }
@@ -886,6 +922,12 @@ export const store = new Vuex.Store({
     },
     analysisMode (state) {
       return state.analysisMode
+    },
+    menuAtMove (state) {
+      return state.menuAtMove
+    },
+    displayMenu (state) {
+      return state.displayMenu
     }
   }
 })
