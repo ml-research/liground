@@ -426,6 +426,8 @@ export const store = new Vuex.Store({
       }
       context.commit('newBoard')
       context.dispatch('updateBoard')
+      context.state.activeEngine = context.getters.availableEngines[0].name
+      context.dispatch('changeEngine', context.state.activeEngine)
       context.commit('initialized', true)
     },
     updateBoard (context) {
@@ -538,7 +540,7 @@ export const store = new Vuex.Store({
         is960: payload.is960
       })
     },
-    async registerEngine (context, payload) {
+    async addEngine (context, payload) {
       // we discover the variants by running the engine
       const { name, binary } = payload
       const info = await engine.run(binary)
@@ -555,6 +557,28 @@ export const store = new Vuex.Store({
       // swap back to current engine after we are done
       // TODO: we could automatically swap to the new engine if it supports the current variant
       await engine.run(context.getters.engineBinary)
+      await context.dispatch('initEngineOptions')
+    },
+    async editEngine (context, payload) {
+      const { old, changed: { name, binary } } = payload
+      if (context.state.allEngines[old].binary !== binary) {
+        // TODO: handle changed binary
+        alert('TODO: changed binary')
+      } else {
+        const engines = { ...context.state.allEngines }
+        const updated = Object.assign(engines[old], { binary })
+        delete engines[old]
+        engines[name] = updated
+        context.state.allEngines = engines
+        localStorage.engines = JSON.stringify(context.state.allEngines)
+        await context.dispatch('changeEngine', name)
+      }
+    },
+    deleteEngine (context, payload) {
+      const engines = { ...context.state.allEngines }
+      delete engines[payload]
+      context.state.allEngines = engines
+      localStorage.engines = JSON.stringify(context.state.allEngines)
     },
     async changeEngine (context, payload) {
       const id = payload

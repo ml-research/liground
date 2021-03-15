@@ -168,17 +168,21 @@ export default {
         title: 'Edit Engine',
         name: this.selectedEngine.name,
         path: this.selectedEngine.binary,
-        save: (data) => console.log(`Editing engine "${this.selectedEngine.name}":`, data)
+        save: ({ name, path }) => this.$store.dispatch('editEngine', {
+          old: this.selectedEngine.name,
+          changed: { name, binary: path }
+        })
       }
     },
     deleteEngine () {
-      console.log(`Deleting engine "${this.selectedEngine.name}"`)
+      // TODO: check before deletion
+      this.$store.dispatch('deleteEngine', this.selectedEngine.name)
     },
     addEngine () {
       this.modal = {
         visible: true,
         title: 'Add new Engine',
-        save: ({ name, path }) => this.$store.dispatch('registerEngine', { name, binary: path })
+        save: ({ name, path }) => this.$store.dispatch('addEngine', { name, binary: path })
       }
     }
   }
