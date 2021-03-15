@@ -577,6 +577,13 @@ export const store = new Vuex.Store({
     async deleteEngine (context, payload) {
       const engines = { ...context.state.allEngines }
       delete engines[payload]
+      const missing = Object.entries(context.state.variantOptions.getAll())
+        .filter(([_, variant]) => !Object.values(engines).find(engine => engine.variants.includes(variant)))
+        .map(([name, _]) => name)
+      if (missing.length > 0) {
+        alert(`Cannot delete Engine "${payload}":\nOnly Engine for Variants ${missing.join(', ')}!`)
+        return
+      }
       context.state.allEngines = engines
       localStorage.engines = JSON.stringify(context.state.allEngines)
       await context.dispatch('changeEngine', context.getters.availableEngines[0].name)

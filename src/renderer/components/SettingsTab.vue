@@ -175,7 +175,6 @@ export default {
       }
     },
     deleteEngine () {
-      // TODO: check before deletion
       this.$store.dispatch('deleteEngine', this.selectedEngine.name)
     },
     addEngine () {
