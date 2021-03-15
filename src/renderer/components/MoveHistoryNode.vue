@@ -143,14 +143,6 @@ export default {
       return this.firstMoves.filter((move) => {
         return move.fen !== this.mainFirstMove.fen
       })
-    },
-    currentMove () {
-      for (const idx in this.moves) {
-        if (this.moves[idx].current) {
-          return this.moves[idx]
-        }
-      }
-      return null
     }
   },
   methods: {
@@ -171,6 +163,15 @@ export default {
       }
       return result
     },
+    currentMove () {
+      for (const idx in this.moves) {
+        if (this.moves[idx].current) {
+          console.log(this.moves[idx])
+          return this.moves[idx]
+        }
+      }
+      return null
+    },
     promote (move) {
       let mov = move
       while (mov.prev) { // promote at every "fork"
@@ -179,6 +180,7 @@ export default {
       }
     },
     deleteMove (move) {
+      const currentMove = this.currentMove()
       this.$store.dispatch('deleteFromMoves', move)
       const currentLine = this.currentLine(move)
       if (move.prev) {
@@ -195,7 +197,7 @@ export default {
           }
         }
         move.prev.next.splice(moveIndex, 1)
-        if (currentLine.includes(this.currentMove)) {
+        if (currentLine.includes(currentMove)) {
           this.updateBoard(move.prev)
         }
       } else {
@@ -204,12 +206,12 @@ export default {
             this.$store.dispatch('resetBoard', { is960: this.is960 })
           } else {
             this.$store.dispatch('mainFirstMove', this.firstMoves[0])
-            if (currentLine.includes(this.currentMove)) {
+            if (currentLine.includes(currentMove)) {
               this.updateBoard(this.firstMoves[0])
             }
           }
         } else {
-          if (currentLine.includes(this.currentMove)) {
+          if (currentLine.includes(currentMove)) {
             this.updateBoard(this.mainFirstMove)
           }
         }
