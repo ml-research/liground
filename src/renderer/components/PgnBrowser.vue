@@ -111,9 +111,6 @@ export default {
   watch: {
     loadedGames: function () {
       if (this.$store.getters.loadedGames) {
-        if (this.$store.getters.loadedGames.length <= 1) {
-          this.groupByRound = false
-        }
         // get distinct rounds
         this.rounds = this.$store.getters.loadedGames.map((value, idx, arr) => {
           return `${value.headers('Round')} ${value.headers('Event')}`
