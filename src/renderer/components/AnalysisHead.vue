@@ -66,11 +66,12 @@ export default {
 
 <style scoped>
 .reset {
+  padding-bottom: 5px;
+  padding-top: 5px;
+  border-radius: 50%;
   background-color:lightgray ;
   border: black;
   outline: none;
-  padding-bottom: 5px;
-  padding-top: 5px;
 }
 .reset:hover {
   cursor:pointer;
@@ -79,7 +80,7 @@ export default {
   /* display: table */
   font-size: 15pt;
   height: 40px;
-  width: 600px;
+  width: 650px;
 }
 .multiselect {
   width: 200px;
