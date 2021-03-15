@@ -28,6 +28,7 @@
           <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
             <BoardStyleSelector id="board-style" />
+            <EvalPlotButton id="evalbutton-style" />
           </div>
         </div>
         <EvalPlot id="evalplot" />
@@ -64,6 +65,7 @@ import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
+import EvalPlotButton from './EvalPlotButton'
 // TODO: use GameInfo component?
 // import GameInfo from './GameInfo.vue'
 
@@ -78,7 +80,8 @@ export default {
     EvalPlot,
     // GameInfo,
     PgnBrowser,
-    SettingsTab
+    SettingsTab,
+    EvalPlotButton
   },
   data () {
     return {
@@ -121,21 +124,23 @@ export default {
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
       const keyName = event.key
-      if (keyName === 'ArrowUp') {
-        event.preventDefault()
-        this.moveToStart()
-      }
-      if (keyName === 'ArrowDown') {
-        event.preventDefault()
-        this.moveToEnd()
-      }
-      if (keyName === 'ArrowLeft') {
-        event.preventDefault()
-        this.moveBackOne()
-      }
-      if (keyName === 'ArrowRight') {
-        event.preventDefault()
-        this.moveForwardOne()
+      if (event.target.nodeName.toLowerCase() !== 'input') {
+        if (keyName === 'ArrowUp') {
+          event.preventDefault()
+          this.moveToStart()
+        }
+        if (keyName === 'ArrowDown') {
+          event.preventDefault()
+          this.moveToEnd()
+        }
+        if (keyName === 'ArrowLeft') {
+          event.preventDefault()
+          this.moveBackOne()
+        }
+        if (keyName === 'ArrowRight') {
+          event.preventDefault()
+          this.moveForwardOne()
+        }
       }
     }, false)
   },
@@ -335,6 +340,9 @@ input {
 }
 #evalplot {
   grid-area: evalplot;
+}
+#evalbutton-style {
+  margin-top: 10px;
 }
 
 </style>
