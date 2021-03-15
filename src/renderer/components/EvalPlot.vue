@@ -247,7 +247,7 @@ export default {
       let points = 0
       const tmpArray = this.series[0].data
       tmpArray[0] = 0
-      const depth = this.$store.getters.evalPlotDepth
+      const depth = this.evalPlotDepth
       while (index < this.mainMoves.length) {
         if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
@@ -293,7 +293,7 @@ export default {
     setDepth (arr) { // sets the depthArray
       const tmpArray = arr
       let index = 0
-      const evalPlotDepth = this.$store.getters.evalPlotDepth
+      const evalPlotDepth = this.evalPlotDepth
       while (index < tmpArray.length) {
         if (this.depthArr[index] === undefined || this.depthArr[index] < evalPlotDepth) {
           this.depthArr[index] = evalPlotDepth
@@ -302,7 +302,7 @@ export default {
       }
     },
     checkForMainVariantChange (arr) { // if position no longer in main variant then it resets the depthArray at that position
-      const depth = this.$store.getters.evalPlotDepth
+      const depth = this.evalPlotDepth
       let move = this.mainMoves[0]
       if (!move) {
         return
