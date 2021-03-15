@@ -4,14 +4,16 @@
       <div class="main-grid">
         <div class="chessboard-grid">
           <PgnBrowser id="pgnbrowser" />
-          <div @mousewheel.prevent="scroll($event)">
-            <ChessGround
-              id="chessboard"
-              :orientation="orientation"
-              @onMove="showInfo"
-            />
+          <div class="board">
+            <div @mousewheel.prevent="scroll($event)">
+              <ChessGround
+                id="chessboard"
+                :orientation="orientation"
+                @onMove="showInfo"
+              />
+            </div>
+            <EvalBar class="evalbar" />
           </div>
-          <EvalBar id="evalbar" />
           <div id="fen-field">
             FEN <input
               id="lname"
@@ -29,12 +31,11 @@
           </div>
         </div>
         <EvalPlot id="evalplot" />
-        <div
-          v-if="viewAnalysis"
-          id="right-column"
-        >
+        <div id="right-column">
           <AnalysisView
             id="analysisview"
+            class="tab"
+            :class="{ visible: viewAnalysis }"
             :reset="resetAnalysis"
             @move-to-start="moveToStart"
             @move-to-end="moveToEnd"
@@ -42,10 +43,10 @@
             @move-forward-one="moveForwardOne"
             @flip-board="flipBoard"
           />
-        </div>
-        <div v-else>
           <SettingsTab
             id="settingstab"
+            class="tab"
+            :class="{ visible: !viewAnalysis }"
           />
         </div>
       </div>
@@ -146,19 +147,7 @@ export default {
         this.moveForwardOne()
       }
     },
-    updateCurrent (move) {
-      for (const num in this.moves) {
-        if (this.moves[num].current) {
-          this.moves[num].current = false
-          break
-        }
-      }
-      if (move) {
-        move.current = true
-      }
-    },
     moveToStart () { // this method returns to the starting point of the current line
-      this.updateCurrent(undefined)
       this.$store.dispatch('fen', this.startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
@@ -177,7 +166,6 @@ export default {
           endOfLine = endOfLine.main
         }
       }
-      this.updateCurrent(endOfLine)
       this.$store.dispatch('fen', endOfLine.fen)
     },
     moveBackOne () { // this method moves back one move in the current line
@@ -186,19 +174,16 @@ export default {
         return
       }
       if (mov.ply === 1) {
-        this.updateCurrent(undefined)
         this.$store.dispatch('fen', this.startFen)
         return
       }
       this.$store.dispatch('fen', mov.prev.fen)
-      this.updateCurrent(mov.prev)
     },
     moveForwardOne () { // this method moves forward one move in the current line
       const mov = this.currentMove
       if (!mov) {
         if (this.moves[0]) {
           this.$store.dispatch('fen', this.moves[0].fen)
-          this.updateCurrent(this.moves[0])
         }
         return
       }
@@ -207,7 +192,6 @@ export default {
       }
       this.$store.dispatch('playAudio', mov.main.name)
       this.$store.dispatch('fen', mov.main.fen)
-      this.updateCurrent(mov.main)
     },
     flipBoard () {
       if (this.variant === 'racingkings') {
@@ -266,23 +250,22 @@ export default {
 <style scoped>
 .main-grid {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: auto auto;
   grid-template-rows: auto auto;
   grid-template-areas:
     "chessboard analysisview"
     "evalplot analysisview";
 }
-.main-grid > .chessboard-grid {
+.chessboard-grid {
   min-width: 925px;
   grid-area: chessboard;
   display: grid;
-  grid-template-columns: 20% 70% auto;
-  grid-template-rows: auto auto auto auto;
+  grid-template-columns: 20% auto;
+  grid-template-rows: auto auto auto;
   grid-template-areas:
-    "pgnbrowser . ."
-    ". fenfield ."
-    ". selector ."
-    ". evalplot .";
+    "pgnbrowser ."
+    ". fenfield"
+    ". selector";
 }
 #analysisview {
   height: 100%;
@@ -292,6 +275,9 @@ export default {
   grid-area: analysisview;
   width: 40vw;
   max-height: calc(100vh - 25px);
+}
+.tab:not(.visible) {
+  display: none;
 }
 input {
   font-size: 12pt;
@@ -319,20 +305,17 @@ input {
   margin-top: 10px;
   width: 210px;
 }
-.main-grid {
-  display: grid;
-  grid-template-columns: auto auto;
-}
-.chessboard-grid {
-  display: grid;
-  grid-template-columns: 20% auto auto;
-}
 #pgnbrowser {
   grid-area: pgnbrowser;
   border: 1px solid black;
   border-radius: 4px;
   margin-left: 1em;
   max-height: 60vh;
+}
+.board {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 #chessboard {
   display: inline-block;
@@ -344,11 +327,11 @@ input {
   display: table;
   margin: 0 auto;
 }
+.evalbar {
+  margin-left: 8px;
+}
 #analysisview {
   margin-left: 15px;
-}
-#evalbar {
-  float: left;
 }
 #evalplot {
   grid-area: evalplot;
