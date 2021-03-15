@@ -78,8 +78,8 @@ export default {
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     },
     updateLines () {
+      const count = this.engineSettings.MultiPV || 1
       const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
-      const count = this.engineSettings.MultiPV
       this.lines = lines.concat(Array(count - lines.length).fill(null))
     }
   }

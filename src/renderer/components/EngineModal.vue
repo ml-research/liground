@@ -96,7 +96,7 @@ export default {
         this.error = 'Engine name cannot be empty!'
       } else if (path.length === 0) {
         this.error = 'Engine path cannot be empty!'
-      } else if (this.$store.state.allEngines[name]) {
+      } else if (this.$store.state.allEngines[name] && name !== this.initialName) {
         this.error = `Name "${name}" already in use!`
       } else {
         this.error = 'none'

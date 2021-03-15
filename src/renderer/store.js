@@ -132,7 +132,7 @@ export const store = new Vuex.Store({
     orientation: 'white',
     message: 'hello from Vuex',
     allEngines,
-    activeEngine: Object.keys(allEngines)[0],
+    activeEngine: null,
     selectedEngines: {},
     engineInfo: {
       name: '',
@@ -426,8 +426,7 @@ export const store = new Vuex.Store({
       }
       context.commit('newBoard')
       context.dispatch('updateBoard')
-      context.state.activeEngine = context.getters.availableEngines[0].name
-      context.dispatch('changeEngine', context.state.activeEngine)
+      context.dispatch('changeEngine', context.getters.availableEngines[0].name)
       context.commit('initialized', true)
     },
     updateBoard (context) {
@@ -541,7 +540,7 @@ export const store = new Vuex.Store({
       })
     },
     async addEngine (context, payload) {
-      // we discover the variants by running the engine
+      // discover the variants by running the engine
       const { name, binary } = payload
       const info = await engine.run(binary)
       const variantOption = info.options.find(option => option.name === 'UCI_Variant')
@@ -555,24 +554,46 @@ export const store = new Vuex.Store({
       localStorage.engines = JSON.stringify(context.state.allEngines)
 
       // swap back to current engine after we are done
-      // TODO: we could automatically swap to the new engine if it supports the current variant
+      context.commit('clearIO')
       await engine.run(context.getters.engineBinary)
       await context.dispatch('initEngineOptions')
     },
     async editEngine (context, payload) {
       const { old, changed: { name, binary } } = payload
-      if (context.state.allEngines[old].binary !== binary) {
-        // TODO: handle changed binary
-        alert('TODO: changed binary')
-      } else {
-        const engines = { ...context.state.allEngines }
-        const updated = Object.assign(engines[old], { binary })
+      const engines = { ...context.state.allEngines }
+
+      // grab new engine entry
+      let updated
+      if (name !== old) {
+        engines[name] = { ...engines[old] }
         delete engines[old]
-        engines[name] = updated
-        context.state.allEngines = engines
-        localStorage.engines = JSON.stringify(context.state.allEngines)
-        await context.dispatch('changeEngine', name)
+      } else {
+        updated = engines[old]
       }
+
+      // update active engine name
+      context.state.activeEngine = name
+
+      // update name in selected engines
+      const selectedEngines = { ...context.state.selectedEngines }
+      for (const [variant, selected] of Object.entries(selectedEngines)) {
+        if (selected === old) {
+          selectedEngines[variant] = name
+        }
+      }
+      context.state.selectedEngines = selectedEngines
+
+      // run new binary if it changed
+      if (updated.binary !== binary) {
+        updated.binary = binary
+        await context.dispatch('runBinary', binary)
+        const variantOption = context.state.engineInfo.options.find(option => option.name === 'UCI_Variant')
+        updated.variants = variantOption ? variantOption.var : ['chess']
+      }
+
+      // save engines
+      context.state.allEngines = engines
+      localStorage.engines = JSON.stringify(context.state.allEngines)
     },
     async deleteEngine (context, payload) {
       const engines = { ...context.state.allEngines }
@@ -601,14 +622,17 @@ export const store = new Vuex.Store({
       // only change engine when its a different one
       if (context.state.activeEngine !== id) {
         context.state.activeEngine = id
-        if (context.getters.active) {
-          context.commit('active', false)
-        }
-        context.commit('clearIO')
-        await context.dispatch('resetEngineData')
-        context.commit('engineInfo', await engine.run(context.getters.engineBinary))
-        await context.dispatch('initEngineOptions')
+        context.dispatch('runBinary', context.getters.engineBinary)
       }
+    },
+    async runBinary (context, payload) {
+      if (context.getters.active) {
+        context.commit('active', false)
+      }
+      context.commit('clearIO')
+      await context.dispatch('resetEngineData')
+      context.commit('engineInfo', await engine.run(payload))
+      await context.dispatch('initEngineOptions')
     },
     initEngineOptions (context) {
       context.dispatch('setEngineOptions', {
@@ -957,6 +981,4 @@ ffish.onRuntimeInitialized = () => {
 
   // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))
-  store.commit('engineInfo', await engine.run(store.getters.engineBinary))
-  await store.dispatch('initEngineOptions')
 })()
