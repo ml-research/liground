@@ -28,7 +28,7 @@
     </span>
     <VueContext
       ref="menu"
-      @open="onOpen($event, { name: move.name })"
+      @open="onOpen($event, { move: move })"
       @close="onClose"
     >
       <li>
@@ -164,7 +164,7 @@ export default {
     },
     onOpen (event, data) {
       if (this.displayMenu) {
-        this.$store.dispatch('menuAtMove', data.name)
+        this.$store.dispatch('menuAtMove', data.move)
         this.$store.dispatch('displayMenu', false)
       }
     },
@@ -189,10 +189,21 @@ export default {
       }
       return result
     },
+    movesToDelete (move) {
+      const result = []
+      if (this.mainFirstMove) {
+        let movNext = move.main
+        result.push(move)
+        while (movNext) {
+          result.push(movNext)
+          movNext = movNext.main
+        }
+      }
+      return result
+    },
     currentMove () {
       for (const idx in this.moves) {
-        if (this.moves[idx].current) {
-          console.log(this.moves[idx])
+        if (this.moves[idx].fen === this.fen) {
           return this.moves[idx]
         }
       }
@@ -207,8 +218,12 @@ export default {
     },
     deleteMove (move) {
       const currentMove = this.currentMove()
-      this.$store.dispatch('deleteFromMoves', move)
       const currentLine = this.currentLine(move)
+      const movesToDelete = this.movesToDelete(move)
+      if (movesToDelete.includes(this.menuAtMove)) {
+        this.$store.dispatch('displayMenu', true)
+        this.$store.dispatch('menuAtMove', null)
+      }
       if (move.prev) {
         const moveIndex = move.prev.next.indexOf(move)
         if (move.prev.main === move) { // ensure we still have a main line if there are still continuations
@@ -228,12 +243,16 @@ export default {
         }
       } else {
         if (this.mainFirstMove === move) {
-          if (this.firstMoves.length === 0) {
+          if (this.firstMoves.length === 1) {
             this.$store.dispatch('resetBoard', { is960: this.is960 })
           } else {
-            this.$store.dispatch('mainFirstMove', this.firstMoves[0])
+            if (this.firstMoves[0] === move) {
+              this.$store.dispatch('mainFirstMove', this.firstMoves[1])
+            } else {
+              this.$store.dispatch('mainFirstMove', this.firstMoves[0])
+            }
             if (currentLine.includes(currentMove)) {
-              this.updateBoard(this.firstMoves[0])
+              this.updateBoard(this.mainFirstMove)
             }
           }
         } else {
@@ -242,6 +261,7 @@ export default {
           }
         }
       }
+      this.$store.dispatch('deleteFromMoves', move)
     },
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
