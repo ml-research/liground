@@ -253,7 +253,6 @@ export default {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
           if (this.break) { // stops evaluating
             this.break = false
-            this.setDepth(this.mainMoves)
             return
           }
           points = this.adjustPoints(points)
