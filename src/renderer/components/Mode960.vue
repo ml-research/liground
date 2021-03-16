@@ -191,7 +191,7 @@ input[type=number] {
   visibility: hidden;
   background-color: var(--main-bg-color);
   color:var(--main-text-color);
-  border: 1px solid var(--main-border-color);
+  box-shadow:  5px 5px 10px 2px black;
   border-radius: 5px;
   text-align: center;
   position: absolute;
