@@ -51,7 +51,7 @@ export default {
       return {
         data: [
           ['Depth', 'node/s', 'Nodes', 'Time', 'Hash', 'TB'],
-          [g.depth + '/' + g.seldepth, this.parse(g.nps) + 'nps', this.parse(g.nodes), this.parseTime(g.time), g.hashfull, this.parse(g.tbhits)]
+          [g.depth + '/' + g.seldepth, this.parse(g.nps) + 'nps', this.parse(g.nodes), this.parseTime(g.enginetime), g.hashfull, this.parse(g.tbhits)]
         ],
         header: 'row',
         border: true,
