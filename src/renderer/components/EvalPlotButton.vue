@@ -13,7 +13,7 @@
         type="number"
         :value="plotDepth"
         :placeholder="plotDepth"
-        @change="updateEvalDepth"
+        @change="updateEvalDepthAndStart"
       >
     </div>
     <button
@@ -53,12 +53,17 @@ export default {
     })
   },
   methods: {
-    updateEvalDepth (event) {
+    updateEvalDepthAndStart (event) {
       if (event.target.value === '') {
         this.$store.commit('evalPlotDepth', 20)
         return
       }
       this.$store.commit('evalPlotDepth', parseInt(event.target.value))
+      if (this.$store.getters.moves.length === 0) {
+        return
+      }
+      this.running = true
+      document.dispatchEvent(new Event('startEval'))
     },
     startEval () {
       if (this.$store.getters.moves.length === 0) {
