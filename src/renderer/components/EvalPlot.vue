@@ -256,9 +256,12 @@ export default {
       tmpArray[0] = 0
       const depth = this.evalPlotDepth
       while (index < this.mainMoves.length) {
-        console.log(this.chartOptions.xaxis.categories.length - 1 + this.mainMoves.length)
-        if (this.chartOptions.xaxis.categories.length - 1 !== this.mainMoves.length) {
+        const xlength = this.chartOptions.xaxis.categories.length
+        if (xlength - 1 !== this.mainMoves.length) {
           this.loadPlot()
+        }
+        if (this.series[0].data.length > xlength) {
+          this.series[0].data.splice(0, xlength)
         }
         if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)

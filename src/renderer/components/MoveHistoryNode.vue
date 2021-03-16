@@ -216,6 +216,8 @@ export default {
       return null
     },
     promote (move) {
+      const moves = this.$store.getters.moves
+      this.$store.dispatch('movesChangeDummy', moves)
       const movesToDelete = this.movesToDelete(move)
       if (movesToDelete.includes(this.menuAtMove)) {
         this.$store.dispatch('displayMenu', true)
