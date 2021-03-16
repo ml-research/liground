@@ -278,7 +278,6 @@ export default {
       this.$store.dispatch('deleteFromMoves', move)
     },
     updateBoard (move) {
-      console.log(this.mainFirstMove)
       this.$store.dispatch('fen', move.fen)
       for (const num in this.moves) {
         if (this.moves[num].current) {
