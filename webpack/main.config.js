@@ -8,7 +8,7 @@ const webpack = require('webpack')
 
 const ESLintPlugin = require('eslint-webpack-plugin')
 
-let mainConfig = {
+const mainConfig = {
   entry: {
     main: path.join(__dirname, '../src/main/index.js')
   },
@@ -53,7 +53,7 @@ let mainConfig = {
 if (process.env.NODE_ENV !== 'production') {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
-      '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+      __static: `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
     })
   )
 }

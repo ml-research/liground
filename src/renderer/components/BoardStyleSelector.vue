@@ -1,12 +1,13 @@
 <template>
   <div>
     <Multiselect
-      v-model="selected"
       class="multiselect"
+      :value="displayStyle"
       :options="boardStyles"
       :allow-empty="false"
       :show-labels="false"
       :placeholder="selected"
+      @input="updateBoardStyle"
     >
       <template
         slot="option"
@@ -85,44 +86,63 @@ export default {
         'lightbrown',
         'orange',
         'riverbanks'
-      ],
-      selected: 'blue'
+      ]
     }
   },
   computed: {
-    ...mapGetters(['variant', 'isInternational', 'isSEA', 'isXiangqi', 'isJanggi', 'isShogi'])
+    ...mapGetters(['variant', 'boardStyle', 'isInternational', 'isShogi', 'isXiangqi', 'isSEA', 'isJanggi']),
+    displayStyle () {
+      return this.boardStyle
+    }
   },
   watch: {
-    selected () {
-      this.$store.dispatch('boardStyle', this.selected)
-    },
     variant () {
       if (this.isInternational) {
-        this.selected = this.internationalStyles[0]
+        if (localStorage.internationalBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.internationalBoardStyle)
+        } else {
+          this.updateBoardStyle(this.internationalStyles[0])
+        }
         this.boardStyles = []
         this.internationalStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else if (this.isShogi) {
-        this.selected = this.shogiStyles[1]
+        if (localStorage.shogiBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.shogiBoardStyle)
+        } else {
+          this.updateBoardStyle(this.shogiStyles[1])
+        }
         this.boardStyles = []
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else if (this.isSEA) {
-        this.selected = this.seaStyles[1]
+        if (localStorage.seaBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.seaBoardStyle)
+        } else {
+          this.updateBoardStyle(this.seaStyles[1])
+        }
         this.boardStyles = []
         this.seaStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else if (this.isXiangqi) {
-        this.selected = this.xiangqiStyles[1]
+        if (localStorage.xiangqiBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.xiangqiBoardStyle)
+        } else {
+          this.updateBoardStyle(this.xiangqiStyles[1])
+        }
         this.boardStyles = []
         this.xiangqiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       } else if (this.isJanggi) {
-        this.selected = this.janggiStyles[3]
+        if (localStorage.janggiBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.janggiBoardStyle)
+        } else {
+          this.updateBoardStyle(this.janggiStyles[3])
+        }
         this.boardStyles = []
         this.janggiStyles.forEach(element => {
           this.boardStyles.push(element)
@@ -166,8 +186,23 @@ export default {
         board = conv[name]
       }
       return `url(static/board/svg/${board}.svg`
+    },
+    updateBoardStyle (payload) {
+      if (this.isInternational) { // localStorage for all different groups of board stylings
+        localStorage.internationalBoardStyle = payload
+      } else if (this.isShogi) {
+        localStorage.shogiBoardStyle = payload
+      } else if (this.isSEA) {
+        localStorage.seaBoardStyle = payload
+      } else if (this.isXiangqi) {
+        localStorage.xiangqiBoardStyle = payload
+      } else if (this.isJanggi) {
+        localStorage.janggiBoardStyle = payload
+      }
+      this.$store.dispatch('boardStyle', payload)
     }
   }
+
 }
 </script>
 

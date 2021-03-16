@@ -1,12 +1,13 @@
 <template>
   <div>
     <Multiselect
-      v-model="selected"
       class="multiselect"
+      :value="displayPieceStyle"
       :options="pieceStyles"
       :allow-empty="false"
       :show-labels="false"
       :placeholder="selected"
+      @input="updatePieceStyle"
     >
       <template
         slot="option"
@@ -151,38 +152,53 @@ export default {
         'Ka_kakao',
         'Ka_wooden',
         'playok'
-      ],
-      selected: 'merida'
+      ]
     }
   },
   computed: {
-    ...mapGetters(['variant', 'isInternational', 'isSEA', 'isXiangqi', 'isJanggi', 'isShogi'])
+    ...mapGetters(['variant', 'pieceStyle', 'isInternational', 'isShogi', 'isXiangqi', 'isSEA', 'isJanggi']),
+    displayPieceStyle () {
+      return this.pieceStyle
+    }
   },
   watch: {
-    selected () {
-      this.$store.dispatch('pieceStyle', this.selected)
-    },
     variant () {
       if (this.isInternational) {
-        this.selected = this.internationalPieces[18]
+        if (localStorage.internationalPieceStyle) {
+          this.$store.dispatch('pieceStyle', localStorage.internationalPieceStyle)
+        } else {
+          this.updatePieceStyle(this.internationalPieces[18])
+        }
         this.pieceStyles = []
         this.internationalPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
       } else if (this.isShogi) {
-        this.selected = this.shogiPieces[0]
+        if (localStorage.shogiPieceStyle) {
+          this.$store.dispatch('pieceStyle', localStorage.shogiPieceStyle)
+        } else {
+          this.updatePieceStyle(this.shogiPieces[0])
+        }
         this.pieceStyles = []
         this.shogiPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
       } else if (this.isSEA) {
-        this.selected = this.seaPieces[0]
+        if (localStorage.seaPieceStyle) {
+          this.$store.dispatch('pieceStyle', localStorage.seaPieceStyle)
+        } else {
+          this.updatePieceStyle(this.seaPieces[0])
+        }
         this.pieceStyles = []
         this.seaPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
       } else if (this.isXiangqi || this.isJanggi) {
-        this.selected = this.xiangqiPieces[0]
+        if (localStorage.xiangqiPieceStyle) {
+          this.$store.dispatch('pieceStyle', localStorage.xiangqiPieceStyle)
+        } else {
+          this.updatePieceStyle(this.xiangqiPieces[0])
+        }
         this.pieceStyles = []
         this.xiangqiPieces.forEach(element => {
           this.pieceStyles.push(element)
@@ -238,6 +254,18 @@ export default {
         }
       }
       return [`url(static/piece/${pieces[0]}.svg)`, `url(static/piece/${pieces[1]}.svg)`]
+    },
+    updatePieceStyle (payload) {
+      if (this.isInternational) {
+        localStorage.internationalPieceStyle = payload
+      } else if (this.isShogi) {
+        localStorage.shogiPieceStyle = payload
+      } else if (this.isSEA) {
+        localStorage.seaPieceStyle = payload
+      } else if (this.isXiangqi || this.isJanggi) {
+        localStorage.xiangqiPieceStyle = payload
+      }
+      this.$store.dispatch('pieceStyle', payload)
     }
   }
 }

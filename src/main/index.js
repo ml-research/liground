@@ -33,6 +33,7 @@ function createWindow () {
 
   mainWindow.maximize()
   mainWindow.loadURL(winURL)
+  mainWindow.removeMenu()
 
   mainWindow.on('closed', () => {
     mainWindow = null

@@ -6,17 +6,18 @@
       :value="displayVariant"
       :options="options"
       :allow-empty="false"
-      :placeholder="selected"
       :show-labels="false"
       @input="updateVariant"
     />
+    <div class="resetButton">
+      <input
+        type="button"
+        value="Reset"
+        class="reset"
+        @click="resetBoard"
+      >
+    </div>
     <Mode960 />
-    <input
-      type="button"
-      value="Reset"
-      class="reset"
-      @click="resetBoard"
-    >
   </div>
 </template>
 
@@ -67,11 +68,16 @@ export default {
 
 <style scoped>
 .reset {
-  background-color:lightgray ;
+  background-color:lightgrey;
   border: black;
   outline: none;
+  border-radius: 100%;
   padding-bottom: 5px;
   padding-top: 5px;
+}
+.resetButton {
+  display: grid;
+  padding-left: 5px;
 }
 .reset:hover {
   cursor:pointer;
@@ -80,11 +86,8 @@ export default {
   /* display: table */
   font-size: 15pt;
   height: 40px;
-  width: 600px;
 }
-.multiselect {
-  width: 200px;
-}
+
 .grid-parent {
   display: grid;
   grid-template-columns: auto auto auto auto auto;
@@ -97,4 +100,5 @@ export default {
     font-size: 15pt;
     font-family: sans-serif;
 }
+
 </style>
