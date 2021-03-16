@@ -123,6 +123,7 @@ export const store = new Vuex.Store({
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
       Antichess: 'antichess',
+      Atomic: 'atomic',
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
@@ -169,7 +170,7 @@ export const store = new Vuex.Store({
     selectedGame: null,
     boardStyle: 'blue',
     internationalVariants: [
-      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
     seaVariants: [
       'makruk'
