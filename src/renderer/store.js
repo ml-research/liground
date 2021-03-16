@@ -600,12 +600,16 @@ export const store = new Vuex.Store({
       }
     },
     initEngineOptions (context) {
-      context.dispatch('setEngineOptions', {
-        MultiPV: 5,
-        UCI_AnalyseMode: true,
-        UCI_Variant: context.getters.variant,
-        'Analysis Contempt': 'Off'
-      })
+      if(localStorage.getItem('engine' + context.state.activeEngine)){
+        context.dispatch('setEngineOptions', JSON.parse(localStorage.getItem('engine' + context.state.activeEngine)))
+      } else {
+        context.dispatch('setEngineOptions', {
+          MultiPV: 5,
+          UCI_AnalyseMode: true,
+          UCI_Variant: context.getters.variant,
+          'Analysis Contempt': 'Off'
+        })
+      }
     },
     setEngineOptions (context, payload) {
       if (context.getters.active) {
@@ -623,6 +627,7 @@ export const store = new Vuex.Store({
           engine.send(`setoption name ${name}`)
         }
       }
+      localStorage.setItem('engine' + context.state.activeEngine, JSON.stringify(context.state.engineSettings))
     },
     idName (context, payload) {
       context.commit('idName', payload)
