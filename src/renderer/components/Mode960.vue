@@ -172,6 +172,7 @@ input[type=number] {
 .inputField {
   width: 50px;
   background-color: var(--second-bg-color);
+  color: var(--main-text-color); 
 }
 .button {
   padding: 5px;
