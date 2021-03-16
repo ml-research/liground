@@ -4,6 +4,7 @@
       <p>DarkMode</p>
       <DarkModeSwitch class="darkSwitch" />
     </div>
+    <div class="engine_settings_container">
     <span class="title">Engine Settings</span>
     <table class="table">
       <tr
@@ -84,6 +85,7 @@
     >
       Cancel
     </a>
+    </div>
   </div>
 </template>
 
@@ -149,11 +151,17 @@ export default {
   display: flex;
   flex-direction: column;
 }
+.engine_settings_container {
+  border: 1px solid var(--main-border-color); 
+  border-radius: 5px;
+  margin-top: 5px;
+}
 .title {
   font-size: 1.2em;
   text-align: center;
 }
 .table {
+  width: 100%;
   font-size: 0.9em;
   text-align: left;
 }
