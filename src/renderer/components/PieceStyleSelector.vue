@@ -198,26 +198,26 @@ export default {
       } else if (this.isSEA) {
         switch (name) {
           case 'adarb':
-            pieces = ['southeastasian/ada/orig/rN', 'southeastasian/ada/orig/bN']
+            pieces = ['SouthEastAsian/ada/orig/rN', 'SouthEastAsian/ada/orig/bN']
             break
           case 'adawb':
-            pieces = ['southeastasian/ada/orig/wN', 'southeastasian/ada/orig/bN']
+            pieces = ['SouthEastAsian/ada/orig/wN', 'SouthEastAsian/ada/orig/bN']
             break
           case 'adawr':
-            pieces = ['southeastasian/ada/orig/wN', 'southeastasian/ada/orig/rN']
+            pieces = ['SouthEastAsian/ada/orig/wN', 'SouthEastAsian/ada/orig/rN']
             break
           case 'intl':
             pieces = ['international/merida/wN', 'international/merida/bN']
             break
           default:
-            pieces = [`southeastasian/${name}/wN`, `southeastasian/${name}/bN`]
+            pieces = [`SouthEastAsian/${name}/wN`, `SouthEastAsian/${name}/bN`]
         }
       } else if (this.isShogi) {
-        pieces = [`shogi/${name}/0KE`, `shogi/${name}/1KE`]
+        pieces = [`Shogi/${name}/0KE`, `Shogi/${name}/1KE`]
       } else if (this.isXiangqi || this.isJanggi) {
         switch (name) {
           case 'ct2':
-            pieces = ['xiangqi/ct2/red_horse2', 'xiangqi/ct2/black_horse2']
+            pieces = ['Xiangqi/ct2/red_horse2', 'Xiangqi/ct2/black_horse2']
             break
           case 'hanjablue':
           case 'intlblue':
@@ -225,16 +225,16 @@ export default {
           case 'intlwooden':
           case 'Ka_kakao':
           case 'Ka_wooden':
-            pieces = [`xiangqi/${name}/red_horse`, `xiangqi/${name}/blue_horse`]
+            pieces = [`Xiangqi/${name}/red_horse`, `Xiangqi/${name}/blue_horse`]
             break
           case 'hanjagreen':
-            pieces = ['xiangqi/hanjablue/red_horse', 'xiangqi/hanjagreen/blue_horse']
+            pieces = ['Xiangqi/hanjablue/red_horse', 'Xiangqi/hanjagreen/blue_horse']
             break
           case 'intlgreen':
-            pieces = ['xiangqi/intlblue/red_horse', 'xiangqi/intlgreen/blue_horse']
+            pieces = ['Xiangqi/intlblue/red_horse', 'Xiangqi/intlgreen/blue_horse']
             break
           default:
-            pieces = [`xiangqi/${name}/red_horse`, `xiangqi/${name}/black_horse`]
+            pieces = [`Xiangqi/${name}/red_horse`, `Xiangqi/${name}/black_horse`]
         }
       }
       return [`url(static/piece/${pieces[0]}.svg)`, `url(static/piece/${pieces[1]}.svg)`]
