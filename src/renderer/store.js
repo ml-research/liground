@@ -719,6 +719,7 @@ export const store = new Vuex.Store({
       }
       context.dispatch('fen', context.state.startFen)
       context.dispatch('updateBoard')
+      context.dispatch('setEngineOptions', { UCI_Chess960: false })
       context.commit('openedPGN', false)
     },
     increment (context, payload) {
