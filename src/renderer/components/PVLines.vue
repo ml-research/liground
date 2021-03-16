@@ -45,7 +45,7 @@
             <span class="left">{{ line.cpDisplay }}</span>
             <span
               class="right"
-              @contextmenu.prevent="currentMove && currentMove.main ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
+              @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
             >
               {{ line.pv }}
             </span>
