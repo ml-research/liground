@@ -166,7 +166,7 @@ export default {
       this.clear()
     })
     document.addEventListener('startEval', () => {
-      this.loadPlot()
+      this.evaluateHistory()
     })
     document.addEventListener('stopEval', () => {
       this.break = true
@@ -241,10 +241,10 @@ export default {
         index++
       }
       this.setDepth(this.mainMoves)
-      await this.evaluateHistory()
     },
 
     async evaluateHistory () { // updates the graph
+      this.loadPlot()
       if (this.break) {
         this.break = false
         setTimeout(this.evaluateHistory, 1000)
@@ -256,6 +256,10 @@ export default {
       tmpArray[0] = 0
       const depth = this.evalPlotDepth
       while (index < this.mainMoves.length) {
+        console.log(this.chartOptions.xaxis.categories.length - 1 + this.mainMoves.length)
+        if (this.chartOptions.xaxis.categories.length - 1 !== this.mainMoves.length) {
+          this.loadPlot()
+        }
         if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
           if (this.break) { // stops evaluating
