@@ -122,7 +122,10 @@ export default {
   border-radius: 8px;
 }
 .item {
-  padding: 5px 16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 1.5%;
+  padding-bottom: 1.5%;
   display: inline-block;
   color: #fff;
   font-size: 11px;
