@@ -11,7 +11,8 @@
         id="in"
         class="inputField"
         type="number"
-        :value="this.$store.getters.evalPlotDepth"
+        :value="plotDepth"
+        :placeholder="plotDepth"
         @change="updateEvalDepth"
       >
     </div>
@@ -41,6 +42,11 @@ export default {
       running: false
     }
   },
+  computed: {
+    plotDepth () {
+      return this.$store.getters.evalPlotDepth
+    }
+  },
   created () {
     document.addEventListener('finishedEval', () => {
       this.running = false
@@ -63,7 +69,7 @@ export default {
     },
     stopEval () {
       this.running = false
-      document.dispatchEvent(new Event('stopEval'))
+      document.dispatchEvent(new Event('resetPlot'))
     }
   }
 }
@@ -85,10 +91,13 @@ input::-webkit-inner-spin-button {
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
+.inputField::placeholder {
+  color: var(--main-text-color);
+}
 .button {
   padding: 5px;
   border-radius: 50%;
-  background-color:lightgray ;
+  background-color:#8CA2AD;
   border: black;
   outline: none;
 }
@@ -98,6 +107,8 @@ input::-webkit-inner-spin-button {
 .EvalPlotButton {
   display: inline-block;
   position: relative;
+  padding-top: 5px;
+  padding-left: 10px;
 }
 .EvalPlotButton .hide {
   visibility: hidden;

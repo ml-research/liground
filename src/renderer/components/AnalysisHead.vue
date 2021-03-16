@@ -68,7 +68,7 @@ export default {
 
 <style scoped>
 .reset {
-  background-color:lightgrey;
+  background-color:#8CA2AD;
   border: black;
   outline: none;
   border-radius: 100%;

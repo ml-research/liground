@@ -19,7 +19,7 @@
       class="button"
       @click="randBoard"
     >
-      Random
+      🎲
     </button>
   </div>
 </template>
@@ -172,12 +172,12 @@ input[type=number] {
 .inputField {
   width: 50px;
   background-color: var(--second-bg-color);
+  color: var(--main-text-color);
 }
 .button {
   padding: 5px;
+  background-color:#8CA2AD;
   border-radius: 50%;
-  background-color:lightgray ;
-  border: black;
   outline: none;
 }
 .button:hover {
