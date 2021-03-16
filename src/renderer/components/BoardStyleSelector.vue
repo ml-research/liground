@@ -1,13 +1,42 @@
 <template>
   <div>
     <Multiselect
-      v-model="selected"
       class="multiselect"
+      :value="displayStyle"
       :options="boardStyles"
       :allow-empty="false"
       :show-labels="false"
-      :placeholder="selected"
-    />
+      @input="updateBoardStyle"
+    >
+      <template
+        slot="option"
+        slot-scope="props"
+      >
+        <div class="item">
+          <div class="preview">
+            <div
+              class="image"
+              :style="{ backgroundImage: preview(props.option) }"
+            />
+          </div>
+          <span class="name">{{ props.option }}</span>
+        </div>
+      </template>
+      <template
+        slot="singleLabel"
+        slot-scope="props"
+      >
+        <div class="item">
+          <div class="preview">
+            <div
+              class="image"
+              :style="{ backgroundImage: preview(props.option) }"
+            />
+          </div>
+          <span class="name">{{ props.option }}</span>
+        </div>
+      </template>
+    </Multiselect>
   </div>
 </template>
 
@@ -22,21 +51,6 @@ export default {
   },
   data () {
     return {
-      internationalVariants: [
-        'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
-      ],
-      seaVariants: [
-        'makruk'
-      ],
-      xiangqiVariants: [
-        'xiangqi'
-      ],
-      janggiVariants: [
-        'janggi'
-      ],
-      shogiVariants: [
-        'shogi'
-      ],
       boardStyles: [
         'blue',
         'brown',
@@ -71,57 +85,146 @@ export default {
         'lightbrown',
         'orange',
         'riverbanks'
-      ],
-      selected: 'blue'
+      ]
     }
   },
   computed: {
-    ...mapGetters(['variant'])
+    ...mapGetters(['variant', 'boardStyle', 'isInternational', 'isShogi', 'isXiangqi', 'isSEA', 'isJanggi']),
+    displayStyle () {
+      return this.boardStyle
+    }
   },
   watch: {
-    selected: function () {
-      this.$store.dispatch('boardStyle', this.selected)
-    },
     variant () {
-      if (this.internationalVariants.includes(this.variant)) {
-        this.selected = this.internationalStyles[0]
+      if (this.isInternational) {
+        if (localStorage.internationalBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.internationalBoardStyle)
+        } else {
+          this.updateBoardStyle(this.internationalStyles[0])
+        }
         this.boardStyles = []
         this.internationalStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.shogiVariants.includes(this.variant)) {
-        this.selected = this.shogiStyles[1]
+      } else if (this.isShogi) {
+        if (localStorage.shogiBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.shogiBoardStyle)
+        } else {
+          this.updateBoardStyle(this.shogiStyles[1])
+        }
         this.boardStyles = []
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.seaVariants.includes(this.variant)) {
-        this.selected = this.seaStyles[1]
+      } else if (this.isSEA) {
+        if (localStorage.seaBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.seaBoardStyle)
+        } else {
+          this.updateBoardStyle(this.seaStyles[1])
+        }
         this.boardStyles = []
         this.seaStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.xiangqiVariants.includes(this.variant)) {
-        this.selected = this.xiangqiStyles[1]
+      } else if (this.isXiangqi) {
+        if (localStorage.xiangqiBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.xiangqiBoardStyle)
+        } else {
+          this.updateBoardStyle(this.xiangqiStyles[1])
+        }
         this.boardStyles = []
         this.xiangqiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.janggiVariants.includes(this.variant)) {
-        this.selected = this.janggiStyles[3]
+      } else if (this.isJanggi) {
+        if (localStorage.janggiBoardStyle) {
+          this.$store.dispatch('boardStyle', localStorage.janggiBoardStyle)
+        } else {
+          this.updateBoardStyle(this.janggiStyles[3])
+        }
         this.boardStyles = []
         this.janggiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
       }
     }
+  },
+  methods: {
+    preview (name) {
+      let board = ''
+      if (this.isInternational) {
+        board = name === 'lightgreen' ? 'ic' : `${name}`
+      } else if (this.isShogi) {
+        const conv = {
+          traditional: 'shogi',
+          bluechess: 'shogic'
+        }
+        board = conv[name]
+      } else if (this.isSEA) {
+        const conv = {
+          yellow: 'makruk',
+          orange: 'makruk2'
+        }
+        board = conv[name]
+      } else if (this.isXiangqi) {
+        const conv = {
+          dark: 'xiangqiDark',
+          lightbrown: 'xiangqi',
+          orange: 'xiangqiWikimedia',
+          riverbanks: 'xiangqic'
+        }
+        board = conv[name]
+      } else if (this.isJanggi) {
+        const conv = {
+          brown: 'JanggiBrown',
+          dark: 'JanggiDark',
+          darkwood: 'JanggiWoodDark',
+          lightbrown: 'Janggi',
+          stone: 'JanggiStone'
+        }
+        board = conv[name]
+      }
+      return `url(static/board/svg/${board}.svg`
+    },
+    updateBoardStyle (payload) {
+      if (this.isInternational) { // localStorage for all different groups of board stylings
+        localStorage.internationalBoardStyle = payload
+      } else if (this.isShogi) {
+        localStorage.shogiBoardStyle = payload
+      } else if (this.isSEA) {
+        localStorage.seaBoardStyle = payload
+      } else if (this.isXiangqi) {
+        localStorage.xiangqiBoardStyle = payload
+      } else if (this.isJanggi) {
+        localStorage.janggiBoardStyle = payload
+      }
+      this.$store.dispatch('boardStyle', payload)
+    }
   }
+
 }
 </script>
-<style scoped>
 
+<style scoped>
+.item {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9em;
+}
+.item .preview {
+  margin-top: -8px;
+  margin-bottom: -8px;
+  margin-left: -4px;
+  margin-right: 1ch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.item .preview .image {
+  width: 35px;
+  height: 35px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
 </style>

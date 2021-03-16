@@ -121,6 +121,9 @@ export default class EngineDriver {
         this.events.emit('info', info)
         break
       }
+      case 'bestmove':
+        this.events.emit('bestmove')
+        break
     }
   }
 
@@ -145,7 +148,6 @@ export default class EngineDriver {
 
   /**
    * Execute a UCI command.
-   * If the command is not known it will trigger a ready check after execution.
    * @param {string} cmd UCI command
    */
   async exec (cmd) {
@@ -206,7 +208,7 @@ export default class EngineDriver {
   }
 
   /**
-   * Set the engine position
+   * Set the engine position.
    * @param {string} [fen = null] Position in FEN notation
    */
   async position (fen = null) {

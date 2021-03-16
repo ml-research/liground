@@ -4,14 +4,16 @@
       <div class="main-grid">
         <div class="chessboard-grid">
           <PgnBrowser id="pgnbrowser" />
-          <div @mousewheel.prevent="scroll($event)">
-            <ChessGround
-              id="chessboard"
-              :orientation="orientation"
-              @onMove="showInfo"
-            />
+          <div class="board">
+            <div @mousewheel.prevent="scroll($event)">
+              <ChessGround
+                id="chessboard"
+                :orientation="orientation"
+                @onMove="showInfo"
+              />
+            </div>
+            <EvalBar class="evalbar" />
           </div>
-          <EvalBar id="evalbar" />
           <div id="fen-field">
             FEN <input
               id="lname"
@@ -26,15 +28,15 @@
           <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
             <BoardStyleSelector id="board-style" />
+            <EvalPlotButton id="evalbutton-style" />
           </div>
         </div>
         <EvalPlot id="evalplot" />
-        <div
-          v-if="viewAnalysis"
-          id="right-column"
-        >
+        <div id="right-column">
           <AnalysisView
             id="analysisview"
+            class="tab"
+            :class="{ visible: viewAnalysis }"
             :reset="resetAnalysis"
             @move-to-start="moveToStart"
             @move-to-end="moveToEnd"
@@ -42,10 +44,10 @@
             @move-forward-one="moveForwardOne"
             @flip-board="flipBoard"
           />
-        </div>
-        <div v-else>
           <SettingsTab
             id="settingstab"
+            class="tab"
+            :class="{ visible: !viewAnalysis }"
           />
         </div>
       </div>
@@ -63,6 +65,7 @@ import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
+import EvalPlotButton from './EvalPlotButton'
 // TODO: use GameInfo component?
 // import GameInfo from './GameInfo.vue'
 
@@ -77,7 +80,8 @@ export default {
     EvalPlot,
     // GameInfo,
     PgnBrowser,
-    SettingsTab
+    SettingsTab,
+    EvalPlotButton
   },
   data () {
     return {
@@ -109,7 +113,7 @@ export default {
       return this.$store.getters.startFen
     },
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
-      for (let num = 0; num < this.moves.length; num++) {
+      for (let num = 0; num < this.moves.length; num++) { // beware that it matches by current FEN, not the one after dispatching a new one
         if (this.moves[num].fen === this.fen) {
           return this.moves[num]
         }
@@ -120,21 +124,23 @@ export default {
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
       const keyName = event.key
-      if (keyName === 'ArrowUp') {
-        event.preventDefault()
-        this.moveToStart()
-      }
-      if (keyName === 'ArrowDown') {
-        event.preventDefault()
-        this.moveToEnd()
-      }
-      if (keyName === 'ArrowLeft') {
-        event.preventDefault()
-        this.moveBackOne()
-      }
-      if (keyName === 'ArrowRight') {
-        event.preventDefault()
-        this.moveForwardOne()
+      if (event.target.nodeName.toLowerCase() !== 'input') {
+        if (keyName === 'ArrowUp') {
+          event.preventDefault()
+          this.moveToStart()
+        }
+        if (keyName === 'ArrowDown') {
+          event.preventDefault()
+          this.moveToEnd()
+        }
+        if (keyName === 'ArrowLeft') {
+          event.preventDefault()
+          this.moveBackOne()
+        }
+        if (keyName === 'ArrowRight') {
+          event.preventDefault()
+          this.moveForwardOne()
+        }
       }
     }, false)
   },
@@ -146,19 +152,7 @@ export default {
         this.moveForwardOne()
       }
     },
-    updateCurrent (move) {
-      for (const num in this.moves) {
-        if (this.moves[num].current) {
-          this.moves[num].current = false
-          break
-        }
-      }
-      if (move) {
-        move.current = true
-      }
-    },
     moveToStart () { // this method returns to the starting point of the current line
-      this.updateCurrent(undefined)
       this.$store.dispatch('fen', this.startFen)
     },
     moveToEnd () { // this method moves to the last move of the current line
@@ -177,7 +171,6 @@ export default {
           endOfLine = endOfLine.main
         }
       }
-      this.updateCurrent(endOfLine)
       this.$store.dispatch('fen', endOfLine.fen)
     },
     moveBackOne () { // this method moves back one move in the current line
@@ -186,19 +179,17 @@ export default {
         return
       }
       if (mov.ply === 1) {
-        this.updateCurrent(undefined)
         this.$store.dispatch('fen', this.startFen)
         return
       }
       this.$store.dispatch('fen', mov.prev.fen)
-      this.updateCurrent(mov.prev)
     },
     moveForwardOne () { // this method moves forward one move in the current line
       const mov = this.currentMove
       if (!mov) {
         if (this.moves[0]) {
+          this.$store.dispatch('playAudio', this.moves[0].name)
           this.$store.dispatch('fen', this.moves[0].fen)
-          this.updateCurrent(this.moves[0])
         }
         return
       }
@@ -207,7 +198,6 @@ export default {
       }
       this.$store.dispatch('playAudio', mov.main.name)
       this.$store.dispatch('fen', mov.main.fen)
-      this.updateCurrent(mov.main)
     },
     flipBoard () {
       if (this.variant === 'racingkings') {
@@ -256,7 +246,8 @@ export default {
       console.log(`event: ${event}`)
     },
     checkValidFEN (event) {
-      this.$store.dispatch('fen', event.target.value)
+      document.dispatchEvent(new Event('resetPlot'))
+      this.$store.dispatch('fenField', event.target.value)
       this.resetAnalysis = !this.resetAnalysis
     }
   }
@@ -266,23 +257,22 @@ export default {
 <style scoped>
 .main-grid {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: auto auto;
   grid-template-rows: auto auto;
-  gap: 1em 1em;
   grid-template-areas:
     "chessboard analysisview"
     "evalplot analysisview";
 }
-.main-grid > .chessboard-grid {
+.chessboard-grid {
   min-width: 925px;
   grid-area: chessboard;
   display: grid;
-  grid-template-columns: 20% 70% auto;
-  grid-template-rows: auto auto;
-  gap: 1em;
+  grid-template-columns: 20% auto;
+  grid-template-rows: auto auto auto;
   grid-template-areas:
-    "pgnbrowser . ."
-    "fenfield fenfield fenfield";
+    "pgnbrowser ."
+    ". fenfield"
+    ". selector";
 }
 #analysisview {
   height: 100%;
@@ -293,6 +283,9 @@ export default {
   width: 40vw;
   max-height: calc(100vh - 25px);
 }
+.tab:not(.visible) {
+  display: none;
+}
 input {
   font-size: 12pt;
   max-width: 60vw;
@@ -301,28 +294,23 @@ input {
   grid-area: fenfield;
   /*margin-left: 48px;*/
 }
+#lname {
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color)
+}
 #selector-container {
-  height:60px;
+  grid-area: selector;
+  display: flex;
+  justify-content: space-around;
+  height: 60px;
 }
 #piece-style {
   margin-top: 10px;
   width: 210px;
-  margin-left: 60px;
-  position: absolute;
 }
 #board-style {
   margin-top: 10px;
   width: 210px;
-  margin-left: 330px;
-  position: absolute;
-}
-.main-grid {
-  display: grid;
-  grid-template-columns: auto auto;
-}
-.chessboard-grid {
-  display: grid;
-  grid-template-columns: 20% auto auto;
 }
 #pgnbrowser {
   grid-area: pgnbrowser;
@@ -330,6 +318,11 @@ input {
   border-radius: 4px;
   margin-left: 1em;
   max-height: 60vh;
+}
+.board {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 #chessboard {
   display: inline-block;
@@ -341,14 +334,61 @@ input {
   display: table;
   margin: 0 auto;
 }
+.evalbar {
+  margin-left: 8px;
+}
 #analysisview {
   margin-left: 15px;
 }
-#evalbar {
-  float: left;
-}
 #evalplot {
   grid-area: evalplot;
+}
+#evalbutton-style {
+  margin-top: 10px;
+}
+
+</style>
+<style>
+.multiselect * {
+  color: var(--main-text-color, white) !important;
+  background-color: var(--second-bg-color, white) !important;
+  border-color: var(--main-border-color, white) !important;
+}
+.multiselect ::placeholder {
+  color: var(--main-text-color) !important;
+  opacity: 0.5;
+}
+.multiselect__select {
+  border-radius: 5px;
+  right: 2px;
+  top: 2px;
+  height: 36px;
+}
+
+.v-table-header-wrap *,
+.v-table-body * {
+  background-color: var(--second-bg-color, white) !important;
+  color: var(--main-text-color, black) !important;
+  border-color: var(--main-border-color, white) !important;
+}
+.v-table-dynamic * ,
+.v-table:before{
+  border-color: var(--main-border-color, white) !important;
+}
+::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
+}
+::-webkit-scrollbar-track{
+  background: var(--scroll-track-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb-color);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-corner {
+  background: var(--main-bg-color);
+  border-radius: 8px;
 }
 
 </style>

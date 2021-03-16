@@ -77,6 +77,9 @@ export default {
     this.$store.subscribe((mutation) => {
       if (mutation.type === 'clearIO') {
         this.io = Object.freeze([])
+        this.lastScrollPosition = 0
+        this.fullWidth = 0
+        this.rerender()
       }
     })
 
@@ -118,12 +121,8 @@ export default {
 
       // only fire when we scrolled vertically
       if (scroller.scrollTop !== this.lastScrollPosition) {
-        // calculate start & end index
-        const start = Math.max(Math.floor(scroller.scrollTop / this.elSize - this.bufferSize), 0)
-        const end = Math.min(Math.ceil(start + this.renderLength), this.io.length)
-
-        // grab rendered elements
-        this.rendered = this.io.slice(start, end).map((content, i) => ({ content, id: start + i }))
+        // trigger render
+        this.rerender()
 
         // disable auto scroll if user scrolled up, reenable it if we arrived at the bottom
         if (this.autoScroll && scroller.scrollTop < this.lastScrollPosition) {
@@ -135,6 +134,16 @@ export default {
         // save last scroll position
         this.lastScrollPosition = scroller.scrollTop
       }
+    },
+    rerender () {
+      const { scroller } = this.$refs
+
+      // calculate start & end index
+      const start = Math.max(Math.floor(scroller.scrollTop / this.elSize - this.bufferSize), 0)
+      const end = Math.min(Math.ceil(start + this.renderLength), this.io.length)
+
+      // grab rendered elements
+      this.rendered = this.io.slice(start, end).map((content, i) => ({ content, id: start + i }))
     },
     onClick () {
       this.autoScroll = true
@@ -162,7 +171,7 @@ export default {
 }
 .console {
   height: 200px;
-  border: 1px solid #888;
+  border: 1px solid var(--main-border-color);
   border-radius: 3px;
   font-family: monospace;
   font-size: 11px;
@@ -204,5 +213,6 @@ export default {
 .input {
   outline: none;
   border: 1px solid #888;
+  background-color: var(--second-bg-color);
 }
 </style>
