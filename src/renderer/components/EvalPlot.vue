@@ -112,6 +112,8 @@ export default {
           title: {
             text: 'Eval',
             style: {
+              fontFamily: 'Helvetica',
+              fontSize: 16,
               color: 'var(--main-text-color)'
             }
           }
