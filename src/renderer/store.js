@@ -426,9 +426,16 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
+    },
+    movesChangeDummy (state, payload) {
+      state.moves = []
+      state.moves = payload
     }
   },
   actions: { // async
+    movesChangeDummy (context, payload) {
+      context.commit('movesChangeDummy', payload)
+    },
     playAudio (context, payload) {
       context.commit('playAudio', payload)
     },

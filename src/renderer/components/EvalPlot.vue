@@ -1,7 +1,7 @@
 <template>
   <div>
     <VueApexCharts
-      height="260"
+      height="250"
       type="area"
       :options="chartOptions"
       :series="series"
@@ -148,6 +148,10 @@ export default {
     moves () { // extracts the main variant
       let move = this.$store.getters.mainFirstMove
       const tempMainMoves = []
+      const check = this.chartOptions.xaxis.categories[1]
+      if (check && (move && move.name !== check)) {
+        this.clear()
+      }
       if (move) {
         tempMainMoves.push(move)
         while (move.main) {
@@ -178,7 +182,7 @@ export default {
       this.clear()
     })
     document.addEventListener('startEval', () => {
-      this.loadPlot()
+      this.evaluateHistory()
     })
     document.addEventListener('stopEval', () => {
       this.break = true
@@ -200,7 +204,11 @@ export default {
       this.chartOptions.fill.gradient.colorStops[0].offset = 100
     },
 
-    adjustPoints (points) { // sets min/max for graph and converts the results from engine to the correct format
+    adjustPoints (Inpoints, index) { // sets min/max for graph and converts the results from engine to the correct format
+      let points = Inpoints
+      if ((typeof (Inpoints)) === 'number') {
+        points = String(Inpoints)
+      }
       if ((points.includes('#') && !points.includes('-'))) {
         points = 10
       } else if ((points.includes('#') && points.includes('-'))) {
@@ -212,6 +220,9 @@ export default {
         points = 10
       } else if (points < -10) {
         points = -10
+      }
+      if (this.chartOptions.xaxis.categories[index].includes('..')) {
+        points = points * -1
       }
       return points
     },
@@ -246,17 +257,17 @@ export default {
       this.chartOptions.xaxis.categories.push('Start')
       while (index < length) {
         if (index % 2 === 1) {
-          this.chartOptions.xaxis.categories.push('..' + this.mainMoves[index].name)
+          this.chartOptions.xaxis.categories[index + 1] = '..' + this.mainMoves[index].name
         } else {
-          this.chartOptions.xaxis.categories.push(this.mainMoves[index].name)
+          this.chartOptions.xaxis.categories[index + 1] = this.mainMoves[index].name
         }
         index++
       }
       this.setDepth(this.mainMoves)
-      await this.evaluateHistory()
     },
 
     async evaluateHistory () { // updates the graph
+      this.loadPlot()
       if (this.break) {
         this.break = false
         setTimeout(this.evaluateHistory, 1000)
@@ -268,13 +279,20 @@ export default {
       tmpArray[0] = 0
       const depth = this.evalPlotDepth
       while (index < this.mainMoves.length) {
+        const xlength = this.chartOptions.xaxis.categories.length
+        if (xlength - 1 !== this.mainMoves.length) {
+          this.loadPlot()
+        }
+        if (this.series[0].data.length > xlength) {
+          this.series[0].data.splice(0, xlength)
+        }
         if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
           if (this.break) { // stops evaluating
             this.break = false
             return
           }
-          points = this.adjustPoints(points)
+          points = this.adjustPoints(points, index + 1)
           tmpArray[index + 1] = points
           this.series = [{
             data: tmpArray
@@ -296,7 +314,7 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            newArray[index + 1] = this.cpForWhite / 100
+            newArray[index + 1] = this.adjustPoints(this.cpForWhite, index + 1)
             this.series = [{
               data: newArray
             }]
