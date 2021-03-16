@@ -154,6 +154,7 @@ export const store = new Vuex.Store({
       tbhits: 0,
       time: 0
     },
+    enginetime: 0,
     multipv: [
       {
         cp: 0,
@@ -190,7 +191,8 @@ export const store = new Vuex.Store({
     ],
     shogiVariants: [
       'shogi'
-    ]
+    ],
+    clock: null
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -278,6 +280,7 @@ export const store = new Vuex.Store({
       state.engineStats = payload
     },
     resetEngineStats (state) {
+      state.enginetime = 0
       state.engineStats = {
         depth: 0,
         seldepth: 0,
@@ -441,6 +444,12 @@ export const store = new Vuex.Store({
     movesChangeDummy (state, payload) {
       state.moves = []
       state.moves = payload
+    },
+    setEngineClock (state) {
+      state.clock = setInterval(function () { state.enginetime = state.enginetime + 1000 }, 1000)
+    },
+    resetEngineTime (state) {
+      clearInterval(state.clock)
     }
   },
   actions: { // async
@@ -513,10 +522,12 @@ export const store = new Vuex.Store({
     },
     goEngine (context) {
       engine.send('go infinite')
+      context.commit('setEngineClock')
       context.commit('active', true)
     },
     stopEngine (context) {
       engine.send('stop')
+      context.commit('resetEngineTime')
       context.commit('active', false)
     },
     restartEngine (context) {
@@ -882,6 +893,9 @@ export const store = new Vuex.Store({
     },
     time (state) {
       return state.engineStats.time
+    },
+    enginetime (state) {
+      return state.enginetime
     },
     pv (state) {
       return state.multipv[0].pv
