@@ -46,7 +46,7 @@ export default {
     plotDepth () {
       return this.$store.getters.evalPlotDepth
     }
-  } ,
+  },
   created () {
     document.addEventListener('finishedEval', () => {
       this.running = false

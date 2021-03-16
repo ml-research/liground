@@ -443,7 +443,7 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
-      if(localStorage.evalPlotDepth){
+      if (localStorage.evalPlotDepth) {
         context.state.evalPlotDepth = localStorage.evalPlotDepth
       }
       if (localStorage.darkMode) {
@@ -600,7 +600,7 @@ export const store = new Vuex.Store({
       }
     },
     initEngineOptions (context) {
-      if(localStorage.getItem('engine' + context.state.activeEngine)){
+      if (localStorage.getItem('engine' + context.state.activeEngine)) {
         context.dispatch('setEngineOptions', JSON.parse(localStorage.getItem('engine' + context.state.activeEngine)))
       } else {
         context.dispatch('setEngineOptions', {
