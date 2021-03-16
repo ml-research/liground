@@ -100,7 +100,8 @@
       v-if="modal.visible"
       :title="modal.title"
       :initial-name="modal.name"
-      :initial-path="modal.path"
+      :initial-binary="modal.binary"
+      :initial-logo="modal.logo"
       @close="modal.visible = false"
       @save="modal.save"
     />
@@ -111,6 +112,7 @@
 import { mapGetters } from 'vuex'
 import EngineSelect from './EngineSelect'
 import EngineModal from './EngineModal'
+import defaultLogo from '../assets/images/engines/chess_engine.svg'
 
 export default {
   name: 'SettingsTab',
@@ -167,10 +169,11 @@ export default {
         visible: true,
         title: 'Edit Engine',
         name: this.selectedEngine.name,
-        path: this.selectedEngine.binary,
-        save: ({ name, path }) => this.$store.dispatch('editEngine', {
+        binary: this.selectedEngine.binary,
+        logo: this.selectedEngine.logo,
+        save: ({ name, binary, logo }) => this.$store.dispatch('editEngine', {
           old: this.selectedEngine.name,
-          changed: { name, binary: path }
+          changed: { name, binary, logo }
         })
       }
     },
@@ -184,7 +187,8 @@ export default {
       this.modal = {
         visible: true,
         title: 'Add new Engine',
-        save: ({ name, path }) => this.$store.dispatch('addEngine', { name, binary: path })
+        logo: defaultLogo,
+        save: ({ name, binary, logo }) => this.$store.dispatch('addEngine', { name, binary, logo })
       }
     }
   }

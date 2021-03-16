@@ -541,7 +541,7 @@ export const store = new Vuex.Store({
     },
     async addEngine (context, payload) {
       // discover the variants by running the engine
-      const { name, binary } = payload
+      const { name, binary, logo } = payload
       const info = await engine.run(binary)
       const variantOption = info.options.find(option => option.name === 'UCI_Variant')
       const variants = variantOption ? variantOption.var : ['chess']
@@ -549,7 +549,7 @@ export const store = new Vuex.Store({
       // update engines
       context.state.allEngines = {
         ...context.state.allEngines,
-        [name]: { binary, variants }
+        [name]: { binary, logo, variants }
       }
       localStorage.engines = JSON.stringify(context.state.allEngines)
 
@@ -559,7 +559,7 @@ export const store = new Vuex.Store({
       await context.dispatch('initEngineOptions')
     },
     async editEngine (context, payload) {
-      const { old, changed: { name, binary } } = payload
+      const { old, changed: { name, binary, logo } } = payload
       const engines = { ...context.state.allEngines }
 
       // grab new engine entry
@@ -570,6 +570,7 @@ export const store = new Vuex.Store({
       } else {
         updated = engines[old]
       }
+      updated.logo = logo
 
       // update active engine name
       context.state.activeEngine = name

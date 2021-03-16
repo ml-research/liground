@@ -28,6 +28,19 @@
           <span class="display">{{ display }}</span>
         </div>
         <div class="item">
+          <span class="label">Logo</span>
+          <button
+            class="btn grey"
+            @click="selectImage"
+          >
+            Select Image
+          </button>
+          <span
+            class="preview"
+            :style="{ backgroundImage: `url(${logo})` }"
+          />
+        </div>
+        <div class="item">
           <span
             class="error"
             :class="{ visible: error !== 'none' }"
@@ -56,6 +69,7 @@
 
 <script>
 import path from 'path'
+import { promises as fs } from 'fs'
 import { remote } from 'electron'
 
 export default {
@@ -69,7 +83,11 @@ export default {
       default: '',
       type: String
     },
-    initialPath: {
+    initialBinary: {
+      default: '',
+      type: String
+    },
+    initialLogo: {
       default: '',
       type: String
     }
@@ -77,13 +95,14 @@ export default {
   data () {
     return {
       name: this.initialName,
-      path: this.initialPath,
+      binary: this.initialBinary,
+      logo: this.initialLogo,
       error: 'none'
     }
   },
   computed: {
     display () {
-      return this.path.length > 0 ? path.basename(this.path) : 'empty'
+      return this.binary.length > 0 ? path.basename(this.binary) : '(empty)'
     }
   },
   methods: {
@@ -91,22 +110,49 @@ export default {
       this.$emit('close')
     },
     save () {
-      const { name, path } = this
+      const { name, binary, logo } = this
       if (name.length === 0) {
         this.error = 'Engine name cannot be empty!'
-      } else if (path.length === 0) {
+      } else if (binary.length === 0) {
         this.error = 'Engine path cannot be empty!'
       } else if (this.$store.state.allEngines[name] && name !== this.initialName) {
         this.error = `Name "${name}" already in use!`
       } else {
         this.error = 'none'
-        this.$emit('save', { name, path })
+        this.$emit('save', { name, binary, logo })
         this.$emit('close')
       }
     },
     async selectPath () {
       const { filePaths: [file] } = await remote.dialog.showOpenDialog({ properties: ['openFile'] })
-      this.path = file || ''
+      this.binary = file || ''
+    },
+    async selectImage () {
+      const { filePaths: [file] } = await remote.dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [
+          { name: 'Images', extensions: ['bmp', 'gif', 'jpg', 'jpeg', 'png', 'svg', 'tif', 'tiff', 'webp'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      })
+      if (file) {
+        const base64 = await fs.readFile(file, { encoding: 'base64' })
+        this.logo = `data:image/${this.imageExtToMime(path.extname(file))};base64,${base64}`
+      }
+    },
+    imageExtToMime (ext) {
+      switch (ext) {
+        case '.jpg':
+        case '.jpeg':
+          return 'jpeg'
+        case '.tif':
+        case '.tiff':
+          return 'tiff'
+        case '.svg':
+          return 'svg+xml'
+        default:
+          return ext.substring(1)
+      }
     }
   }
 }
@@ -163,6 +209,9 @@ export default {
   align-items: center;
   font-size: .9em;
 }
+.item > * {
+  margin: 0 3px;
+}
 .label {
   font-weight: bold;
   margin-right: 5px;
@@ -171,6 +220,13 @@ export default {
   font-family: monospace;
   color: #333;
   font-size: 11px;
+}
+.preview {
+  width: 90px;
+  height: 45px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .error {
   color: #b22222;
