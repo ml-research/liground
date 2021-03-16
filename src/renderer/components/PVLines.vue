@@ -108,7 +108,7 @@ export default {
     asMain (target, data) {
       const mainLine = data.line.pvUCI.split(' ')
       const prevMov = this.currentMove
-      console.log(prevMov)
+      console.log(mainLine)
       this.$store.dispatch('pushMainLine', { line: mainLine, prev: prevMov })
     },
     asAlt (target, data) {
