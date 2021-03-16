@@ -204,6 +204,7 @@ export default {
 
     adjustPoints (Inpoints, index) { // sets min/max for graph and converts the results from engine to the correct format
       let points = Inpoints
+      console.log(typeof (Inpoints))
       if ((typeof (Inpoints)) === 'number') {
         points = String(Inpoints)
       }
@@ -212,15 +213,16 @@ export default {
       } else if ((points.includes('#') && points.includes('-'))) {
         points = -10
       } else {
-        points = (points / 100).toFixed(2)
-      }
-      if (points > 10) {
-        points = 10
-      } else if (points < -10) {
-        points = -10
-      }
-      if (!this.chartOptions.xaxis.categories[index].includes('..')) {
-        points = points * -1
+        points = (parseInt(points) / 100).toFixed(2)
+        if (Math.abs(points) < 10 && this.chartOptions.xaxis.categories[index].includes('..')) {
+          points = points * -1
+        }
+        if (points > 10) {
+          points = 10
+        } else if (points < -10) {
+          points = -10
+        }
+        return points * -1
       }
       return points
     },
@@ -291,6 +293,7 @@ export default {
             return
           }
           points = this.adjustPoints(points, index + 1)
+          console.log('AfterEval: ' + points + typeof (points))
           tmpArray[index + 1] = points
           this.series = [{
             data: tmpArray
@@ -312,7 +315,9 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
+            console.log('typefrombetter: ' + typeof (this.cpForWhite))
             newArray[index + 1] = this.adjustPoints(this.cpForWhite, index + 1)
+            console.log('AfterSet: ' + newArray[index + 1] + typeof (newArray[index + 1]))
             this.series = [{
               data: newArray
             }]
