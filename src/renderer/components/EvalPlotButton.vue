@@ -115,6 +115,8 @@ input::-webkit-inner-spin-button {
   visibility: hidden;
   background-color: var(--main-bg-color);
   color: var(--main-text-color);
+  border: 1px solid var(--main-border-color);
+  border-radius: 5px;
   text-align: center;
   position: absolute;
   z-index: 1;
