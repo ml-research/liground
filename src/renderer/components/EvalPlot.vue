@@ -87,6 +87,7 @@ export default {
           strokeWidth: 0
         },
         chart: {
+          fontFamily: 'Noto Chess',
           id: 'plot',
           foreColor: 'var(--main-text-color)',
           events: { // changes the board position by clicking on a plot marker

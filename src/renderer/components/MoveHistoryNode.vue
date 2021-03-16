@@ -316,6 +316,7 @@ export default {
 .move-name {
   margin-right: 4px;
   pointer-events: auto;
+  font-family: 'Noto Chess', sans-serif;
 }
 .variation {
   background-color:var(--variation-color);
