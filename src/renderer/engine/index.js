@@ -57,14 +57,36 @@ class Engine extends EventEmitter {
   run (binary, cwd) {
     return new Promise(resolve => {
       this.once('active', info => resolve(info))
+
+      // run main engine
       this.mainWorker.postMessage({
         payload: { binary, cwd, listeners: ['io', 'info'] },
         type: 'run'
       })
+
+      // run eval engine
       this.evalWorker.postMessage({
         payload: { binary, cwd, listeners: [] },
         type: 'run'
       })
+
+      // initialize eval engine options
+      const listener = ({ data }) => {
+        if (data.type === 'active' || (data.type === 'cache' && data.events.find(event => event.type === 'active'))) {
+          this.evalWorker.removeEventListener('message', listener)
+          const options = {
+            UCI_AnalyseMode: 'true',
+            'Analysis Contempt': 'Off'
+          }
+          for (const [name, value] of Object.entries(options)) {
+            this.evalWorker.postMessage({
+              payload: `setoption name ${name} value ${value}`,
+              type: 'cmd'
+            })
+          }
+        }
+      }
+      this.evalWorker.addEventListener('message', listener)
     })
   }
 
