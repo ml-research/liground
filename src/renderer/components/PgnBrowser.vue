@@ -213,9 +213,6 @@ export default {
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
-#gamefilter::placeholder {
-  color: var(--main-text-color);
-}
 
 .roundseperator {
   border-top: 2px solid var(--main-border-color);

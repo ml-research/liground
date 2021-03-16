@@ -101,7 +101,7 @@ function checkOption (options, name, value) {
   }
 }
 
-const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
+const filteredSettings = ['UCI_Variant']
 
 export const store = new Vuex.Store({
   state: {
@@ -118,14 +118,14 @@ export const store = new Vuex.Store({
     destinations: {},
     variant: 'chess',
     variantOptions: new TwoWayMap({ // all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
-      Standard: 'chess',
-      Crazyhouse: 'crazyhouse',
-      'King of the Hill': 'kingofthehill',
+      '♟️ Standard': 'chess',
+      '🏠 Crazyhouse': 'crazyhouse',
+      '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
       Antichess: 'antichess',
       Atomic: 'atomic',
       Horde: 'horde',
-      'Racing Kings': 'racingkings',
+      '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
       Shogi: 'shogi',
       Janggi: 'janggi',
@@ -163,7 +163,7 @@ export const store = new Vuex.Store({
     ],
     hoveredpv: -1,
     counter: 0,
-    pieceStyle: 'cburnett',
+    pieceStyle: 'merida',
     board: null,
     gameInfo: {},
     loadedGames: [],
@@ -175,7 +175,6 @@ export const store = new Vuex.Store({
     menuAtMove: null,
     displayMenu: true,
     darkMode: false,
-    fenply: 1,
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
@@ -343,8 +342,6 @@ export const store = new Vuex.Store({
       state.lastFen = state.board.fen()
       state.startFen = state.board.fen()
       state.selectedGame = null
-      state.fenply = 1
-      this.commit('resetEngineStats')
     },
     resetBoard (state, payload) {
       if (!payload.is960) {
@@ -361,11 +358,7 @@ export const store = new Vuex.Store({
       if (prev) {
         ply = prev.ply + 1
       } else { // then its a starting move
-        if (state.turn) {
-          ply = state.fenply
-        } else {
-          ply = state.fenply + 1
-        }
+        ply = 1
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
@@ -433,20 +426,9 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
-      localStorage.evalPlotDepth = payload
-    },
-    fenply (state, payload) {
-      state.fenply = payload
-    },
-    movesChangeDummy (state, payload) {
-      state.moves = []
-      state.moves = payload
     }
   },
   actions: { // async
-    movesChangeDummy (context, payload) {
-      context.commit('movesChangeDummy', payload)
-    },
     playAudio (context, payload) {
       context.commit('playAudio', payload)
     },
@@ -456,13 +438,9 @@ export const store = new Vuex.Store({
     resetBoard (context, payload) {
       context.commit('resetMultiPV')
       context.commit('resetBoard', payload)
-      context.dispatch('setEngineOptions', { UCI_Chess960: payload.is960 })
       context.dispatch('restartEngine')
     },
     initialize (context) {
-      if (localStorage.evalPlotDepth) {
-        context.state.evalPlotDepth = localStorage.evalPlotDepth
-      }
       if (localStorage.darkMode) {
         if (localStorage.darkMode === 'true') {
           context.commit('switchDarkMode')
@@ -550,25 +528,6 @@ export const store = new Vuex.Store({
         context.dispatch('restartEngine')
       }
     },
-    fenField (context, payload) {
-      if (ffish.validateFen(payload, context.getters.variant) === 1) { // this doesnt work properly for horde and racing kings
-        if (context.state.fen !== payload) {
-          context.commit('fen', payload)
-          context.dispatch('updateBoard')
-          context.dispatch('restartEngine')
-          context.commit('newBoard', { fen: payload })
-          let index = 1
-          while (payload[payload.length - index] !== ' ') {
-            index = index + 1
-          }
-          const numAsString = payload.substring(payload.length - index, payload.length)
-          const ply = parseInt(numAsString)
-          context.commit('fenply', 2 * ply - 1)
-        }
-      } else {
-        alert('Please insert a valid FEN for the current variant')
-      }
-    },
     lastFen (context, payload) {
       context.commit('lastFen', payload)
     },
@@ -622,7 +581,6 @@ export const store = new Vuex.Store({
         fen: payload.fen,
         is960: payload.is960
       })
-      context.dispatch('setEngineOptions', { UCI_Chess960: payload.is960 })
     },
     async addEngine (context, payload) {
       // discover the variants by running the engine
@@ -729,17 +687,12 @@ export const store = new Vuex.Store({
       await context.dispatch('initEngineOptions')
     },
     initEngineOptions (context) {
-      if (localStorage.getItem('engine' + context.state.activeEngine)) {
-        context.dispatch('setEngineOptions', JSON.parse(localStorage.getItem('engine' + context.state.activeEngine)))
-      } else {
-        context.dispatch('setEngineOptions', {
-          MultiPV: 5,
-          UCI_AnalyseMode: true,
-          UCI_Variant: context.getters.variant,
-          'Analysis Contempt': 'Off',
-          UCI_Chess960: context.state.board.is960()
-        })
-      }
+      context.dispatch('setEngineOptions', {
+        MultiPV: 5,
+        UCI_AnalyseMode: true,
+        UCI_Variant: context.getters.variant,
+        'Analysis Contempt': 'Off'
+      })
     },
     setEngineOptions (context, payload) {
       if (context.getters.active) {
@@ -757,7 +710,6 @@ export const store = new Vuex.Store({
           engine.send(`setoption name ${name}`)
         }
       }
-      localStorage.setItem('engine' + context.state.activeEngine, JSON.stringify(context.state.engineSettings))
     },
     idName (context, payload) {
       context.commit('idName', payload)
@@ -847,7 +799,6 @@ export const store = new Vuex.Store({
       }
       context.dispatch('fen', context.state.startFen)
       context.dispatch('updateBoard')
-      context.dispatch('setEngineOptions', { UCI_Chess960: false })
       context.commit('openedPGN', false)
     },
     increment (context, payload) {

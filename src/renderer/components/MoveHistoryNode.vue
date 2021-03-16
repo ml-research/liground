@@ -9,7 +9,7 @@
       {{ (move.ply+1) / 2 }}.
     </span>
     <span
-      v-else-if="(move === mainFirstMove) || move.ply % 2 === 0 && printRoot
+      v-else-if="move.ply % 2 === 0 && printRoot
         &&(beginVariation || move.prev && (move.prev.prev && move.prev.prev.main === move.prev && move.prev.prev.next.length > 1)
           || (firstMoves.includes(move.prev) && firstMoves.length > 1 && mainFirstMove.next.length > 0 && (move.prev === mainFirstMove || move.prev.main !== move) )
           && move.prev.main === move)"
@@ -24,7 +24,7 @@
       @click="updateBoard(move)"
       @contextmenu.prevent="(menuAtMove === move.name || displayMenu) ? $refs.menu.open($event, { name: move.name }) : dummy"
     >
-      {{ checkCheckmate }}
+      {{ checkCheckmate(move) }}
     </span>
     <VueContext
       ref="menu"
@@ -159,16 +159,6 @@ export default {
       return this.firstMoves.filter((move) => {
         return move.fen !== this.mainFirstMove.fen
       })
-    },
-    checkCheckmate () {
-      let name = this.move.name
-      const variant = this.$store.getters.variant
-      const board = new ffish.Board(variant, this.move.fen)
-      const legalMoves = board.legalMoves()
-      if (legalMoves.length === 0 && !name.includes('#')) {
-        name = this.move.name + '#'
-      }
-      return name
     }
   },
   watch: {
@@ -229,8 +219,6 @@ export default {
       return null
     },
     promote (move) {
-      const moves = this.$store.getters.moves
-      this.$store.dispatch('movesChangeDummy', moves)
       const movesToDelete = this.movesToDelete(move)
       if (movesToDelete.includes(this.menuAtMove)) {
         this.$store.dispatch('displayMenu', true)
@@ -294,6 +282,17 @@ export default {
     },
     updateBoard (move) {
       this.$store.dispatch('fen', this.move.fen)
+    },
+    checkCheckmate (moveIn) {
+      const move = moveIn
+      let name = moveIn.name
+      const variant = this.$store.getters.variant
+      const board = new ffish.Board(variant, move.fen)
+      const legalMoves = board.legalMoves()
+      if (legalMoves.length === 0 && !name.includes('#')) {
+        name = name + '#'
+      }
+      return name
     }
   }
 }
@@ -317,7 +316,6 @@ export default {
 .move-name {
   margin-right: 4px;
   pointer-events: auto;
-  font-family: 'Noto Chess', sans-serif;
 }
 .variation {
   background-color:var(--variation-color);
