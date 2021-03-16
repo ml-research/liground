@@ -101,7 +101,7 @@ function checkOption (options, name, value) {
   }
 }
 
-const filteredSettings = ['UCI_Variant']
+const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
 
 export const store = new Vuex.Store({
   state: {
@@ -438,6 +438,7 @@ export const store = new Vuex.Store({
     resetBoard (context, payload) {
       context.commit('resetMultiPV')
       context.commit('resetBoard', payload)
+      context.dispatch('setEngineOptions', { UCI_Chess960: payload.is960 })
       context.dispatch('restartEngine')
     },
     initialize (context) {
@@ -573,6 +574,7 @@ export const store = new Vuex.Store({
         fen: payload.fen,
         is960: payload.is960
       })
+      context.dispatch('setEngineOptions', { UCI_Chess960: payload.is960 })
     },
     async engineBinary (context, payload) {
       const id = context.state.allEngines.findIndex(engine => engine.binary === payload)
@@ -599,7 +601,8 @@ export const store = new Vuex.Store({
         MultiPV: 5,
         UCI_AnalyseMode: true,
         UCI_Variant: context.getters.variant,
-        'Analysis Contempt': 'Off'
+        'Analysis Contempt': 'Off',
+        UCI_Chess960: context.state.board.is960()
       })
     },
     setEngineOptions (context, payload) {
