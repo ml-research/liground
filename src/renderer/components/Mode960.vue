@@ -216,5 +216,6 @@ input[type=number] {
 .board960:hover::after {
   opacity: 1;
   visibility: visible;
+  transition-delay: 150ms;
 }
 </style>

@@ -129,7 +129,7 @@ input::-webkit-inner-spin-button {
   top: 120%;
   margin-top: -20px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-20%);
   border: 10px solid #000;
   border-color: transparent transparent var(--tooltip-color) transparent ;
   opacity: 0;
@@ -140,5 +140,6 @@ input::-webkit-inner-spin-button {
 .EvalPlotButton:hover::after {
   opacity: 1;
   visibility: visible;
+  transition-delay: 150ms;
 }
 </style>
