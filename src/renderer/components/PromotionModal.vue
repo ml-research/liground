@@ -65,7 +65,7 @@ export default {
     background-repeat: no-repeat;
     width: 100%;
     height: 100%;
-    background-color: white;
+    background-color: var(--second-bg-color);
   }
   .pieceoption:hover {
     background-color: rgb(182, 155, 107);

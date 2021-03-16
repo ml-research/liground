@@ -1,5 +1,9 @@
 <template>
   <div class="settings">
+    <div>
+      <p>DarkMode</p>
+      <DarkModeSwitch class="darkSwitch" />
+    </div>
     <div class="engines">
       <EngineSelect class="select" />
       <div
@@ -113,11 +117,12 @@
 import { mapGetters } from 'vuex'
 import EngineSelect from './EngineSelect'
 import EngineModal from './EngineModal'
+import DarkModeSwitch from './DarkModeSwitch'
 import defaultLogo from '../assets/images/engines/chess_engine.svg'
 
 export default {
   name: 'SettingsTab',
-  components: { EngineSelect, EngineModal },
+  components: { EngineSelect, EngineModal, DarkModeSwitch },
   data () {
     return {
       settings: {},
@@ -241,6 +246,7 @@ export default {
   text-align: center;
 }
 .table {
+  width: 100%;
   font-size: 0.9em;
   text-align: left;
 }
@@ -250,10 +256,13 @@ input[type=number] {
 }
 /* make arrows of number input always visible */
 input[type=number]::-webkit-inner-spin-button {
-  opacity: 1
+  opacity: 0.5;
 }
+
 .input {
   width: 100%;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
 }
 
 .btn {

@@ -88,7 +88,7 @@ export default {
 
 <style scoped>
 .pv-lines {
-  background-color: #fff;
+  background-color: var(--second-bg-color);
   font-weight: 100;
   white-space: nowrap;
 }
@@ -110,7 +110,7 @@ export default {
   user-select: none;
 }
 .item + .item {
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--main-border-color);
 }
 .item.clickable {
   cursor: pointer;

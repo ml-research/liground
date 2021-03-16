@@ -4,6 +4,9 @@ import ffish from 'ffish'
 import engine from './engine'
 import allEngines from './store/engines'
 
+import moveAudio from './assets/audio/Move.mp3'
+import captureAudio from './assets/audio/Capture.mp3'
+
 Vue.use(Vuex)
 
 class TwoWayMap {
@@ -120,6 +123,7 @@ export const store = new Vuex.Store({
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
       Antichess: 'antichess',
+      Atomic: 'atomic',
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
@@ -129,6 +133,7 @@ export const store = new Vuex.Store({
 
     }),
     openedPGN: false,
+    evalPlotDepth: 20,
     orientation: 'white',
     message: 'hello from Vuex',
     allEngines,
@@ -164,21 +169,27 @@ export const store = new Vuex.Store({
     loadedGames: [],
     selectedGame: null,
     boardStyle: 'blue',
+    curVar960Fen: '',
+    viewAnalysis: true,
+    analysisMode: true,
+    menuAtMove: null,
+    displayMenu: true,
+    darkMode: false,
     internationalVariants: [
-      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
     seaVariants: [
       'makruk'
     ],
     xiangqiVariants: [
-      'janggi', 'xiangqi'
+      'xiangqi'
+    ],
+    janggiVariants: [
+      'janggi'
     ],
     shogiVariants: [
       'shogi'
-    ],
-    curVar960Fen: '',
-    viewAnalysis: true,
-    analysisMode: true
+    ]
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -204,6 +215,15 @@ export const store = new Vuex.Store({
     },
     firstMoves (state, payload) {
       state.firstMoves.push(payload)
+    },
+    deleteFromFirstMoves (state, payload) {
+      state.firstMoves.splice(state.firstMoves.indexOf(payload), 1)
+    },
+    deleteFromMoves (state, payload) {
+      for (const index in payload.next) {
+        this.commit('deleteFromMoves', payload.next[index])
+      }
+      state.moves.splice(state.moves.indexOf(payload), 1)
     },
     legalMoves (state, payload) {
       state.legalMoves = payload
@@ -305,7 +325,12 @@ export const store = new Vuex.Store({
           state.board = new ffish.Board(state.variant, fen)
         }
       } else {
-        state.board = new ffish.Board(state.variant)
+        if (is960) {
+          console.log(state.curVar960Fen)
+          state.board = new ffish.Board(state.variant, state.curVar960Fen, true)
+        } else {
+          state.board = new ffish.Board(state.variant)
+        }
       }
       state.moves = []
       state.mainFirstMove = null
@@ -316,9 +341,12 @@ export const store = new Vuex.Store({
       state.legalMoves = state.board.legalMoves()
       state.lastFen = state.board.fen()
       state.startFen = state.board.fen()
+      state.selectedGame = null
     },
     resetBoard (state, payload) {
-      state.curVar960Fen = ''
+      if (!payload.is960) {
+        state.curVar960Fen = ''
+      }
       this.commit('newBoard', payload)
       state.selectedGame = null
       state.moves = []
@@ -334,20 +362,16 @@ export const store = new Vuex.Store({
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
-        if (state.moves[num].current) {
-          state.moves[num].current = false // set all moves as not the current one
-        }
         if (state.moves[num].uci === mov[0] && state.moves[num].prev === prev) {
           alreadyInMoves = state.moves[num] // if the move is already in the history its stored here
         }
       }
-      const current = true // the latest move is marked as current
       if (!alreadyInMoves) {
         state.moves = state.moves.concat(mov.map((curVal, idx, arr) => {
           const sanMove = state.board.sanMove(curVal)
           state.board.push(curVal)
           this.commit('playAudio', sanMove)
-          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev, current: current }
+          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev }
         }))
         if (payload.prev) { // if the move is not a starting move
           prev.next.push(state.moves[state.moves.length - 1]) // the last entry in moves is the move object of the current move
@@ -362,7 +386,6 @@ export const store = new Vuex.Store({
         }
       } else {
         state.board.push(alreadyInMoves.uci)
-        alreadyInMoves.current = true
       }
       state.lastFen = state.board.fen()
     },
@@ -370,9 +393,9 @@ export const store = new Vuex.Store({
       if (state.openedPGN) {
         return
       }
-      let note = new Audio('/static/audio/Move.mp3')
+      let note = new Audio(moveAudio)
       if (move.toString().includes('x')) {
-        note = new Audio('/static/audio/Capture.mp3')
+        note = new Audio(captureAudio)
       }
       note.play()
     },
@@ -388,11 +411,21 @@ export const store = new Vuex.Store({
     analysisMode (state, payload) {
       state.analysisMode = payload
     },
-    points (state, payload) {
-      state.points = payload
-    },
     openedPGN (state, payload) {
       state.openedPGN = payload
+    },
+    menuAtMove (state, payload) {
+      state.menuAtMove = payload
+    },
+    displayMenu (state, payload) {
+      state.displayMenu = payload
+    },
+    switchDarkMode (state) {
+      state.darkMode = !state.darkMode
+      localStorage.darkMode = state.darkMode
+    },
+    evalPlotDepth (state, payload) {
+      state.evalPlotDepth = payload
     }
   },
   actions: { // async
@@ -408,6 +441,11 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.darkMode) {
+        if (localStorage.darkMode === 'true') {
+          context.commit('switchDarkMode')
+        }
+      }
       if (localStorage.internationalPieceStyle) {
         context.commit('pieceStyle', localStorage.internationalPieceStyle)
       }
@@ -441,13 +479,19 @@ export const store = new Vuex.Store({
     },
     mainFirstMove (context, payload) {
       if (context.state.mainFirstMove !== payload) {
-        context.dispatch('mainFirstMove', payload)
+        context.commit('mainFirstMove', payload)
       }
     },
     firstMoves (context, payload) {
       if (!context.state.firstMoves.includes(payload)) {
         context.dispatch('firstMoves', payload)
       }
+    },
+    deleteFromMoves (context, payload) {
+      if (!payload.prev) {
+        context.commit('deleteFromFirstMoves', payload)
+      }
+      context.commit('deleteFromMoves', payload)
     },
     resetEngineData (context) {
       context.commit('resetMultiPV')
@@ -471,6 +515,8 @@ export const store = new Vuex.Store({
     },
     position (context) {
       engine.send(`position fen ${context.getters.fen}`)
+      const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
+      document.dispatchEvent(eve)
     },
     sendEngineCommand (_, payload) {
       engine.send(payload)
@@ -505,9 +551,6 @@ export const store = new Vuex.Store({
         }
         context.dispatch('resetEngineData')
         const oldEngine = context.getters.selectedEngine
-
-        // deselect game
-        context.commit('selectedGame', null)
 
         // update variant
         context.commit('variant', payload)
@@ -742,10 +785,10 @@ export const store = new Vuex.Store({
         gameInfo[curVal] = payload.game.headers(curVal)
       }
 
-      context.commit('selectedGame', payload.game)
-      context.commit('gameInfo', gameInfo)
       await context.dispatch('variant', variant)
       context.commit('newBoard')
+      context.commit('selectedGame', payload.game)
+      context.commit('gameInfo', gameInfo)
       const moves = payload.game.mainlineMoves().split(' ')
       for (const num in moves) {
         if (num === 0) {
@@ -754,7 +797,7 @@ export const store = new Vuex.Store({
           context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1] }) // TODO differentiate between alternative lines
         }
       }
-      context.dispatch('fen', context.state.board.fen())
+      context.dispatch('fen', context.state.startFen)
       context.dispatch('updateBoard')
       context.commit('openedPGN', false)
     },
@@ -775,6 +818,18 @@ export const store = new Vuex.Store({
     },
     openedPGN (context, payload) {
       context.commit('openedPGN', payload)
+    },
+    menuAtMove (context, payload) {
+      context.commit('menuAtMove', payload)
+    },
+    displayMenu (context, payload) {
+      context.commit('displayMenu', payload)
+    },
+    switchDarkMode (context) {
+      context.commit('switchDarkMode')
+    },
+    evalPlotDepth (context, payload) {
+      context.commit('evalPlotDepth', payload)
     }
   },
   getters: {
@@ -973,8 +1028,23 @@ export const store = new Vuex.Store({
     viewAnalysis (state) {
       return state.viewAnalysis
     },
+    evalPlotDepth (state) {
+      return state.evalPlotDepth
+    },
+    openedPGN (state) {
+      return state.openedPGN
+    },
     analysisMode (state) {
       return state.analysisMode
+    },
+    menuAtMove (state) {
+      return state.menuAtMove
+    },
+    displayMenu (state) {
+      return state.displayMenu
+    },
+    darkMode (state) {
+      return state.darkMode
     }
   }
 })
@@ -985,8 +1055,10 @@ ffish.onRuntimeInitialized = () => {
 
 (async () => {
   // setup debug and error output
-  engine.on('debug', (...msgs) => console.log('%c[Worker] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
-  engine.on('error', (...msgs) => console.error('%c[Worker]', 'color: #82aaff; font-weight: 700;', ...msgs))
+  engine.on('debug', (...msgs) => console.log('%c[Main Engine] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
+  engine.on('error', (...msgs) => console.error('%c[Main Engine]', 'color: #82aaff; font-weight: 700;', ...msgs))
+  engine.on('eval-debug', (...msgs) => console.log('%c[Eval Engine] Debug:', 'color: #9580ff; font-weight: 700;', ...msgs))
+  engine.on('eval-error', (...msgs) => console.error('%c[Eval Engine]', 'color: #9580ff; font-weight: 700;', ...msgs))
 
   // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))

@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="page">
     <MenuBar id="menubar" />
     <GameBoards id="gameboards" />
   </div>
@@ -24,6 +24,7 @@ export default {
 </script>
 
 <style>
+@import '../assets/cssVars.css';
 
 * {
   box-sizing: border-box;
@@ -34,16 +35,20 @@ export default {
 body { font-family: Avenir, Helvetica, Arial, sans-serif; }
 
 #app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  background-color: #f9f9f9;
+  color: var(--main-text-color, black);
+  background-color: var(--main-bg-color, white);
   font-weight: 800;
   font-size: 12pt;
-  height: 100%;
-  width: 100%;
+  overflow: auto;
 }
 
 #menubar {

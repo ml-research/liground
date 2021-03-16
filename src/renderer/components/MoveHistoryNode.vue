@@ -20,11 +20,31 @@
     <span
       v-if="printRoot"
       class="move-name"
-      :class="{ current : move.current }"
+      :class="{ current : move.fen === fen }"
       @click="updateBoard(move)"
+      @contextmenu.prevent="(menuAtMove === move.name || displayMenu) ? $refs.menu.open($event, { name: move.name }) : dummy"
     >
-      {{ move.name }}
+      {{ checkCheckmate(move) }}
     </span>
+    <VueContext
+      ref="menu"
+      @open="onOpen($event, { move: move })"
+      @close="onClose"
+    >
+      <li>
+        <a
+          v-if="!mainLine.includes(move)"
+          href="#"
+          @click.prevent="promote(move)"
+        >Promote Variation</a>
+      </li>
+      <li>
+        <a
+          href="#"
+          @click.prevent="deleteMove(move)"
+        >Delete Variation</a>
+      </li>
+    </VueContext>
     <span v-if="move.fen === mainFirstMove.fen">
       <MoveHistoryNode
         v-for="variation in firstMovesFiltered"
@@ -66,8 +86,15 @@
 </template>
 
 <script>
+
+import ffish from 'ffish'
+import VueContext from 'vue-context/src/js/index'
+
 export default {
   name: 'MoveHistoryNode',
+  components: {
+    VueContext
+  },
   props: {
     move: {
       default: undefined,
@@ -87,6 +114,24 @@ export default {
     }
   },
   computed: {
+    displayMenu () {
+      return this.$store.getters.displayMenu
+    },
+    menuAtMove () {
+      return this.$store.getters.menuAtMove
+    },
+    mainLine () {
+      const result = []
+      if (this.mainFirstMove) {
+        let mov = this.mainFirstMove
+        result.push(mov)
+        while (mov.main) {
+          mov = mov.main
+          result.push(mov)
+        }
+      }
+      return result
+    },
     filteredNext () {
       return this.move.next.filter((variation) => {
         return variation.fen !== this.move.main.fen
@@ -98,8 +143,17 @@ export default {
     mainFirstMove () {
       return this.$store.getters.mainFirstMove
     },
+    fen () {
+      return this.$store.getters.fen
+    },
     firstMoves () {
       return this.$store.getters.firstMoves
+    },
+    startFen () {
+      return this.$store.getters.startFen
+    },
+    is960 () {
+      return this.$store.getters.is960
     },
     firstMovesFiltered () {
       return this.firstMoves.filter((move) => {
@@ -107,16 +161,138 @@ export default {
       })
     }
   },
+  watch: {
+    moves () {
+      this.$store.dispatch('displayMenu', true)
+      this.$store.dispatch('menuAtMove', null)
+    }
+  },
   methods: {
-    updateBoard (move) {
-      this.$store.dispatch('fen', this.move.fen)
-      for (const num in this.moves) {
-        if (this.moves[num].current) {
-          this.moves[num].current = false
-          break
+    dummy () {
+      return null
+    },
+    onOpen (event, data) {
+      if (this.displayMenu) {
+        this.$store.dispatch('menuAtMove', data.move)
+        this.$store.dispatch('displayMenu', false)
+      }
+    },
+    onClose () {
+      this.$store.dispatch('displayMenu', true)
+      this.$store.dispatch('menuAtMove', null)
+    },
+    currentLine (move) {
+      const result = []
+      if (this.mainFirstMove) {
+        let movPrev = move.prev
+        let movNext = move.main
+        result.push(move)
+        while (movPrev) {
+          result.push(movPrev)
+          movPrev = movPrev.prev
+        }
+        while (movNext) {
+          result.push(movNext)
+          movNext = movNext.main
         }
       }
-      move.current = true
+      return result
+    },
+    movesToDelete (move) {
+      const result = []
+      if (this.mainFirstMove) {
+        let movNext = move.main
+        result.push(move)
+        while (movNext) {
+          result.push(movNext)
+          movNext = movNext.main
+        }
+      }
+      return result
+    },
+    currentMove () {
+      for (const idx in this.moves) {
+        if (this.moves[idx].fen === this.fen) {
+          return this.moves[idx]
+        }
+      }
+      return null
+    },
+    promote (move) {
+      const movesToDelete = this.movesToDelete(move)
+      if (movesToDelete.includes(this.menuAtMove)) {
+        this.$store.dispatch('displayMenu', true)
+        this.$store.dispatch('menuAtMove', null)
+      }
+      let mov = move
+      while (mov.prev) { // promote at every "fork"
+        mov.prev.main = mov
+        mov = mov.prev
+      }
+      if (!mov.prev) {
+        this.$store.dispatch('mainFirstMove', mov)
+      }
+    },
+    deleteMove (move) {
+      const currentMove = this.currentMove()
+      const currentLine = this.currentLine(move)
+      const movesToDelete = this.movesToDelete(move)
+      if (movesToDelete.includes(this.menuAtMove)) {
+        this.$store.dispatch('displayMenu', true)
+        this.$store.dispatch('menuAtMove', null)
+      }
+      if (move.prev) {
+        const moveIndex = move.prev.next.indexOf(move)
+        if (move.prev.main === move) { // ensure we still have a main line if there are still continuations
+          if (move.prev.next.length > 1) {
+            if (move === move.prev.next[0]) {
+              move.prev.main = move.prev.next[1]
+            } else {
+              move.prev.main = move.prev.next[0]
+            }
+          } else {
+            move.prev.main = undefined
+          }
+        }
+        move.prev.next.splice(moveIndex, 1)
+        if (currentLine.includes(currentMove)) {
+          this.updateBoard(move.prev)
+        }
+      } else {
+        if (this.mainFirstMove === move) {
+          if (this.firstMoves.length === 1) {
+            this.$store.dispatch('resetBoard', { is960: this.is960 })
+          } else {
+            if (this.firstMoves[0] === move) {
+              this.$store.dispatch('mainFirstMove', this.firstMoves[1])
+            } else {
+              this.$store.dispatch('mainFirstMove', this.firstMoves[0])
+            }
+            if (currentLine.includes(currentMove)) {
+              this.updateBoard(this.mainFirstMove)
+            }
+          }
+        } else {
+          if (currentLine.includes(currentMove)) {
+            this.updateBoard(this.mainFirstMove)
+          }
+        }
+      }
+      this.$store.dispatch('deleteFromMoves', move)
+    },
+    updateBoard (move) {
+      this.$store.dispatch('fen', this.move.fen)
+    },
+    checkCheckmate (moveIn) {
+      const move = moveIn
+      let name = moveIn.name
+      const variant = this.$store.getters.variant
+      const board = new ffish.Board(variant, move.fen)
+      const legalMoves = board.legalMoves()
+      if (legalMoves.length === 0 && !name.includes('#')) {
+        name = name + '#'
+      }
+      return name
     }
   }
 }
@@ -142,7 +318,7 @@ export default {
   pointer-events: auto;
 }
 .variation {
-  background-color:lightgray;
+  background-color:var(--variation-color);
   display: block;
 }
 .variation::before {

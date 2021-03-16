@@ -98,7 +98,7 @@ i {
   font-size: 24pt;
   width: 70px;
   height: 40px;
-  color: #2c3e50;
+  color: var(--main-text-color);
   border-radius: 5px 5px 5px 5px;
 }
 .jump:hover {
@@ -115,7 +115,7 @@ i {
   color:gray
 }
 .grey:hover {
-  background-color: #f9f9f9;
+  background-color: var(--main-bg-color);
   color: gray;
   cursor: default;
 }

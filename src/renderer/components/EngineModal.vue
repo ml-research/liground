@@ -203,8 +203,8 @@ export default {
 .contents {
   display: flex;
   flex-direction: column;
-  background: #FFFFFF;
-  box-shadow: 2px 2px 20px 1px;
+  background: var(--second-bg-color);
+  box-shadow: 2px 2px 20px 1px var(--second-bg-color);
   overflow-x: auto;
 }
 
@@ -212,7 +212,7 @@ export default {
   padding: 15px;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--main-border-color);
   color: #4AAE9B;
   user-select: none;
 }
@@ -262,7 +262,7 @@ export default {
   padding: 15px;
   display: flex;
   justify-content: flex-end;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--main-border-color);
   user-select: none;
 }
 .btn {
