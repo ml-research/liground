@@ -4,6 +4,9 @@ import ffish from 'ffish'
 import engine from './engine'
 import allEngines from './store/engines'
 
+import moveAudio from './assets/audio/Move.mp3'
+import captureAudio from './assets/audio/Capture.mp3'
+
 Vue.use(Vuex)
 
 class TwoWayMap {
@@ -120,6 +123,7 @@ export const store = new Vuex.Store({
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
       Antichess: 'antichess',
+      Atomic: 'atomic',
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
@@ -165,23 +169,27 @@ export const store = new Vuex.Store({
     loadedGames: [],
     selectedGame: null,
     boardStyle: 'blue',
+    curVar960Fen: '',
+    viewAnalysis: true,
+    analysisMode: true,
+    menuAtMove: null,
+    displayMenu: true,
+    darkMode: false,
     internationalVariants: [
-      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
     seaVariants: [
       'makruk'
     ],
     xiangqiVariants: [
-      'janggi', 'xiangqi'
+      'xiangqi'
+    ],
+    janggiVariants: [
+      'janggi'
     ],
     shogiVariants: [
       'shogi'
-    ],
-    curVar960Fen: '',
-    viewAnalysis: true,
-    analysisMode: true,
-    menuAtMove: null,
-    displayMenu: true
+    ]
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -385,9 +393,9 @@ export const store = new Vuex.Store({
       if (state.openedPGN) {
         return
       }
-      let note = new Audio('/static/audio/Move.mp3')
+      let note = new Audio(moveAudio)
       if (move.toString().includes('x')) {
-        note = new Audio('/static/audio/Capture.mp3')
+        note = new Audio(captureAudio)
       }
       note.play()
     },
@@ -411,6 +419,10 @@ export const store = new Vuex.Store({
     },
     displayMenu (state, payload) {
       state.displayMenu = payload
+    },
+    switchDarkMode (state) {
+      state.darkMode = !state.darkMode
+      localStorage.darkMode = state.darkMode
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
@@ -436,11 +448,16 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.darkMode) {
+        if (localStorage.darkMode === 'true') {
+          context.commit('switchDarkMode')
+        }
+      }
       if (localStorage.internationalPieceStyle) {
-        store.commit('pieceStyle', localStorage.internationalPieceStyle)
+        context.commit('pieceStyle', localStorage.internationalPieceStyle)
       }
       if (localStorage.internationalBoardStyle) {
-        store.commit('boardStyle', localStorage.internationalBoardStyle)
+        context.commit('boardStyle', localStorage.internationalBoardStyle)
       }
       if (localStorage.variant) {
         store.commit('variant', localStorage.variant)
@@ -723,6 +740,9 @@ export const store = new Vuex.Store({
     displayMenu (context, payload) {
       context.commit('displayMenu', payload)
     },
+    switchDarkMode (context) {
+      context.commit('switchDarkMode')
+    },
     evalPlotDepth (context, payload) {
       context.commit('evalPlotDepth', payload)
     }
@@ -905,6 +925,9 @@ export const store = new Vuex.Store({
     isXiangqi (state) {
       return state.xiangqiVariants.includes(state.variant)
     },
+    isJanggi (state) {
+      return state.janggiVariants.includes(state.variant)
+    },
     isShogi (state) {
       return state.shogiVariants.includes(state.variant)
     },
@@ -935,6 +958,9 @@ export const store = new Vuex.Store({
     },
     displayMenu (state) {
       return state.displayMenu
+    },
+    darkMode (state) {
+      return state.darkMode
     }
   }
 })

@@ -99,6 +99,6 @@ downloadBinary('multi-variant-stockfish', {
 })
 
 downloadBinary('fairy-stockfish', {
-  linux: 'https://github.com/ianfab/Fairy-Stockfish/releases/download/fairy_sf_11_2/fairy-stockfish-largeboard_x86-64',
-  win: 'https://github.com/ianfab/Fairy-Stockfish/releases/download/fairy_sf_11_2/fairy-stockfish-largeboard_x86-64.exe'
+  linux: 'https://github.com/ianfab/Fairy-Stockfish/releases/download/fairy_sf_13/fairy-stockfish-largeboard_x86-64',
+  win: 'https://github.com/ianfab/Fairy-Stockfish/releases/download/fairy_sf_13/fairy-stockfish-largeboard_x86-64.exe'
 })

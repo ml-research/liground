@@ -5,7 +5,6 @@
 <img src="./media/screenshots/liground-0.0.1.png" alt="LiGround screenshot" title="LiGround screenshot." />
 
 ### Build Setup
-
 ``` bash
 # install dependencies
 npm install
@@ -21,13 +20,13 @@ npm run lint
 ```
 
 ### Post-Installation Actions
+LiGround ships with preincluded engine binaries. By default all engines are downloaded automatically into the `./engines/` folder as postinstall action. However, if no prebuilt binaries are available for you system or something goes wrong, please go ahead and build/download them manually:
 
-* [Download](https://github.com/ianfab/Fairy-Stockfish/releases/) a **largeboard** binary of _Fairy-Stockfish_ or build it from scratch.
-
-* Rename the _Fairy-Stockfish_ binary to `stockfish` and move it to `./engines/`.
+* Download [Stockfish 2020-06-13](https://github.com/niklasf/Stockfish/releases/fishnet-20200613) and rename it to `stockfish`
+* Download [Multi-Variant-Stockfish 10](https://github.com/ddugovic/Stockfish/releases/variant_sf_10) and rename it to `multi-variant-stockfish`
+* Download [Fairy-Stockfish 13 **Largeboard**](https://github.com/ianfab/Fairy-Stockfish/releases/fairy_sf_13) and rename it to `fairy-stockfish`
 
 ### Libraries
-
 The following libraries or assets are used in **LiGround**:
 
 Library | Description | Usage
@@ -40,7 +39,6 @@ Library | Description | Usage
 [**electron-vue**](https://github.com/SimulatedGREG/electron-vue) | An Electron & Vue.js quick start boilerplate | Used for the boilerplate code.
 
 ### Related
-
 Projects that influenced the creation of **LiGround**:
 
 Project | Description

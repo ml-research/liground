@@ -24,7 +24,7 @@
       @click="updateBoard(move)"
       @contextmenu.prevent="(menuAtMove === move.name || displayMenu) ? $refs.menu.open($event, { name: move.name }) : dummy"
     >
-      {{ move.name }}
+      {{ checkCheckmate(move) }}
     </span>
     <VueContext
       ref="menu"
@@ -86,7 +86,10 @@
 </template>
 
 <script>
+
+import ffish from 'ffish'
 import VueContext from 'vue-context/src/js/index'
+
 export default {
   name: 'MoveHistoryNode',
   components: {
@@ -280,13 +283,18 @@ export default {
       this.$store.dispatch('deleteFromMoves', move)
     },
     updateBoard (move) {
-      this.$store.dispatch('fen', move.fen)
-      for (const num in this.moves) {
-        if (this.moves[num].current) {
-          this.moves[num].current = false
-        }
+      this.$store.dispatch('fen', this.move.fen)
+    },
+    checkCheckmate (moveIn) {
+      const move = moveIn
+      let name = moveIn.name
+      const variant = this.$store.getters.variant
+      const board = new ffish.Board(variant, move.fen)
+      const legalMoves = board.legalMoves()
+      if (legalMoves.length === 0 && !name.includes('#')) {
+        name = name + '#'
       }
-      move.current = true
+      return name
     }
   }
 }
@@ -312,7 +320,7 @@ export default {
   pointer-events: auto;
 }
 .variation {
-  background-color:lightgray;
+  background-color:var(--variation-color);
   display: block;
 }
 .variation::before {
