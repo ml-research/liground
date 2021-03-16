@@ -2,22 +2,31 @@
   <div class="pv-lines">
     <div class="scroller">
       <VueContext
-        ref="menu"
+        ref="menu1"
         v-slot="{ data }"
-        @open="onOpen"
-        @close="onClose"
       >
         <li>
           <a
             href="#"
             @click.prevent="asMain($event.target, data)"
-          >Play entire line</a>
+          >Play as main line</a>
         </li>
         <li>
           <a
             href="#"
             @click.prevent="asAlt($event.target, data)"
           >Play line as alternative</a>
+        </li>
+      </VueContext>
+      <VueContext
+        ref="menu2"
+        v-slot="{ data }"
+      >
+        <li>
+          <a
+            href="#"
+            @click.prevent="asMain($event.target, data)"
+          >Play entire line</a>
         </li>
       </VueContext>
       <div class="list">
@@ -36,7 +45,7 @@
             <span class="left">{{ line.cpDisplay }}</span>
             <span
               class="right"
-              @contextmenu.prevent="$refs.menu.open($event, { line: line })"
+              @contextmenu.prevent="currentMove && currentMove.main ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
             >
               {{ line.pv }}
             </span>
@@ -77,6 +86,14 @@ export default {
       const { engineName, engineAuthor } = this.$store.getters
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     },
+    currentMove () {
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
+          return this.moves[num]
+        }
+      }
+      return null
+    },
     ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove'])
   },
   watch: {
@@ -88,34 +105,15 @@ export default {
     }
   },
   methods: {
-    onOpen (event, data) {
-      console.log(data.line)
-    },
-    onClose () {
-      console.log('close')
-    },
     asMain (target, data) {
       const mainLine = data.line.pvUCI.split(' ')
-      let prevMov
-      for (let num = 0; num < this.moves.length; num++) {
-        if (this.moves[num].fen === this.fen) {
-          prevMov = this.moves[num]
-          break
-        }
-      }
+      const prevMov = this.currentMove
       console.log(prevMov)
       this.$store.dispatch('pushMainLine', { line: mainLine, prev: prevMov })
     },
     asAlt (target, data) {
       const mainLine = data.line.pvUCI.split(' ')
-      let prevMov
-      for (let num = 0; num < this.moves.length; num++) {
-        if (this.moves[num].fen === this.fen) {
-          prevMov = this.moves[num]
-          break
-        }
-      }
-      console.log(prevMov)
+      const prevMov = this.currentMove
       this.$store.dispatch('pushAltLine', { line: mainLine, prev: prevMov })
     },
     onMouseEnter (id) {
@@ -126,13 +124,7 @@ export default {
     },
     onClick (line) {
       this.$store.commit('hoveredpv', -1)
-      let prevMov
-      for (let num = 0; num < this.moves.length; num++) {
-        if (this.moves[num].fen === this.fen) {
-          prevMov = this.moves[num]
-          break
-        }
-      }
+      const prevMov = this.currentMove
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     },
     updateLines () {
