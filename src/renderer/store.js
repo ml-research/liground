@@ -118,7 +118,7 @@ export const store = new Vuex.Store({
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
       Antichess: 'antichess',
-      'Atomic': 'atomic',
+      Atomic: 'atomic',
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
