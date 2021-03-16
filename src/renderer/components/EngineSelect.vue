@@ -58,21 +58,24 @@ export default {
 .container {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .logo {
-  border-radius: 5px;
   flex-basis: 120px;
   flex-shrink: 0;
   flex-grow: 0;
   margin-right: 5px;
 }
 .logo .image {
+  box-sizing: content-box;
   width: 120px;
   height: 60px;
+  background-color: #fff;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 5px;
 }
 
 .multiselect {

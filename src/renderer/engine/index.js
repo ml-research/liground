@@ -62,7 +62,7 @@ class Engine extends EventEmitter {
         type: 'run'
       })
       this.evalWorker.postMessage({
-        payload: { binary, cwd, listeners: [], silent: true },
+        payload: { binary, cwd, listeners: [] },
         type: 'run'
       })
     })

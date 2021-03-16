@@ -238,17 +238,28 @@ export default {
   text-align: left;
   font-weight: bold;
 }
+.input {
+  padding: 2px 3px;
+  background: lightgrey;
+  border: none;
+  border-radius: 3px;
+}
 .path {
+  margin-left: 10px;
+  color: var(--main-text-color);
   font-family: monospace;
-  color: #333;
   font-size: 11px;
 }
 .preview {
-  width: 90px;
-  height: 45px;
+  box-sizing: content-box;
+  margin-left: 20px;
+  width: 120px;
+  height: 60px;
+  background-color: #fff;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 5px;
 }
 .error {
   color: #b22222;

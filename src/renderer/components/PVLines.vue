@@ -116,7 +116,7 @@ export default {
   cursor: pointer;
 }
 .item.clickable:hover {
-  background-color: #d3e1eb;
+  background-color: #2196F3;
 }
 .item > .left {
   margin-right: 5px;
