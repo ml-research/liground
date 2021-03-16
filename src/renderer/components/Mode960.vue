@@ -1,10 +1,7 @@
 <template>
   <div>
-    <div class="board960">
+    <div class="board960" data-text="Input any number and press Enter or click the button for a random Board.">
       960 Board:
-      <span class="hide tooltip">
-        Input any number and press Enter or click the button for a random Board.
-      </span>
     </div>
     <div class="input960">
       <input
@@ -187,38 +184,37 @@ input[type=number] {
   display: inline-block;
   position: relative;
 }
-.tooltip::before {
-  content: "";
+.board960::before{
+  content: attr(data-text);
   position: absolute;
-
-  top: 0%;
-  margin-top: -20px;
-  left: 50%;
-  transition: opacity 0.3s ease-in-out;
-  border: 10px solid #000;
-  border-color: transparent transparent var(--tooltip-color) transparent ;
-  opacity: 0;
-}
-.board960:hover .tooltip::before {
-  opacity: 1;
-}
-.board960 .hide {
-  margin-top: 15px;
+  top: 120%;
+  font-size: 12px;
   background-color: var(--tooltip-color);
   color:var(--main-text-color);
   box-shadow:  5px 5px 10px 2px black;
   border-radius: 5px;
-  text-align: center;
-  position: absolute;
-  z-index: 1;
-  top:100%;
-  left:0%;
-  font-size: 12px;
+  z-index: 2;
   opacity: 0;
+  visibility: hidden;
   transition: opacity 0.3s ease-in-out;
 }
-.board960:hover .hide {
+.board960::after{
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 120%;
+  margin-top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 10px solid #000;
+  border-color: transparent transparent var(--tooltip-color) transparent ;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+.board960:hover::before,
+.board960:hover::after {
   opacity: 1;
-  
+  visibility: visible;
 }
 </style>

@@ -1,10 +1,7 @@
 <template>
   <div>
-    <div class="EvalPlotButton">
+    <div class="EvalPlotButton" data-text="Input a number to set the engine depth for the Eval Plot.">
       Eval Depth:
-      <span class="hide tooltip">
-        Input a number to set the engine depth for the Eval Plot.
-      </span>
     </div>
     <div class="inputDepth">
       <input
@@ -105,44 +102,43 @@ input::-webkit-inner-spin-button {
 .button:hover {
   cursor: pointer;
 }
-.tooltip::before {
-  content: "";
-  position: absolute;
-
-  top: 0%;
-  margin-top: -20px;
-  left: 50%;
-  transition: opacity 0.3s ease-in-out;
-  border: 10px solid #000;
-  border-color: transparent transparent var(--tooltip-color) transparent ;
-  opacity: 0;
-}
-.EvalPlotButton:hover .tooltip::before {
-  opacity: 1;
-  
-}
 .EvalPlotButton {
   display: inline-block;
   position: relative;
   padding-top: 5px;
   padding-left: 10px;
 }
-.EvalPlotButton .hide {
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  margin-top: 15px;
+.EvalPlotButton::before{
+  content: attr(data-text);
+  position: absolute;
+  top: 120%;
+  font-size: 12px;
   background-color: var(--tooltip-color);
-  color: var(--main-text-color);
+  color:var(--main-text-color);
   box-shadow:  5px 5px 10px 2px black;
   border-radius: 5px;
-  text-align: center;
-  font-size: 12px;
-  position: absolute;
-  z-index: 1;
-  top:100%;
-  left:0%;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
 }
-.EvalPlotButton:hover .hide {
+.EvalPlotButton::after{
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 120%;
+  margin-top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 10px solid #000;
+  border-color: transparent transparent var(--tooltip-color) transparent ;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+.EvalPlotButton:hover::before,
+.EvalPlotButton:hover::after {
   opacity: 1;
+  visibility: visible;
 }
 </style>
