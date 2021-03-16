@@ -474,7 +474,6 @@ export const store = new Vuex.Store({
       for (const i in payload.line) {
         context.commit('appendMoves', { move: payload.line[i], prev: prev })
         const move = context.getters.getMoveByUCIAndPrev(payload.line[i], prev)[0]
-        console.log(move)
         if (!prev) {
           context.commit('mainFirstMove', move)
           prev = move
