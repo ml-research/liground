@@ -426,6 +426,8 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
+      console.log('evalplotdepth commit')
+      localStorage.evalPlotDepth = payload
     }
   },
   actions: { // async
@@ -441,6 +443,9 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if(localStorage.evalPlotDepth){
+        context.state.evalPlotDepth = localStorage.evalPlotDepth
+      }
       if (localStorage.darkMode) {
         if (localStorage.darkMode === 'true') {
           context.commit('switchDarkMode')
