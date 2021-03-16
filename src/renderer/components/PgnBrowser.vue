@@ -210,16 +210,18 @@ export default {
 
 #gamefilter {
   max-width: 65%;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
 }
 
 .roundseperator {
-  border-top: 2px solid black;
+  border-top: 2px solid var(--main-border-color);
 }
 
 .browserelement {
   text-decoration: none;
   display: block;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--main-border-color);
   font-size: 0.75em;
   font-weight: 600;
   text-align: left;

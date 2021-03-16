@@ -89,8 +89,9 @@ export default {
   }
 
   .modal {
-    background: #FFFFFF;
-    box-shadow: 2px 2px 20px 1px;
+    background: var(--second-bg-color);
+    box-shadow: 2px 2px 20px 1px var(--second-bg-color);
+
     overflow-x: auto;
     display: flex;
     flex-direction: column;
@@ -103,13 +104,13 @@ export default {
   }
 
   .modal-header {
-    border-bottom: 1px solid #eeeeee;
+    border-bottom: 1px solid var(--main-border-color);
     color: #4AAE9B;
     justify-content: space-between;
   }
 
   .modal-footer {
-    border-top: 1px solid #eeeeee;
+    border-top: 1px solid var(--main-border-color);
     justify-content: flex-end;
   }
 

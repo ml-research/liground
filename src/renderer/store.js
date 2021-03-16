@@ -176,7 +176,10 @@ export const store = new Vuex.Store({
       'makruk'
     ],
     xiangqiVariants: [
-      'janggi', 'xiangqi'
+      'xiangqi'
+    ],
+    janggiVariants: [
+      'janggi'
     ],
     shogiVariants: [
       'shogi'
@@ -185,7 +188,8 @@ export const store = new Vuex.Store({
     viewAnalysis: true,
     analysisMode: true,
     menuAtMove: null,
-    displayMenu: true
+    displayMenu: true,
+    darkMode: false
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -416,6 +420,10 @@ export const store = new Vuex.Store({
     displayMenu (state, payload) {
       state.displayMenu = payload
     },
+    switchDarkMode (state) {
+      state.darkMode = !state.darkMode
+      localStorage.darkMode = state.darkMode
+    },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
     }
@@ -433,11 +441,16 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.darkMode) {
+        if (localStorage.darkMode === 'true') {
+          context.commit('switchDarkMode')
+        }
+      }
       if (localStorage.internationalPieceStyle) {
-        store.commit('pieceStyle', localStorage.internationalPieceStyle)
+        context.commit('pieceStyle', localStorage.internationalPieceStyle)
       }
       if (localStorage.internationalBoardStyle) {
-        store.commit('boardStyle', localStorage.internationalBoardStyle)
+        context.commit('boardStyle', localStorage.internationalBoardStyle)
       }
       if (localStorage.variant) {
         store.commit('variant', localStorage.variant)
@@ -720,6 +733,9 @@ export const store = new Vuex.Store({
     displayMenu (context, payload) {
       context.commit('displayMenu', payload)
     },
+    switchDarkMode (context) {
+      context.commit('switchDarkMode')
+    },
     evalPlotDepth (context, payload) {
       context.commit('evalPlotDepth', payload)
     }
@@ -902,6 +918,9 @@ export const store = new Vuex.Store({
     isXiangqi (state) {
       return state.xiangqiVariants.includes(state.variant)
     },
+    isJanggi (state) {
+      return state.janggiVariants.includes(state.variant)
+    },
     isShogi (state) {
       return state.shogiVariants.includes(state.variant)
     },
@@ -932,6 +951,9 @@ export const store = new Vuex.Store({
     },
     displayMenu (state) {
       return state.displayMenu
+    },
+    darkMode (state) {
+      return state.darkMode
     }
   }
 })
