@@ -6,7 +6,6 @@
       :options="boardStyles"
       :allow-empty="false"
       :show-labels="false"
-      :placeholder="selected"
       @input="updateBoardStyle"
     >
       <template

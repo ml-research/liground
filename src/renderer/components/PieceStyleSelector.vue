@@ -6,7 +6,6 @@
       :options="pieceStyles"
       :allow-empty="false"
       :show-labels="false"
-      :placeholder="selected"
       @input="updatePieceStyle"
     >
       <template
