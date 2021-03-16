@@ -204,27 +204,39 @@ export default {
 
     adjustPoints (Inpoints, index) { // sets min/max for graph and converts the results from engine to the correct format
       let points = Inpoints
-      console.log(typeof (Inpoints))
-      if ((typeof (Inpoints)) === 'number') {
-        points = String(Inpoints)
-      }
-      if ((points.includes('#') && !points.includes('-'))) {
-        points = 10
-      } else if ((points.includes('#') && points.includes('-'))) {
-        points = -10
+      let turn
+      if (this.chartOptions.xaxis.categories[index].includes('..')) {
+        turn = 'black'
       } else {
-        points = (parseInt(points) / 100).toFixed(2)
-        if (Math.abs(points) < 10 && this.chartOptions.xaxis.categories[index].includes('..')) {
-          points = points * -1
-        }
-        if (points > 10) {
-          points = 10
-        } else if (points < -10) {
-          points = -10
-        }
-        return points * -1
+        turn = 'white'
       }
-      return points
+      points = String(Inpoints)
+      if (points.includes('#') && points.includes('0')) {
+        const lastNum = this.series[0].data[index - 1]
+        if (lastNum > 0) {
+          return 10
+        } else {
+          return -10
+        }
+      } else {
+        if (points.includes('#') && ((turn === 'black' && !points.includes('-')) || (turn === 'white' && points.includes('-')))) {
+          return 10
+        } else if (points.includes('#')) {
+          return -10
+        } else {
+          points = parseFloat((parseInt(points) / 100).toFixed(2))
+          if (turn === 'white') {
+            points = points * -1
+          }
+          if (points > 10) {
+            return 10
+          } else if (points < -10) {
+            return -10
+          } else {
+            return points
+          }
+        }
+      }
     },
 
     calcOffset () { // calculates and sets the offset which is used to determine how much of the graph should be colored black
@@ -293,7 +305,6 @@ export default {
             return
           }
           points = this.adjustPoints(points, index + 1)
-          console.log('AfterEval: ' + points + typeof (points))
           tmpArray[index + 1] = points
           this.series = [{
             data: tmpArray
@@ -315,9 +326,7 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            console.log('typefrombetter: ' + typeof (this.cpForWhite))
             newArray[index + 1] = this.adjustPoints(this.cpForWhite, index + 1)
-            console.log('AfterSet: ' + newArray[index + 1] + typeof (newArray[index + 1]))
             this.series = [{
               data: newArray
             }]
