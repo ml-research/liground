@@ -11,13 +11,13 @@
           <a
             href="#"
             @click.prevent="asMain($event.target, data)"
-          >Copy entire line as main variation</a>
+          >Play entire line</a>
         </li>
         <li>
           <a
             href="#"
-            @click.prevent="asAlt"
-          >Copy entire line as alternative variation </a>
+            @click.prevent="asAlt($event.target, data)"
+          >Play line as alternative</a>
         </li>
       </VueContext>
       <div class="list">
@@ -77,7 +77,7 @@ export default {
       const { engineName, engineAuthor } = this.$store.getters
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     },
-    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings'])
+    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove'])
   },
   watch: {
     multipv () {
@@ -95,13 +95,28 @@ export default {
       console.log('close')
     },
     asMain (target, data) {
-      console.log(target)
-      console.log(data.line)
-      const mainLine = data.line.pv.split(' ')
-      console.log(mainLine)
+      const mainLine = data.line.pvUCI.split(' ')
+      let prevMov
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
+          prevMov = this.moves[num]
+          break
+        }
+      }
+      console.log(prevMov)
+      this.$store.dispatch('pushMainLine', { line: mainLine, prev: prevMov })
     },
-    asAlt (line) {
-      console.log(line)
+    asAlt (target, data) {
+      const mainLine = data.line.pvUCI.split(' ')
+      let prevMov
+      for (let num = 0; num < this.moves.length; num++) {
+        if (this.moves[num].fen === this.fen) {
+          prevMov = this.moves[num]
+          break
+        }
+      }
+      console.log(prevMov)
+      this.$store.dispatch('pushAltLine', { line: mainLine, prev: prevMov })
     },
     onMouseEnter (id) {
       this.$store.commit('hoveredpv', id)

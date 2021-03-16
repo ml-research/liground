@@ -281,7 +281,9 @@ export default {
       this.$store.dispatch('deleteFromMoves', move)
     },
     updateBoard (move) {
-      this.$store.dispatch('fen', this.move.fen)
+      console.log(move)
+      console.log(this.moves)
+      this.$store.dispatch('fen', move.fen)
     },
     checkCheckmate (moveIn) {
       const move = moveIn
