@@ -118,14 +118,14 @@ export const store = new Vuex.Store({
     destinations: {},
     variant: 'chess',
     variantOptions: new TwoWayMap({ // all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
-      '♟️ Standard': 'chess',
-      '🏠 Crazyhouse': 'crazyhouse',
-      '⛰️ King of the Hill': 'kingofthehill',
+      Standard: 'chess',
+      Crazyhouse: 'crazyhouse',
+      'King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
       Antichess: 'antichess',
       Atomic: 'atomic',
       Horde: 'horde',
-      '🏇 Racing Kings': 'racingkings',
+      'Racing Kings': 'racingkings',
       Makruk: 'makruk',
       Shogi: 'shogi',
       Janggi: 'janggi',
@@ -163,7 +163,7 @@ export const store = new Vuex.Store({
     ],
     hoveredpv: -1,
     counter: 0,
-    pieceStyle: 'merida',
+    pieceStyle: 'cburnett',
     board: null,
     gameInfo: {},
     loadedGames: [],
@@ -437,9 +437,16 @@ export const store = new Vuex.Store({
     },
     fenply (state, payload) {
       state.fenply = payload
+    },
+    movesChangeDummy (state, payload) {
+      state.moves = []
+      state.moves = payload
     }
   },
   actions: { // async
+    movesChangeDummy (context, payload) {
+      context.commit('movesChangeDummy', payload)
+    },
     playAudio (context, payload) {
       context.commit('playAudio', payload)
     },

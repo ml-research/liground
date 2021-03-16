@@ -91,6 +91,9 @@ input::-webkit-inner-spin-button {
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
+.inputField::placeholder {
+  color: var(--main-text-color);
+}
 .button {
   padding: 5px;
   border-radius: 50%;
