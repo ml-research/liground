@@ -294,6 +294,10 @@ input {
   grid-area: fenfield;
   /*margin-left: 48px;*/
 }
+#lname {
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color)
+}
 #selector-container {
   grid-area: selector;
   display: flex;
@@ -341,6 +345,50 @@ input {
 }
 #evalbutton-style {
   margin-top: 10px;
+}
+
+</style>
+<style>
+.multiselect * {
+  color: var(--main-text-color, white) !important;
+  background-color: var(--second-bg-color, white) !important;
+  border-color: var(--main-border-color, white) !important;
+}
+.multiselect ::placeholder {
+  color: var(--main-text-color) !important;
+  opacity: 0.5;
+}
+.multiselect__select {
+  border-radius: 5px;
+  right: 2px;
+  top: 2px;
+  height: 36px;
+}
+
+.v-table-header-wrap *,
+.v-table-body * {
+  background-color: var(--second-bg-color, white) !important;
+  color: var(--main-text-color, black) !important;
+  border-color: var(--main-border-color, white) !important;
+}
+.v-table-dynamic * ,
+.v-table:before{
+  border-color: var(--main-border-color, white) !important;
+}
+::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
+}
+::-webkit-scrollbar-track{
+  background: var(--scroll-track-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb-color);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-corner {
+  background: var(--main-bg-color);
+  border-radius: 8px;
 }
 
 </style>

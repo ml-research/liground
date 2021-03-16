@@ -171,6 +171,7 @@ input[type=number] {
 }
 .inputField {
   width: 50px;
+  background-color: var(--second-bg-color);
 }
 .button {
   padding: 5px;
@@ -188,8 +189,8 @@ input[type=number] {
 }
 .board960 .hide {
   visibility: hidden;
-  background-color: white;
-  color:black;
+  background-color: var(--main-bg-color);
+  color:var(--main-text-color);
   text-align: center;
   position: absolute;
   z-index: 1;

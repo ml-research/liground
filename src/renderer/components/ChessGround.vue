@@ -377,7 +377,7 @@ export default {
         node.href = 'static/piece-css/international/' + pieceStyle + '.css'
       } else if (this.$store.getters.isSEA) {
         node.href = 'static/piece-css/sea/' + pieceStyle + '.css'
-      } else if (this.$store.getters.isXiangqi) {
+      } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
         node.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
       } else if (this.$store.getters.isShogi) {
         node.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
@@ -387,7 +387,7 @@ export default {
       const node = this.boardStyleEl
       if (this.$store.getters.isInternational) {
         node.href = 'static/board-css/international/' + boardStyle + '.css'
-      } else if (this.$store.getters.isXiangqi) {
+      } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
         node.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
       } else if (this.$store.getters.isSEA) {
         node.href = 'static/board-css/sea/' + boardStyle + '.css'
@@ -694,6 +694,8 @@ export default {
 .pockets {
   margin-right: 1.5px;
   height: 100%;
+  background-color: var(--second-bg-color);
+  border-radius: 5px;
 }
 .pockets.shogi{
   display:grid;

@@ -318,7 +318,7 @@ export default {
   pointer-events: auto;
 }
 .variation {
-  background-color:lightgray;
+  background-color:var(--variation-color);
   display: block;
 }
 .variation::before {

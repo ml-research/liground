@@ -1,8 +1,6 @@
 <template>
   <div>
     <VueApexCharts
-      title="plot"
-      width="710"
       height="260"
       type="area"
       :options="chartOptions"
@@ -46,7 +44,13 @@ export default {
         },
         tooltip: {
           shared: false,
-          intersect: true
+          intersect: true,
+          x: {
+            show: false
+          },
+          marker: {
+            show: false
+          }
         },
         noData: {
           text: '',
@@ -55,7 +59,7 @@ export default {
           offsetX: 0,
           offsetY: 0,
           style: {
-            color: '#000000',
+            color: 'var(--main-text-color)',
             fontSize: '14px'
           }
         },
@@ -79,10 +83,12 @@ export default {
           }
         },
         markers: {
-          size: 4
+          size: 3,
+          strokeWidth: 0
         },
         chart: {
           id: 'plot',
+          foreColor: 'var(--main-text-color)',
           events: { // changes the board position by clicking on a plot marker
             markerClick: (event, chartContext, { seriesIndex, dataPointIndex, config }) => {
               if (dataPointIndex === 0) {
@@ -96,17 +102,26 @@ export default {
         },
         xaxis: {
           type: 'category',
-          categories: ['Start']
+          categories: ['Start'],
+          style: {
+            color: 'var(--main-text-color)'
+          }
         },
         yaxis: {
           title: {
-            text: 'Eval'
+            text: 'Eval',
+            style: {
+              color: 'var(--main-text-color)'
+            }
           }
         }
       },
       series: [{
         name: 'Evaluation',
-        data: []
+        data: [],
+        style: {
+          color: 'var(--main-text-color)'
+        }
       }]
     }
   },
@@ -318,3 +333,14 @@ export default {
   }
 }
 </script>
+<style scoped>
+.link {
+  color: var(--main-text-color);
+}
+</style>
+<style>
+  .apexcharts-tooltip {
+    background-color: var(--main-bg-color) !important;
+    color: var(--main-text-color) !important;
+  }
+</style>
