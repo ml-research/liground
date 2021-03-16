@@ -438,7 +438,11 @@ export const store = new Vuex.Store({
     },
     initialize (context) {
       if (localStorage.darkMode) {
-        if (localStorage.darkMode !== context.state.darkMode) {
+        const tmp = localStorage.darkMode
+        console.log('localstorage has darkmode set', localStorage.darkMode)
+        console.log(tmp)
+        if (tmp === true) {
+          console.log('switch to darkmode')
           context.commit('switchDarkMode')
         }
       }

@@ -353,6 +353,10 @@ input {
   background-color: var(--second-bg-color, white) !important;
   border-color: var(--main-border-color, white) !important;
 }
+.multiselect ::placeholder {
+  color: var(--main-text-color) !important;
+  opacity: 0.5;
+}
 .multiselect__select {
   border-radius: 5px;
   right: 2px;
@@ -371,7 +375,8 @@ input {
   border-color: var(--main-border-color, white) !important;
 }
 ::-webkit-scrollbar {
-  width: auto;
+  width: 15px;
+  height: 15px;
 }
 ::-webkit-scrollbar-track{
   background: var(--scroll-track-color);

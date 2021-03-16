@@ -19,8 +19,8 @@ export default {
     ...mapGetters(['darkMode'])
   },
   watch: {
-    darkMode (darkMode) {
-      if (this.darkMode) {
+    darkMode () {
+      if (this.darkMode === true) {
         document.documentElement.style.setProperty('--main-bg-color', '#222326')
         document.documentElement.style.setProperty('--second-bg-color', '#4b4e54')
         document.documentElement.style.setProperty('--main-text-color', 'lightgrey')
