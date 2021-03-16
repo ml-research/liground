@@ -1,6 +1,25 @@
 <template>
   <div class="pv-lines">
     <div class="scroller">
+      <VueContext
+        ref="menu"
+        v-slot="{ data }"
+        @open="onOpen"
+        @close="onClose"
+      >
+        <li>
+          <a
+            href="#"
+            @click.prevent="asMain($event.target, data)"
+          >Copy entire line as main variation</a>
+        </li>
+        <li>
+          <a
+            href="#"
+            @click.prevent="asAlt"
+          >Copy entire line as alternative variation </a>
+        </li>
+      </VueContext>
       <div class="list">
         <div
           v-for="(line, id) in lines"
@@ -15,7 +34,12 @@
             @click="onClick(line)"
           >
             <span class="left">{{ line.cpDisplay }}</span>
-            <span class="right">{{ line.pv }}</span>
+            <span
+              class="right"
+              @contextmenu.prevent="$refs.menu.open($event, { line: line })"
+            >
+              {{ line.pv }}
+            </span>
           </div>
           <div
             v-else
@@ -37,8 +61,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import VueContext from 'vue-context/src/js/index'
 
 export default {
+  components: {
+    VueContext
+  },
   data () {
     return {
       lines: []
@@ -60,6 +88,21 @@ export default {
     }
   },
   methods: {
+    onOpen (event, data) {
+      console.log(data.line)
+    },
+    onClose () {
+      console.log('close')
+    },
+    asMain (target, data) {
+      console.log(target)
+      console.log(data.line)
+      const mainLine = data.line.pv.split(' ')
+      console.log(mainLine)
+    },
+    asAlt (line) {
+      console.log(line)
+    },
     onMouseEnter (id) {
       this.$store.commit('hoveredpv', id)
     },
