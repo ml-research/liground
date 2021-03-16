@@ -336,6 +336,7 @@ export const store = new Vuex.Store({
       state.startFen = state.board.fen()
       state.selectedGame = null
       state.fenply = 1
+      this.commit('resetEngineStats')
     },
     resetBoard (state, payload) {
       if (!payload.is960) {
