@@ -4,6 +4,9 @@ import ffish from 'ffish'
 import engine from './engine'
 import allEngines from './store/engines'
 
+import moveAudio from './assets/audio/Move.mp3'
+import captureAudio from './assets/audio/Capture.mp3'
+
 Vue.use(Vuex)
 
 class TwoWayMap {
@@ -120,6 +123,7 @@ export const store = new Vuex.Store({
       '⛰️ King of the Hill': 'kingofthehill',
       '️Three-Check': '3check',
       Antichess: 'antichess',
+      Atomic: 'atomic',
       Horde: 'horde',
       '🏇 Racing Kings': 'racingkings',
       Makruk: 'makruk',
@@ -166,7 +170,7 @@ export const store = new Vuex.Store({
     selectedGame: null,
     boardStyle: 'blue',
     internationalVariants: [
-      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
+      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
     seaVariants: [
       'makruk'
@@ -392,9 +396,9 @@ export const store = new Vuex.Store({
       if (state.openedPGN) {
         return
       }
-      let note = new Audio('/static/audio/Move.mp3')
+      let note = new Audio(moveAudio)
       if (move.toString().includes('x')) {
-        note = new Audio('/static/audio/Capture.mp3')
+        note = new Audio(captureAudio)
       }
       note.play()
     },
