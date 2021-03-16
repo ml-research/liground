@@ -49,7 +49,7 @@ async function run (binary, cwd, listeners) {
     engine = new EngineDriver(child.stdin, child.stdout)
 
     // setup error logging & crash handling
-    child.stderr.on('data', err => msg.error(err.toString().trim()))
+    child.stderr.on('data', err => msg.error('Engine reported Error:', err.toString().trim()))
     child.on('exit', () => msg.queue('crash'))
 
     // setup listeners
