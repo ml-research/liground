@@ -5,86 +5,86 @@
       <DarkModeSwitch class="darkSwitch" />
     </div>
     <div class="engine_settings_container">
-    <span class="title">Engine Settings</span>
-    <table class="table">
-      <tr
-        v-for="option in engineOptions"
-        :key="option.name"
-      >
-        <td> {{ option.name }} </td>
-        <template v-if="option.type === 'combo'">
-          <td>
-            <select
-              v-model="settings[option.name]"
-              size="1"
-              class="input"
-            >
-              <option
-                v-for="selOption in option.var"
-                :key="selOption"
-                :value="selOption"
+      <span class="title">Engine Settings</span>
+      <table class="table">
+        <tr
+          v-for="option in engineOptions"
+          :key="option.name"
+        >
+          <td> {{ option.name }} </td>
+          <template v-if="option.type === 'combo'">
+            <td>
+              <select
+                v-model="settings[option.name]"
+                size="1"
+                class="input"
               >
-                {{ selOption }}
-              </option>
-            </select>
-          </td>
-        </template>
-        <template v-else-if="option.type === 'check'">
-          <td>
-            <input
-              v-model="settings[option.name]"
-              type="checkbox"
-              class="input"
-            >
-          </td>
-        </template>
-        <template v-else-if="option.type === 'spin'">
-          <td>
-            <input
-              v-model.number="settings[option.name]"
-              type="number"
-              class="input"
-              step="1"
-              :min="option.min"
-              :max="option.max"
-              @change="clampNumber(option.name, option.min, option.max)"
-            >
-          </td>
-        </template>
-        <template v-else-if="option.type === 'string'">
-          <td>
-            <input
-              v-model="settings[option.name]"
-              type="text"
-              class="input"
-            >
-          </td>
-        </template>
-        <template v-else-if="option.type === 'button'">
-          <td>
-            <button
-              type="button"
-              class="input"
-              @click="triggerButtonSetting(option.name)"
-            >
-              {{ option.name }}
-            </button>
-          </td>
-        </template>
-      </tr>
-    </table>
-    <a
-      class="btn green"
-      @click="save"
-    >
-      Save
-    </a>
-    <a
-      class="btn red"
-      @click="cancel"
-    >
-      Cancel
-    </a>
+                <option
+                  v-for="selOption in option.var"
+                  :key="selOption"
+                  :value="selOption"
+                >
+                  {{ selOption }}
+                </option>
+              </select>
+            </td>
+          </template>
+          <template v-else-if="option.type === 'check'">
+            <td>
+              <input
+                v-model="settings[option.name]"
+                type="checkbox"
+                class="input"
+              >
+            </td>
+          </template>
+          <template v-else-if="option.type === 'spin'">
+            <td>
+              <input
+                v-model.number="settings[option.name]"
+                type="number"
+                class="input"
+                step="1"
+                :min="option.min"
+                :max="option.max"
+                @change="clampNumber(option.name, option.min, option.max)"
+              >
+            </td>
+          </template>
+          <template v-else-if="option.type === 'string'">
+            <td>
+              <input
+                v-model="settings[option.name]"
+                type="text"
+                class="input"
+              >
+            </td>
+          </template>
+          <template v-else-if="option.type === 'button'">
+            <td>
+              <button
+                type="button"
+                class="input"
+                @click="triggerButtonSetting(option.name)"
+              >
+                {{ option.name }}
+              </button>
+            </td>
+          </template>
+        </tr>
+      </table>
+      <a
+        class="btn green"
+        @click="save"
+      >
+        Save
+      </a>
+      <a
+        class="btn red"
+        @click="cancel"
+      >
+        Cancel
+      </a>
     </div>
   </div>
 </template>
@@ -152,7 +152,7 @@ export default {
   flex-direction: column;
 }
 .engine_settings_container {
-  border: 1px solid var(--main-border-color); 
+  border: 1px solid var(--main-border-color);
   border-radius: 5px;
   margin-top: 5px;
 }
