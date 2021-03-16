@@ -426,7 +426,6 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
-      console.log('evalplotdepth commit')
       localStorage.evalPlotDepth = payload
     }
   },
