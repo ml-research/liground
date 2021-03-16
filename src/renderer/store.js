@@ -163,7 +163,7 @@ export const store = new Vuex.Store({
     ],
     hoveredpv: -1,
     counter: 0,
-    pieceStyle: 'merida',
+    pieceStyle: 'cburnett',
     board: null,
     gameInfo: {},
     loadedGames: [],
