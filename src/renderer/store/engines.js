@@ -3,22 +3,24 @@ import logoStockfish from '../assets/images/engines/stockfish.png'
 import logoStockfishBlue from '../assets/images/engines/stockfish_blue.png'
 import logoStockfishPurple from '../assets/images/engines/stockfish_purple.png'
 
+const enginePath = path.resolve(
+  process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
+  'engines'
+)
+
 /**
  * Resolve the path to an engine binary.
  * @param {string} name binary file name
  */
 function resolveBinary (name) {
-  return path.resolve(
-    process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
-    'engines',
-    `${name}${process.platform === 'win32' ? '.exe' : ''}`
-  )
+  return path.resolve(enginePath, `${name}${process.platform === 'win32' ? '.exe' : ''}`)
 }
 
 // first engine in the list has highest priority for default engine selection
 export default {
   'Stockfish 12': {
     binary: resolveBinary('stockfish'),
+    cwd: enginePath,
     logo: logoStockfish,
     variants: [
       'chess',
@@ -34,6 +36,7 @@ export default {
   },
   'Multi-Variant-Stockfish 10': {
     binary: resolveBinary('multi-variant-stockfish'),
+    cwd: enginePath,
     logo: logoStockfishBlue,
     variants: [
       'chess',
@@ -59,6 +62,7 @@ export default {
   },
   'Fairy Stockfish 11.2': {
     binary: resolveBinary('fairy-stockfish'),
+    cwd: enginePath,
     logo: logoStockfishPurple,
     variants: [
       '3check',

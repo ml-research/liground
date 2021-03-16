@@ -13,8 +13,9 @@
           <span class="label">Name</span>
           <input
             v-model="name"
-            type="text"
             class="input"
+            type="text"
+            size="20"
           >
         </div>
         <div class="item">
@@ -25,7 +26,16 @@
           >
             Select Path
           </button>
-          <span class="display">{{ display }}</span>
+          <span class="path">{{ displayBinary }}</span>
+        </div>
+        <div class="item">
+          <span class="label">CWD</span>
+          <input
+            v-model="cwd"
+            class="input"
+            type="text"
+            size="60"
+          >
         </div>
         <div class="item">
           <span class="label">Logo</span>
@@ -87,6 +97,10 @@ export default {
       default: '',
       type: String
     },
+    initialCwd: {
+      default: '',
+      type: String
+    },
     initialLogo: {
       default: '',
       type: String
@@ -96,12 +110,13 @@ export default {
     return {
       name: this.initialName,
       binary: this.initialBinary,
+      cwd: this.initialCwd,
       logo: this.initialLogo,
       error: 'none'
     }
   },
   computed: {
-    display () {
+    displayBinary () {
       return this.binary.length > 0 ? path.basename(this.binary) : '(empty)'
     }
   },
@@ -110,7 +125,7 @@ export default {
       this.$emit('close')
     },
     save () {
-      const { name, binary, logo } = this
+      const { name, binary, cwd, logo } = this
       if (name.length === 0) {
         this.error = 'Engine name cannot be empty!'
       } else if (binary.length === 0) {
@@ -119,13 +134,18 @@ export default {
         this.error = `Name "${name}" already in use!`
       } else {
         this.error = 'none'
-        this.$emit('save', { name, binary, logo })
+        this.$emit('save', { name, binary, cwd, logo })
         this.$emit('close')
       }
     },
     async selectPath () {
       const { filePaths: [file] } = await remote.dialog.showOpenDialog({ properties: ['openFile'] })
-      this.binary = file || ''
+      if (file) {
+        if (this.cwd.length === 0 || this.cwd === path.dirname(this.binary)) {
+          this.cwd = path.dirname(file)
+        }
+        this.binary = file
+      }
     },
     async selectImage () {
       const { filePaths: [file] } = await remote.dialog.showOpenDialog({
@@ -213,10 +233,12 @@ export default {
   margin: 0 3px;
 }
 .label {
-  font-weight: bold;
+  width: 6ch;
   margin-right: 5px;
+  text-align: left;
+  font-weight: bold;
 }
-.display {
+.path {
   font-family: monospace;
   color: #333;
   font-size: 11px;

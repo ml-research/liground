@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { spawn } from 'child_process'
 import EngineDriver from './driver'
 import EngineSender from './sender'
@@ -14,10 +15,9 @@ let engine = null
 /**
  * Run a new engine, killing the old process.
  * @param {string} binary binary to use
+ * @param {string} cwd working directory to use
  */
-async function run (binary) {
-  msg.debug('Running engine')
-
+async function run (binary, cwd) {
   // kill old engine
   if (engine) {
     msg.debug('Killing...')
@@ -35,11 +35,12 @@ async function run (binary) {
   }
 
   // spawn engine process
-  if (!binary) {
+  if (!fs.existsSync(binary)) {
     msg.error(`Could not find engine binary "${binary}"`)
     return
   }
-  child = spawn(binary, []).on('error', err => msg.error(err.message))
+  msg.debug('Running:', { binary, cwd })
+  child = spawn(binary, [], { cwd }).on('error', err => msg.error(err.message))
 
   // success
   if (typeof child.pid === 'number') {
@@ -82,7 +83,7 @@ function exec (cmd) {
 self.addEventListener('message', ({ data: { type, payload } }) => {
   switch (type) {
     case 'run':
-      run(payload)
+      run(payload.binary, payload.cwd)
       break
     case 'cmd':
       exec(payload)

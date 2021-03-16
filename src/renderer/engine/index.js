@@ -42,13 +42,14 @@ class Engine extends EventEmitter {
 
   /**
    * Start the engine process.
-   * @param {string} engineId identifier of engine to run
+   * @param {string} binary path to engine binary to run
+   * @param {string} cwd working directory to run the engine in
    */
-  run (engineId) {
+  run (binary, cwd) {
     return new Promise(resolve => {
       this.once('active', info => resolve(info))
       this.worker.postMessage({
-        payload: engineId,
+        payload: { binary, cwd },
         type: 'run'
       })
     })

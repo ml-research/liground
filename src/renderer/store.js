@@ -541,25 +541,25 @@ export const store = new Vuex.Store({
     },
     async addEngine (context, payload) {
       // discover the variants by running the engine
-      const { name, binary, logo } = payload
-      const info = await engine.run(binary)
+      const { name, binary, cwd, logo } = payload
+      const info = await engine.run(binary, cwd)
       const variantOption = info.options.find(option => option.name === 'UCI_Variant')
       const variants = variantOption ? variantOption.var : ['chess']
 
       // update engines
       context.state.allEngines = {
         ...context.state.allEngines,
-        [name]: { binary, logo, variants }
+        [name]: { binary, cwd, logo, variants }
       }
       localStorage.engines = JSON.stringify(context.state.allEngines)
 
       // swap back to current engine after we are done
       context.commit('clearIO')
-      await engine.run(context.getters.engineBinary)
+      await engine.run(context.getters.engineBinary, context.getters.selectedEngine.cwd)
       await context.dispatch('initEngineOptions')
     },
     async editEngine (context, payload) {
-      const { old, changed: { name, binary, logo } } = payload
+      const { old, changed: { name, binary, cwd, logo } } = payload
       const engines = { ...context.state.allEngines }
 
       // grab new engine entry
@@ -571,6 +571,8 @@ export const store = new Vuex.Store({
       } else {
         updated = engines[old]
       }
+
+      // update logo
       updated.logo = logo
 
       // update active engine name
@@ -585,13 +587,14 @@ export const store = new Vuex.Store({
       }
       context.state.selectedEngines = selectedEngines
 
-      // run new binary if it changed
-      if (updated.binary !== binary) {
-        updated.binary = binary
-        await context.dispatch('runBinary', binary)
+      // rerun if binary or cwd changed
+      if (updated.binary !== binary || updated.cwd !== cwd) {
+        await context.dispatch('runBinary', { binary, cwd })
         const variantOption = context.state.engineInfo.options.find(option => option.name === 'UCI_Variant')
         updated.variants = variantOption ? variantOption.var : ['chess']
       }
+      updated.binary = binary
+      updated.cwd = cwd
 
       // save engines
       context.state.allEngines = engines
@@ -624,16 +627,20 @@ export const store = new Vuex.Store({
       // only change engine when its a different one
       if (context.state.activeEngine !== id) {
         context.state.activeEngine = id
-        context.dispatch('runBinary', context.getters.engineBinary)
+        context.dispatch('runBinary', {
+          binary: context.getters.engineBinary,
+          cwd: context.getters.selectedEngine.cwd
+        })
       }
     },
     async runBinary (context, payload) {
+      const { binary, cwd } = payload
       if (context.getters.active) {
         context.commit('active', false)
       }
       context.commit('clearIO')
       await context.dispatch('resetEngineData')
-      context.commit('engineInfo', await engine.run(payload))
+      context.commit('engineInfo', await engine.run(binary, cwd))
       await context.dispatch('initEngineOptions')
     },
     initEngineOptions (context) {

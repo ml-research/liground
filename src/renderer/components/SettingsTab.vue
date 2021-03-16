@@ -101,6 +101,7 @@
       :title="modal.title"
       :initial-name="modal.name"
       :initial-binary="modal.binary"
+      :initial-cwd="modal.cwd"
       :initial-logo="modal.logo"
       @close="modal.visible = false"
       @save="modal.save"
@@ -165,15 +166,17 @@ export default {
       }
     },
     editEngine () {
+      const { name, binary, cwd, logo } = this.selectedEngine
       this.modal = {
         visible: true,
         title: 'Edit Engine',
-        name: this.selectedEngine.name,
-        binary: this.selectedEngine.binary,
-        logo: this.selectedEngine.logo,
-        save: ({ name, binary, logo }) => this.$store.dispatch('editEngine', {
+        name,
+        binary,
+        logo,
+        cwd,
+        save: data => this.$store.dispatch('editEngine', {
           old: this.selectedEngine.name,
-          changed: { name, binary, logo }
+          changed: data
         })
       }
     },
@@ -188,7 +191,7 @@ export default {
         visible: true,
         title: 'Add new Engine',
         logo: defaultLogo,
-        save: ({ name, binary, logo }) => this.$store.dispatch('addEngine', { name, binary, logo })
+        save: data => this.$store.dispatch('addEngine', data)
       }
     }
   }
