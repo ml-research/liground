@@ -11,7 +11,8 @@
         id="in"
         class="inputField"
         type="number"
-        :value="this.$store.getters.evalPlotDepth"
+        :value="plotDepth"
+        :placeholder="plotDepth"
         @change="updateEvalDepth"
       >
     </div>
@@ -39,6 +40,11 @@ export default {
   data () {
     return {
       running: false
+    }
+  },
+  computed: {
+    plotDepth () {
+      return this.$store.getters.evalPlotDepth
     }
   },
   created () {

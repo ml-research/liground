@@ -433,6 +433,7 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
+      localStorage.evalPlotDepth = payload
     },
     fenply (state, payload) {
       state.fenply = payload
@@ -451,6 +452,9 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.evalPlotDepth) {
+        context.state.evalPlotDepth = localStorage.evalPlotDepth
+      }
       if (localStorage.darkMode) {
         if (localStorage.darkMode === 'true') {
           context.commit('switchDarkMode')
@@ -624,12 +628,16 @@ export const store = new Vuex.Store({
       }
     },
     initEngineOptions (context) {
-      context.dispatch('setEngineOptions', {
-        MultiPV: 5,
-        UCI_AnalyseMode: true,
-        UCI_Variant: context.getters.variant,
-        'Analysis Contempt': 'Off'
-      })
+      if (localStorage.getItem('engine' + context.state.activeEngine)) {
+        context.dispatch('setEngineOptions', JSON.parse(localStorage.getItem('engine' + context.state.activeEngine)))
+      } else {
+        context.dispatch('setEngineOptions', {
+          MultiPV: 5,
+          UCI_AnalyseMode: true,
+          UCI_Variant: context.getters.variant,
+          'Analysis Contempt': 'Off'
+        })
+      }
     },
     setEngineOptions (context, payload) {
       if (context.getters.active) {
@@ -647,6 +655,7 @@ export const store = new Vuex.Store({
           engine.send(`setoption name ${name}`)
         }
       }
+      localStorage.setItem('engine' + context.state.activeEngine, JSON.stringify(context.state.engineSettings))
     },
     idName (context, payload) {
       context.commit('idName', payload)
