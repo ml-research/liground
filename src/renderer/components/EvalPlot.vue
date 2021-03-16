@@ -203,7 +203,11 @@ export default {
       this.chartOptions.fill.gradient.colorStops[0].offset = 100
     },
 
-    adjustPoints (points) { // sets min/max for graph and converts the results from engine to the correct format
+    adjustPoints (Inpoints, index) { // sets min/max for graph and converts the results from engine to the correct format
+      let points = Inpoints
+      if ((typeof (Inpoints)) === 'number') {
+        points = String(Inpoints)
+      }
       if ((points.includes('#') && !points.includes('-'))) {
         points = 10
       } else if ((points.includes('#') && points.includes('-'))) {
@@ -215,6 +219,9 @@ export default {
         points = 10
       } else if (points < -10) {
         points = -10
+      }
+      if (this.chartOptions.xaxis.categories[index].includes('..')) {
+        points = points * -1
       }
       return points
     },
@@ -284,7 +291,7 @@ export default {
             this.break = false
             return
           }
-          points = this.adjustPoints(points)
+          points = this.adjustPoints(points, index + 1)
           tmpArray[index + 1] = points
           this.series = [{
             data: tmpArray
@@ -306,7 +313,7 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            newArray[index + 1] = this.cpForWhite / 100
+            newArray[index + 1] = this.adjustPoints(this.cpForWhite, index + 1)
             this.series = [{
               data: newArray
             }]
