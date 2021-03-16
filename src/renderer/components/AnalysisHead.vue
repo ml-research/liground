@@ -1,6 +1,6 @@
 <template>
   <div class="ceval grid-parent">
-    <i class="logo icon mdi mdi-feature-search-outline" />LiGround
+    LiGround
     <Multiselect
       class="multiselect"
       :value="displayVariant"
