@@ -2,7 +2,7 @@
   <div>
     <div class="board960">
       960 Board:
-      <span class="hide">
+      <span class="hide tooltip">
         Input any number and press Enter or click the button for a random Board.
       </span>
     </div>
@@ -187,9 +187,25 @@ input[type=number] {
   display: inline-block;
   position: relative;
 }
+.tooltip::before {
+  content: "";
+  position: absolute;
+
+  top: 0%;
+  margin-top: -20px;
+  left: 50%;
+
+  border: 10px solid #000;
+  border-color: transparent transparent var(--tooltip-color) transparent ;
+  display: none;
+}
+.board960:hover .tooltip::before {
+  display: block;
+}
 .board960 .hide {
+  margin-top: 15px;
   visibility: hidden;
-  background-color: var(--main-bg-color);
+  background-color: var(--tooltip-color);
   color:var(--main-text-color);
   box-shadow:  5px 5px 10px 2px black;
   border-radius: 5px;

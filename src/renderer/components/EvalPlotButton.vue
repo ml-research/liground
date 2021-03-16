@@ -2,7 +2,7 @@
   <div>
     <div class="EvalPlotButton">
       Eval Depth:
-      <span class="hide">
+      <span class="hide tooltip">
         Input a number to set the engine depth for the Eval Plot.
       </span>
     </div>
@@ -105,6 +105,21 @@ input::-webkit-inner-spin-button {
 .button:hover {
   cursor: pointer;
 }
+.tooltip::before {
+  content: "";
+  position: absolute;
+
+  top: 0%;
+  margin-top: -20px;
+  left: 50%;
+
+  border: 10px solid #000;
+  border-color: transparent transparent var(--tooltip-color) transparent ;
+  display: none;
+}
+.EvalPlotButton:hover .tooltip::before {
+  display: block;
+}
 .EvalPlotButton {
   display: inline-block;
   position: relative;
@@ -113,7 +128,8 @@ input::-webkit-inner-spin-button {
 }
 .EvalPlotButton .hide {
   visibility: hidden;
-  background-color: var(--main-bg-color);
+  margin-top: 15px;
+  background-color: var(--tooltip-color);
   color: var(--main-text-color);
   box-shadow:  5px 5px 10px 2px black;
   border-radius: 5px;

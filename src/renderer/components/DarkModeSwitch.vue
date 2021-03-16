@@ -28,6 +28,7 @@ export default {
         document.documentElement.style.setProperty('--scroll-track-color', '#4b4e54')
         document.documentElement.style.setProperty('--scroll-thumb-color', '#222326')
         document.documentElement.style.setProperty('--variation-color', '#4b4e54')
+        document.documentElement.style.setProperty('--tooltip-color', '#4b4e54')
       } else {
         document.documentElement.style.setProperty('--main-bg-color', 'white')
         document.documentElement.style.setProperty('--second-bg-color', 'white')
@@ -36,6 +37,7 @@ export default {
         document.documentElement.style.setProperty('--scroll-track-color', 'lightgrey')
         document.documentElement.style.setProperty('--scroll-thumb-color', 'grey')
         document.documentElement.style.setProperty('--variation-color', 'lightgrey')
+        document.documentElement.style.setProperty('--tooltip-color', 'lightgrey')
       }
     }
   },
