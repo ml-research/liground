@@ -11,7 +11,7 @@
       :class="{ active: !viewAnalysis }"
       @click="changeTab"
     >
-      <em class="icon mdi mdi-engine" /> Engine Settings
+      <em class="icon mdi mdi-hammer-screwdriver" /> Settings
     </div>
     <div
       class="item"
