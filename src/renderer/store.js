@@ -531,7 +531,7 @@ export const store = new Vuex.Store({
       }
     },
     fenField (context, payload) {
-      if (ffish.validateFen(payload, context.getters.variant) === 1) {
+      if (ffish.validateFen(payload, context.getters.variant) === 1) { // this doesnt work properly for horde and racing kings
         if (context.state.fen !== payload) {
           context.commit('fen', payload)
           context.dispatch('updateBoard')
