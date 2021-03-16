@@ -176,7 +176,7 @@ input[type=number] {
 }
 .button {
   padding: 5px;
-  background-color:#8CA2AD;
+  background-color:var(--button-color);
   border-radius: 50%;
   outline: none;
 }

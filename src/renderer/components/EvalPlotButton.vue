@@ -97,7 +97,7 @@ input::-webkit-inner-spin-button {
 .button {
   padding: 5px;
   border-radius: 50%;
-  background-color:#8CA2AD;
+  background-color:var(--button-color);
   border: black;
   outline: none;
 }
