@@ -24,7 +24,7 @@
       @click="updateBoard(move)"
       @contextmenu.prevent="(menuAtMove === move.name || displayMenu) ? $refs.menu.open($event, { name: move.name }) : dummy"
     >
-      {{ checkCheckmate(move) }}
+      {{ checkCheckmate }}
     </span>
     <VueContext
       ref="menu"
@@ -159,6 +159,16 @@ export default {
       return this.firstMoves.filter((move) => {
         return move.fen !== this.mainFirstMove.fen
       })
+    },
+    checkCheckmate () {
+      let name = this.move.name
+      const variant = this.$store.getters.variant
+      const board = new ffish.Board(variant, this.move.fen)
+      const legalMoves = board.legalMoves()
+      if (legalMoves.length === 0 && !name.includes('#')) {
+        name = this.move.name + '#'
+      }
+      return name
     }
   },
   watch: {
@@ -282,17 +292,6 @@ export default {
     },
     updateBoard (move) {
       this.$store.dispatch('fen', this.move.fen)
-    },
-    checkCheckmate (moveIn) {
-      const move = moveIn
-      let name = moveIn.name
-      const variant = this.$store.getters.variant
-      const board = new ffish.Board(variant, move.fen)
-      const legalMoves = board.legalMoves()
-      if (legalMoves.length === 0 && !name.includes('#')) {
-        name = name + '#'
-      }
-      return name
     }
   }
 }
