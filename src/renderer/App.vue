@@ -13,8 +13,7 @@ export default {
 <style>
 @import "../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
 @import '../../node_modules/pretty-checkbox/dist/pretty-checkbox.css';
-@import '../../node_modules/vue-material-design-icons/styles.css';
-@import 'https://cdn.materialdesignicons.com/5.3.45/css/materialdesignicons.min.css';
+@import './assets/mdi-icons/materialdesignicons.min.css';
 @import '~vue-context/dist/css/vue-context.css';
 
 @font-face {
