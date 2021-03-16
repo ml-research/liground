@@ -246,6 +246,7 @@ export default {
       console.log(`event: ${event}`)
     },
     checkValidFEN (event) {
+      document.dispatchEvent(new Event('resetPlot'))
       this.$store.dispatch('fenField', event.target.value)
       this.resetAnalysis = !this.resetAnalysis
     }
