@@ -169,6 +169,12 @@ export const store = new Vuex.Store({
     loadedGames: [],
     selectedGame: null,
     boardStyle: 'blue',
+    curVar960Fen: '',
+    viewAnalysis: true,
+    analysisMode: true,
+    menuAtMove: null,
+    displayMenu: true,
+    darkMode: false,
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
@@ -183,13 +189,7 @@ export const store = new Vuex.Store({
     ],
     shogiVariants: [
       'shogi'
-    ],
-    curVar960Fen: '',
-    viewAnalysis: true,
-    analysisMode: true,
-    menuAtMove: null,
-    displayMenu: true,
-    darkMode: false
+    ]
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -426,6 +426,7 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
+      localStorage.evalPlotDepth = payload
     }
   },
   actions: { // async
@@ -442,6 +443,9 @@ export const store = new Vuex.Store({
       context.dispatch('restartEngine')
     },
     initialize (context) {
+      if (localStorage.evalPlotDepth) {
+        context.state.evalPlotDepth = localStorage.evalPlotDepth
+      }
       if (localStorage.darkMode) {
         if (localStorage.darkMode === 'true') {
           context.commit('switchDarkMode')
@@ -597,13 +601,17 @@ export const store = new Vuex.Store({
       }
     },
     initEngineOptions (context) {
-      context.dispatch('setEngineOptions', {
-        MultiPV: 5,
-        UCI_AnalyseMode: true,
-        UCI_Variant: context.getters.variant,
-        'Analysis Contempt': 'Off',
-        UCI_Chess960: context.state.board.is960()
-      })
+      if (localStorage.getItem('engine' + context.state.activeEngine)) {
+        context.dispatch('setEngineOptions', JSON.parse(localStorage.getItem('engine' + context.state.activeEngine)))
+      } else {
+        context.dispatch('setEngineOptions', {
+          MultiPV: 5,
+          UCI_AnalyseMode: true,
+          UCI_Variant: context.getters.variant,
+          'Analysis Contempt': 'Off',
+          UCI_Chess960: context.state.board.is960()
+        })
+      }
     },
     setEngineOptions (context, payload) {
       if (context.getters.active) {
@@ -621,6 +629,7 @@ export const store = new Vuex.Store({
           engine.send(`setoption name ${name}`)
         }
       }
+      localStorage.setItem('engine' + context.state.activeEngine, JSON.stringify(context.state.engineSettings))
     },
     idName (context, payload) {
       context.commit('idName', payload)
