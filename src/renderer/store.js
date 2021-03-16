@@ -175,6 +175,7 @@ export const store = new Vuex.Store({
     menuAtMove: null,
     displayMenu: true,
     darkMode: false,
+    fenply: 1,
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
@@ -189,13 +190,7 @@ export const store = new Vuex.Store({
     ],
     shogiVariants: [
       'shogi'
-    ],
-    curVar960Fen: '',
-    viewAnalysis: true,
-    analysisMode: true,
-    fenply: 1,
-    menuAtMove: null,
-    displayMenu: true
+    ]
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
