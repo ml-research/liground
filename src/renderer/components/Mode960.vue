@@ -194,17 +194,16 @@ input[type=number] {
   top: 0%;
   margin-top: -20px;
   left: 50%;
-
+  transition: opacity 0.3s ease-in-out;
   border: 10px solid #000;
   border-color: transparent transparent var(--tooltip-color) transparent ;
-  display: none;
+  opacity: 0;
 }
 .board960:hover .tooltip::before {
-  display: block;
+  opacity: 1;
 }
 .board960 .hide {
   margin-top: 15px;
-  visibility: hidden;
   background-color: var(--tooltip-color);
   color:var(--main-text-color);
   box-shadow:  5px 5px 10px 2px black;
@@ -214,9 +213,12 @@ input[type=number] {
   z-index: 1;
   top:100%;
   left:0%;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
 .board960:hover .hide {
-  visibility: visible;
-  font-size: 12px;
+  opacity: 1;
+  
 }
 </style>
