@@ -4,6 +4,9 @@ import ffish from 'ffish'
 import engine from './engine'
 import allEngines from './store/engines'
 
+import moveAudio from './assets/audio/Move.mp3'
+import captureAudio from './assets/audio/Capture.mp3'
+
 Vue.use(Vuex)
 
 class TwoWayMap {
@@ -385,9 +388,9 @@ export const store = new Vuex.Store({
       if (state.openedPGN) {
         return
       }
-      let note = new Audio('/static/audio/Move.mp3')
+      let note = new Audio(moveAudio)
       if (move.toString().includes('x')) {
-        note = new Audio('/static/audio/Capture.mp3')
+        note = new Audio(captureAudio)
       }
       note.play()
     },
