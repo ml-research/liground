@@ -179,10 +179,6 @@ export default {
     document.addEventListener('startEval', () => {
       this.loadPlot()
     })
-    document.addEventListener('stopEval', () => {
-      this.break = true
-      this.clear()
-    })
     document.addEventListener('position', (e) => {
       this.currentCalcPos = e.detail.fen
     })

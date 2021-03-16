@@ -69,7 +69,7 @@ export default {
     },
     stopEval () {
       this.running = false
-      document.dispatchEvent(new Event('stopEval'))
+      document.dispatchEvent(new Event('resetPlot'))
     }
   }
 }

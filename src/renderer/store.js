@@ -175,6 +175,7 @@ export const store = new Vuex.Store({
     menuAtMove: null,
     displayMenu: true,
     darkMode: false,
+    fenply: 1,
     internationalVariants: [
       'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
@@ -342,6 +343,8 @@ export const store = new Vuex.Store({
       state.lastFen = state.board.fen()
       state.startFen = state.board.fen()
       state.selectedGame = null
+      state.fenply = 1
+      this.commit('resetEngineStats')
     },
     resetBoard (state, payload) {
       if (!payload.is960) {
@@ -358,7 +361,11 @@ export const store = new Vuex.Store({
       if (prev) {
         ply = prev.ply + 1
       } else { // then its a starting move
-        ply = 1
+        if (state.turn) {
+          ply = state.fenply
+        } else {
+          ply = state.fenply + 1
+        }
       }
       let alreadyInMoves = false
       for (const num in state.moves) {
@@ -427,6 +434,9 @@ export const store = new Vuex.Store({
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
       localStorage.evalPlotDepth = payload
+    },
+    fenply (state, payload) {
+      state.fenply = payload
     }
   },
   actions: { // async
@@ -522,6 +532,25 @@ export const store = new Vuex.Store({
         context.commit('fen', payload)
         context.dispatch('updateBoard')
         context.dispatch('restartEngine')
+      }
+    },
+    fenField (context, payload) {
+      if (ffish.validateFen(payload, context.getters.variant) === 1) { // this doesnt work properly for horde and racing kings
+        if (context.state.fen !== payload) {
+          context.commit('fen', payload)
+          context.dispatch('updateBoard')
+          context.dispatch('restartEngine')
+          context.commit('newBoard', { fen: payload })
+          let index = 1
+          while (payload[payload.length - index] !== ' ') {
+            index = index + 1
+          }
+          const numAsString = payload.substring(payload.length - index, payload.length)
+          const ply = parseInt(numAsString)
+          context.commit('fenply', 2 * ply - 1)
+        }
+      } else {
+        alert('Please insert a valid FEN for the current variant')
       }
     },
     lastFen (context, payload) {
