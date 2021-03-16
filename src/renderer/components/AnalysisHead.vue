@@ -9,12 +9,14 @@
       :show-labels="false"
       @input="updateVariant"
     />
-    <input
-      type="button"
-      value="Reset"
-      class="reset"
-      @click="resetBoard"
-    >
+    <div class="resetButton">
+      <input
+        type="button"
+        value="Reset"
+        class="reset"
+        @click="resetBoard"
+      >
+    </div>
     <Mode960 />
   </div>
 </template>
@@ -69,8 +71,13 @@ export default {
   background-color:lightgrey;
   border: black;
   outline: none;
+  border-radius: 100%;
   padding-bottom: 5px;
   padding-top: 5px;
+}
+.resetButton {
+  display: grid;
+  padding-left: 5px;
 }
 .reset:hover {
   cursor:pointer;
