@@ -301,7 +301,7 @@ input {
 #selector-container {
   grid-area: selector;
   display: flex;
-  justify-content: space-around;
+  justify-content: content-distribution;
   height: 60px;
 }
 #piece-style {

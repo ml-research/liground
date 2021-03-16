@@ -97,7 +97,7 @@ input::-webkit-inner-spin-button {
 .button {
   padding: 5px;
   border-radius: 50%;
-  background-color:lightgray ;
+  background-color:#8CA2AD;
   border: black;
   outline: none;
 }
@@ -107,6 +107,8 @@ input::-webkit-inner-spin-button {
 .EvalPlotButton {
   display: inline-block;
   position: relative;
+  padding-top: 5px;
+  padding-left: 10px;
 }
 .EvalPlotButton .hide {
   visibility: hidden;
