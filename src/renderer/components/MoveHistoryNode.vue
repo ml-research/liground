@@ -293,7 +293,7 @@ export default {
       this.$store.dispatch('deleteFromMoves', move)
     },
     updateBoard (move) {
-      this.$store.dispatch('fen', this.move.fen)
+      this.$store.dispatch('fen', move.fen)
     }
   }
 }
