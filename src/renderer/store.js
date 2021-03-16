@@ -566,6 +566,7 @@ export const store = new Vuex.Store({
       let updated
       if (name !== old) {
         engines[name] = { ...engines[old] }
+        updated = engines[name]
         delete engines[old]
       } else {
         updated = engines[old]
