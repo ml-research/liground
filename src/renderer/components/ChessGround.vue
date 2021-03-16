@@ -24,7 +24,7 @@
         <div class="cg-board-wrap">
           <div ref="board" />
           <div
-            v-if="isPromotionModalVisible && !isPast"
+            v-if="isPromotionModalVisible"
             id="PromotionModal"
             ref="promotion"
 
@@ -338,6 +338,10 @@ export default {
       },
       premovable: {
         enabled: false
+      },
+      events: {
+        select: () => this.removeFocusFromInputs(),
+        move: () => this.removeFocusFromInputs()
       },
       orientation: this.orientation
     })
@@ -653,6 +657,11 @@ export default {
     drawShapes () {
       if (this.board !== null) {
         this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
+      }
+    },
+    removeFocusFromInputs () {
+      if (document.activeElement.nodeName.toLowerCase() === 'input') {
+        document.activeElement.blur()
       }
     }
   }
