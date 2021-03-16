@@ -7,7 +7,36 @@
       :allow-empty="false"
       :show-labels="false"
       @input="updateBoardStyle"
-    />
+    >
+      <template
+        slot="option"
+        slot-scope="props"
+      >
+        <div class="item">
+          <div class="preview">
+            <div
+              class="image"
+              :style="{ backgroundImage: preview(props.option) }"
+            />
+          </div>
+          <span class="name">{{ props.option }}</span>
+        </div>
+      </template>
+      <template
+        slot="singleLabel"
+        slot-scope="props"
+      >
+        <div class="item">
+          <div class="preview">
+            <div
+              class="image"
+              :style="{ backgroundImage: preview(props.option) }"
+            />
+          </div>
+          <span class="name">{{ props.option }}</span>
+        </div>
+      </template>
+    </Multiselect>
   </div>
 </template>
 
@@ -22,21 +51,6 @@ export default {
   },
   data () {
     return {
-      internationalVariants: [
-        'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess'
-      ],
-      seaVariants: [
-        'makruk'
-      ],
-      xiangqiVariants: [
-        'xiangqi'
-      ],
-      janggiVariants: [
-        'janggi'
-      ],
-      shogiVariants: [
-        'shogi'
-      ],
       boardStyles: [
         'blue',
         'brown',
@@ -92,8 +106,7 @@ export default {
         this.internationalStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.isShogi) {
+      } else if (this.isShogi) {
         if (localStorage.shogiBoardStyle) {
           this.$store.dispatch('boardStyle', localStorage.shogiBoardStyle)
         } else {
@@ -103,8 +116,7 @@ export default {
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.isSEA) {
+      } else if (this.isSEA) {
         if (localStorage.seaBoardStyle) {
           this.$store.dispatch('boardStyle', localStorage.seaBoardStyle)
         } else {
@@ -114,8 +126,7 @@ export default {
         this.seaStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.isXiangqi) {
+      } else if (this.isXiangqi) {
         if (localStorage.xiangqiBoardStyle) {
           this.$store.dispatch('boardStyle', localStorage.xiangqiBoardStyle)
         } else {
@@ -125,8 +136,7 @@ export default {
         this.xiangqiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
-      } else
-      if (this.isJanggi) {
+      } else if (this.isJanggi) {
         if (localStorage.janggiBoardStyle) {
           this.$store.dispatch('boardStyle', localStorage.janggiBoardStyle)
         } else {
@@ -140,6 +150,42 @@ export default {
     }
   },
   methods: {
+    preview (name) {
+      let board = ''
+      if (this.isInternational) {
+        board = name === 'lightgreen' ? 'ic' : `${name}`
+      } else if (this.isShogi) {
+        const conv = {
+          traditional: 'shogi',
+          bluechess: 'shogic'
+        }
+        board = conv[name]
+      } else if (this.isSEA) {
+        const conv = {
+          yellow: 'makruk',
+          orange: 'makruk2'
+        }
+        board = conv[name]
+      } else if (this.isXiangqi) {
+        const conv = {
+          dark: 'xiangqiDark',
+          lightbrown: 'xiangqi',
+          orange: 'xiangqiWikimedia',
+          riverbanks: 'xiangqic'
+        }
+        board = conv[name]
+      } else if (this.isJanggi) {
+        const conv = {
+          brown: 'JanggiBrown',
+          dark: 'JanggiDark',
+          darkwood: 'JanggiWoodDark',
+          lightbrown: 'Janggi',
+          stone: 'JanggiStone'
+        }
+        board = conv[name]
+      }
+      return `url(static/board/svg/${board}.svg`
+    },
     updateBoardStyle (payload) {
       if (this.isInternational) { // localStorage for all different groups of board stylings
         localStorage.internationalBoardStyle = payload
@@ -158,6 +204,27 @@ export default {
 
 }
 </script>
-<style scoped>
 
+<style scoped>
+.item {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9em;
+}
+.item .preview {
+  margin-top: -8px;
+  margin-bottom: -8px;
+  margin-left: -4px;
+  margin-right: 1ch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.item .preview .image {
+  width: 35px;
+  height: 35px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
 </style>

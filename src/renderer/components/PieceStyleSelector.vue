@@ -7,7 +7,44 @@
       :allow-empty="false"
       :show-labels="false"
       @input="updatePieceStyle"
-    />
+    >
+      <template
+        slot="option"
+        slot-scope="props"
+      >
+        <div class="item">
+          <div class="preview">
+            <div
+              class="image white"
+              :style="{ backgroundImage: preview(props.option)[0] }"
+            />
+            <div
+              class="image black"
+              :style="{ backgroundImage: preview(props.option)[1] }"
+            />
+          </div>
+          <span class="name">{{ props.option }}</span>
+        </div>
+      </template>
+      <template
+        slot="singleLabel"
+        slot-scope="props"
+      >
+        <div class="item">
+          <div class="preview">
+            <div
+              class="image white"
+              :style="{ backgroundImage: preview(props.option)[0] }"
+            />
+            <div
+              class="image black"
+              :style="{ backgroundImage: preview(props.option)[1] }"
+            />
+          </div>
+          <span class="name">{{ props.option }}</span>
+        </div>
+      </template>
+    </Multiselect>
   </div>
 </template>
 
@@ -22,7 +59,6 @@ export default {
   },
   data () {
     return {
-
       pieceStyles: [
         'alpha',
         'california',
@@ -136,8 +172,7 @@ export default {
         this.internationalPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
-      }
-      if (this.isShogi) {
+      } else if (this.isShogi) {
         if (localStorage.shogiPieceStyle) {
           this.$store.dispatch('pieceStyle', localStorage.shogiPieceStyle)
         } else {
@@ -147,8 +182,7 @@ export default {
         this.shogiPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
-      }
-      if (this.isSEA) {
+      } else if (this.isSEA) {
         if (localStorage.seaPieceStyle) {
           this.$store.dispatch('pieceStyle', localStorage.seaPieceStyle)
         } else {
@@ -158,8 +192,7 @@ export default {
         this.seaPieces.forEach(element => {
           this.pieceStyles.push(element)
         })
-      }
-      if (this.isXiangqi || this.isJanggi) {
+      } else if (this.isXiangqi || this.isJanggi) {
         if (localStorage.xiangqiPieceStyle) {
           this.$store.dispatch('pieceStyle', localStorage.xiangqiPieceStyle)
         } else {
@@ -173,6 +206,54 @@ export default {
     }
   },
   methods: {
+    preview (name) {
+      let pieces = ['', '']
+      if (this.isInternational) {
+        pieces = [`international/${name}/wN`, `international/${name}/bN`]
+      } else if (this.isSEA) {
+        switch (name) {
+          case 'adarb':
+            pieces = ['SouthEastAsian/ada/orig/rN', 'SouthEastAsian/ada/orig/bN']
+            break
+          case 'adawb':
+            pieces = ['SouthEastAsian/ada/orig/wN', 'SouthEastAsian/ada/orig/bN']
+            break
+          case 'adawr':
+            pieces = ['SouthEastAsian/ada/orig/wN', 'SouthEastAsian/ada/orig/rN']
+            break
+          case 'intl':
+            pieces = ['international/merida/wN', 'international/merida/bN']
+            break
+          default:
+            pieces = [`SouthEastAsian/${name}/wN`, `SouthEastAsian/${name}/bN`]
+        }
+      } else if (this.isShogi) {
+        pieces = [`Shogi/${name}/0KE`, `Shogi/${name}/1KE`]
+      } else if (this.isXiangqi || this.isJanggi) {
+        switch (name) {
+          case 'ct2':
+            pieces = ['Xiangqi/ct2/red_horse2', 'Xiangqi/ct2/black_horse2']
+            break
+          case 'hanjablue':
+          case 'intlblue':
+          case 'intlkakao':
+          case 'intlwooden':
+          case 'Ka_kakao':
+          case 'Ka_wooden':
+            pieces = [`Xiangqi/${name}/red_horse`, `Xiangqi/${name}/blue_horse`]
+            break
+          case 'hanjagreen':
+            pieces = ['Xiangqi/hanjablue/red_horse', 'Xiangqi/hanjagreen/blue_horse']
+            break
+          case 'intlgreen':
+            pieces = ['Xiangqi/intlblue/red_horse', 'Xiangqi/intlgreen/blue_horse']
+            break
+          default:
+            pieces = [`Xiangqi/${name}/red_horse`, `Xiangqi/${name}/black_horse`]
+        }
+      }
+      return [`url(static/piece/${pieces[0]}.svg)`, `url(static/piece/${pieces[1]}.svg)`]
+    },
     updatePieceStyle (payload) {
       if (this.isInternational) {
         localStorage.internationalPieceStyle = payload
@@ -190,5 +271,28 @@ export default {
 </script>
 
 <style scoped>
-
+.item {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9em;
+}
+.item .preview {
+  margin-top: -8px;
+  margin-bottom: -8px;
+  margin-left: -4px;
+  margin-right: 1ch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.item .image {
+  width: 35px;
+  height: 35px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.item .image + .image {
+  margin-left: 2px;
+}
 </style>
