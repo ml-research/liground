@@ -219,10 +219,10 @@ export default {
       } else if (points < -10) {
         points = -10
       }
-      if (this.chartOptions.xaxis.categories[index].includes('..')) {
+      if (!this.chartOptions.xaxis.categories[index].includes('..')) {
         points = points * -1
       }
-      return points * -1
+      return points
     },
 
     calcOffset () { // calculates and sets the offset which is used to determine how much of the graph should be colored black
