@@ -8,12 +8,10 @@
     </div>
     <div class="inputDepth">
       <input
-        id="in"
+        v-model.number.lazy="depth"
         class="inputField"
         type="number"
-        :value="plotDepth"
-        :placeholder="plotDepth"
-        @change="updateEvalDepth"
+        @keyup.enter="startEval"
       >
     </div>
     <button
@@ -32,19 +30,23 @@
     </button>
   </div>
 </template>
-<script>
 
+<script>
 export default {
   name: 'EvalPlotButton',
-  components: {},
   data () {
     return {
       running: false
     }
   },
   computed: {
-    plotDepth () {
-      return this.$store.getters.evalPlotDepth
+    depth: {
+      get () {
+        return this.$store.getters.evalPlotDepth
+      },
+      set (value) {
+        this.$store.commit('evalPlotDepth', typeof value === 'number' ? Math.max(value, 0) : 20)
+      }
     }
   },
   created () {
@@ -53,13 +55,6 @@ export default {
     })
   },
   methods: {
-    updateEvalDepth (event) {
-      if (event.target.value === '') {
-        this.$store.commit('evalPlotDepth', 20)
-        return
-      }
-      this.$store.commit('evalPlotDepth', parseInt(event.target.value))
-    },
     startEval () {
       if (this.$store.getters.moves.length === 0) {
         return
