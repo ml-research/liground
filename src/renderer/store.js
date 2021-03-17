@@ -1106,6 +1106,9 @@ export const store = new Vuex.Store({
     isXiangqi (state) {
       return state.xiangqiVariants.includes(state.variant)
     },
+    isJanggi (state) {
+      return state.janggiVariants.includes(state.variant)
+    },
     isShogi (state) {
       return state.shogiVariants.includes(state.variant)
     },
