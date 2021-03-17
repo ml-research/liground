@@ -19,7 +19,7 @@
       class="button"
       @click="randBoard"
     >
-      🎲
+      <span class="icon mdi mdi-dice-6-outline" />
     </button>
   </div>
 </template>
@@ -176,6 +176,7 @@ input[type=number] {
 }
 .button {
   padding: 5px;
+  color: var(--main-text-color);
   background-color:var(--button-color);
   border-radius: 50%;
   outline: none;
