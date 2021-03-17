@@ -129,7 +129,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhite', 'depth', 'evalPlotDepth'])
+    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhitePerc', 'depth', 'evalPlotDepth'])
   },
   watch: {
     board () {
@@ -322,7 +322,9 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            newArray[index + 1] = this.adjustPoints(this.cpForWhite, index + 1)
+            console.log('before: ' + this.cpForWhitePerc + ' ' + typeof (this.cpForWhitePerc)) // this doenst work
+            newArray[index + 1] = this.cpForWhitePerc
+            console.log(newArray[index + 1] + ' ' + typeof (newArray[index + 1]))
             this.series = [{
               data: newArray
             }]
