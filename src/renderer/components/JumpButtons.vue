@@ -105,9 +105,6 @@ i {
   background-color: #2196F3;
   color: white;
 }
-.next {
-  color: black;
-}
 .round {
   border-radius: 90%;
 }
