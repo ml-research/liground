@@ -357,6 +357,9 @@ export default {
     // set initial styles
     this.updateBoardCSS(this.boardStyle)
     this.updatePieceCSS(this.pieceStyle)
+
+    // force initial resize
+    document.body.dispatchEvent(new Event('chessground.resize'))
   },
   methods: {
     showPromotionModal () {
