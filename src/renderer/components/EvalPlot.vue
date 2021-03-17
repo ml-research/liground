@@ -211,13 +211,10 @@ export default {
         turn = 'white'
       }
       points = String(Inpoints)
-      if (points.includes('#') && points.includes('0')) {
-        const lastNum = this.series[0].data[index - 1]
-        if (lastNum > 0) {
-          return 10
-        } else {
-          return -10
-        }
+      if (points.includes('#') && points.includes('0') && turn === 'white') {
+        return 10
+      } else if (points.includes('#') && points.includes('0') && turn === 'black') {
+        return -10
       } else {
         if (points.includes('#') && ((turn === 'black' && !points.includes('-')) || (turn === 'white' && points.includes('-')))) {
           return 10
