@@ -371,18 +371,17 @@ export default {
         index++
       }
     },
-    checkForMainVariantChange (arr) { // if position no longer in main variant then it resets the depthArray at that position
-      const depth = this.evalPlotDepth
+    checkForMainVariantChange (arr) {
       let move = this.mainMoves[0]
       if (!move) {
         return
       }
-      this.clear()
       let tempMove = arr[0]
       let index = 0
       while (move && tempMove) {
         if (move.fen !== tempMove.fen) {
-          this.depthArr[index] = depth
+          this.depthArr.splice(index, this.depthArr.length)
+          this.series[0].data.splice(index, this.depthArr.length)
         }
         index++
         move = move.main
