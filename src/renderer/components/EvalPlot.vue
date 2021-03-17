@@ -343,7 +343,7 @@ export default {
           return 10
         }
       } else {
-        if (strPoints.include('-')) {
+        if (strPoints.includes('-')) {
           strPoints = strPoints.substring(1, strPoints.length - 1)
           return parseFloat(strPoints) * -1
         } else {
