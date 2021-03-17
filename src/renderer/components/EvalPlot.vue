@@ -266,10 +266,15 @@ export default {
         return
       }
       let index = 0
+      let offset = 0
       this.chartOptions.xaxis.categories.splice(0, this.chartOptions.xaxis.categories.length)
       this.chartOptions.xaxis.categories.push('Start')
+      const check = this.$store.getters.mainFirstMove.fen.split(' ')
+      if (check[1] === 'w') {
+        offset++
+      }
       while (index < length) {
-        if (index % 2 === 1) {
+        if ((index + offset) % 2 === 1) {
           this.chartOptions.xaxis.categories[index + 1] = '..' + this.mainMoves[index].name
         } else {
           this.chartOptions.xaxis.categories[index + 1] = this.mainMoves[index].name
