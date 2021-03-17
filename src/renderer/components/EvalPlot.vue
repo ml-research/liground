@@ -164,8 +164,6 @@ export default {
         this.mainMoves = tempMainMoves
         if (reEval) {
           this.evaluateHistory()
-        } else {
-          this.loadPlot()
         }
       }
     },
@@ -380,6 +378,7 @@ export default {
           data: tmpArray
         }]
         this.calcOffset()
+        return true
       } else {
         while (name && tempMove) {
           if (name !== tempMove.name && name !== ('..' + (tempMove.name))) {
