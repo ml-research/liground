@@ -164,6 +164,8 @@ export default {
         this.mainMoves = tempMainMoves
         if (reEval) {
           this.evaluateHistory()
+        } else {
+          this.loadPlot()
         }
       }
     },
@@ -371,7 +373,6 @@ export default {
       let index = 1
       if (arr.length < this.chartOptions.xaxis.categories.length - 1) {
         index = arr.length + 1
-        this.chartOptions.xaxis.categories.splice(index, this.depthArr.length)
         this.depthArr.splice(index - 1, this.depthArr.length)
         const tmpArray = this.series[0].data.splice(0, index)
         this.series = [{
@@ -381,7 +382,6 @@ export default {
       } else {
         while (name && tempMove) {
           if (name !== tempMove.name && name !== ('..' + (tempMove.name))) {
-            this.chartOptions.xaxis.categories.splice(index, this.depthArr.length)
             this.depthArr.splice(index - 1, this.depthArr.length)
             const tmpArray = this.series[0].data.splice(0, index)
             this.series = [{
