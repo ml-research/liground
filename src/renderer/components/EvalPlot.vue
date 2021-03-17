@@ -271,7 +271,6 @@ export default {
         }
         index++
       }
-      this.setDepth(this.mainMoves)
     },
 
     async evaluateHistory () { // updates the graph
@@ -294,12 +293,13 @@ export default {
         if (this.series[0].data.length > xlength) {
           this.series[0].data.splice(0, xlength)
         }
-        if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
+        if (depth > this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
           if (this.break) { // stops evaluating
             this.break = false
             return
           }
+          this.depthArr[index] = depth
           points = this.adjustPoints(points, index + 1)
           tmpArray[index + 1] = points
           this.series = [{
@@ -335,7 +335,6 @@ export default {
     },
     adjustStr (input) {
       let strPoints = input
-      console.log(typeof (strPoints) + ' ' + strPoints)
       if (strPoints.includes('#')) {
         if (strPoints.includes('-')) {
           return -10
@@ -360,32 +359,21 @@ export default {
         }
       }
     },
-    setDepth (arr) { // sets the depthArray
-      const tmpArray = arr
-      let index = 0
-      const evalPlotDepth = this.evalPlotDepth
-      while (index < tmpArray.length) {
-        if (this.depthArr[index] === undefined || this.depthArr[index] < evalPlotDepth) {
-          this.depthArr[index] = evalPlotDepth
-        }
-        index++
-      }
-    },
     checkForMainVariantChange (arr) {
-      let move = this.mainMoves[0]
-      if (!move) {
+      let name = this.chartOptions.xaxis.categories[1]
+      if (!name) {
         return
       }
       let tempMove = arr[0]
-      let index = 0
-      while (move && tempMove) {
-        if (move.fen !== tempMove.fen) {
+      let index = 1
+      while (name && tempMove) {
+        if (name !== tempMove.name) {
           this.depthArr.splice(index, this.depthArr.length)
           this.series[0].data.splice(index, this.depthArr.length)
           return
         }
         index++
-        move = move.main
+        name = this.chartOptions.xaxis.categories[index]
         tempMove = tempMove.main
       }
     }
