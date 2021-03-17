@@ -9,8 +9,10 @@
     <div class="inputDepth">
       <input
         v-model.number.lazy="depth"
+        v-on:keyup.enter="startEval"
         class="inputField"
         type="number"
+        
       >
     </div>
     <button
