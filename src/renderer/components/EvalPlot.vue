@@ -203,14 +203,13 @@ export default {
     },
 
     adjustPoints (Inpoints, index) { // sets min/max for graph and converts the results from engine to the correct format
-      let points = Inpoints
       let turn
       if (this.chartOptions.xaxis.categories[index].includes('..')) {
         turn = 'black'
       } else {
         turn = 'white'
       }
-      points = String(Inpoints)
+      let points = String(Inpoints)
       if (points.includes('#') && points.includes('0') && turn === 'white') {
         return 10
       } else if (points.includes('#') && points.includes('0') && turn === 'black') {
