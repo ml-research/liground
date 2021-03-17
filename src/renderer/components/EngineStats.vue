@@ -6,53 +6,21 @@
 
 <script>
 import VueTableDynamic from 'vue-table-dynamic'
+
 export default {
   name: 'EngineStats',
   components: {
     VueTableDynamic
   },
-  props: {
-    depth: {
-      type: Number,
-      default: 21
-    },
-    selDepth: {
-      type: Number,
-      default: 26
-    },
-    nps: {
-      type: Number,
-      default: 1000
-    },
-    nodes: {
-      type: Number,
-      default: 2012031
-    },
-    time: {
-      type: Number,
-      default: 123
-    },
-    ponder: {
-      type: String,
-      default: '-'
-    },
-    hash: {
-      type: Number,
-      default: 44
-    },
-    tb: {
-      type: Number,
-      default: 232
-    }
-  },
   computed: {
-    params: function () {
-      const g = this.$store.getters
+    params () {
+      const { depth, seldepth, nps, nodes, enginetime, hashfull, tbhits } = this.$store.getters
       return {
         data: [
-          ['Depth', 'node/s', 'Nodes', 'Time', 'Hash', 'TB'],
-          [g.depth + '/' + g.seldepth, this.parse(g.nps) + 'nps', this.parse(g.nodes), this.parseTime(g.enginetime), g.hashfull, this.parse(g.tbhits)]
+          ['Depth / Sel. Depth', 'Nodes/s', 'Nodes', 'Time', 'Hash', 'TB Hits'],
+          [depth + ' / ' + seldepth, this.parse(nps) + 'nps', this.parse(nodes), this.parseTime(enginetime), hashfull, this.parse(tbhits)]
         ],
+        columnWidth: [{ column: 0, width: 150 }],
         header: 'row',
         border: true,
         stripe: true
@@ -61,8 +29,7 @@ export default {
 
   },
   methods: {
-
-    parse: function (value) {
+    parse (value) {
       if (value > 1000000) {
         value /= 1000000
         return String(value.toFixed(1)) + ' M'
@@ -74,7 +41,7 @@ export default {
       }
       return String(value)
     },
-    parseTime: function (value) {
+    parseTime (value) {
       const date = new Date(Number(value))
       return `${date.getUTCHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
     }
