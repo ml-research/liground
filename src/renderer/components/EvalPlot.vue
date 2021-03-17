@@ -371,7 +371,21 @@ export default {
       }
       let tempMove = arr[0]
       let index = 1
+      while (name && tempMove) {
+        if (name !== tempMove.name && name !== ('..' + (tempMove.name))) {
+          this.depthArr.splice(index - 1, this.depthArr.length)
+          const tmpArray = this.series[0].data.splice(0, index)
+          this.series = [{
+            data: tmpArray
+          }]
+          return true
+        }
+        index++
+        name = this.chartOptions.xaxis.categories[index]
+        tempMove = tempMove.main
+      }
       if (arr.length < this.chartOptions.xaxis.categories.length - 1) {
+        console.log('if')
         index = arr.length + 1
         this.depthArr.splice(index - 1, this.depthArr.length)
         const tmpArray = this.series[0].data.splice(0, index)
@@ -380,20 +394,6 @@ export default {
         }]
         this.calcOffset()
         return true
-      } else {
-        while (name && tempMove) {
-          if (name !== tempMove.name && name !== ('..' + (tempMove.name))) {
-            this.depthArr.splice(index - 1, this.depthArr.length)
-            const tmpArray = this.series[0].data.splice(0, index)
-            this.series = [{
-              data: tmpArray
-            }]
-            return true
-          }
-          index++
-          name = this.chartOptions.xaxis.categories[index]
-          tempMove = tempMove.main
-        }
       }
     }
   }
