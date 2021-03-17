@@ -652,7 +652,7 @@ export const store = new Vuex.Store({
           ? last
           : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine.name : context.getters.availableEngines[0].name)
         context.dispatch('changeEngine', newEngine).then(() => {
-          context.dispatch('initEngineOptions')
+          context.dispatch('setEngineOptions', { UCI_Variant: payload })
         })
       }
     },
@@ -770,17 +770,21 @@ export const store = new Vuex.Store({
       await context.dispatch('initEngineOptions')
     },
     initEngineOptions (context) {
-      if (localStorage.getItem('engine' + context.state.activeEngine)) {
-        context.dispatch('setEngineOptions', JSON.parse(localStorage.getItem('engine' + context.state.activeEngine)))
-      } else {
-        context.dispatch('setEngineOptions', {
-          MultiPV: 5,
-          UCI_AnalyseMode: true,
-          UCI_Variant: context.getters.variant,
-          'Analysis Contempt': 'Off',
-          UCI_Chess960: context.state.board.is960()
-        })
+      const options = {
+        // variant & 960 are handled separately and always set
+        UCI_Variant: context.getters.variant,
+        UCI_Chess960: context.state.board.is960(),
+
+        // multi pv 5 is default
+        MultiPV: 5
       }
+      const stored = localStorage.getItem('engine' + context.state.activeEngine)
+      if (stored) {
+        Object.assign(options, JSON.parse(stored))
+      }
+
+      // this will update the settings in store & local storage
+      context.dispatch('setEngineOptions', options)
     },
     setEngineOptions (context, payload) {
       if (context.getters.active) {
