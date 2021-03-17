@@ -318,6 +318,7 @@ export default {
       let index = 0
       let depth = this.$store.getters.depth
       if (this.mainMoves === [] || depth === 0) { // no values set
+        this.setBetterValuesRunning = false
         return
       }
       while (index < this.series[0].data.length - 1) {
