@@ -8,7 +8,7 @@
     </div>
     <div class="inputDepth">
       <input
-        v-model.number="depth"
+        v-model.number.lazy="depth"
         class="inputField"
         type="number"
       >
