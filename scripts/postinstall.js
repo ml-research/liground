@@ -89,13 +89,13 @@ async function downloadBinary (fileName, urlMap) {
 downloadBinary('stockfish', {
   linux: 'https://github.com/niklasf/Stockfish/releases/download/fishnet-20200613/stockfish-x86_64',
   win: 'https://github.com/niklasf/Stockfish/releases/download/fishnet-20200613/stockfish-windows-amd64.exe',
-  osx: 'https://github.com/niklasf/Stockfish/releases/download/fishnet-20200613/stockfish-osx-x86_64'
+  mac: 'https://github.com/niklasf/Stockfish/releases/download/fishnet-20200613/stockfish-osx-x86_64'
 })
 
 downloadBinary('multi-variant-stockfish', {
   linux: 'https://github.com/ddugovic/Stockfish/releases/download/variant_sf_10/stockfish-x86_64',
   win: 'https://github.com/ddugovic/Stockfish/releases/download/variant_sf_10/stockfish-windows-x86_64.exe',
-  osx: 'https://github.com/ddugovic/Stockfish/releases/download/variant_sf_10/stockfish-osx-x86_64'
+  mac: 'https://github.com/ddugovic/Stockfish/releases/download/variant_sf_10/stockfish-osx-x86_64'
 })
 
 downloadBinary('fairy-stockfish', {
