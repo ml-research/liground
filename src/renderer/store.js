@@ -136,9 +136,9 @@ export const store = new Vuex.Store({
     evalPlotDepth: 20,
     orientation: 'white',
     message: 'hello from Vuex',
-    allEngines: allEngines.map((engine, id) => ({ id, ...engine })),
-    activeEngine: 0,
-    selectedEngineIds: {},
+    allEngines,
+    activeEngine: null,
+    selectedEngines: {},
     engineInfo: {
       name: '',
       author: '',
@@ -250,9 +250,9 @@ export const store = new Vuex.Store({
       state.variant = payload
     },
     selectedEngines (state, payload) {
-      state.selectedEngineIds = payload
+      state.selectedEngines = payload
     },
-    clearIO (state) {
+    clearIO () {
       // dummy to trigger update in console
     },
     engineInfo (state, payload) {
@@ -484,10 +484,18 @@ export const store = new Vuex.Store({
         context.commit('boardStyle', localStorage.internationalBoardStyle)
       }
       if (localStorage.variant) {
-        store.commit('variant', localStorage.variant)
+        context.commit('variant', localStorage.variant)
+      }
+      if (localStorage.engines) {
+        try {
+          context.state.allEngines = JSON.parse(localStorage.engines)
+        } catch (err) {
+          localStorage.removeItem('engines')
+        }
       }
       context.commit('newBoard')
       context.dispatch('updateBoard')
+      context.dispatch('changeEngine', context.getters.availableEngines[0].name)
       context.commit('initialized', true)
     },
     updateBoard (context) {
@@ -639,11 +647,11 @@ export const store = new Vuex.Store({
         }
 
         // switch to new engine
-        const lastId = context.state.selectedEngineIds[payload]
-        const newEngine = typeof lastId === 'number'
-          ? context.state.allEngines[lastId]
-          : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine : context.getters.availableEngines[0])
-        context.dispatch('engineBinary', newEngine.binary).then(() => {
+        const last = context.state.selectedEngines[payload]
+        const newEngine = typeof last === 'string'
+          ? last
+          : (oldEngine && oldEngine.variants.includes(payload) ? oldEngine.name : context.getters.availableEngines[0].name)
+        context.dispatch('changeEngine', newEngine).then(() => {
           context.dispatch('setEngineOptions', { UCI_Variant: payload })
         })
       }
@@ -657,38 +665,126 @@ export const store = new Vuex.Store({
       })
       context.dispatch('setEngineOptions', { UCI_Chess960: payload.is960 })
     },
-    async engineBinary (context, payload) {
-      const id = context.state.allEngines.findIndex(engine => engine.binary === payload)
+    async addEngine (context, payload) {
+      // discover the variants by running the engine
+      const { name, binary, cwd, logo } = payload
+      const info = await engine.run(binary, cwd)
+      const variantOption = info.options.find(option => option.name === 'UCI_Variant')
+      const variants = variantOption ? variantOption.var : ['chess']
+
+      // update engines
+      context.state.allEngines = {
+        ...context.state.allEngines,
+        [name]: { binary, cwd, logo, variants }
+      }
+      localStorage.engines = JSON.stringify(context.state.allEngines)
+
+      // swap back to current engine after we are done
+      context.commit('clearIO')
+      await engine.run(context.getters.engineBinary, context.getters.selectedEngine.cwd)
+      await context.dispatch('initEngineOptions')
+    },
+    async editEngine (context, payload) {
+      const { old, changed: { name, binary, cwd, logo } } = payload
+      const engines = { ...context.state.allEngines }
+
+      // grab new engine entry
+      let updated
+      if (name !== old) {
+        engines[name] = { ...engines[old] }
+        updated = engines[name]
+        delete engines[old]
+      } else {
+        updated = engines[old]
+      }
+
+      // update logo
+      updated.logo = logo
+
+      // update active engine name
+      context.state.activeEngine = name
+
+      // update name in selected engines
+      const selectedEngines = { ...context.state.selectedEngines }
+      for (const [variant, selected] of Object.entries(selectedEngines)) {
+        if (selected === old) {
+          selectedEngines[variant] = name
+        }
+      }
+      context.state.selectedEngines = selectedEngines
+
+      // rerun if binary or cwd changed
+      if (updated.binary !== binary || updated.cwd !== cwd) {
+        await context.dispatch('runBinary', { binary, cwd })
+        const variantOption = context.state.engineInfo.options.find(option => option.name === 'UCI_Variant')
+        updated.variants = variantOption ? variantOption.var : ['chess']
+      }
+      updated.binary = binary
+      updated.cwd = cwd
+
+      // save engines
+      context.state.allEngines = engines
+      localStorage.engines = JSON.stringify(context.state.allEngines)
+    },
+    async deleteEngine (context, payload) {
+      const engines = { ...context.state.allEngines }
+      delete engines[payload]
+      const missing = Object.entries(context.state.variantOptions.getAll())
+        .filter(([_, variant]) => !Object.values(engines).find(engine => engine.variants.includes(variant)))
+        .map(([name, _]) => name)
+      if (missing.length > 0) {
+        alert(`"${payload}" can not be deleted:\nOnly Engine supporting Variants ${missing.join(', ')}!`)
+        return
+      }
+      context.state.allEngines = engines
+      localStorage.engines = JSON.stringify(context.state.allEngines)
+      await context.dispatch('changeEngine', context.getters.availableEngines[0].name)
+    },
+    async changeEngine (context, payload) {
+      const id = payload
 
       // always update selected engines
-      const selected = { ...context.state.selectedEngineIds }
-      selected[context.getters.variant] = id
+      const selected = {
+        ...context.state.selectedEngines,
+        [context.getters.variant]: id
+      }
       context.commit('selectedEngines', selected)
 
       // only change engine when its a different one
       if (context.state.activeEngine !== id) {
         context.state.activeEngine = id
-        if (context.getters.active) {
-          context.commit('active', false)
-        }
-        context.commit('clearIO')
-        await context.dispatch('resetEngineData')
-        context.commit('engineInfo', await engine.run(payload))
-        await context.dispatch('initEngineOptions')
-      }
-    },
-    initEngineOptions (context) {
-      if (localStorage.getItem('engine' + context.state.activeEngine)) {
-        context.dispatch('setEngineOptions', JSON.parse(localStorage.getItem('engine' + context.state.activeEngine)))
-      } else {
-        context.dispatch('setEngineOptions', {
-          MultiPV: 5,
-          UCI_AnalyseMode: true,
-          UCI_Variant: context.getters.variant,
-          'Analysis Contempt': 'Off',
-          UCI_Chess960: context.state.board.is960()
+        context.dispatch('runBinary', {
+          binary: context.getters.engineBinary,
+          cwd: context.getters.selectedEngine.cwd
         })
       }
+    },
+    async runBinary (context, payload) {
+      const { binary, cwd } = payload
+      if (context.getters.active) {
+        context.commit('active', false)
+      }
+      context.commit('clearIO')
+      await context.dispatch('resetEngineData')
+      context.commit('engineInfo', await engine.run(binary, cwd))
+      await context.dispatch('initEngineOptions')
+    },
+    initEngineOptions (context) {
+      const options = {
+        // variant & 960 are handled separately and always set
+        UCI_Variant: context.getters.variant,
+        UCI_Chess960: context.state.board.is960(),
+
+        // multi pv 5 is default
+        MultiPV: 5
+      }
+      const stored = localStorage.getItem('engine' + context.state.activeEngine)
+      if (stored) {
+        Object.assign(options, JSON.parse(stored))
+      }
+
+      // this will update the settings in store & local storage
+      context.dispatch('setEngineOptions', options)
     },
     setEngineOptions (context, payload) {
       if (context.getters.active) {
@@ -885,10 +981,12 @@ export const store = new Vuex.Store({
       return state.variantOptions
     },
     availableEngines (state, getters) {
-      return state.allEngines.filter(engine => engine.variants && engine.variants.includes(getters.variant))
+      return Object.entries(state.allEngines)
+        .map(([name, info]) => ({ name, ...info }))
+        .filter(engine => engine.variants && engine.variants.includes(getters.variant))
     },
     selectedEngine (state) {
-      return state.allEngines[state.activeEngine]
+      return { name: state.activeEngine, ...state.allEngines[state.activeEngine] }
     },
     engineBinary (state, getters) {
       return getters.selectedEngine.binary
@@ -999,6 +1097,18 @@ export const store = new Vuex.Store({
     selectedGame (state) {
       return state.selectedGame
     },
+    isInternational (state) {
+      return state.internationalVariants.includes(state.variant)
+    },
+    isSEA (state) {
+      return state.seaVariants.includes(state.variant)
+    },
+    isXiangqi (state) {
+      return state.xiangqiVariants.includes(state.variant)
+    },
+    isShogi (state) {
+      return state.shogiVariants.includes(state.variant)
+    },
 
     // TODO: integrate getters into store state?
     moveStack (state) {
@@ -1012,21 +1122,6 @@ export const store = new Vuex.Store({
     },
     is960 (state) {
       return state.board.is960()
-    },
-    isInternational (state) {
-      return state.internationalVariants.includes(state.variant)
-    },
-    isSEA (state) {
-      return state.seaVariants.includes(state.variant)
-    },
-    isXiangqi (state) {
-      return state.xiangqiVariants.includes(state.variant)
-    },
-    isJanggi (state) {
-      return state.janggiVariants.includes(state.variant)
-    },
-    isShogi (state) {
-      return state.shogiVariants.includes(state.variant)
     },
     dimensionNumber (state) {
       if (state.internationalVariants.includes(state.variant)) {
@@ -1075,6 +1170,4 @@ ffish.onRuntimeInitialized = () => {
 
   // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))
-  store.commit('engineInfo', await engine.run(store.getters.engineBinary))
-  await store.dispatch('initEngineOptions')
 })()

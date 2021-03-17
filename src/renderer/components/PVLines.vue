@@ -30,14 +30,13 @@
         </li>
       </VueContext>
       <div class="list">
-        <div
+        <template
           v-for="(line, id) in lines"
-          :key="id"
-          class="item"
         >
           <div
             v-if="line"
-            class="content"
+            :key="id"
+            class="item clickable"
             @mouseenter="onMouseEnter(id)"
             @mouseleave="onMouseLeave(id)"
             @click="onClick(line)"
@@ -52,11 +51,12 @@
           </div>
           <div
             v-else
-            class="placeholder"
+            :key="id"
+            class="item placeholder"
           >
             ...
           </div>
-        </div>
+        </template>
       </div>
     </div>
     <div
@@ -128,9 +128,9 @@ export default {
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     },
     updateLines () {
-      const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
       const count = this.engineSettings.MultiPV
-      this.lines = lines.concat(Array(count - lines.length).fill(null))
+      const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+      this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
     }
   }
 }
@@ -138,7 +138,7 @@ export default {
 
 <style scoped>
 .pv-lines {
-  background-color:var(--second-bg-color);
+  background-color: var(--second-bg-color);
   font-weight: 100;
   white-space: nowrap;
 }
@@ -155,34 +155,32 @@ export default {
   height: 2em;
   padding: 5px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   user-select: none;
 }
 .item + .item {
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--main-border-color);
 }
-.content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.item.clickable {
   cursor: pointer;
 }
-.content:hover {
-  background-color: #d3e1eb;
+.item.clickable:hover {
+  background-color: #2196F3;
 }
-.content > .left {
+.item > .left {
   margin-right: 5px;
   font-family: sans-serif;
   font-weight: 1000;
   text-align: center;
 }
-.content > .right {
+.item > .right {
   text-align: left;
   flex: 0 0 auto;
 }
-.placeholder {
+.item.placeholder {
   font-family: sans-serif;
-  text-align: center;
+  justify-content: center;
 }
 
 .details {

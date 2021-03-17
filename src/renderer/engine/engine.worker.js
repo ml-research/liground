@@ -1,4 +1,4 @@
-import path from 'path'
+import fs from 'fs'
 import { spawn } from 'child_process'
 import EngineDriver from './driver'
 import EngineSender from './sender'
@@ -13,24 +13,12 @@ let child = null
 let engine = null
 
 /**
- * Resolve the path to an engine binary.
- * @param {string} name binary file name
- */
-function resolveBinary (name) {
-  return path.resolve(
-    process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
-    'engines',
-    `${name}${process.platform === 'win32' ? '.exe' : ''}`
-  )
-}
-
-/**
  * Run a new engine, killing the old process.
- * @param {string} engineBinary binary to use
+ * @param {string} binary binary to use
+ * @param {string} cwd working directory to use
+ * @param {string[]} listeners listeners to attach to driver
  */
-async function run (engineBinary, listeners, silent) {
-  msg.debug('Running engine')
-
+async function run (binary, cwd, listeners) {
   // kill old engine
   if (engine) {
     msg.debug('Killing...')
@@ -48,12 +36,12 @@ async function run (engineBinary, listeners, silent) {
   }
 
   // spawn engine process
-  const binary = resolveBinary(engineBinary)
-  if (!binary) {
-    msg.error(`Could not find engine binary for "${engineBinary}"`)
+  if (!fs.existsSync(binary)) {
+    msg.error(`Could not find engine binary "${binary}"`)
     return
   }
-  child = spawn(binary, []).on('error', err => msg.error(err.message))
+  msg.debug('Running:', { binary, cwd })
+  child = spawn(binary, [], { cwd }).on('error', err => msg.error(err.message))
 
   // success
   if (typeof child.pid === 'number') {
@@ -61,7 +49,7 @@ async function run (engineBinary, listeners, silent) {
     engine = new EngineDriver(child.stdin, child.stdout)
 
     // setup error logging & crash handling
-    child.stderr.on('data', err => msg.error(err.toString().trim()))
+    child.stderr.on('data', err => msg.error('Engine reported Error:', err.toString().trim()))
     child.on('exit', () => msg.queue('crash'))
 
     // setup listeners
@@ -77,9 +65,7 @@ async function run (engineBinary, listeners, silent) {
     // initialize
     await engine.initialize()
 
-    if (!silent) {
-      msg.debug('Engine active:', engine.info)
-    }
+    msg.debug('Engine active:', engine.info)
 
     // reply with engine infos
     msg.queue('active', engine.info)
@@ -127,7 +113,7 @@ function evalPos (fen, depth) {
 self.addEventListener('message', ({ data: { type, payload } }) => {
   switch (type) {
     case 'run':
-      run(payload.engineId, payload.listeners || [], payload.silent)
+      run(payload.binary, payload.cwd, payload.listeners || [])
       break
     case 'cmd':
       exec(payload)
