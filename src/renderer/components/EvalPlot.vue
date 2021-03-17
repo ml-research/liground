@@ -318,11 +318,12 @@ export default {
     },
     setBetterValue () { // sets a better value for an already drawn plot
       let index = 0
-      if (this.mainMoves === []) { // no values set
+      let depth = this.$store.getters.depth
+      if (this.mainMoves === [] || depth === 0) { // no values set
         return
       }
       while (index < this.series[0].data.length - 1) {
-        const depth = this.$store.getters.depth
+        depth = this.$store.getters.depth
         if (this.currentCalcPos === this.mainMoves[index].fen) {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
