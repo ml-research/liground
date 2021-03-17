@@ -175,12 +175,12 @@ input[type=number] {
   color: var(--main-text-color);
 }
 .button {
-  padding: 5px;
   color: white;
   background-color:var(--button-color);
   box-shadow: 1px 1px 1px 1px black;
   border-radius: 5px;
   outline: none;
+  font-size: 25px;
 }
 .button:hover {
   background-color: #22303d;
