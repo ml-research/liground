@@ -27,9 +27,9 @@
           </div>
           <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
-            <BoardStyleSelector id="board-style" />
+            <BoardStyleSelector id="board-style" />          
+            <EvalPlotButton id="evalbutton-style" />
           </div>
-          <EvalPlotButton id="evalbutton-style" />
         </div>
         <EvalPlot id="evalplot" />
         <div id="right-column">
@@ -178,7 +178,7 @@ export default {
       if (!mov) {
         return
       }
-      if (mov.ply === 1) {
+      if (mov.ply === 1 || !mov.prev) {
         this.$store.dispatch('fen', this.startFen)
         return
       }
@@ -272,7 +272,7 @@ export default {
   grid-template-areas:
     "pgnbrowser ."
     ". fenfield"
-    "evalstart selector";
+    ". selector";
 }
 #analysisview {
   height: 100%;
@@ -301,9 +301,9 @@ input {
 #selector-container {
   grid-area: selector;
   display: grid;
-  grid-template-columns: 15% calc(55% / 2) 15% calc(55% / 2) 15%;
+  grid-template-columns: 10% 30% 5% 30% 5% 20%;
   grid-template-areas:
-  ". piecestyle . boardstyle .";
+  ". piecestyle . boardstyle . evalButton";
   height: 60px;
 }
 #piece-style {
@@ -349,7 +349,7 @@ input {
 }
 #evalbutton-style {
   margin-top: 10px;
-  grid-area: evalstart;
+  grid-area: evalButton;
 }
 
 </style>

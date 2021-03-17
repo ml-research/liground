@@ -244,8 +244,9 @@ export default {
 .icon.mdi-magnify {
   padding: 0px 6px;
   margin: 0px 1px;
-  border-radius: 3px;
+  border-radius: 5px;
   background-color: var(--button-color);
+  box-shadow: 1px 1px 1px 1px black;
   color: white;
 }
 
@@ -259,7 +260,7 @@ export default {
 }
 
 .search {
-  padding: 2px 0px;
+  padding: 5px 0px;
   white-space: nowrap;
   width: 100%;
 }

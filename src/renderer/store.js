@@ -928,6 +928,9 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    currentMove (state) {
+      return state.moves.filter(moves => moves.fen === state.fen)
+    },
     getMoveByUCIAndPrev (state, uci, prev) {
       return (uci, prev) => state.moves.filter(moves => moves.uci === uci && moves.prev === prev)
       /* const moves = state.moves
@@ -1043,17 +1046,25 @@ export const store = new Vuex.Store({
       return calcForSide(state.multipv[0].cp, state.turn)
     },
     cpForWhiteStr (state, getters) {
+      const currentMove = getters.currentMove[0]
       const { mate } = state.multipv[0]
       if (typeof mate === 'number') {
         return `#${calcForSide(mate, state.turn)}`
+      } else if (currentMove && currentMove.name.includes('#')){
+        return state.turn ? '0-1' : '1-0'
+      } else if (state.legalMoves.length === 0) {
+        return '1/2-1/2'
       } else {
         return cpToString(getters.cpForWhite)
       }
     },
     cpForWhitePerc (state, getters) {
+      const currentMove = getters.currentMove[0]
       const { mate } = state.multipv[0]
       if (typeof mate === 'number') {
         return (calcForSide(Math.sign(mate), state.turn) + 1) / 2
+      }else if (currentMove && currentMove.name.includes('#')){
+        return state.turn ? 0 : 1
       } else {
         return 1 / (1 + Math.exp(-0.003 * getters.cpForWhite))
       }
