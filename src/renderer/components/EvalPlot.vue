@@ -366,11 +366,35 @@ export default {
       }
       let tempMove = arr[0]
       let index = 1
+      console.log('called')
+      console.log(arr.length + ' ' + this.chartOptions.xaxis.categories.length)
+      if (arr.length < this.chartOptions.xaxis.categories.length - 1) {
+        console.log('spliceMaindelettion')
+        index = arr.length + 1
+        console.log(index)
+        this.chartOptions.xaxis.categories.splice(index, this.depthArr.length)
+        let counter = 0
+        while (counter < this.series[0].data.length) {
+          console.log('Before: ' + this.series[0].data[counter])
+          counter++
+        }
+        const tmpArray = this.series[0].data.splice(0, index)
+        counter = 0
+        while (counter < tmpArray.length) {
+          console.log('After: ' + tmpArray[counter])
+          counter++
+        }
+        this.series = [{
+          data: tmpArray
+        }]
+        this.calcOffset()
+        return
+      }
       while (name && tempMove) {
         if (name !== tempMove.name) {
           this.depthArr.splice(index, this.depthArr.length)
+          this.chartOptions.xaxis.categories.splice(index, this.depthArr.length)
           this.series[0].data.splice(index, this.depthArr.length)
-          return
         }
         index++
         name = this.chartOptions.xaxis.categories[index]
