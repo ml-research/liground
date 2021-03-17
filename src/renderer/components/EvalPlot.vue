@@ -184,7 +184,6 @@ export default {
   created () {
     document.addEventListener('resetPlot', () => {
       this.break = true
-      this.clear()
     })
     document.addEventListener('startEval', () => {
       this.evaluateHistory()
