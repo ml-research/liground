@@ -27,7 +27,7 @@
           </div>
           <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
-            <BoardStyleSelector id="board-style" />          
+            <BoardStyleSelector id="board-style" />
             <EvalPlotButton id="evalbutton-style" />
           </div>
         </div>

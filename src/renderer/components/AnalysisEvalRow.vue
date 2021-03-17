@@ -1,7 +1,9 @@
 <template>
   <div class="container">
-    <div class="eval"
-    :class="{ smaller: cpForWhiteStr.includes('/') }">
+    <div
+      class="eval"
+      :class="{ smaller: cpForWhiteStr.includes('/') }"
+    >
       {{ cpForWhiteStr }}
     </div>
     <EngineSelect class="select" />
