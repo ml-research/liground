@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="board960" data-text="Input any number and press Enter or click the button for a random Board.">
+    <div
+      class="board960"
+      data-text="Input any number and press Enter or click the button for a random Board."
+    >
       960 Board:
     </div>
     <div class="input960">

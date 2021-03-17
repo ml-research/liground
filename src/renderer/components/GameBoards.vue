@@ -301,20 +301,20 @@ input {
 #selector-container {
   grid-area: selector;
   display: grid;
-  grid-template-columns: 15% auto auto 15%;
+  grid-template-columns: 15% calc(55% / 2) 15% calc(55% / 2) 15%;
   grid-template-areas:
-  ". piecestyle boardstyle .";
+  ". piecestyle . boardstyle .";
   height: 60px;
 }
 #piece-style {
   grid-area: piecestyle;
   margin-top: 10px;
-  width: 210px;
+  width: 100%;
 }
 #board-style {
   grid-area: boardstyle;
   margin-top: 10px;
-  width: 210px;
+  width: 100%;
 }
 #pgnbrowser {
   grid-area: pgnbrowser;
@@ -354,10 +354,21 @@ input {
 
 </style>
 <style>
-.multiselect * {
+.multiselect {
   color: var(--main-text-color, white) !important;
   background-color: var(--second-bg-color, white) !important;
   border-color: var(--main-border-color, white) !important;
+}
+.multiselect__content ,
+.multiselect__content-wrapper,
+.multiselect__single,
+.multiselect__tags ,
+.multiselect__element,
+.multiselect__option--selected,
+.multiselect__input{
+    background-color: var(--second-bg-color, white);
+    color: var(--main-text-color);
+    border-color: var(--main-border-color);
 }
 .multiselect ::placeholder {
   color: var(--main-text-color) !important;

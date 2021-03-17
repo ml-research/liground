@@ -206,9 +206,7 @@ export default {
 </script>
 
 <style scoped>
-.multiselect {
-  padding-left: 5px;
-}
+
 .item {
   display: flex;
   flex-direction: row;

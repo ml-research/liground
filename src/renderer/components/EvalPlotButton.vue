@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="EvalPlotButton" data-text="Input a number to set the engine depth for the Eval Plot.">
+    <div
+      class="EvalPlotButton"
+      data-text="Input a number to set the engine depth for the Eval Plot."
+    >
       Eval Depth:
     </div>
     <div class="inputDepth">
