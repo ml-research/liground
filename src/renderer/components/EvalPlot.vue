@@ -327,7 +327,9 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
+            console.log(this.cpForWhiteStr)
             newArray[index + 1] = this.adjustStr(this.cpForWhiteStr)
+            console.log('After: ' + newArray[index + 1])
             this.series = [{
               data: newArray
             }]
@@ -350,7 +352,7 @@ export default {
         if (strPoints.includes('-')) {
           strPoints = strPoints.substring(1, strPoints.length - 1)
           strPoints = parseFloat(strPoints) * -1
-          if (strPoints < 10) {
+          if (strPoints < -10) {
             strPoints = -10
           }
           return strPoints
