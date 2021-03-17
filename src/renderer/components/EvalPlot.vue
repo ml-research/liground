@@ -382,6 +382,7 @@ export default {
         if (move.fen !== tempMove.fen) {
           this.depthArr.splice(index, this.depthArr.length)
           this.series[0].data.splice(index, this.depthArr.length)
+          return
         }
         index++
         move = move.main
