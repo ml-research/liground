@@ -327,9 +327,7 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            console.log(this.cpForWhiteStr)
             newArray[index + 1] = this.adjustStr(this.cpForWhiteStr)
-            console.log('After: ' + newArray[index + 1])
             this.series = [{
               data: newArray
             }]
@@ -387,7 +385,6 @@ export default {
         tempMove = tempMove.main
       }
       if (arr.length < this.chartOptions.xaxis.categories.length - 1) {
-        console.log('if')
         index = arr.length + 1
         this.depthArr.splice(index - 1, this.depthArr.length)
         const tmpArray = this.series[0].data.splice(0, index)
