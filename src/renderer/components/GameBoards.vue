@@ -301,9 +301,9 @@ input {
 #selector-container {
   grid-area: selector;
   display: grid;
-  grid-template-columns: 10% 30% 5% 30% 5% 20%;
+  grid-template-columns: 5% 30% 5% 30%  30%;
   grid-template-areas:
-  ". piecestyle . boardstyle . evalButton";
+  ". piecestyle . boardstyle evalButton";
   height: 60px;
 }
 #piece-style {
