@@ -60,9 +60,9 @@ export default {
       'twokingssymmetric'
     ]
   },
-  'Fairy Stockfish 11.2': {
-    binary: resolveBinary('fairy-stockfish'),
-    cwd: enginePath,
+  {
+    name: 'Fairy Stockfish 13',
+    binary: 'fairy-stockfish',
     logo: logoStockfishPurple,
     variants: [
       '3check',

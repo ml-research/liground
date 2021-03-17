@@ -281,18 +281,7 @@ export default {
       this.$store.dispatch('deleteFromMoves', move)
     },
     updateBoard (move) {
-      this.$store.dispatch('fen', this.move.fen)
-    },
-    checkCheckmate (moveIn) {
-      const move = moveIn
-      let name = moveIn.name
-      const variant = this.$store.getters.variant
-      const board = new ffish.Board(variant, move.fen)
-      const legalMoves = board.legalMoves()
-      if (legalMoves.length === 0 && !name.includes('#')) {
-        name = name + '#'
-      }
-      return name
+      this.$store.dispatch('fen', move.fen)
     }
   }
 }

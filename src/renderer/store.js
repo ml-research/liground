@@ -154,6 +154,7 @@ export const store = new Vuex.Store({
       tbhits: 0,
       time: 0
     },
+    enginetime: 0,
     multipv: [
       {
         cp: 0,
@@ -189,7 +190,8 @@ export const store = new Vuex.Store({
     ],
     shogiVariants: [
       'shogi'
-    ]
+    ],
+    clock: null
   },
   mutations: { // sync
     curVar960Fen (state, payload) {
@@ -277,6 +279,7 @@ export const store = new Vuex.Store({
       state.engineStats = payload
     },
     resetEngineStats (state) {
+      state.enginetime = 0
       state.engineStats = {
         depth: 0,
         seldepth: 0,
@@ -426,6 +429,20 @@ export const store = new Vuex.Store({
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
+      localStorage.evalPlotDepth = payload
+    },
+    fenply (state, payload) {
+      state.fenply = payload
+    },
+    movesChangeDummy (state, payload) {
+      state.moves = []
+      state.moves = payload
+    },
+    setEngineClock (state) {
+      state.clock = setInterval(function () { state.enginetime = state.enginetime + 1000 }, 1000)
+    },
+    resetEngineTime (state) {
+      clearInterval(state.clock)
     }
   },
   actions: { // async
@@ -477,6 +494,36 @@ export const store = new Vuex.Store({
       context.commit('appendMoves', payload)
       context.dispatch('fen', context.state.board.fen())
     },
+    pushMainLine (context, payload) {
+      let prev = payload.prev
+      for (const i in payload.line) {
+        context.commit('appendMoves', { move: payload.line[i], prev: prev })
+        const move = context.getters.getMoveByUCIAndPrev(payload.line[i], prev)[0]
+        if (!prev) {
+          context.commit('mainFirstMove', move)
+          prev = move
+        } else {
+          prev.main = move
+          prev = prev.main
+        }
+      }
+      context.dispatch('fen', context.state.board.fen())
+    },
+    pushAltLine (context, payload) {
+      let prev = payload.prev
+      for (const i in payload.line) {
+        context.commit('appendMoves', { move: payload.line[i], prev: prev })
+        const move = context.getters.getMoveByUCIAndPrev(payload.line[i], prev)[0]
+        console.log(move)
+        if (!prev) {
+          if (!context.state.mainFirstMove) {
+            context.commit('mainFirstMove', move)
+          }
+        }
+        prev = move
+      }
+      context.dispatch('fen', context.state.board.fen())
+    },
     mainFirstMove (context, payload) {
       if (context.state.mainFirstMove !== payload) {
         context.commit('mainFirstMove', payload)
@@ -484,7 +531,7 @@ export const store = new Vuex.Store({
     },
     firstMoves (context, payload) {
       if (!context.state.firstMoves.includes(payload)) {
-        context.dispatch('firstMoves', payload)
+        context.commit('firstMoves', payload)
       }
     },
     deleteFromMoves (context, payload) {
@@ -499,10 +546,12 @@ export const store = new Vuex.Store({
     },
     goEngine (context) {
       engine.send('go infinite')
+      context.commit('setEngineClock')
       context.commit('active', true)
     },
     stopEngine (context) {
       engine.send('stop')
+      context.commit('resetEngineTime')
       context.commit('active', false)
     },
     restartEngine (context) {
@@ -748,6 +797,7 @@ export const store = new Vuex.Store({
             const pvline = {
               cp: payload.cp,
               mate: payload.mate,
+              pvUCI: payload.pv,
               ucimove
             }
             try {
@@ -833,6 +883,16 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    getMoveByUCIAndPrev (state, uci, prev) {
+      return (uci, prev) => state.moves.filter(moves => moves.uci === uci && moves.prev === prev)
+      /* const moves = state.moves
+      for (const i in moves) {
+        if (moves[i].uci === uci && moves[i].prev === prev) {
+          return moves[i]
+        }
+      }
+      return null */
+    },
     curVar960Fen (state) {
       return state.curVar960Fen
     },
@@ -927,6 +987,9 @@ export const store = new Vuex.Store({
     },
     time (state) {
       return state.engineStats.time
+    },
+    enginetime (state) {
+      return state.enginetime
     },
     pv (state) {
       return state.multipv[0].pv
