@@ -117,8 +117,10 @@ export default {
 <style scoped>
 .bar {
   margin: 10px auto;
+  position: relative;
+  background-color: var(--button-color);
+  font-size: 11px;
   width: 33.3%;
-  background-color: #34495e;
   border-radius: 8px;
 }
 .item {
