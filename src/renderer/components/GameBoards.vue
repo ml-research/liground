@@ -187,9 +187,9 @@ export default {
     moveForwardOne () { // this method moves forward one move in the current line
       const mov = this.currentMove
       if (!mov) {
-        if (this.moves[0]) {
-          this.$store.dispatch('playAudio', this.moves[0].name)
-          this.$store.dispatch('fen', this.moves[0].fen)
+        if (this.mainFirstMove) {
+          this.$store.dispatch('playAudio', this.mainFirstMove.name)
+          this.$store.dispatch('fen', this.mainFirstMove.fen)
         }
         return
       }
