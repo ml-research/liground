@@ -47,7 +47,7 @@ export default [
     ]
   },
   {
-    name: 'Fairy Stockfish 11.2',
+    name: 'Fairy Stockfish 13',
     binary: 'fairy-stockfish',
     logo: logoStockfishPurple,
     variants: [
