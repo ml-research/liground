@@ -28,8 +28,8 @@
           <div id="selector-container">
             <PieceStyleSelector id="piece-style" />
             <BoardStyleSelector id="board-style" />
-            <EvalPlotButton id="evalbutton-style" />
           </div>
+          <EvalPlotButton id="evalbutton-style" />
         </div>
         <EvalPlot id="evalplot" />
         <div id="right-column">
@@ -272,7 +272,7 @@ export default {
   grid-template-areas:
     "pgnbrowser ."
     ". fenfield"
-    ". selector";
+    "evalstart selector";
 }
 #analysisview {
   height: 100%;
@@ -300,15 +300,19 @@ input {
 }
 #selector-container {
   grid-area: selector;
-  display: flex;
-  justify-content: content-distribution;
+  display: grid;
+  grid-template-columns: 15% auto auto 15%;
+  grid-template-areas:
+  ". piecestyle boardstyle .";
   height: 60px;
 }
 #piece-style {
+  grid-area: piecestyle;
   margin-top: 10px;
   width: 210px;
 }
 #board-style {
+  grid-area: boardstyle;
   margin-top: 10px;
   width: 210px;
 }
@@ -345,6 +349,7 @@ input {
 }
 #evalbutton-style {
   margin-top: 10px;
+  grid-area: evalstart;
 }
 
 </style>

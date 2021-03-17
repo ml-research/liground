@@ -18,14 +18,14 @@
       class="button"
       @click="startEval"
     >
-      StartEval
+      Start
     </button>
     <button
       v-if="running"
       class="button"
       @click="stopEval"
     >
-      CancelEval
+      Cancel
     </button>
   </div>
 </template>
@@ -84,7 +84,7 @@ input::-webkit-inner-spin-button {
   width: 50px;
 }
 .inputField {
-  width: 50px;
+  width: 30px;
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
