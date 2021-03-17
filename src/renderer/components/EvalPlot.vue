@@ -129,7 +129,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhitePerc', 'depth', 'evalPlotDepth'])
+    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhiteStr', 'depth', 'evalPlotDepth'])
   },
   watch: {
     board () {
@@ -322,9 +322,7 @@ export default {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            console.log('before: ' + this.cpForWhitePerc + ' ' + typeof (this.cpForWhitePerc)) // this doenst work
-            newArray[index + 1] = this.cpForWhitePerc
-            console.log(newArray[index + 1] + ' ' + typeof (newArray[index + 1]))
+            newArray[index + 1] = this.adjustStr(this.cpForWhiteStr)
             this.series = [{
               data: newArray
             }]
@@ -334,6 +332,25 @@ export default {
         index++
       }
       this.setBetterValuesRunning = false
+    },
+    adjustStr (input) {
+      let strPoints = input
+      console.log(typeof (strPoints) + ' ' + strPoints)
+      if (strPoints.includes('#')) {
+        if (strPoints.includes('-')) {
+          return -10
+        } else {
+          return 10
+        }
+      } else {
+        if (strPoints.include('-')) {
+          strPoints = strPoints.substring(1, strPoints.length - 1)
+          return parseFloat(strPoints) * -1
+        } else {
+          strPoints = strPoints.substring(1, strPoints.length - 1)
+          return parseFloat(strPoints)
+        }
+      }
     },
     setDepth (arr) { // sets the depthArray
       const tmpArray = arr
