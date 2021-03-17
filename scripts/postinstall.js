@@ -29,7 +29,7 @@ function downloadFile (url, filePath) {
           file.close(() => resolve())
         })
         .on('error', (err) => {
-          fs.unlink(file)
+          fs.unlink(filePath, () => {})
           reject(err)
         })
     })
