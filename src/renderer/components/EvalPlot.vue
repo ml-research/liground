@@ -45,6 +45,9 @@ export default {
         tooltip: {
           shared: false,
           intersect: true,
+          style: {
+            fontFamily: 'Helvetica'
+          },
           x: {
             show: false
           },

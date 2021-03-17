@@ -206,6 +206,7 @@ export default {
 </script>
 
 <style scoped>
+
 .item {
   display: flex;
   flex-direction: row;

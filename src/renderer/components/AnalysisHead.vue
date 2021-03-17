@@ -68,8 +68,9 @@ export default {
 
 <style scoped>
 .reset {
-  background-color:lightgrey;
+  background-color:var(--button-color);
   border: black;
+  color: white;
   outline: none;
   border-radius: 100%;
   padding-bottom: 5px;

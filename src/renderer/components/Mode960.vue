@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="board960">
+    <div
+      class="board960"
+      data-text="Input any number and press Enter or click the button for a random Board."
+    >
       960 Board:
-      <span class="hide">
-        Input any number and press Enter or click the button for a random Board.
-      </span>
     </div>
     <div class="input960">
       <input
@@ -19,7 +19,7 @@
       class="button"
       @click="randBoard"
     >
-      Random
+      <span class="icon mdi mdi-dice-6-outline" />
     </button>
   </div>
 </template>
@@ -176,9 +176,9 @@ input[type=number] {
 }
 .button {
   padding: 5px;
+  color: var(--main-text-color);
+  background-color:var(--button-color);
   border-radius: 50%;
-  background-color:lightgray ;
-  border: black;
   outline: none;
 }
 .button:hover {
@@ -188,18 +188,38 @@ input[type=number] {
   display: inline-block;
   position: relative;
 }
-.board960 .hide {
-  visibility: hidden;
-  background-color: var(--main-bg-color);
-  color:var(--main-text-color);
-  text-align: center;
+.board960::before{
+  content: attr(data-text);
   position: absolute;
-  z-index: 1;
-  top:100%;
-  left:0%;
-}
-.board960:hover .hide {
-  visibility: visible;
+  top: 120%;
   font-size: 12px;
+  background-color: var(--tooltip-color);
+  color:var(--main-text-color);
+  box-shadow:  5px 5px 10px 2px black;
+  border-radius: 5px;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+.board960::after{
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 120%;
+  margin-top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 10px solid #000;
+  border-color: transparent transparent var(--tooltip-color) transparent ;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+.board960:hover::before,
+.board960:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 150ms;
 }
 </style>

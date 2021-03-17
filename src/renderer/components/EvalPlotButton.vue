@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="EvalPlotButton">
+    <div
+      class="EvalPlotButton"
+      data-text="Input a number to set the engine depth for the Eval Plot."
+    >
       Eval Depth:
-      <span class="hide">
-        Input a number to set the engine depth for the Eval Plot.
-      </span>
     </div>
     <div class="inputDepth">
       <input
@@ -21,14 +21,14 @@
       class="button"
       @click="startEval"
     >
-      StartEval
+      Start
     </button>
     <button
       v-if="running"
       class="button"
       @click="stopEval"
     >
-      CancelEval
+      Cancel
     </button>
   </div>
 </template>
@@ -87,7 +87,7 @@ input::-webkit-inner-spin-button {
   width: 50px;
 }
 .inputField {
-  width: 50px;
+  width: 30px;
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
@@ -97,7 +97,8 @@ input::-webkit-inner-spin-button {
 .button {
   padding: 5px;
   border-radius: 50%;
-  background-color:lightgray ;
+  background-color:var(--button-color);
+  color: white;
   border: black;
   outline: none;
 }
@@ -107,19 +108,41 @@ input::-webkit-inner-spin-button {
 .EvalPlotButton {
   display: inline-block;
   position: relative;
+  padding-top: 5px;
+  padding-left: 10px;
 }
-.EvalPlotButton .hide {
-  visibility: hidden;
-  background-color: var(--main-bg-color);
-  color: var(--main-text-color);
-  text-align: center;
+.EvalPlotButton::before{
+  content: attr(data-text);
   position: absolute;
-  z-index: 1;
-  top:100%;
-  left:0%;
-}
-.EvalPlotButton:hover .hide {
-  visibility: visible;
+  top: 120%;
   font-size: 12px;
+  background-color: var(--tooltip-color);
+  color:var(--main-text-color);
+  box-shadow:  5px 5px 10px 2px black;
+  border-radius: 5px;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+.EvalPlotButton::after{
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 120%;
+  margin-top: -20px;
+  left: 50%;
+  transform: translateX(-20%);
+  border: 10px solid #000;
+  border-color: transparent transparent var(--tooltip-color) transparent ;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+.EvalPlotButton:hover::before,
+.EvalPlotButton:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 150ms;
 }
 </style>
