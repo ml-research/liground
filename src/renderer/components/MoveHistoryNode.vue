@@ -160,12 +160,15 @@ export default {
         return move.fen !== this.mainFirstMove.fen
       })
     },
+    legalMoves () {
+      return this.$store.getters.legalMoves
+    },
     checkCheckmate () {
       let name = this.move.name
       const variant = this.$store.getters.variant
       const board = new ffish.Board(variant, this.move.fen)
       const legalMoves = board.legalMoves()
-      if (legalMoves.length === 0 && !name.includes('#')) {
+      if (legalMoves.length === 0 && !name.includes('#') && this.move.prev && this.move.prev.prev && this.move.prev.prev.name.includes('+')) {
         name = this.move.name + '#'
       }
       return name

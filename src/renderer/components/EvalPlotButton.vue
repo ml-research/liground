@@ -91,13 +91,14 @@ input::-webkit-inner-spin-button {
 }
 .button {
   padding: 5px;
-  border-radius: 50%;
+  border-radius: 5px;
   background-color:var(--button-color);
   color: white;
-  border: black;
+  box-shadow: 1px 1px 1px 1px black;
   outline: none;
 }
 .button:hover {
+  background-color: #22303d;
   cursor: pointer;
 }
 .EvalPlotButton {

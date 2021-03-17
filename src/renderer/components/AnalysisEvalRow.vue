@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <div class="eval">
+    <div
+      class="eval"
+      :class="{ smaller: cpForWhiteStr.includes('/') }"
+    >
       {{ cpForWhiteStr }}
     </div>
     <EngineSelect class="select" />
@@ -39,7 +42,9 @@ export default {
 .eval {
   font-size: 2em;
 }
-
+.smaller {
+  font-size: 1.5em !important;
+}
 .select {
   flex-basis: auto;
   flex-shrink: 1;
