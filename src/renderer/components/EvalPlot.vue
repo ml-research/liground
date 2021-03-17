@@ -132,7 +132,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhite', 'depth', 'evalPlotDepth'])
+    ...mapGetters(['variant', 'board', 'startFen', 'moves', 'openedPGN', 'cpForWhiteStr', 'depth', 'evalPlotDepth'])
   },
   watch: {
     board () {
@@ -163,8 +163,11 @@ export default {
           move = move.main
           tempMainMoves.push(move)
         }
-        this.checkForMainVariantChange(tempMainMoves)
+        const reEval = this.checkForMainVariantChange(tempMainMoves)
         this.mainMoves = tempMainMoves
+        if (reEval) {
+          this.evaluateHistory()
+        }
       }
     },
     depth () {
@@ -184,7 +187,6 @@ export default {
   created () {
     document.addEventListener('resetPlot', () => {
       this.break = true
-      this.clear()
     })
     document.addEventListener('startEval', () => {
       this.evaluateHistory()
@@ -206,26 +208,36 @@ export default {
     },
 
     adjustPoints (Inpoints, index) { // sets min/max for graph and converts the results from engine to the correct format
-      let points = Inpoints
-      if ((typeof (Inpoints)) === 'number') {
-        points = String(Inpoints)
-      }
-      if ((points.includes('#') && !points.includes('-'))) {
-        points = 10
-      } else if ((points.includes('#') && points.includes('-'))) {
-        points = -10
-      } else {
-        points = (points / 100).toFixed(2)
-      }
-      if (points > 10) {
-        points = 10
-      } else if (points < -10) {
-        points = -10
-      }
+      let turn
       if (this.chartOptions.xaxis.categories[index].includes('..')) {
-        points = points * -1
+        turn = 'black'
+      } else {
+        turn = 'white'
       }
-      return points
+      let points = String(Inpoints)
+      if (points.includes('#') && points.includes('0') && turn === 'white') {
+        return 10
+      } else if (points.includes('#') && points.includes('0') && turn === 'black') {
+        return -10
+      } else {
+        if (points.includes('#') && ((turn === 'black' && !points.includes('-')) || (turn === 'white' && points.includes('-')))) {
+          return 10
+        } else if (points.includes('#')) {
+          return -10
+        } else {
+          points = parseFloat((parseInt(points) / 100).toFixed(2))
+          if (turn === 'white') {
+            points = points * -1
+          }
+          if (points > 10) {
+            return 10
+          } else if (points < -10) {
+            return -10
+          } else {
+            return points
+          }
+        }
+      }
     },
 
     calcOffset () { // calculates and sets the offset which is used to determine how much of the graph should be colored black
@@ -264,7 +276,6 @@ export default {
         }
         index++
       }
-      this.setDepth(this.mainMoves)
     },
 
     async evaluateHistory () { // updates the graph
@@ -287,12 +298,13 @@ export default {
         if (this.series[0].data.length > xlength) {
           this.series[0].data.splice(0, xlength)
         }
-        if (depth >= this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
+        if (depth > this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
           points = await Engine.evaluate(this.mainMoves[index].fen, depth)
           if (this.break) { // stops evaluating
             this.break = false
             return
           }
+          this.depthArr[index] = depth
           points = this.adjustPoints(points, index + 1)
           tmpArray[index + 1] = points
           this.series = [{
@@ -306,16 +318,18 @@ export default {
     },
     setBetterValue () { // sets a better value for an already drawn plot
       let index = 0
-      if (this.mainMoves === []) { // no values set
+      let depth = this.$store.getters.depth
+      if (this.mainMoves === [] || depth === 0) { // no values set
+        this.setBetterValuesRunning = false
         return
       }
       while (index < this.series[0].data.length - 1) {
-        const depth = this.$store.getters.depth
+        depth = this.$store.getters.depth
         if (this.currentCalcPos === this.mainMoves[index].fen) {
           if (depth > this.depthArr[index]) {
             this.depthArr[index] = depth
             const newArray = this.series[0].data
-            newArray[index + 1] = this.adjustPoints(this.cpForWhite, index + 1)
+            newArray[index + 1] = this.adjustStr(this.cpForWhiteStr)
             this.series = [{
               data: newArray
             }]
@@ -326,32 +340,61 @@ export default {
       }
       this.setBetterValuesRunning = false
     },
-    setDepth (arr) { // sets the depthArray
-      const tmpArray = arr
-      let index = 0
-      const evalPlotDepth = this.evalPlotDepth
-      while (index < tmpArray.length) {
-        if (this.depthArr[index] === undefined || this.depthArr[index] < evalPlotDepth) {
-          this.depthArr[index] = evalPlotDepth
+    adjustStr (input) {
+      let strPoints = input
+      if (strPoints.includes('#')) {
+        if (strPoints.includes('-')) {
+          return -10
+        } else {
+          return 10
         }
-        index++
+      } else {
+        if (strPoints.includes('-')) {
+          strPoints = strPoints.substring(1, strPoints.length - 1)
+          strPoints = parseFloat(strPoints) * -1
+          if (strPoints < -10) {
+            strPoints = -10
+          }
+          return strPoints
+        } else {
+          strPoints = strPoints.substring(1, strPoints.length - 1)
+          strPoints = parseFloat(strPoints)
+          if (strPoints > 10) {
+            strPoints = 10
+          }
+          return strPoints
+        }
       }
     },
-    checkForMainVariantChange (arr) { // if position no longer in main variant then it resets the depthArray at that position
-      const depth = this.evalPlotDepth
-      let move = this.mainMoves[0]
-      if (!move) {
+    checkForMainVariantChange (arr) {
+      let name = this.chartOptions.xaxis.categories[1]
+      if (!name) {
         return
       }
       let tempMove = arr[0]
-      let index = 0
-      while (move && tempMove) {
-        if (move.fen !== tempMove.fen) {
-          this.depthArr[index] = depth
+      let index = 1
+      while (name && tempMove) {
+        if (name !== tempMove.name && name !== ('..' + (tempMove.name))) {
+          this.depthArr.splice(index - 1, this.depthArr.length)
+          const tmpArray = this.series[0].data.splice(0, index)
+          this.series = [{
+            data: tmpArray
+          }]
+          return true
         }
         index++
-        move = move.main
+        name = this.chartOptions.xaxis.categories[index]
         tempMove = tempMove.main
+      }
+      if (arr.length < this.chartOptions.xaxis.categories.length - 1) {
+        index = arr.length + 1
+        this.depthArr.splice(index - 1, this.depthArr.length)
+        const tmpArray = this.series[0].data.splice(0, index)
+        this.series = [{
+          data: tmpArray
+        }]
+        this.calcOffset()
+        return true
       }
     }
   }
