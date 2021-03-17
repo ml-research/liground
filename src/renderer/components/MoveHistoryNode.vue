@@ -87,6 +87,7 @@
 
 <script>
 
+import ffish from 'ffish'
 import VueContext from 'vue-context/src/js/index'
 
 export default {
