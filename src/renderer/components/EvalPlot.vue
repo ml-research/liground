@@ -345,10 +345,18 @@ export default {
       } else {
         if (strPoints.includes('-')) {
           strPoints = strPoints.substring(1, strPoints.length - 1)
-          return parseFloat(strPoints) * -1
+          strPoints = parseFloat(strPoints) * -1
+          if (strPoints < 10) {
+            strPoints = -10
+          }
+          return strPoints
         } else {
           strPoints = strPoints.substring(1, strPoints.length - 1)
-          return parseFloat(strPoints)
+          strPoints = parseFloat(strPoints)
+          if (strPoints > 10) {
+            strPoints = 10
+          }
+          return strPoints
         }
       }
     },
@@ -369,6 +377,7 @@ export default {
       if (!move) {
         return
       }
+      this.clear()
       let tempMove = arr[0]
       let index = 0
       while (move && tempMove) {
