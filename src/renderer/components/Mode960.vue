@@ -32,7 +32,7 @@ export default {
     return {
       curVar: '',
       fen: '',
-      variants: ['chess', 'crazyhouse', 'kingofthehill', '3check', 'antichess']
+      variants: ['chess', 'crazyhouse', 'kingofthehill', '3check', 'antichess', 'atomic']
     }
   },
   computed: {
