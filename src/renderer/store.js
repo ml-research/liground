@@ -637,7 +637,7 @@ export const store = new Vuex.Store({
         // update variant
         context.commit('variant', payload)
         localStorage.variant = payload
-        const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess']
+        const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess', 'atomic']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
           const is960Mode = varFen !== ''
