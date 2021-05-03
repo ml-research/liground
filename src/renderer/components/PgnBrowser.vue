@@ -124,6 +124,8 @@ export default {
           const event = value.substring(firstSpace + 1)
           return { name: round, eventName: event, visible: idx === 0 }
         })
+
+        this.$store.dispatch('rounds', this.rounds)
       }
     }
   },
