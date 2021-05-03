@@ -864,7 +864,6 @@ export const store = new Vuex.Store({
     async loadGame (context, payload) {
       context.commit('openedPGN', true)
       let variant = payload.game.headers('Variant').toLowerCase()
-
       if (variant === '') { // if no variant is given we assume it to be standard chess
         variant = 'chess'
       }
@@ -880,7 +879,16 @@ export const store = new Vuex.Store({
       }
 
       await context.dispatch('variant', variant)
-      context.commit('newBoard')
+
+      let fen = payload.game.headers('FEN')
+      if (fen === '') { // if no FEN is given we use the standard starting FEN for this variant
+        context.commit('newBoard')
+        fen = context.state.startFen
+      } else {
+        context.commit('newBoard', { fen: fen })
+      }
+      await context.dispatch('fen', fen)
+
       context.commit('selectedGame', payload.game)
       context.commit('gameInfo', gameInfo)
       const moves = payload.game.mainlineMoves().split(' ')
@@ -891,7 +899,6 @@ export const store = new Vuex.Store({
           context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1] }) // TODO differentiate between alternative lines
         }
       }
-      context.dispatch('fen', context.state.startFen)
       context.dispatch('updateBoard')
       context.dispatch('setEngineOptions', { UCI_Chess960: false })
       context.commit('openedPGN', false)
