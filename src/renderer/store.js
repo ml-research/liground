@@ -168,6 +168,7 @@ export const store = new Vuex.Store({
     board: null,
     gameInfo: {},
     loadedGames: [],
+    rounds: null,
     selectedGame: null,
     boardStyle: 'blue',
     curVar960Fen: '',
@@ -414,6 +415,10 @@ export const store = new Vuex.Store({
     },
     loadedGames (state, payload) {
       state.loadedGames = payload
+      state.selectedGame = null
+    },
+    rounds (state, payload) {
+      state.rounds = payload
     },
     selectedGame (state, payload) {
       state.selectedGame = payload
@@ -861,6 +866,9 @@ export const store = new Vuex.Store({
     loadedGames (context, payload) {
       context.commit('loadedGames', payload)
     },
+    rounds (context, payload) {
+      context.commit('rounds', payload)
+    },
     async loadGame (context, payload) {
       context.commit('openedPGN', true)
       let variant = payload.game.headers('Variant').toLowerCase()
@@ -1111,6 +1119,9 @@ export const store = new Vuex.Store({
     },
     loadedGames (state) {
       return state.loadedGames
+    },
+    rounds (state) {
+      return state.rounds
     },
     selectedGame (state) {
       return state.selectedGame

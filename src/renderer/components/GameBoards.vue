@@ -141,6 +141,14 @@ export default {
           event.preventDefault()
           this.moveForwardOne()
         }
+        if (keyName === 'n') {
+          event.preventDefault()
+          this.openNextGame()
+        }
+        if (keyName === 'p') {
+          event.preventDefault()
+          this.openPrevGame()
+        }
       }
     }, false)
   },
@@ -198,6 +206,54 @@ export default {
       }
       this.$store.dispatch('playAudio', mov.main.name)
       this.$store.dispatch('fen', mov.main.fen)
+    },
+    openNextGame () { // selects the next game, if a pgn with multiple games has been opened
+      const selGame = this.$store.getters.selectedGame
+      if (selGame) {
+        const loadedGames = this.$store.getters.loadedGames
+        if (loadedGames.length > (selGame.id + 1)) {
+          const nextGame = loadedGames[selGame.id + 1]
+          this.$store.dispatch('loadGame', { game: nextGame })
+          this.closeThisRoundOpenNext(selGame, nextGame)
+        }
+      } else { // we just loaded the pgn
+        this.$store.dispatch('loadGame', { game: this.$store.getters.loadedGames[0] })
+      }
+    },
+    openPrevGame () { // selects the previous game, if a pgn with multiple games has been opened
+      const selGame = this.$store.getters.selectedGame
+      if (selGame) {
+        const loadedGames = this.$store.getters.loadedGames
+        if (selGame.id !== 0) {
+          const prevGame = loadedGames[selGame.id - 1]
+          this.$store.dispatch('loadGame', { game: prevGame })
+          this.closeThisRoundOpenNext(selGame, prevGame)
+        }
+      } else { // we just loaded the pgn
+        const loadedGames = this.$store.getters.loadedGames
+        this.$store.dispatch('loadGame', { game: loadedGames[loadedGames.length - 1] })
+        // show last round
+        this.toggleRoundVisibility(loadedGames[loadedGames.length - 1])
+        // hide first round, it is expanded by default
+        const firstRound = this.$store.getters.rounds[0]
+        firstRound.visible = !firstRound.visible
+      }
+    },
+    closeThisRoundOpenNext (lastGame, nextGame) {
+      if (lastGame.headers('Round') !== nextGame.headers('Round') ||
+          lastGame.headers('Event') !== nextGame.headers('Event')) {
+        this.toggleRoundVisibility(lastGame)
+        this.toggleRoundVisibility(nextGame)
+      }
+    },
+    toggleRoundVisibility (game) {
+      const rounds = this.$store.getters.rounds
+      for (const idx in rounds) {
+        const round = rounds[idx]
+        if (round.name === game.headers('Round') && round.eventName === game.headers('Event')) {
+          round.visible = !round.visible
+        }
+      }
     },
     flipBoard () {
       if (this.variant === 'racingkings') {
