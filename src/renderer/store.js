@@ -129,7 +129,9 @@ export const store = new Vuex.Store({
       Makruk: 'makruk',
       Shogi: 'shogi',
       Janggi: 'janggi',
-      Xiangqi: 'xiangqi'
+      Xiangqi: 'xiangqi',
+      Chess960: 'chess960',
+      Fischerandom: 'fischerandom'
 
     }),
     openedPGN: false,
@@ -886,14 +888,22 @@ export const store = new Vuex.Store({
         gameInfo[curVal] = payload.game.headers(curVal)
       }
 
+      let fen = payload.game.headers('FEN')
+
+      let is960 = false
+      if (variant === 'fischerandom' || variant === 'chess960') {
+        variant = 'chess'
+        is960 = true
+        context.state.curVar960Fen = fen
+      }
+
       await context.dispatch('variant', variant)
 
-      let fen = payload.game.headers('FEN')
       if (fen === '') { // if no FEN is given we use the standard starting FEN for this variant
         context.commit('newBoard')
         fen = context.state.startFen
       } else {
-        context.commit('newBoard', { fen: fen })
+        context.commit('newBoard', { fen: fen, is960: is960 })
       }
       await context.dispatch('fen', fen)
 
@@ -908,7 +918,7 @@ export const store = new Vuex.Store({
         }
       }
       context.dispatch('updateBoard')
-      context.dispatch('setEngineOptions', { UCI_Chess960: false })
+      context.dispatch('setEngineOptions', { UCI_Chess960: is960 })
       context.commit('openedPGN', false)
     },
     increment (context, payload) {
