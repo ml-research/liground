@@ -2,6 +2,16 @@
 
 import { app, BrowserWindow } from 'electron'
 
+// Hotfix: https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/776
+try {
+  await installExtension({
+    id: 'ljjemllljcmogpfapbkkighbhhppjdbg', //Vue Devtools beta
+    electron: '>=1.2.1'
+  })
+} catch (e) {
+  console.error('Vue Devtools failed to install:', e.toString())
+}
+
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
