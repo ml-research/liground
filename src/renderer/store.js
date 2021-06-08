@@ -1073,6 +1073,30 @@ export const store = new Vuex.Store({
     cpForWhiteStr (state, getters) {
       const currentMove = getters.currentMove[0]
       const { mate } = state.multipv[0]
+
+      // TODO: Update this block when ffish.board.is_terminal() or ffish.board.check_result() is available
+      // Temporary fix, as lang as we don't have an `is_terminal()` or `check_result` function
+      // if the SAN in the pgn is the same than the SAN in states.moves
+      // and we are at the last move, return pgn result
+      if (state.selectedGame) {
+        let pgnBoard
+        if (state.selectedGame.headers('FEN')) {
+          pgnBoard = new ffish.Board(state.variant, state.selectedGame.headers('FEN'))
+        } else {
+          pgnBoard = state.board
+        }
+        const pgnMoves = state.selectedGame.mainlineMoves()
+        const san = pgnBoard.variationSan(pgnMoves, ffish.Notation.SAN, false)
+        let str = ''
+        state.moves.forEach(move => { str += move.name })
+        const lastMove = state.moves[state.moves.length - 1]
+        if (san.replace(/ /g, '') === str.replace(/ /g, '')) {
+          if (lastMove === currentMove && lastMove.ply === currentMove.ply) {
+            return state.selectedGame.headers('Result')
+          }
+        }
+      }
+
       if (typeof mate === 'number') {
         return `#${calcForSide(mate, state.turn)}`
       } else if (currentMove && currentMove.name.includes('#')) {
