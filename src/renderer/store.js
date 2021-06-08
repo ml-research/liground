@@ -1064,6 +1064,7 @@ export const store = new Vuex.Store({
       const currentMove = getters.currentMove[0]
       const { mate } = state.multipv[0]
 
+      // TODO: Update this block when ffish.board.is_terminal() or ffish.board.check_result() is available
       // Temporary fix, as lang as we don't have an `is_terminal()` or `check_result` function
       // if the SAN in the pgn is the same than the SAN in states.moves
       // and we are at the last move, return pgn result
