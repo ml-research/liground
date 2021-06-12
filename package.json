@@ -19,7 +19,7 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "dependencies": {
-    "apexcharts": "^3.23.1",
+    "apexcharts": "^3.24.0",
     "chessgroundx": "^7.6.42",
     "epic-spinners": "^1.1.0",
     "ffish": "^0.6.1",
