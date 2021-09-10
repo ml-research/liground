@@ -218,16 +218,15 @@ export default {
       for (const [i, pvline] of multipv.entries()) {
         if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
           const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
-          let move = pvline.ucimove
+          const move = pvline.ucimove
           let orig = move.substring(0, 2)
           let dest = move.substring(2, 4)
           let drawShape
           if (this.dimensionNumber === 3) {
-            move = this.lowerNumbers(move)
-            orig = move.substring(0, 2)
-            dest = move.substring(2, 4)
+            const extract = this.extractMoves(move)
+            orig = extract[0].replace('10', ':')
+            dest = extract[1].replace('10', ':')
           }
-
           if (move.includes('@')) {
             const pieceType = move[0].toLowerCase()
             const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
@@ -404,6 +403,25 @@ export default {
       console.log(`dropPiece: ${event} ${pieceType} ${color}`)
       console.log(`dropPiece: ${this.board.getFen()}`)
     },
+    extractMoves (move) {
+      const letters = move.split(/(\d+)/)
+      let first = ''
+      let second = ''
+      let firstcomplete = false
+      for (const i in letters) {
+        if (isNaN(parseInt(letters[i])) && first.length !== 0) {
+          firstcomplete = true
+        }
+        if (firstcomplete === false) {
+          first += letters[i]
+        }
+        if (firstcomplete) {
+          second += letters[i]
+        }
+      }
+      const ret = [first, second]
+      return ret
+    },
     increaseNumbers (move) {
       const letters = move.split(/(\d+)/)
       letters[1] = String(parseInt(letters[1]) + 1)
@@ -426,12 +444,14 @@ export default {
       for (let i = 0; i < this.legalMoves.length; i++) {
         // don't include dropping moves
         if (this.legalMoves[i].length !== 3) {
-          let Move = this.legalMoves[i]
-          if (this.dimensionNumber === 3) {
-            Move = this.lowerNumbers(Move)
-          }
+          const Move = this.legalMoves[i]
           fromSq = Move.substring(0, 2)
           toSq = Move.substring(2, 4)
+          if (this.dimensionNumber === 3) {
+            const extract = this.extractMoves(Move)
+            fromSq = extract[0].replace('10', ':')
+            toSq = extract[1].replace('10', ':')
+          }
         }
         if (fromSq in dests) {
           dests[fromSq].push(toSq)
@@ -544,7 +564,7 @@ export default {
       return (orig, dest, metadata) => {
         let uciMove = orig + dest
         if (this.dimensionNumber === 3) {
-          uciMove = this.increaseNumbers(uciMove)
+          uciMove = uciMove.replace(':', '10') // Convert the ':' back to '10'
         }
         if (this.isPromotion(uciMove)) {
           if (this.variant === 'makruk') {
@@ -621,12 +641,14 @@ export default {
       if (this.currentMove === undefined || this.moves.length === 0) {
         this.board.state.lastMove = undefined
       } else {
-        let string = String(this.currentMove.uci)
+        const string = String(this.currentMove.uci)
+        let first = string.substring(0, 2)
+        let second = string.substring(2, 4)
         if (this.dimensionNumber === 3) {
-          string = this.lowerNumbers(string)
+          const extract = this.extractMoves(string)
+          first = extract[0].replace('10', ':')
+          second = extract[1].replace('10', ':') // the 10th rank is represented as ":"
         }
-        const first = string.substring(0, 2)
-        const second = string.substring(2, 4)
         if (string.includes('@')) { // no longer displays a green box in the corner
           this.board.state.lastMove = [second]
         } else {
@@ -652,7 +674,7 @@ export default {
             },
         orientation: this.orientation
       })
-
+      console.log(this.board.state.lastMove)
       if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
         this.updateHand()
       }
