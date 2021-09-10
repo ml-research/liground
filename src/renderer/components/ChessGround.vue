@@ -674,7 +674,6 @@ export default {
             },
         orientation: this.orientation
       })
-      console.log(this.board.state.lastMove)
       if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
         this.updateHand()
       }
