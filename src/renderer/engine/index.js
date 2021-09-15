@@ -90,6 +90,38 @@ class Engine extends EventEmitter {
     })
   }
 
+
+  check_variants (binary, cwd) {
+    return new Promise(resolve => {
+      this.once('active', info => resolve(info))
+
+            // run main engine
+
+      // initialize eval engine options
+      const listener = ({ data }) => {
+        if (data.type === 'active' || (data.type === 'cache' && data.events.find(event => event.type === 'active'))) {
+          this.evalWorker.removeEventListener('message', listener)
+          const options = {
+            UCI_AnalyseMode: 'true',
+            'Analysis Contempt': 'Off'
+          }
+          for (const [name, value] of Object.entries(options)) {
+            this.evalWorker.postMessage({
+              payload: `setoption name ${name} value ${value}`,
+              type: 'cmd'
+            })
+          }
+        }
+      }
+      this.mainWorker.postMessage({
+        payload: { binary, cwd, listeners: ['io', 'info'], variants },
+        type: 'check_variants'
+      })
+      
+      this.evalWorker.addEventListener('message', listener)
+    })
+  }
+
   /**
    * Send an UCI command to the engine process.
    * @param {string} command UCI command

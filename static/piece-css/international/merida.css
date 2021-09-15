@@ -8,5 +8,25 @@
 .is2d .knight.black {background-image:url('../../piece/international/merida/bN.svg')}
 .is2d .bishop.black {background-image:url('../../piece/international/merida/bB.svg')}
 .is2d .rook.black {background-image:url('../../piece/international/merida/bR.svg')}
-.is2d .queen.black {background-image:url('../../piece/international/merida/bQ.svg')}
 .is2d .king.black {background-image:url('../../piece/international/merida/bK.svg')}
+.is2d .hawk.white {
+    background-image: url('../../piece/international/merida/wH.svg');
+}
+.is2d .archbishop.black {
+    /*background-image: url('../../piece/international/merida/bA.svg');*/
+    background-image: url('../../piece/international/merida/bA5-suxx.png')
+}
+.is2d .hawk.black {
+    background-image: url('../../piece/international/merida/bH.svg');
+}
+.is2d .lancer.black {
+    background-image: url('../../piece/international/merida/bL.svg');
+}
+.is2d .yurt.black {
+    background-image: url('../../piece/international/merida/bY.svg');
+}
+.is2d .queen.black {
+    background-image: url('../../piece/international/merida/bQ.svg');
+}
+
+.is2d .queen.black {background-image:url('../../piece/international/merida/bQ.svg')}

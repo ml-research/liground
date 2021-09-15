@@ -104,6 +104,10 @@
       >
         Cancel
       </a>
+      <a
+        class="btn blue"
+        @click="refresh"
+      > Refresh</a>
       <EngineModal
         v-if="modal.visible"
         :title="modal.title"
@@ -154,6 +158,12 @@ export default {
     cancel () {
       this.resetSettings()
       this.$store.commit('viewAnalysis', true)
+    },
+    refresh () {
+      this.refreshSettings()
+    },
+    refreshSettings () {
+      this.$store.dispatch('refreshVariants', this.selectedEngine)
     },
     updateSettings () {
       const changed = {}
@@ -312,5 +322,12 @@ input[type=number]::-webkit-inner-spin-button {
 }
 .btn.red:hover {
   background-color: #8b1919;
+}
+.btn.blue {
+  color: white;
+  background-color: #1e46c9;
+}
+.btn.blue:hover {
+  background-color: #2a198b;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="blue merida is2d">
     <div class="grid-parent">
       <div
-        v-if="variant==='crazyhouse'|| variant==='shogi' "
+        v-if="variant==='crazyhouse'|| variant==='shogi' || hasPockets "
         ref="pockets"
         class="pockets"
         :class="{ mirror : $store.getters.orientation === &quot;black&quot;, shogi: variant === &quot;shogi&quot; }"
@@ -72,8 +72,8 @@ export default {
   },
   data () {
     return {
-      ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
-      files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+      ranks: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+      files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'],
       selectedPiece: null,
       piecesToIdx: {
         P: 4,
@@ -190,7 +190,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode'])
+    ...mapGetters(['initialized', 'variant', 'hasPockets', 'hasGating', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode'])
   },
   watch: {
     initialized () {
@@ -270,8 +270,7 @@ export default {
       if (this.variant === 'shogi') {
         this.piecesW = this.shogiPiecesW
         this.piecesB = this.shogiPiecesB
-      }
-      if (this.variant === 'crazyhouse') {
+      } else if ((this.variant === 'crazyhouse') || this.hasPockets) {
         this.piecesW = this.chessPiecesW
         this.piecesB = this.chessPiecesB
       }
@@ -303,7 +302,7 @@ export default {
 
         document.body.dispatchEvent(new Event('chessground.resize'))
       }
-      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi' || this.hasPockets) {
         document.body.dispatchEvent(new Event('chessground.resize'))
       }
       this.board.set({
@@ -653,7 +652,7 @@ export default {
         orientation: this.orientation
       })
 
-      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
+      if (this.variant === 'crazyhouse' || this.variant === 'shogi' || this.hasPockets) {
         this.updateHand()
       }
     },

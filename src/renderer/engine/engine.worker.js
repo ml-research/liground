@@ -40,9 +40,16 @@ async function run (binary, cwd, listeners) {
     msg.error(`Could not find engine binary "${binary}"`)
     return
   }
-  msg.debug('Running:', { binary, cwd })
-  child = spawn(binary, [], { cwd }).on('error', err => msg.error(err.message))
 
+  if (fs.existsSync(cwd + '/variants.ini')) {
+    msg.debug('Running:', { binary, cwd })
+    child = spawn(binary, ['load', 'variants.ini'], { cwd }).on('error', err => msg.error(err.message))
+  } else {
+    msg.debug('Running:', { binary, cwd })
+    child = spawn(binary, [], { cwd }).on('error', err => msg.error(err.message))
+  }
+
+  //  }
   // success
   if (typeof child.pid === 'number') {
     // create engine
@@ -72,6 +79,32 @@ async function run (binary, cwd, listeners) {
   }
 }
 
+async function check_variants (binary, cwd, listeners) {
+  if (engine) {
+  // spawn engine process
+  if (!fs.existsSync(binary)) {
+    msg.error(`Could not find engine binary "${binary}"`)
+    return
+  }
+    for (const event of listeners) {
+      if (event === 'io') {
+        engine.events.on('input', data => msg.queue('io', `> ${data}`))
+        engine.events.on('line', data => msg.queue('io', data))
+      } else {
+        engine.events.on(event, info => msg.queue(event, info))
+      }
+    }
+
+    // initialize
+    await engine.uci_only()
+    console.log("ENGINE: ",JSON.stringify(engine))
+    msg.debug('Engine active:', engine.info)
+
+    // reply with engine infos
+    msg.queue('active', engine.info)
+  }
+  //}
+}
 /**
  * Execute a UCI command.
  * @param {string} cmd
@@ -112,6 +145,9 @@ function evalPos (fen, depth) {
 
 self.addEventListener('message', ({ data: { type, payload } }) => {
   switch (type) {
+    case 'check_variants':
+      check_variants(payload.binary, payload.cwd, payload.listeners || [])
+      break
     case 'run':
       run(payload.binary, payload.cwd, payload.listeners || [])
       break

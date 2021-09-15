@@ -183,6 +183,11 @@ export default class EngineDriver {
     await this.waitForReady()
   }
 
+  async uci_only () {
+    // send "uci" to engine
+    this._write('uci')
+  }
+
   /**
    * Tell the engine to quit.
    */

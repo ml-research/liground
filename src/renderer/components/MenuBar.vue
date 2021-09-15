@@ -13,6 +13,13 @@
     >
       <em class="icon mdi mdi-hammer-screwdriver" /> Settings
     </div>
+        <div
+      class="item"
+      @click="addVariantsConfig"
+    >
+      <em class="icon mdi mdi-hammer" /> Custom Variants
+    </div>
+
     <div
       class="item"
       @click="openExternalBrowser"
@@ -61,6 +68,23 @@ export default {
         if (!result.canceled) {
           localStorage.PGNPath = JSON.stringify(result.filePaths[0])
           this.openPGNFromPath(result.filePaths[0])
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    addVariantsConfig () {
+      this.$electron.remote.dialog.showOpenDialog({
+        title: 'Open Variants.ini',
+        properties: ['openFile'],
+        filters: [
+          { name: 'INI Files', extensions: ['ini'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      }).then(result => {
+        if (!result.canceled) {
+          localStorage.INIPath = result.filePaths[0]
+          this.$store.commit('refreshVariants', result.filePaths[0])
         }
       }).catch(err => {
         console.log(err)
