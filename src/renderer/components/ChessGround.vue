@@ -104,50 +104,50 @@ export default {
         r: 6
       },
       piecesW: [
-        { count: 0, type: 'queen' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'pawn' }
+        { count: 0, type: 'q-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'p-piece' }
       ],
       piecesB: [
-        { count: 0, type: 'pawn' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'queen' }
+        { count: 0, type: 'p-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'q-piece' }
       ],
       chessPiecesW: [
-        { count: 0, type: 'queen' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'pawn' }
+        { count: 0, type: 'q-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'p-piece' }
       ],
       chessPiecesB: [
-        { count: 0, type: 'pawn' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'queen' }
+        { count: 0, type: 'p-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'q-piece' }
       ],
       shogiPiecesB: [
-        { count: 0, type: 'pawn' },
-        { count: 0, type: 'lance' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'silver' },
-        { count: 0, type: 'gold' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'rook' }
+        { count: 0, type: 'p-piece' },
+        { count: 0, type: 'l-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 's-piece' },
+        { count: 0, type: 'g-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'r-piece' }
       ],
       shogiPiecesW: [
-        { count: 0, type: 'rook' },
-        { count: 0, type: 'bishop' },
-        { count: 0, type: 'gold' },
-        { count: 0, type: 'silver' },
-        { count: 0, type: 'knight' },
-        { count: 0, type: 'lance' },
-        { count: 0, type: 'pawn' }
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'g-piece' },
+        { count: 0, type: 's-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'l-piece' },
+        { count: 0, type: 'p-piece' }
       ],
       board: null,
       shapes: [],
@@ -478,18 +478,18 @@ export default {
       if (this.$store.getters.isInternational) {
         if (this.variant === 'antichess') {
           this.promotions = [
-            { type: 'king' },
-            { type: 'queen' },
-            { type: 'rook' },
-            { type: 'bishop' },
-            { type: 'knight' }
+            { type: 'k-piece' },
+            { type: 'q-piece' },
+            { type: 'r-piece' },
+            { type: 'b-piece' },
+            { type: 'n-piece' }
           ]
         } else {
           this.promotions = [
-            { type: 'queen' },
-            { type: 'rook' },
-            { type: 'bishop' },
-            { type: 'knight' }
+            { type: 'q-piece' },
+            { type: 'r-piece' },
+            { type: 'b-piece' },
+            { type: 'n-piece' }
           ]
         }
       }
@@ -506,35 +506,35 @@ export default {
             }
           }
         }
-        if (type === 'pawn') {
+        if (type === 'p-piece') {
           this.promotions = [
-            { type: 'pawn' },
-            { type: 'ppawn' }
+            { type: 'p-piece' },
+            { type: 'pp-piece' }
           ]
-        } else if (type === 'lance') {
+        } else if (type === 'l-piece') {
           this.promotions = [
-            { type: 'lance' },
-            { type: 'plance' }
+            { type: 'l-piece' },
+            { type: 'pl-piece' }
           ]
-        } else if (type === 'knight') {
+        } else if (type === 'n-piece') {
           this.promotions = [
-            { type: 'knight' },
-            { type: 'pknight' }
+            { type: 'n-piece' },
+            { type: 'pn-piece' }
           ]
-        } else if (type === 'silver') {
+        } else if (type === 's-piece') {
           this.promotions = [
-            { type: 'silver' },
-            { type: 'psilver' }
+            { type: 's-piece' },
+            { type: 'ps-piece' }
           ]
-        } else if (type === 'bishop') {
+        } else if (type === 'b-piece') {
           this.promotions = [
-            { type: 'bishop' },
-            { type: 'pbishop' }
+            { type: 'b-piece' },
+            { type: 'pb-piece' }
           ]
-        } else if (type === 'rook') {
+        } else if (type === 'r-piece') {
           this.promotions = [
-            { type: 'rook' },
-            { type: 'prook' }
+            { type: 'r-piece' },
+            { type: 'pr-piece' }
           ]
         }
         if (num === 1 && promo) {
@@ -549,7 +549,7 @@ export default {
     },
     afterDrag () {
       return (role, key) => {
-        const pieces = { pawn: 'P', knight: 'N', bishop: 'B', rook: 'R', queen: 'Q', silver: 'S', gold: 'G', lance: 'L' }
+        const pieces = { 'p-piece': 'P', 'n-piece': 'N', 'b-piece': 'B', 'r-piece': 'R', 'q-piece': 'Q', 's-piece': 'S', 'g-piece': 'G', 'l-piece': 'L' }
         const move = pieces[role] + '@' + key
         const prevMov = this.currentMove
         if (this.$store.getters.legalMoves.includes(move)) {
@@ -569,7 +569,8 @@ export default {
         if (this.isPromotion(uciMove)) {
           if (this.variant === 'makruk') {
             const move = uciMove + 'm'
-            this.$store.dispatch('push', move)
+            const prevMov = this.currentMove
+            this.$store.dispatch('push', { move: move, prev: prevMov })
           } else {
             this.setPromotionOptions(uciMove)
             this.promotionMove = uciMove

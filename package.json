@@ -20,9 +20,9 @@
   },
   "dependencies": {
     "apexcharts": "^3.24.0",
-    "chessgroundx": "^7.6.42",
+    "chessgroundx": "^8.3.0",
     "epic-spinners": "^1.1.0",
-    "ffish": "^0.6.1",
+    "ffish": "^0.6.2",
     "pretty-checkbox-vue": "^1.1.9",
     "vue": "^2.5.16",
     "vue-apexcharts": "^1.6.0",

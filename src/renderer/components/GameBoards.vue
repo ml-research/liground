@@ -280,7 +280,6 @@ export default {
 
         const letters = { 0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h' }
         let pieceCode = Vue.methds.pieceTypeToShort(this.selectedPockedPiece.boardA)
-
         pieceCode = { type: pieceCode, color: this.turnColor.charAt(0) }
         this.$store.dispatch('insertPieceAtPosition', ['boardA', pieceCode, letters[x] + (8 - y)])
       } else {
