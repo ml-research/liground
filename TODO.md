@@ -27,6 +27,9 @@
 - [ ] Betza editor for each custom piece added, the betza editor's idea is to purely add movement based on arrows and pointers from chessground (Very hard and will be looked at the end)
 - [ ] Common options for variants 
 
+### Ambitious Plans
+- [ ] Ability to have a match against the computer (with premoves disabled)
+
 ### Graphics
 - [ ] Get SVGs for the whole alphabet in order to have generic pieces available
 - [ ] Get SVGs for the promoted pieces (whole alphabet)
