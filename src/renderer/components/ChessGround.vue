@@ -564,7 +564,7 @@ export default {
       return (orig, dest, metadata) => {
         let uciMove = orig + dest
         if (this.dimensionNumber === 3) {
-          uciMove = uciMove.replace(':', '10') // Convert the ':' back to '10'
+          uciMove = uciMove.replaceAll(':', '10') // Convert the ':' back to '10'
         }
         if (this.isPromotion(uciMove)) {
           if (this.variant === 'makruk') {
