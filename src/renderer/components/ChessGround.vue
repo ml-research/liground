@@ -493,7 +493,7 @@ export default {
           }
         }
         if (num === 1 && promo) {
-          this.promotions = [ {type: 'p'+type} ]
+          this.promotions = [ {type: type }, {type: 'p'+type} ]
         }
         else {
         const key = uciMove.substring(2, 4)
