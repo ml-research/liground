@@ -2,13 +2,13 @@
 
 ### Todo
 
-- [ ] Stop being lazy+scared and do something
+- [X] Stop being lazy+scared and do something
 - [ ] Explore the Chessgroundx 8.3.0 to the point I am comfortable with it
 - [ ] Adapt Chessgroundx 8.3.0 for all the possible boards (12 to 1 both files and ranks)  
   - [ ] Option 1: Caveman code, insert all manually
   - [ ] Option 2: Besides the existing code on chessgroundx, add a potential calculator for board size and heights
   - [ ] Option 3: Generator of boards in the constructor
-- [ ] Merge the changes for the Chessgroundx 8.3.0 adaptation to the current code
+- [X] Merge the changes for the Chessgroundx 8.3.0 adaptation to the current code
 - [ ] Figure out a better way of having Fairy-Stockfish only loading the local variants.ini file (Low priority) - and have the engine auto-load the variants
 - [ ] Reformulate the promotions to be based on legal moves available instead of the pre-programmed promotion tables (this will work nicely with Gating, and perhaps cause troubles to variants such as Kyoto)
 - [ ] Have a piece "detector" everytime they're played, e.g. a variant with hidden pieces, the "detector" will add them to the database using the generic graphics, afterwards that piece will be available for customization (graphics)
@@ -39,8 +39,8 @@
 - [ ] Possible way to have ffish.js dynamically loaded instead of using the default one (in case of code testing)
 - [ ] Look at ffish.js code and try to add PGN Support
 - [ ] Definitely work on pyffish' Board support
+- [ ] Look into the xboard display (e.g. xboard -> variant shogun displays all the details, pieces) Possibly implement that into ffish.js and pyffish
 
 ### Annoyances
 - [ ] Figure out why variants with '-' do not work properly
 
-## nothing
