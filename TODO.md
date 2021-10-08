@@ -31,7 +31,7 @@
 - [ ] Ability to have a match against the computer (with premoves disabled)
 
 ### Graphics
-- [ ] Get SVGs for the whole alphabet in order to have generic pieces available
+- [X] Get SVGs for the whole alphabet in order to have generic pieces available (Merida only for now as generic)
 - [ ] Get SVGs for the promoted pieces (whole alphabet)
 - [ ] Dig deeper into VUE's graphical abilities
 
