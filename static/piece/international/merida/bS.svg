@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="26"
+   width="26"
+   version="1.0"
+   id="svg25"
+   sodipodi:docname="Chess_Adt26.svg"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14">
+  <defs
+     id="defs29">
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Colorize"
+       id="filter283">
+      <feComposite
+         in2="SourceGraphic"
+         operator="arithmetic"
+         k1="0"
+         k2="1"
+         result="composite1"
+         id="feComposite269" />
+      <feColorMatrix
+         in="composite1"
+         values="1"
+         type="saturate"
+         result="colormatrix1"
+         id="feColorMatrix271" />
+      <feFlood
+         flood-opacity="1"
+         flood-color="rgb(26,23,21)"
+         result="flood1"
+         id="feFlood273" />
+      <feBlend
+         in="flood1"
+         in2="colormatrix1"
+         mode="multiply"
+         result="blend1"
+         id="feBlend275" />
+      <feBlend
+         in2="blend1"
+         mode="screen"
+         result="blend2"
+         id="feBlend277" />
+      <feColorMatrix
+         in="blend2"
+         values="1"
+         type="saturate"
+         result="colormatrix2"
+         id="feColorMatrix279" />
+      <feComposite
+         in="colormatrix2"
+         in2="SourceGraphic"
+         operator="in"
+         k2="1"
+         result="composite2"
+         id="feComposite281" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Colorize"
+       id="filter299">
+      <feComposite
+         in2="SourceGraphic"
+         operator="arithmetic"
+         k1="0"
+         k2="1"
+         result="composite1"
+         id="feComposite285" />
+      <feColorMatrix
+         in="composite1"
+         values="1"
+         type="saturate"
+         result="colormatrix1"
+         id="feColorMatrix287" />
+      <feFlood
+         flood-opacity="1"
+         flood-color="rgb(26,23,21)"
+         result="flood1"
+         id="feFlood289" />
+      <feBlend
+         in="flood1"
+         in2="colormatrix1"
+         mode="multiply"
+         result="blend1"
+         id="feBlend291" />
+      <feBlend
+         in2="blend1"
+         mode="screen"
+         result="blend2"
+         id="feBlend293" />
+      <feColorMatrix
+         in="blend2"
+         values="1"
+         type="saturate"
+         result="colormatrix2"
+         id="feColorMatrix295" />
+      <feComposite
+         in="colormatrix2"
+         in2="SourceGraphic"
+         operator="in"
+         k2="1"
+         result="composite2"
+         id="feComposite297" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="960"
+     inkscape:window-height="1060"
+     id="namedview27"
+     showgrid="false"
+     inkscape:zoom="25.673415"
+     inkscape:cx="13.220339"
+     inkscape:cy="13"
+     inkscape:window-x="0"
+     inkscape:window-y="20"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg25" />
+  <metadata
+     id="metadata2">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="matrix(0.75757574,0,0,0.75757574,2.8791515,-7.9393932)"
+     id="g10"
+     style="filter:url(#filter283)">
+    <path
+       stroke-linejoin="miter"
+       d="m14.44,29.5c0.222,1.68-3.09,4.06-4.5,5-1.73,1.16-1.74,2.7-3,2.5-0.602-0.545,0.817-2.02,0-2-0.58,0,0.19,1.1-0.5,1.5-0.58,0-2.5,0.4-2.5-2.5,0-1.2,3.5-6.5,3.5-6.5s0.934-1.08,1-2c-0.419-0.575-0.258-1.48,0-2,0.365-0.731,1.5,1.5,1.5,1.5h1s0.5-1.5,1.5-2c0.517-0.258,0.5,2,0.5,2,6.07,0.578,9.29,4.37,9,16.5h-12.5c0-4.9,4.8-3.7,4.5-10.5"
+       fill-rule="evenodd"
+       stroke="#000"
+       stroke-linecap="round"
+       stroke-miterlimit="4"
+       stroke-dasharray="none"
+       stroke-width="1.31999993"
+       fill="#FFF"
+       id="path4" />
+    <path
+       fill="#000"
+       d="m9,23.5a0.5,0.5,0,1,1,-1,0,0.5,0.5,0,1,1,1,0z"
+       transform="translate(-3.4999999,10)"
+       id="path6" />
+    <path
+       fill="#000"
+       d="m9.6058,30.28a1.0281,1.4729,30,0,1,-1.7807,-1.028,1.0281,1.4729,30,0,1,1.7807,1.028z"
+       id="path8" />
+  </g>
+  <g
+     transform="translate(0,-4)"
+     id="g23"
+     style="filter:url(#filter299)">
+    <path
+       stroke-linejoin="round"
+       d="m18,18,4-8-4,4,0-6-3,5.125-2-5-2,5l-3-5.125v6l-4-4,3,8s2.0349-2.5,6-2.5,5,2.5,5,2.5z"
+       fill-rule="evenodd"
+       stroke="#000"
+       stroke-linecap="butt"
+       stroke-miterlimit="4"
+       stroke-dasharray="none"
+       stroke-width="0.80000001"
+       fill="#FFF"
+       id="path12" />
+    <path
+       id="path3804"
+       stroke-linejoin="miter"
+       d="m5.5,10a1.5,1.5,0,0,1,-3,0,1.5,1.5,0,1,1,3,0z"
+       stroke-dashoffset="0"
+       stroke="#000"
+       stroke-linecap="butt"
+       stroke-miterlimit="4"
+       stroke-dasharray="none"
+       stroke-width="0.75"
+       fill="#FFF" />
+    <use
+       xlink:href="#path3804"
+       transform="translate(4,-2)"
+       height="26"
+       width="26"
+       y="0"
+       x="0"
+       id="use15" />
+    <use
+       xlink:href="#path3804"
+       transform="translate(9,-2)"
+       height="26"
+       width="26"
+       y="0"
+       x="0"
+       id="use17" />
+    <use
+       xlink:href="#path3804"
+       transform="matrix(-1,0,0,1,26,0)"
+       height="26"
+       width="26"
+       y="0"
+       x="0"
+       id="use19" />
+    <use
+       xlink:href="#path3804"
+       transform="matrix(-1,0,0,1,22,-2)"
+       height="26"
+       width="26"
+       y="0"
+       x="0"
+       id="use21" />
+  </g>
+</svg>

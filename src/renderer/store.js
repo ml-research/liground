@@ -395,7 +395,7 @@ export const store = new Vuex.Store({
         const variant_name = `${all_ffish_variants[v]}`
         num_files = 0
         fish_map[variant_name] = variant_name //new Map to add the new variants to VariantsOptions from Fish
-        if (variant_name.includes("shogi")) {
+        if (variant_name.includes("shogi-draft")) {
           shogi_vars.push(variant_name)
         } else if (variant_name.includes("xiangqi")) {
           xiangqi_vars.push(variant_name)
