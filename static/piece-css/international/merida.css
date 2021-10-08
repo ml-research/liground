@@ -1,32 +1,20 @@
-.is2d .pawn.white {background-image:url('../../piece/international/merida/wP.svg')}
-.is2d .knight.white {background-image:url('../../piece/international/merida/wN.svg')}
-.is2d .bishop.white {background-image:url('../../piece/international/merida/wB.svg')}
-.is2d .rook.white {background-image:url('../../piece/international/merida/wR.svg')}
-.is2d .queen.white {background-image:url('../../piece/international/merida/wQ.svg')}
-.is2d .king.white {background-image:url('../../piece/international/merida/wK.svg')}
-.is2d .pawn.black {background-image:url('../../piece/international/merida/bP.svg')}
-.is2d .knight.black {background-image:url('../../piece/international/merida/bN.svg')}
-.is2d .bishop.black {background-image:url('../../piece/international/merida/bB.svg')}
-.is2d .rook.black {background-image:url('../../piece/international/merida/bR.svg')}
-.is2d .king.black {background-image:url('../../piece/international/merida/bK.svg')}
-.is2d .hawk.white {
-    background-image: url('../../piece/international/merida/wH.svg');
-}
-.is2d .archbishop.black {
-    /*background-image: url('../../piece/international/merida/bA.svg');*/
-    background-image: url('../../piece/international/merida/bA5-suxx.png')
-}
-.is2d .hawk.black {
-    background-image: url('../../piece/international/merida/bH.svg');
-}
-.is2d .lancer.black {
-    background-image: url('../../piece/international/merida/bL.svg');
-}
-.is2d .yurt.black {
-    background-image: url('../../piece/international/merida/bY.svg');
-}
-.is2d .queen.black {
-    background-image: url('../../piece/international/merida/bQ.svg');
-}
-
-.is2d .queen.black {background-image:url('../../piece/international/merida/bQ.svg')}
+.is2d .p-piece.white {background-image:url('../../piece/international/merida/wP.svg')}
+.is2d .n-piece.white {background-image:url('../../piece/international/merida/wN.svg')}
+.is2d .b-piece.white {background-image:url('../../piece/international/merida/wB.svg')}
+.is2d .r-piece.white {background-image:url('../../piece/international/merida/wR.svg')}
+.is2d .q-piece.white {background-image:url('../../piece/international/merida/wQ.svg')}
+.is2d .k-piece.white {background-image:url('../../piece/international/merida/wK.svg')}
+.is2d .a-piece.white {background-image: url('../../piece/international/merida/wA.svg')}
+.is2d .l-piece.white {background-image: url('../../piece/international/merida/wL.svg')}
+.is2d .y-piece.white {background-image: url('../../piece/international/merida/wY.svg')}
+.is2d .h-piece.white {background-image: url('../../piece/international/merida/wH.svg')}
+.is2d .p-piece.black {background-image:url('../../piece/international/merida/bP.svg')}
+.is2d .n-piece.black {background-image:url('../../piece/international/merida/bN.svg')}
+.is2d .b-piece.black {background-image:url('../../piece/international/merida/bB.svg')}
+.is2d .r-piece.black {background-image:url('../../piece/international/merida/bR.svg')}
+.is2d .q-piece.black {background-image:url('../../piece/international/merida/bQ.svg')}
+.is2d .k-piece.black {background-image:url('../../piece/international/merida/bK.svg')}
+.is2d .a-piece.black {background-image: url('../../piece/international/merida/bA.svg')}
+.is2d .l-piece.black {background-image: url('../../piece/international/merida/bL.svg')}
+.is2d .y-piece.black {background-image: url('../../piece/international/merida/bY.svg')}
+.is2d .h-piece.black {background-image: url('../../piece/international/merida/bH.svg')}

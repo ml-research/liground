@@ -18,18 +18,18 @@ export default {
     promOptions: {
       type: Array,
       default: () => ([
-        { type: 'king' },
-        { type: 'queen' },
-        { type: 'rook' },
-        { type: 'bishop' },
-        { type: 'knight' }
+        { type: 'k-piece' },
+        { type: 'q-piece' },
+        { type: 'r-piece' },
+        { type: 'b-piece' },
+        { type: 'n-piece' }
       ])
     }
   },
   data () {
     return {
-      promDir: { queen: 'q', rook: 'r', bishop: 'b', knight: 'n', pawn: 'p', king: 'k' },
-      shogiPromDir: { pawn: '=', lance: '=', knight: '=', bishop: '=', silver: '=', rook: '=', ppawn: '+', plance: '+', pknight: '+', pbishop: '+', psilver: '+', prook: '+' },
+      promDir: { 'q-piece': 'q', 'r-piece': 'r', 'b-piece': 'b', 'n-piece': 'n', 'p-piece': 'p', 'k-piece': 'k' },
+      shogiPromDir: { 'p-piece': '=', 'l-piece': '=', 'n-piece': '=', 'b-piece': '=', 's-piece': '=', 'r-piece': '=', 'pp-piece': '+', 'pl-piece': '+', 'pn-piece': '+', 'pb-piece': '+', 'ps-piece': '+', 'pr-piece': '+' },
       idtocss: {
         0: 'one',
         1: 'two',
