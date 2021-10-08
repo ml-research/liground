@@ -76,6 +76,8 @@ export default {
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'],
       selectedPiece: null,
       piecesToIdx: {
+        H: 6,
+        E: 5,
         P: 4,
         N: 3,
         B: 2,
@@ -85,7 +87,9 @@ export default {
         n: 1,
         b: 2,
         r: 3,
-        q: 4
+        q: 4,
+        e: 5,
+        h: 6
       },
       shogiPiecesToIdx: {
         P: 6,
@@ -474,7 +478,36 @@ export default {
       return false
     },
     setPromotionOptions (uciMove) {
+      this.promotions = [];
       if (this.$store.getters.isInternational) {
+        const key = uciMove.substring(2, 4)
+        const type = this.board.state.pieces[key].role
+        let num = 0
+        let promo = false
+        for (let i = 0; i < this.legalMoves.length; i++) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            num = num + 1
+            if (this.legalMoves[i].includes('+')) {
+              promo = true
+            }
+          }
+        }
+        if (num === 1 && promo) {
+          this.promotions = [ {type: 'p'+type} ]
+        }
+        else {
+        const key = uciMove.substring(2, 4)
+        const type = this.board.state.pieces[key].role
+        let num = 0
+        let promo = false
+        for (let i = 0; i < this.legalMoves.length; i++) {
+          if (this.legalMoves[i].includes(uciMove)) {
+            console.log("Legal moves: ", this.legalMoves[i])
+            this.promotions[num] = {type : this.legalMoves[i].substring(4,5)+'-piece'}
+            num = num + 1
+          }
+        }
+          /*
         if (this.variant === 'antichess') {
           this.promotions = [
             { type: 'k-piece' },
@@ -490,7 +523,8 @@ export default {
             { type: 'b-piece' },
             { type: 'n-piece' }
           ]
-        }
+        }*/
+      }
       }
       if (this.variant === 'shogi') {
         const key = uciMove.substring(2, 4)
@@ -540,6 +574,7 @@ export default {
           this.promotions = [this.promotions[1]]
         }
       }
+      console.log("Promotions: ", this.promotions)
     },
     resetPockets (pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
@@ -548,7 +583,17 @@ export default {
     },
     afterDrag () {
       return (role, key) => {
-        const pieces = { 'p-piece': 'P', 'n-piece': 'N', 'b-piece': 'B', 'r-piece': 'R', 'q-piece': 'Q', 's-piece': 'S', 'g-piece': 'G', 'l-piece': 'L' }
+        const pieces = { 
+          'p-piece': 'P', 
+          'n-piece': 'N', 
+          'b-piece': 'B', 
+          'r-piece': 'R', 
+          'q-piece': 'Q', 
+          's-piece': 'S', 
+          'g-piece': 'G',
+          'h-piece': 'H',
+          'e-piece': 'E', 
+          'l-piece': 'L' }
         const move = pieces[role] + '@' + key
         const prevMov = this.currentMove
         if (this.$store.getters.legalMoves.includes(move)) {

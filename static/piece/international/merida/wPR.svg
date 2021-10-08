@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   clip-rule="evenodd"
+   fill-rule="evenodd"
+   height="50mm"
+   image-rendering="optimizeQuality"
+   shape-rendering="geometricPrecision"
+   text-rendering="geometricPrecision"
+   viewBox="0 0 50 50"
+   width="50mm"
+   version="1.1"
+   id="svg11"
+   sodipodi:docname="wR.svg"
+   inkscape:version="1.1 (ce6663b3b7, 2021-05-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs15" />
+  <sodipodi:namedview
+     id="namedview13"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.4075833"
+     inkscape:cx="55.769345"
+     inkscape:cy="55.058907"
+     inkscape:window-width="1294"
+     inkscape:window-height="704"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg11" />
+  <linearGradient
+     id="a"
+     gradientUnits="userSpaceOnUse"
+     x1="21.376"
+     x2="77.641"
+     y1="37.469"
+     y2="37.469">
+    <stop
+       offset="0"
+       stop-color="#fff"
+       id="stop2" />
+    <stop
+       offset="1"
+       stop-color="#fff"
+       stop-opacity="0"
+       id="stop4" />
+  </linearGradient>
+  <g
+     id="g36"
+     transform="matrix(0.85602536,0,0,0.85602536,3.750815,7.2509023)">
+    <path
+       d="m 28.408,9.22 h 4.216 V 5.825 h 6.799 v 9.296 l -5.503,4.242 v 11.862 l 4.216,4.216 v 5.08 h 3.793 v 5.927 H 8.071 V 40.52 h 3.793 v -5.08 l 4.242,-4.216 V 19.363 L 10.602,15.121 V 5.825 h 6.774 V 9.22 h 4.242 V 5.825 h 6.79 z"
+       fill="#1f1a17"
+       id="path7" />
+    <path
+       d="m 33.073,17.678 3.15,-2.556999 H 13.803 L 16.978,17.678 Z M 40.27,42.206 H 9.756 v 2.557 H 40.27 Z M 36.426001,37.151 H 13.6 v 3.37 H 36.426001 Z M 32.209,19.363 H 17.816 v 11.862 h 14.393 z m 5.504,-5.927 V 7.51 h -3.395 v 3.395 H 26.672 V 7.51 h -3.344 v 3.395 h -7.62 V 7.51 h -3.395 v 5.926 z M 35.799,35.441 33.251,32.91 H 16.8 l -2.6,2.531 z"
+       fill="url(#a)"
+       id="path9"
+       style="fill:url(#a);stroke-width:1" />
+    <g
+       id="g4350"
+       transform="matrix(2.1234789,0,0,2.1234789,-1504.9555,-1430.4062)">
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:none;stroke:#000000;stroke-width:2.14639;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 713.18437,674.45897 6.8991,-2.52967 6.8991,2.52967"
+         id="path3940-9-9" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3942-8-2"
+         d="m 713.18437,674.45897 6.8991,-2.52967 6.8991,2.52967"
+         style="fill:none;stroke:#ffffff;stroke-width:0.600988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>
