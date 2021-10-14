@@ -278,7 +278,7 @@ export default {
         const y = Math.floor(event.layerY / 40)
         // var stringPos = y * 9 + x
 
-        const letters = { 0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h' }
+        const letters = { 0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h', 8: 'i', 9: 'j', 10: 'k', 11: 'l' }
         let pieceCode = Vue.methds.pieceTypeToShort(this.selectedPockedPiece.boardA)
         pieceCode = { type: pieceCode, color: this.turnColor.charAt(0) }
         this.$store.dispatch('insertPieceAtPosition', ['boardA', pieceCode, letters[x] + (8 - y)])
