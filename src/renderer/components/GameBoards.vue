@@ -1,4 +1,4 @@
-<template>
+<template>                                <!-- All components but menubar -->
   <div id="inner">
     <div>
       <div class="main-grid">
