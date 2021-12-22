@@ -1,0 +1,11 @@
+:root {
+    --main-bg-color: white;
+    --second-bg-color: white;
+    --main-text-color:  #2c3e50; 
+    --main-border-color: black;
+    --scroll-track-color: lightgrey;
+    --scroll-thumb-color: grey;
+    --variation-color: lightgrey;
+    --button-color: #34495e;
+    --tooltip-color: lightgrey;
+}

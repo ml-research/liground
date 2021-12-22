@@ -1,0 +1,14 @@
+.is2d .p-piece.white {background-image:url('../../piece/Xiangqi/ct2/red_pawn2.svg')}
+.is2d .r-piece.white {background-image:url('../../piece/Xiangqi/ct2/red_chariot2.svg')}
+.is2d .c-piece.white {background-image:url('../../piece/Xiangqi/ct2/red_cannon2.svg')}
+.is2d .n-piece.white {background-image:url('../../piece/Xiangqi/ct2/red_horse2.svg')}
+.is2d .b-piece.white {background-image:url('../../piece/Xiangqi/ct2/red_elephant2.svg')}
+.is2d .a-piece.white {background-image:url('../../piece/Xiangqi/ct2/red_advisor2.svg')}
+.is2d .k-piece.white {background-image:url('../../piece/Xiangqi/ct2/red_king2.svg')}
+.is2d .p-piece.black {background-image:url('../../piece/Xiangqi/ct2/black_pawn2.svg')}
+.is2d .r-piece.black {background-image:url('../../piece/Xiangqi/ct2/black_chariot2.svg')}
+.is2d .c-piece.black {background-image:url('../../piece/Xiangqi/ct2/black_cannon2.svg')}
+.is2d .n-piece.black {background-image:url('../../piece/Xiangqi/ct2/black_horse2.svg')}
+.is2d .b-piece.black {background-image:url('../../piece/Xiangqi/ct2/black_elephant2.svg')}
+.is2d .a-piece.black {background-image:url('../../piece/Xiangqi/ct2/black_advisor2.svg')}
+.is2d .k-piece.black {background-image:url('../../piece/Xiangqi/ct2/black_king2.svg')}

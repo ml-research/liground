@@ -1,0 +1,12 @@
+.is2d .p-piece.white {background-image:url('../../piece/international/shapes/wP.svg')}
+.is2d .n-piece.white {background-image:url('../../piece/international/shapes/wN.svg')}
+.is2d .b-piece.white {background-image:url('../../piece/international/shapes/wB.svg')}
+.is2d .r-piece.white {background-image:url('../../piece/international/shapes/wR.svg')}
+.is2d .q-piece.white {background-image:url('../../piece/international/shapes/wQ.svg')}
+.is2d .k-piece.white {background-image:url('../../piece/international/shapes/wK.svg')}
+.is2d .p-piece.black {background-image:url('../../piece/international/shapes/bP.svg')}
+.is2d .n-piece.black {background-image:url('../../piece/international/shapes/bN.svg')}
+.is2d .b-piece.black {background-image:url('../../piece/international/shapes/bB.svg')}
+.is2d .r-piece.black {background-image:url('../../piece/international/shapes/bR.svg')}
+.is2d .q-piece.black {background-image:url('../../piece/international/shapes/bQ.svg')}
+.is2d .k-piece.black {background-image:url('../../piece/international/shapes/bK.svg')}

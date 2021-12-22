@@ -1,0 +1,14 @@
+.is2d .p-piece.white {background-image:url('../../piece/Xiangqi/euro/red_pawn.svg')}
+.is2d .r-piece.white {background-image:url('../../piece/Xiangqi/euro/red_chariot.svg')}
+.is2d .c-piece.white {background-image:url('../../piece/Xiangqi/euro/red_cannon.svg')}
+.is2d .n-piece.white {background-image:url('../../piece/Xiangqi/euro/red_horse.svg')}
+.is2d .b-piece.white {background-image:url('../../piece/Xiangqi/euro/red_elephant.svg')}
+.is2d .a-piece.white {background-image:url('../../piece/Xiangqi/euro/red_advisor.svg')}
+.is2d .k-piece.white {background-image:url('../../piece/Xiangqi/euro/red_king.svg')}
+.is2d .p-piece.black {background-image:url('../../piece/Xiangqi/euro/black_pawn.svg')}
+.is2d .r-piece.black {background-image:url('../../piece/Xiangqi/euro/black_chariot.svg')}
+.is2d .c-piece.black {background-image:url('../../piece/Xiangqi/euro/black_cannon.svg')}
+.is2d .n-piece.black {background-image:url('../../piece/Xiangqi/euro/black_horse.svg')}
+.is2d .b-piece.black {background-image:url('../../piece/Xiangqi/euro/black_elephant.svg')}
+.is2d .a-piece.black {background-image:url('../../piece/Xiangqi/euro/black_advisor.svg')}
+.is2d .k-piece.black {background-image:url('../../piece/Xiangqi/euro/black_king.svg')}

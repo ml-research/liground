@@ -1,0 +1,12 @@
+.is2d .p-piece.white {background-image:url('../../piece/international/letter/wP.svg')}
+.is2d .n-piece.white {background-image:url('../../piece/international/letter/wN.svg')}
+.is2d .b-piece.white {background-image:url('../../piece/international/letter/wB.svg')}
+.is2d .r-piece.white {background-image:url('../../piece/international/letter/wR.svg')}
+.is2d .q-piece.white {background-image:url('../../piece/international/letter/wQ.svg')}
+.is2d .k-piece.white {background-image:url('../../piece/international/letter/wK.svg')}
+.is2d .p-piece.black {background-image:url('../../piece/international/letter/bP.svg')}
+.is2d .n-piece.black {background-image:url('../../piece/international/letter/bN.svg')}
+.is2d .b-piece.black {background-image:url('../../piece/international/letter/bB.svg')}
+.is2d .r-piece.black {background-image:url('../../piece/international/letter/bR.svg')}
+.is2d .q-piece.black {background-image:url('../../piece/international/letter/bQ.svg')}
+.is2d .k-piece.black {background-image:url('../../piece/international/letter/bK.svg')}
