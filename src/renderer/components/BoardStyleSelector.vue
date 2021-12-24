@@ -153,7 +153,7 @@ export default {
     preview (name) {
       let board = ''
       if (this.isInternational) {
-        board = name === 'lightgreen' ? 'ic' : `${name}`
+        board = name === 'lightgreen' ? 'lightgreen' : `${name}`
       } else if (this.isShogi) {
         const conv = {
           traditional: 'shogi',
