@@ -20,27 +20,25 @@
       <em class="icon mdi mdi-information-outline" /> About <em class="icon mdi mdi-github" />
     </div>
     <AboutTabModal
-        v-if="modal.visible"
-        :title="modal.title"
-        @close="modal.visible = false"
-      />
+      v-if="modal.visible"
+      :title="modal.title"
+      @close="modal.visible = false"
+    />
   </div>
 </template>
 
 <script>
 import fs from 'fs'
-import { shell } from 'electron'
 import { mapGetters } from 'vuex'
 import ffish from 'ffish'
 import AboutTabModal from './AboutTabModal'
 
-
 export default {
   name: 'MenuBar',
-  components: {AboutTabModal},
+  components: { AboutTabModal },
   data () {
     return {
-       modal: {
+      modal: {
         visible: false,
         title: '',
         save: () => {}
@@ -64,10 +62,10 @@ export default {
       this.$store.commit('viewAnalysis', !this.viewAnalysis)
     },
     openAboutTabModal () {
-        this.modal = {
+      this.modal = {
         visible: true,
-        title: 'LiGround',
-        }
+        title: 'LiGround'
+      }
     },
     openPgn () {
       this.$electron.remote.dialog.showOpenDialog({

@@ -65,8 +65,7 @@
                     <span>
                         {{"Daniel Creß, Samuel Gajdos, Gökay Karaahmetli, Lena-Marie Munderich, Leif Schwaß"}}
                     </span>
-                </div>   
-                
+                </div>
             </section>
             <footer class="footer">
                 <button
@@ -82,31 +81,27 @@
 </template>
 
 <script>
-import path from 'path'
-import { promises as fs } from 'fs'
 import { shell } from 'electron'
-import { remote } from 'electron'
-//import cssVars from './assets'
 
 export default {
-    name: 'EngineModal',
-    props: {
-        title: {
-            required: true,
-            type: String
-        }
-    },
-    methods: {
-        cancel () {
-            this.$emit('close')
-        },
-        openGitHub () {
-            shell.openExternal('https://github.com/ml-research/liground')
-        },
-        openLicense () {
-            shell.openExternal('https://github.com/ml-research/liground/blob/master/LICENSE')
-        }
+  name: 'AboutTabModal',
+  props: {
+    title: {
+      required: true,
+      type: String
     }
+  },
+  methods: {
+    cancel () {
+      this.$emit('close')
+    },
+    openGitHub () {
+      shell.openExternal('https://github.com/ml-research/liground')
+    },
+    openLicense () {
+      shell.openExternal('https://github.com/ml-research/liground/blob/master/LICENSE')
+    }
+  }
 }
 </script>
 

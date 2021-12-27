@@ -21,8 +21,7 @@ export default {
   watch: {
     darkMode () {
       if (this.darkMode === true) {
-        /*Darkmode -  Design: */
-        
+        /*  Darkmode -  Design: */
         document.documentElement.style.setProperty('--main-bg-color', '#35383d')
         document.documentElement.style.setProperty('--second-bg-color', '#40434a')
         document.documentElement.style.setProperty('--main-text-color', '#99aab5')
@@ -51,7 +50,6 @@ export default {
         document.documentElement.style.setProperty('--variation-color', '#4b4e54')
         document.documentElement.style.setProperty('--tooltip-color', '#4b4e54')
         */
-        
       } else {
         /* Revert to Light-Mode: */
         document.documentElement.style.setProperty('--main-bg-color', 'white')
@@ -83,7 +81,7 @@ export default {
 </script>
 
 <style scoped>
-/* The switch - the box around the slider */
+/*  The switch - the box around the slider  */
 .switch {
  position: relative;
  display: inline-block;
