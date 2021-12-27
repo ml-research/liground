@@ -65,7 +65,7 @@
                     <span>
                         {{"Daniel Creß, Samuel Gajdos, Gökay Karaahmetli, Lena-Marie Munderich, Leif Schwaß"}}
                     </span>
-                </div>
+                </div>   
                 
             </section>
             <footer class="footer">
