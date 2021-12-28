@@ -272,7 +272,9 @@ export default {
     hoveredpv () {
       const index = this.shapes.length - this.hoveredpv - 1
       for (const [i, shape] of this.shapes.entries()) {
-        shape.brush = i === index ? 'blue' : 'paleBlue'
+        shape.brush = i === index ? 'blue' : 'paleBlue';
+        if(i === this.shapes.length-1)
+          this.shapes[this.shapes.length - 1].brush = 'yellow';
       }
       this.drawShapes()
     },
