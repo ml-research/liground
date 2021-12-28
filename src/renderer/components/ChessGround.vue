@@ -771,7 +771,6 @@ export default {
 @import '../assets/dim8x8.css';
 @import '../assets/dim9x10.css';
 
-
 #PromotionModal {
   position: absolute;
   z-index: 4;

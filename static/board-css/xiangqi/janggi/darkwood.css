@@ -1,7 +1,11 @@
 .cg-board-wrap {
+<<<<<<< HEAD
   background-image: url('../../../board/svg/JanggiWoodDarkCoords.svg');
   background-size: cover;
   padding:0;
   width: 100%;
   height: 100%
+=======
+  background-image: url('../../../board/svg/JanggiWoodDark.svg');
+>>>>>>> 6b523702fb4e823fb38a65d4f76250646721bc5f
 }
