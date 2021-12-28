@@ -755,9 +755,8 @@ export default {
       }
     },
     drawShapes () {
-      if (this.board !== null) {
+     if (this.board !== null) {
         this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
-        this.shapes[this.shapes.length - 1].brush = 'yellow'
       }
     },
     removeFocusFromInputs () {
