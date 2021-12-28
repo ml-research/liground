@@ -5,7 +5,7 @@
         <div class="chessboard-grid">
           <PgnBrowser id="pgnbrowser" />
           <div class="board">
-            <div @mousewheel.prevent="scroll($event)">
+            <div @mousewheel.prevent.exact="scroll($event)">
               <ChessGround
                 id="chessboard"
                 :orientation="orientation"
@@ -21,7 +21,7 @@
               name="lname"
               placeholder="fen position"
               :value="fen"
-              size="60"
+              :size="fen.length"
               @change="checkValidFEN"
             >
           </div>
@@ -319,7 +319,7 @@ export default {
     "evalplot analysisview";
 }
 .chessboard-grid {
-  min-width: 925px;
+  min-width: 1050px;
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% auto;
@@ -330,6 +330,7 @@ export default {
     ". selector";
 }
 #analysisview {
+  grid-area: analysisview;
   height: 100%;
   width: 100%;
 }
@@ -343,7 +344,6 @@ export default {
 }
 input {
   font-size: 12pt;
-  max-width: 60vw;
 }
 #fen-field {
   grid-area: fenfield;
@@ -395,6 +395,7 @@ input {
 }
 .evalbar {
   margin-left: 8px;
+  height: 99%;
 }
 #analysisview {
   margin-left: 15px;
