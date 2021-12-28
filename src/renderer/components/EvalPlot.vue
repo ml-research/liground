@@ -202,7 +202,6 @@ export default {
   methods: {
     clear () { // cleans the whole plot
       document.dispatchEvent(new Event('finishedEval'))
-      console.log(":)");
       this.chartOptions.xaxis.categories.splice(0, this.chartOptions.xaxis.categories.length)
       this.chartOptions.xaxis.categories.push('Start')
       this.series = [{
