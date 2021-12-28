@@ -233,20 +233,23 @@ export default {
             pieceShapes.unshift({
               orig: dest,
               dest: dest,
-              brush: 'blue',
+              brush: 'paleBlue',
               modifiers: { lineWidth },
               piece: {
                 role: pieceConv[pieceType],
                 color: this.turn
               }
             })
-            drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth } }
+            drawShape = { orig: dest, brush: 'paleBlue', modifiers: { lineWidth } }
           } else {
-            drawShape = { orig, dest, brush: 'blue', modifiers: { lineWidth } }
+            drawShape = { orig, dest, brush: 'paleBlue', modifiers: { lineWidth } }
           }
 
           // adjust color if pv line is hovered
           if (i === this.hoveredpv) {
+            drawShape.brush = 'blue'
+          }
+          if(i === 0){
             drawShape.brush = 'yellow'
           }
 
@@ -261,7 +264,7 @@ export default {
     hoveredpv () {
       const index = this.shapes.length - this.hoveredpv - 1
       for (const [i, shape] of this.shapes.entries()) {
-        shape.brush = i === index ? 'yellow' : 'blue'
+        shape.brush = i === index ? 'blue' : 'paleBlue'
       }
       this.drawShapes()
     },
@@ -682,6 +685,7 @@ export default {
     drawShapes () {
       if (this.board !== null) {
         this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
+        this.shapes[this.shapes.length - 1].brush = 'yellow'
       }
     },
     removeFocusFromInputs () {

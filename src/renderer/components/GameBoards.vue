@@ -21,7 +21,7 @@
               name="lname"
               placeholder="fen position"
               :value="fen"
-              size="60"
+              :size="setFenSize()"
               @change="checkValidFEN"
             >
           </div>
@@ -153,6 +153,9 @@ export default {
     }, false)
   },
   methods: {
+    setFenSize(){
+      return this.fen.length + 3
+    },
     scroll (event) { // TODO: also moves back and forth when being slightly next to the board and for example over the pockets
       if (event.deltaY < 0) {
         this.moveBackOne()
