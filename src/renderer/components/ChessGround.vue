@@ -20,22 +20,22 @@
           @selection="dropPiece"
         />
       </div>
-      <div :class="{ koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1 }">
+      <div :class="selectedClasses" id="chessboard" @mousewheel.ctrl.prevent="resize($event)" >
         <div class="cg-board-wrap">
-          <div ref="board" />
-          <div
-            v-if="isPromotionModalVisible"
-            id="PromotionModal"
-            ref="promotion"
+          <div ref="board"/>
+            <div
+              v-if="isPromotionModalVisible"
+              id="PromotionModal"
+              ref="promotion"
 
-            :style="promotionPosition"
-          >
-            <PromotionModal
-              :prom-options="promotions"
-              @close="closePromotionModal"
-            />
-          </div>
-        </div>
+              :style="promotionPosition"
+             >
+              <PromotionModal
+                :prom-options="promotions"
+                @close="closePromotionModal"
+              />
+            </div>
+         </div>
       </div>
     </div>
   </div>
@@ -47,6 +47,8 @@ import { Chessground } from 'chessgroundx'
 import * as cgUtil from 'chessgroundx/util'
 import ChessPocket from './ChessPocket'
 import PromotionModal from './PromotionModal.vue'
+
+
 
 const WHITE = true
 const BLACK = false
@@ -72,6 +74,9 @@ export default {
   },
   data () {
     return {
+      enlarged: 0,
+      enlarged9x9: 0,
+      enlarged9x10: 0,
       ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
       selectedPiece: null,
@@ -160,6 +165,9 @@ export default {
     }
   },
   computed: {
+    selectedClasses(){
+          return { koth: this.variant==='kingofthehill', rk: this.variant==='racingkings', dim8x8: this.dimensionNumber===0, dim9x10: this.dimensionNumber === 3 , dim9x9: this.dimensionNumber === 1 };
+    },
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
       for (let num = 0; num < this.moves.length; num++) {
         if (this.moves[num].fen === this.fen) {
@@ -269,6 +277,9 @@ export default {
       this.drawShapes()
     },
     variant () {
+      
+      
+
       if (this.variant === 'shogi') {
         this.piecesW = this.shogiPiecesW
         this.piecesB = this.shogiPiecesB
@@ -312,7 +323,26 @@ export default {
         variant: this.variant,
         lastMove: false
       })
+      const boardSize = document.querySelector(".cg-wrap");
+      this.enlarged = 0;
+      this.enlarged9x9 = 0;
+      this.enlarged9x10 = 0;
 
+      if(this.dimensionNumber === 0){
+            boardSize.style.width = 600 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged + 'px';
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }else if(this.dimensionNumber === 1){
+            boardSize.style.width = 520 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged + 'px';
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }else if(this.dimensionNumber === 3){
+            if(this.enlarged >= -120){
+              boardSize.style.width = 540 + this.enlarged + 'px';
+              boardSize.style.height = 600 + this.enlarged + 'px';
+              document.body.dispatchEvent(new Event('chessground.resize'));
+            }
+          }
       this.updateBoard()
       this.isPromotionModalVisible = false
     }
@@ -362,8 +392,49 @@ export default {
 
     // force initial resize
     document.body.dispatchEvent(new Event('chessground.resize'))
+
   },
   methods: {
+      makeVisible(){
+        document.querySelector(".resizer").style.backgroundColor = 'black';
+      },
+      resize(event){
+        
+        const boardSize = document.querySelector(".cg-wrap");
+        if(event.deltaY > 0){
+          if(this.enlarged < 200){
+            this.enlarged+= 40;
+            this.enlarged9x9+=46.7; // 
+            this.enlarged9x10+=44.46; //damit breite immer 90% der Länge ist
+          }
+        }else if(event.deltaY < 0){
+          if(this.enlarged > -200){
+              this.enlarged-= 40;
+              this.enlarged9x9-= 46.7;
+              this.enlarged9x10-=44.46;
+            }
+        }
+        if(this.enlarged <= 200 && this.enlarged >= -200){
+          if(this.dimensionNumber === 0){
+            boardSize.style.width = 600 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged + 'px';
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+          
+          else if(this.dimensionNumber === 1 && this.enlarged <200){
+            boardSize.style.width = 520 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged9x9 + 'px';
+            console.log(boardSize.style.height);
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+          
+          else if(this.dimensionNumber === 3){
+              boardSize.style.width = 540 + this.enlarged + 'px';
+              boardSize.style.height = 600 + this.enlarged9x10 + 'px';
+              document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+        }
+    },
     showPromotionModal () {
       this.isPromotionModalVisible = true
     },
@@ -399,6 +470,7 @@ export default {
       } else if (this.$store.getters.isShogi) {
         node.href = 'static/board-css/shogi/' + boardStyle + '.css'
       }
+      document.body.dispatchEvent(new Event('chessground.resize'));
     },
     dropPiece (event, pieceType, color) {
       this.board.dragNewPiece({ role: pieceType, color: color, promoted: false }, event)
@@ -702,6 +774,7 @@ export default {
 @import '../assets/dim9x9.css';
 @import '../assets/dim8x8.css';
 @import '../assets/dim9x10.css';
+
 
 #PromotionModal {
   position: absolute;
