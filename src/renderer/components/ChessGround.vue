@@ -22,6 +22,7 @@
       </div>
       <div :class="selectedClasses" id="chessboard" @mousewheel.ctrl.prevent="resize($event)" >
         <div class="cg-board-wrap">
+          <div class="resizer" @mouseover="shade" @mousedown="startDragging" @mouseout="hideShade" />
           <div ref="board"/>
             <div
               v-if="isPromotionModalVisible"
@@ -74,6 +75,8 @@ export default {
   },
   data () {
     return {
+      startingPoint: 640,
+      dragging: false,
       enlarged: 0,
       enlarged9x9: 0,
       enlarged9x10: 0,
@@ -241,20 +244,23 @@ export default {
             pieceShapes.unshift({
               orig: dest,
               dest: dest,
-              brush: 'blue',
+              brush: 'paleBlue',
               modifiers: { lineWidth },
               piece: {
                 role: pieceConv[pieceType],
                 color: this.turn
               }
             })
-            drawShape = { orig: dest, brush: 'blue', modifiers: { lineWidth } }
+            drawShape = { orig: dest, brush: 'paleBlue', modifiers: { lineWidth } }
           } else {
-            drawShape = { orig, dest, brush: 'blue', modifiers: { lineWidth } }
+            drawShape = { orig, dest, brush: 'paleBlue', modifiers: { lineWidth } }
           }
 
           // adjust color if pv line is hovered
           if (i === this.hoveredpv) {
+            drawShape.brush = 'blue'
+          }
+          if(i === 0){
             drawShape.brush = 'yellow'
           }
 
@@ -269,7 +275,9 @@ export default {
     hoveredpv () {
       const index = this.shapes.length - this.hoveredpv - 1
       for (const [i, shape] of this.shapes.entries()) {
-        shape.brush = i === index ? 'yellow' : 'blue'
+        shape.brush = i === index ? 'blue' : 'paleBlue';
+        if(i === this.shapes.length-1)
+          this.shapes[this.shapes.length - 1].brush = 'yellow';
       }
       this.drawShapes()
     },
@@ -324,7 +332,7 @@ export default {
       this.enlarged = 0;
       this.enlarged9x9 = 0;
       this.enlarged9x10 = 0;
-
+      this.startingPoint = 640;
       if(this.dimensionNumber === 0){
             boardSize.style.width = 600 + this.enlarged + 'px';
             boardSize.style.height = 600 + this.enlarged + 'px';
@@ -334,17 +342,18 @@ export default {
             boardSize.style.height = 600 + this.enlarged + 'px';
             document.body.dispatchEvent(new Event('chessground.resize'));
           }else if(this.dimensionNumber === 3){
-            if(this.enlarged >= -120){
               boardSize.style.width = 540 + this.enlarged + 'px';
               boardSize.style.height = 600 + this.enlarged + 'px';
               document.body.dispatchEvent(new Event('chessground.resize'));
-            }
           }
       this.updateBoard()
       this.isPromotionModalVisible = false
     }
   },
   mounted () {
+    window.addEventListener('mouseup', this.stopDragging);
+    window.addEventListener('mousemove', this.doResize);
+
     this.board = Chessground(this.$refs.board, {
       coordinates: false,
       fen: this.fen,
@@ -392,23 +401,37 @@ export default {
 
   },
   methods: {
-      makeVisible(){
-        document.querySelector(".resizer").style.backgroundColor = 'black';
+    hideShade(){
+      if(this.dragging === false)
+        document.querySelector(".resizer").style.opacity = 0.0;
+    },
+    shade(){
+      document.querySelector(".resizer").style.opacity = 0.8;
+    },
+      stopDragging(){
+        document.querySelector(".resizer").style.opacity = 0.0;
+        this.dragging = false;
       },
-      resize(event){
-        
-        const boardSize = document.querySelector(".cg-wrap");
-        if(event.deltaY > 0){
+      startDragging(){
+        this.dragging = true;
+        document.querySelector(".resizer").style.opacity = 0.8;
+      },
+      doResize(event){
+      const boardSize = document.querySelector(".cg-wrap");
+      if(this.dragging === false){ return };
+        if(event.clientY - this.startingPoint > 40){
           if(this.enlarged < 200){
             this.enlarged+= 40;
             this.enlarged9x9+=46.7; // 
             this.enlarged9x10+=44.46; //damit breite immer 90% der Länge ist
+            this.startingPoint = event.clientY;
           }
-        }else if(event.deltaY < 0){
+        }else if(event.clientY - this.startingPoint < -40){
           if(this.enlarged > -200){
               this.enlarged-= 40;
               this.enlarged9x9-= 46.7;
               this.enlarged9x10-=44.46;
+              this.startingPoint = event.clientY;
             }
         }
         if(this.enlarged <= 200 && this.enlarged >= -200){
@@ -431,7 +454,57 @@ export default {
               document.body.dispatchEvent(new Event('chessground.resize'));
           }
         }
-    },
+      },
+      resize(event){
+        const boardSize = document.querySelector(".cg-wrap");
+        if(event.deltaY > 0){
+          if(this.enlarged < 200){
+            this.enlarged+= 40;
+            this.enlarged9x9+=46.7; // 
+            this.enlarged9x10+=44.46; //damit breite immer 90% der Länge ist
+            if(this.dimensionNumber === 0){
+              this.startingPoint += 40;
+            }else if(this.dimensionNumber === 1){
+              this.startingPoint += 46.7;
+            }else if(this.dimensionNumber === 3){
+              this.startingPoint += 44.46;
+            }
+          }
+        }else if(event.deltaY < 0){
+          if(this.enlarged > -200){
+              this.enlarged-= 40;
+              this.enlarged9x9-= 46.7;
+              this.enlarged9x10-=44.46;
+              if(this.dimensionNumber === 0){
+              this.startingPoint -= 40;
+            }else if(this.dimensionNumber === 1){
+              this.startingPoint -= 46.7;
+            }else if(this.dimensionNumber === 3){
+              this.startingPoint -= 44.46;
+            }
+            }
+        }
+        if(this.enlarged <= 200 && this.enlarged >= -200){
+          if(this.dimensionNumber === 0){
+            boardSize.style.width = 600 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged + 'px';
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+          
+          else if(this.dimensionNumber === 1 && this.enlarged <200){
+            boardSize.style.width = 520 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged9x9 + 'px';
+            console.log(boardSize.style.height);
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+          
+          else if(this.dimensionNumber === 3){
+              boardSize.style.width = 540 + this.enlarged + 'px';
+              boardSize.style.height = 600 + this.enlarged9x10 + 'px';
+              document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+        }
+      },
     showPromotionModal () {
       this.isPromotionModalVisible = true
     },
@@ -700,7 +773,7 @@ export default {
       const events = {}
       events.fen = this.fen
       events.history = [this.lastMoveSan]
-      this.$emit('onMove', events)
+      //this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
     },
     updateBoard () {
@@ -752,7 +825,7 @@ export default {
       }
     },
     drawShapes () {
-      if (this.board !== null) {
+     if (this.board !== null) {
         this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
       }
     },
@@ -772,6 +845,20 @@ export default {
 @import '../assets/dim9x10.css';
 
 
+.resizer{
+  padding-left: 15px;
+  padding-top: 15px;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: red; 
+  z-index: 2;
+  bottom: -1px;
+  right: -1px;
+  cursor: se-resize;
+  opacity: 0.0;
+  }
 #PromotionModal {
   position: absolute;
   z-index: 4;

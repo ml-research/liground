@@ -94,7 +94,7 @@ cg-board square.current-premove {
   pointer-events: none;
 }
 cg-board piece.dragging {
-  cursor: move;
+  cursor:crosshair;
   z-index: 9;
 }
 cg-board piece.anim {
