@@ -455,6 +455,44 @@ export default {
           }
         }
       },
+      resize(event){
+        const boardSize = document.querySelector(".cg-wrap");
+        if(event.deltaY > 0){
+          if(this.enlarged < 200){
+            this.enlarged+= 40;
+            this.enlarged9x9+=46.7; // 
+            this.enlarged9x10+=44.46; //damit breite immer 90% der Länge ist
+            this.startingPoint += 40;
+          }
+        }else if(event.deltaY < 0){
+          if(this.enlarged > -200){
+              this.enlarged-= 40;
+              this.enlarged9x9-= 46.7;
+              this.enlarged9x10-=44.46;
+              this.startingPoint-=40;
+            }
+        }
+        if(this.enlarged <= 200 && this.enlarged >= -200){
+          if(this.dimensionNumber === 0){
+            boardSize.style.width = 600 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged + 'px';
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+          
+          else if(this.dimensionNumber === 1 && this.enlarged <200){
+            boardSize.style.width = 520 + this.enlarged + 'px';
+            boardSize.style.height = 600 + this.enlarged9x9 + 'px';
+            console.log(boardSize.style.height);
+            document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+          
+          else if(this.dimensionNumber === 3){
+              boardSize.style.width = 540 + this.enlarged + 'px';
+              boardSize.style.height = 600 + this.enlarged9x10 + 'px';
+              document.body.dispatchEvent(new Event('chessground.resize'));
+          }
+        }
+      },
     showPromotionModal () {
       this.isPromotionModalVisible = true
     },
