@@ -10,14 +10,28 @@
           placeholder="filter games"
         >
         <span
+          id = "icon"
           slot="extra"
           class="icon mdi mdi-magnify"
         />
         <i
-          class="icon mdi mdi-cog-outline"
+          id = "icon"
+          class="icon mdi mdi-filter-menu-outline"
           @click="openContextMenu()"
         />
+        <i
+          id = "icon"
+          class="icon mdi mdi-plus-box-outline"
+          @click="openAddPgnModal()"
+        />
       </div>
+      <div>
+          <AddPgnModal
+           v-if="addPgnModal.visible"
+           :title="addPgnModal.title"
+           @close="addPgnModal.visible = false"
+           />
+        </div>
       <template v-if="groupByRound">
         <div
           v-for="round in rounds"
@@ -77,11 +91,17 @@
 import { remote } from 'electron'
 import { mapGetters } from 'vuex'
 import { bus } from '../main'
+import AddPgnModal from './AddPgnModal'
 
 export default {
+  components: { AddPgnModal },
   name: 'PgnBrowser',
   data: function () {
     return {
+      addPgnModal: {
+        visible: false,
+        title: ''
+      },
       gameFilter: '',
       rounds: [],
       groupByRound: true,
@@ -194,6 +214,12 @@ export default {
       this.rounds.forEach(round => {
         round.visible = value
       })
+    },
+    openAddPgnModal() {
+      this.addPgnModal = {
+        visible: true,
+        title: 'Add new PGN',
+      }
     }
   }
 }
@@ -201,11 +227,10 @@ export default {
 
 <style scoped>
 #gameselect {
-  background-color: var(--second-bg-color);
-  border: 1px solid var(--main-border-color);
   overflow-y: auto;
   overflow-x: auto;
-  height: 100%
+  height: 100%;
+  border: 0px solid var(--main-border-color);
 }
 
 .optionlabel {
@@ -213,7 +238,7 @@ export default {
 }
 
 #gamefilter {
-  max-width: 65%;
+  max-width: 55%;
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
@@ -235,7 +260,7 @@ export default {
 }
 
 .gameoption:hover:not(.unsupported), .roundseperator:hover {
-  background-color: var(--hover-highlight-color);
+  background-color: #2196F3;
   color: white;
   cursor: pointer;
 }
@@ -245,26 +270,21 @@ export default {
   color: white;
 }
 
-.icon.mdi-magnify {
-  padding: 0px 6px;
-  margin: 0px 1px;
-  border-radius: 5px;
-  background-color: var(--button-color);
-  box-shadow: 1px 1px 1px 1px black;
+.icon {
   color: white;
-}
-
-.icon.mdi-magnify:hover {
-  background-color: var(--hover-color);
   cursor: pointer;
 }
 
-.icon.mdi-cog-outline:hover {
+.icon:hover {
+  background-color: var(--hover-background-color);
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .search {
-  padding: 5px 0px;
+  background-color: var(--button-color);
+  border-bottom: 1px solid var(--main-border-color);
+  padding: 1px 2px 3px 4px;
   white-space: nowrap;
   width: 100%;
 }
