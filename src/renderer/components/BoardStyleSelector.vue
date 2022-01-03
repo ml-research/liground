@@ -1,11 +1,13 @@
 <template>
   <div>
+    
     <Multiselect
       class="multiselect"
       :value="displayStyle"
       :options="boardStyles"
       :allow-empty="false"
       :show-labels="false"
+     
       @input="updateBoardStyle"
     >
       <template
@@ -43,6 +45,7 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
+import fs from 'fs'
 
 export default {
   name: 'BoardStyleSelector',
@@ -52,6 +55,7 @@ export default {
   data () {
     return {
       boardStyles: [
+        '+ Add Custom',
         'blue',
         'brown',
         'green',
@@ -186,8 +190,37 @@ export default {
       }
       return `url(static/board/svg/${board}.svg`
     },
+    
+    addCustom(payload){
+       console.log("bin da")
+        this.$electron.remote.dialog.showOpenDialog({
+        title: 'Choose Custom Board Style',
+        properties: ['openFile'],
+        filters: [
+          { name: 'SVG Files', extensions: ['svg'] },
+          
+        ]
+      }).then(result => {
+        
+        if(!result.canceled){
+       fs.readFile(result, 'utf-8', (err, data) => {
+         if(err){
+            alert("An error ocurred reading the file :" + err.message);
+            return;
+       }
+
+        this.internationalBoardStyle = result[0]
+       this.$store.dispatch('boardStyle', result[0]))}
+        }}
+       
+       
+    },
     updateBoardStyle (payload) {
-      if (this.isInternational) { // localStorage for all different groups of board stylings
+      if(payload == '+ Add Custom'){
+       this.addCustom(payload);
+        return;
+      }
+        else if (this.isInternational) { // localStorage for all different groups of board stylings
         localStorage.internationalBoardStyle = payload
       } else if (this.isShogi) {
         localStorage.shogiBoardStyle = payload
@@ -197,7 +230,7 @@ export default {
         localStorage.xiangqiBoardStyle = payload
       } else if (this.isJanggi) {
         localStorage.janggiBoardStyle = payload
-      }
+      } 
       this.$store.dispatch('boardStyle', payload)
     }
   }
