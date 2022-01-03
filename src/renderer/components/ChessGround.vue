@@ -462,14 +462,26 @@ export default {
             this.enlarged+= 40;
             this.enlarged9x9+=46.7; // 
             this.enlarged9x10+=44.46; //damit breite immer 90% der Länge ist
-            this.startingPoint += 40;
+            if(this.dimensionNumber === 0){
+              this.startingPoint += 40;
+            }else if(this.dimensionNumber === 1){
+              this.startingPoint += 46.7;
+            }else if(this.dimensionNumber === 3){
+              this.startingPoint += 44.46;
+            }
           }
         }else if(event.deltaY < 0){
           if(this.enlarged > -200){
               this.enlarged-= 40;
               this.enlarged9x9-= 46.7;
               this.enlarged9x10-=44.46;
-              this.startingPoint-=40;
+              if(this.dimensionNumber === 0){
+              this.startingPoint -= 40;
+            }else if(this.dimensionNumber === 1){
+              this.startingPoint -= 46.7;
+            }else if(this.dimensionNumber === 3){
+              this.startingPoint -= 44.46;
+            }
             }
         }
         if(this.enlarged <= 200 && this.enlarged >= -200){
