@@ -67,7 +67,8 @@ export default {
         'brown',
         'green',
         'lightgreen',
-        'purple'
+        'purple',
+        'custom'
       ],
       seaStyles: [
         'orange',
@@ -201,22 +202,30 @@ export default {
           
         ]
       }).then(result => {
-        
         if(!result.canceled){
-       fs.readFile(result, 'utf-8', (err, data) => {
-         if(err){
-            alert("An error ocurred reading the file :" + err.message);
-            return;
-       }
-
-        this.internationalBoardStyle = result[0]
-       this.$store.dispatch('boardStyle', result[0]))}
-        }}
-       
-       
+          
+            fs.readFile(result.filePaths[0], 'utf-8', (err, data) => {
+            if(err){
+               alert("An error ocurred reading the file :" + err.message);
+              return;
+            }
+            console.log(result.filePaths[0]);
+            console.log(data);
+            fs.writeFile('static/board/svg/custom.svg', data, (err) => {
+                if (err) {
+                   alert("An error ocurred updating the file" + err.message);
+                   console.log(err);
+                    return;
+                }
+            })
+            })
+            localStorage.internationalBoardStyle = payload;
+            this.$store.dispatch('boardStyle', payload)
+        }
+      })
     },
     updateBoardStyle (payload) {
-      if(payload == '+ Add Custom'){
+      if(payload === '+ Add Custom'){
        this.addCustom(payload);
         return;
       }
