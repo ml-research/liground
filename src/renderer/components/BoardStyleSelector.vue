@@ -157,7 +157,10 @@ export default {
   methods: {
     preview (name) {
       let board = ''
-      if (this.isInternational) {
+      if(name == '+ Add Custom'){
+        board = 'custom'
+      }
+      else if (this.isInternational) {
         board = name === 'lightgreen' ? 'lightgreen' : `${name}`
       } else if (this.isShogi) {
         const conv = {
