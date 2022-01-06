@@ -46,14 +46,16 @@
 import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
 import fs from 'fs'
-
+///DDUDUDUDUDU
 export default {
   name: 'BoardStyleSelector',
   components: {
     Multiselect
   },
   data () {
+   
     return {
+ 
       boardStyles: [
         '+ Add Custom',
         'blue',
@@ -195,9 +197,9 @@ export default {
       return `url(static/board/svg/${board}.svg`
     },
     
-    addCustom(payload){
+     addCustom(payload){
        console.log("bin da")
-        this.$electron.remote.dialog.showOpenDialog({
+         this.$electron.remote.dialog.showOpenDialog({
         title: 'Choose Custom Board Style',
         properties: ['openFile'],
         filters: [
@@ -223,6 +225,7 @@ export default {
             })
             })
             localStorage.internationalBoardStyle = payload;
+          
             this.$store.dispatch('boardStyle', payload)
         }
       })
@@ -230,6 +233,7 @@ export default {
     updateBoardStyle (payload) {
       if(payload === '+ Add Custom'){
        this.addCustom(payload);
+      
         return;
       }
         else if (this.isInternational) { // localStorage for all different groups of board stylings
