@@ -188,6 +188,9 @@ export default {
 
     async reWriteSvgs() {
       var svgFile = await this.addCustom();
+      if(svgFile === undefined){
+       return false;
+      }
       if (!svgFile.canceled) {
         fs.readFile(svgFile.filePaths[0], "utf-8", (err, data) => {
           if (err) {
@@ -211,6 +214,7 @@ export default {
     },
     async updateCustom(counter) {
       const reWritten = await this.reWriteSvgs(counter);
+     
       if (reWritten) {
         setTimeout(() => {
           const boardStyleCustom = "custom" + counter;
@@ -223,6 +227,7 @@ export default {
     addCustom() {
       if (this.counter > 5) {
         alert("You can't add more than 5 Custom Designs");
+        this.counter--;
         return;
       }
       return this.$electron.remote.dialog.showOpenDialog({
