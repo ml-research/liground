@@ -2,12 +2,6 @@
   <div class="bar">
     <div
       class="item"
-      @click="openPgn"
-    >
-      <em class="icon mdi mdi-checkerboard" /> Open PGN
-    </div>
-    <div
-      class="item"
       :class="{ active: !viewAnalysis }"
       @click="changeTab"
     >
@@ -28,9 +22,7 @@
 </template>
 
 <script>
-import fs from 'fs'
 import { mapGetters } from 'vuex'
-import ffish from 'ffish'
 import AboutTabModal from './AboutTabModal'
 
 export default {
@@ -46,16 +38,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['viewAnalysis', 'initialized', 'variantOptions'])
-  },
-  watch: {
-    initialized () {
-      if (this.initialized === true) {
-        if (localStorage.PGNPath) {
-          this.openPGNFromPath(JSON.parse(localStorage.PGNPath))
-        }
-      }
-    }
+    ...mapGetters(['viewAnalysis', 'variantOptions'])
   },
   methods: {
     changeTab () {
@@ -66,67 +49,6 @@ export default {
         visible: true,
         title: 'LiGround'
       }
-    },
-    openPgn () {
-      this.$electron.remote.dialog.showOpenDialog({
-        title: 'Open PGN file',
-        properties: ['openFile'],
-        filters: [
-          { name: 'PGN Files', extensions: ['pgn'] },
-          { name: 'All Files', extensions: ['*'] }
-        ]
-      }).then(result => {
-        if (!result.canceled) {
-          localStorage.PGNPath = JSON.stringify(result.filePaths[0])
-          this.openPGNFromPath(result.filePaths[0])
-        }
-      }).catch(err => {
-        console.log(err)
-      })
-    },
-    openPGNFromPath (path) {
-      const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
-      let games = []
-      fs.readFile(path, 'utf8', (err, data) => {
-        if (err) {
-          return console.log(err)
-        }
-
-        // convert CRLF to LF
-        data = data.replace(/\r\n/g, '\n')
-
-        let numOfUnparseableGames = 0
-
-        let m
-        while ((m = regex.exec(data)) !== null) {
-          if (m.index === regex.lastIndex) {
-            regex.lastIndex++
-          }
-
-          m.forEach((match, groupIndex) => {
-            let game
-            try {
-              game = ffish.readGamePGN(match)
-            } catch (error) {
-              numOfUnparseableGames = numOfUnparseableGames + 1
-              return
-            }
-            games.push(game)
-          })
-        }
-
-        if (numOfUnparseableGames !== 0) {
-          alert(numOfUnparseableGames + ' games could not be parsed.')
-        }
-
-        games = games.map((curVal, idx, arr) => {
-          curVal.id = idx
-          curVal.supported = this.variantOptions.revGet(curVal.headers('Variant').toLowerCase()) !== undefined || !curVal.headers('Variant')
-          return curVal
-        })
-
-        this.$store.dispatch('loadedGames', games)
-      })
     }
   }
 }
@@ -134,23 +56,22 @@ export default {
 
 <style scoped>
 .bar {
-  margin: 10px auto;
   position: relative;
   background-color: var(--button-color);
   font-size: 11px;
-  width: 33.3%;
-  border-radius: 8px;
+  width: 100%;
+  display: flex;
 }
 .item {
   padding-left: 16px;
   padding-right: 16px;
-  padding-top: 1.5%;
-  padding-bottom: 1.5%;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  text-align: left;
   display: inline-block;
   color: var(--light-text-color);;
   font-size: 11px;
   text-decoration: none;
-  text-align: center;
   cursor: pointer;
 }
 .item:hover {

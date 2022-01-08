@@ -43,6 +43,7 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
+import fs from 'fs'
 
 export default {
   name: 'BoardStyleSelector',
@@ -52,6 +53,7 @@ export default {
   data () {
     return {
       boardStyles: [
+        'Add custom',
         'blue',
         'brown',
         'green',
@@ -59,6 +61,7 @@ export default {
         'purple'
       ],
       internationalStyles: [
+        'Add custom',
         'blue',
         'brown',
         'green',
@@ -66,14 +69,17 @@ export default {
         'purple'
       ],
       seaStyles: [
+        'Add custom',
         'orange',
         'yellow'
       ],
       shogiStyles: [
+        'Add custom',
         'bluechess',
         'traditional'
       ],
       janggiStyles: [
+        'Add custom',
         'brown',
         'dark',
         'darkwood',
@@ -81,6 +87,7 @@ export default {
         'stone'
       ],
       xiangqiStyles: [
+        'Add custom',
         'dark',
         'lightbrown',
         'orange',
@@ -113,6 +120,11 @@ export default {
           this.updateBoardStyle(this.shogiStyles[1])
         }
         this.boardStyles = []
+        let i
+        for (i = 0; i < this.counter; i++) {
+          const custom = 'custom' + (i + 1)
+          this.internationalStyles.push(custom)
+        }
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -152,8 +164,11 @@ export default {
   methods: {
     preview (name) {
       let board = ''
+      if (name === 'Add Custom') {
+        board = 'addCustom'
+      }
       if (this.isInternational) {
-        board = name === 'lightgreen' ? 'lightgreen' : `${name}`
+        board = name === 'lightgreen' ? 'ic' : `${name}`
       } else if (this.isShogi) {
         const conv = {
           traditional: 'shogi',
@@ -186,8 +201,60 @@ export default {
       }
       return `url(static/board/svg/${board}.svg`
     },
+    async reWriteSvgs () {
+      const svgFile = await this.addCustom()
+      if (svgFile === undefined) {
+        return false
+      }
+      if (!svgFile.canceled) {
+        fs.readFile(svgFile.filePaths[0], 'utf-8', (err, data) => {
+          if (err) {
+            alert('An error ocurred reading the file :' + err.message)
+            return
+          }
+          const path = 'static/board/svg/custom' + this.counter + '.svg'
+          fs.writeFile(path, data, (err) => {
+            if (err) {
+              alert('An error ocurred updating the file' + err.message)
+              console.log(err)
+            }
+          })
+        })
+        return true
+      } else if (svgFile.canceled) {
+        this.counter--
+        return false
+      }
+    },
+    async updateCustom (counter) {
+      const reWritten = await this.reWriteSvgs(counter)
+      if (reWritten) {
+        setTimeout(() => {
+          const boardStyleCustom = 'custom' + counter
+          this.boardStyles.push(boardStyleCustom)
+          localStorage.internationalBoardStyle = boardStyleCustom
+          this.$store.dispatch('boardStyle', boardStyleCustom)
+        }, 50)
+      }
+    },
+    addCustom () {
+      if (this.counter > 5) {
+        alert("You can't add more than 5 Custom Designs")
+        this.counter--
+        return
+      }
+      return this.$electron.remote.dialog.showOpenDialog({
+        title: 'Choose Custom Board Style',
+        properties: ['openFile'],
+        filters: [{ name: 'SVG Files', extensions: ['svg'] }]
+      })
+    },
     updateBoardStyle (payload) {
-      if (this.isInternational) { // localStorage for all different groups of board stylings
+      if (payload === 'Add Custom') {
+        this.counter++
+        this.updateCustom(this.counter)
+        return
+      } else if (this.isInternational) { // localStorage for all different groups of board stylings
         localStorage.internationalBoardStyle = payload
       } else if (this.isShogi) {
         localStorage.shogiBoardStyle = payload
