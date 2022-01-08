@@ -179,6 +179,7 @@ export const store = new Vuex.Store({
     menuAtMove: null,
     displayMenu: true,
     darkMode: false,
+    muteButton: false,
     fenply: 1,
     internationalVariants: [
       '+ Add Custom', 'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
@@ -406,11 +407,13 @@ export const store = new Vuex.Store({
       if (state.openedPGN) {
         return
       }
-      let note = new Audio(moveAudio)
-      if (move.toString().includes('x')) {
-        note = new Audio(captureAudio)
+      if (!state.muteButton) {
+        let note = new Audio(moveAudio)
+        if (move.toString().includes('x')) {
+          note = new Audio(captureAudio)
+        }
+        note.play()
       }
-      note.play()
     },
     gameInfo (state, payload) {
       state.gameInfo = payload
@@ -439,11 +442,12 @@ export const store = new Vuex.Store({
     },
     switchDarkMode (state) {
       state.darkMode = !state.darkMode
-      localStorage.darkMode = state.darkMode
+    },
+    switchMuteButton (state) {
+      state.muteButton = !state.muteButton
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
-      localStorage.evalPlotDepth = payload
     },
     fenply (state, payload) {
       state.fenply = payload
@@ -457,6 +461,12 @@ export const store = new Vuex.Store({
     },
     resetEngineTime (state) {
       clearInterval(state.clock)
+    },
+    saveSettings (state) {
+      localStorage.darkMode = state.darkMode
+      localStorage.muteButton = state.muteButton
+      localStorage.evalPlotDepth = state.evalPlotDepth
+      localStorage.variant = state.variant
     }
   },
   actions: { // async
@@ -482,6 +492,11 @@ export const store = new Vuex.Store({
       if (localStorage.darkMode) {
         if (localStorage.darkMode === 'true') {
           context.commit('switchDarkMode')
+        }
+      }
+      if (localStorage.muteButton) {
+        if (localStorage.muteButton === 'true') {
+          context.commit('switchMuteButton')
         }
       }
       if (localStorage.internationalPieceStyle) {
@@ -643,7 +658,6 @@ export const store = new Vuex.Store({
 
         // update variant
         context.commit('variant', payload)
-        localStorage.variant = payload
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess', 'atomic']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
@@ -948,8 +962,14 @@ export const store = new Vuex.Store({
     switchDarkMode (context) {
       context.commit('switchDarkMode')
     },
+    switchMuteButton (context) {
+      context.commit('switchMuteButton')
+    },
     evalPlotDepth (context, payload) {
       context.commit('evalPlotDepth', payload)
+    },
+    saveSettings (context) {
+      context.commit('saveSettings')
     }
   },
   getters: {
@@ -1219,6 +1239,9 @@ export const store = new Vuex.Store({
     },
     darkMode (state) {
       return state.darkMode
+    },
+    muteButton (state) {
+      return state.muteButton
     }
   }
 })
