@@ -251,7 +251,7 @@ export default {
   cursor: pointer;
 }
 .item:hover {
-  background-color: var(--hover-background-color);
+  background-color: var(--hover-color);
 }
 .item.active {
   background-color: #00af89;
