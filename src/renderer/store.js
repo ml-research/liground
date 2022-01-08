@@ -1160,7 +1160,6 @@ export const store = new Vuex.Store({
     selectedGame (state) {
       return state.selectedGame
     },
-  
     isInternational (state) {
       return state.internationalVariants.includes(state.variant)
     },
