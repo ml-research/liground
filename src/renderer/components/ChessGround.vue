@@ -2,10 +2,13 @@
   <div class="blue merida is2d">
     <div class="grid-parent">
       <div
-        v-if="variant==='crazyhouse'|| variant==='shogi' "
+        v-if="variant === 'crazyhouse' || variant === 'shogi'"
         ref="pockets"
         class="pockets"
-        :class="{ mirror : $store.getters.orientation === &quot;black&quot;, shogi: variant === &quot;shogi&quot; }"
+        :class="{
+          mirror: $store.getters.orientation === 'black',
+          shogi: variant === 'shogi',
+        }"
       >
         <ChessPocket
           id="chesspocket_top"
@@ -51,6 +54,7 @@
 </template>
 
 <script>
+
 import { mapGetters } from 'vuex'
 import { Chessground } from 'chessgroundx'
 import * as cgUtil from 'chessgroundx/util'
@@ -60,34 +64,36 @@ import PromotionModal from './PromotionModal.vue'
 const WHITE = true
 const BLACK = false
 
+
 export default {
-  name: 'ChessGround',
+  name: "ChessGround",
   components: {
-    ChessPocket, PromotionModal
+    ChessPocket,
+    PromotionModal,
   },
   props: {
     free: {
       type: Boolean,
-      default: false
+      default: false,
     },
     onPromotion: {
       type: Function,
-      default: () => 'q'
+      default: () => "q",
     },
     colors: {
       type: Array,
-      default: () => (['w', 'b'])
-    }
+      default: () => ["w", "b"],
+    },
   },
-  data () {
+  data() {
     return {
       startingPoint: 640,
       dragging: false,
       enlarged: 0,
       enlarged9x9: 0,
       enlarged9x10: 0,
-      ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
-      files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+      ranks: ["1", "2", "3", "4", "5", "6", "7", "8"],
+      files: ["a", "b", "c", "d", "e", "f", "g", "h"],
       selectedPiece: null,
       piecesToIdx: {
         P: 4,
@@ -99,7 +105,7 @@ export default {
         n: 1,
         b: 2,
         r: 3,
-        q: 4
+        q: 4,
       },
       shogiPiecesToIdx: {
         P: 6,
@@ -115,53 +121,53 @@ export default {
         s: 3,
         g: 4,
         b: 5,
-        r: 6
+        r: 6,
       },
       piecesW: [
-        { count: 0, type: 'q-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'p-piece' }
+        { count: 0, type: "q-piece" },
+        { count: 0, type: "r-piece" },
+        { count: 0, type: "b-piece" },
+        { count: 0, type: "n-piece" },
+        { count: 0, type: "p-piece" },
       ],
       piecesB: [
-        { count: 0, type: 'p-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'q-piece' }
+        { count: 0, type: "p-piece" },
+        { count: 0, type: "n-piece" },
+        { count: 0, type: "b-piece" },
+        { count: 0, type: "r-piece" },
+        { count: 0, type: "q-piece" },
       ],
       chessPiecesW: [
-        { count: 0, type: 'q-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'p-piece' }
+        { count: 0, type: "q-piece" },
+        { count: 0, type: "r-piece" },
+        { count: 0, type: "b-piece" },
+        { count: 0, type: "n-piece" },
+        { count: 0, type: "p-piece" },
       ],
       chessPiecesB: [
-        { count: 0, type: 'p-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'q-piece' }
+        { count: 0, type: "p-piece" },
+        { count: 0, type: "n-piece" },
+        { count: 0, type: "b-piece" },
+        { count: 0, type: "r-piece" },
+        { count: 0, type: "q-piece" },
       ],
       shogiPiecesB: [
-        { count: 0, type: 'p-piece' },
-        { count: 0, type: 'l-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 's-piece' },
-        { count: 0, type: 'g-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'r-piece' }
+        { count: 0, type: "p-piece" },
+        { count: 0, type: "l-piece" },
+        { count: 0, type: "n-piece" },
+        { count: 0, type: "s-piece" },
+        { count: 0, type: "g-piece" },
+        { count: 0, type: "b-piece" },
+        { count: 0, type: "r-piece" },
       ],
       shogiPiecesW: [
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'g-piece' },
-        { count: 0, type: 's-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'l-piece' },
-        { count: 0, type: 'p-piece' }
+        { count: 0, type: "r-piece" },
+        { count: 0, type: "b-piece" },
+        { count: 0, type: "g-piece" },
+        { count: 0, type: "s-piece" },
+        { count: 0, type: "n-piece" },
+        { count: 0, type: "l-piece" },
+        { count: 0, type: "p-piece" },
       ],
       board: null,
       shapes: [],
@@ -170,8 +176,8 @@ export default {
       isPromotionModalVisible: false,
       promotionMove: undefined,
       pieceStyleEl: null,
-      boardStyleEl: null
-    }
+      boardStyleEl: null,
+    };
   },
   computed: {
     selectedClasses () {
@@ -180,152 +186,189 @@ export default {
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
       for (let num = 0; num < this.moves.length; num++) {
         if (this.moves[num].fen === this.fen) {
-          return this.moves[num]
+          return this.moves[num];
         }
       }
-      return undefined
+      return undefined;
     },
-    turn () {
-      return this.$store.getters.turn ? 'white' : 'black'
+    turn() {
+      return this.$store.getters.turn ? "white" : "black";
     },
-    legalMoves () {
-      return this.$store.getters.legalMoves.split(' ')
+    legalMoves() {
+      return this.$store.getters.legalMoves.split(" ");
     },
-    promotionPosition () {
+    promotionPosition() {
       if (this.promotionMove) {
-        const dest = this.promotionMove.substring(2, 4)
+        const dest = this.promotionMove.substring(2, 4);
 
-        let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5
+        let left = (8 - cgUtil.key2pos(dest)[0]) * 12.5;
 
-        if (this.orientation === 'white') {
-          left = 87.5 - left
+        if (this.orientation === "white") {
+          left = 87.5 - left;
         }
 
-        const vertical = this.turn === this.orientation ? 0 : (8 - this.promotions.length) * 12.5
-        return { left: `${left}%`, top: `${vertical}%` }
+        const vertical =
+          this.turn === this.orientation
+            ? 0
+            : (8 - this.promotions.length) * 12.5;
+        return { left: `${left}%`, top: `${vertical}%` };
       } else {
-        return undefined
+        return undefined;
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode'])
+    ...mapGetters([
+      "initialized",
+      "variant",
+      "multipv",
+      "hoveredpv",
+      "redraw",
+      "pieceStyle",
+      "boardStyle",
+      "fen",
+      "lastFen",
+      "orientation",
+      "moves",
+      "isPast",
+      "dimensionNumber",
+      "analysisMode",
+    ]),
   },
   watch: {
-    initialized () {
-      this.updateBoard()
+    initialized() {
+      this.updateBoard();
     },
-    fen () {
-      this.updateBoard()
+    fen() {
+      this.updateBoard();
     },
-    orientation () {
-      this.updateBoard()
-      document.dispatchEvent(new Event('renderPromotion'))
+    orientation() {
+      this.updateBoard();
+      document.dispatchEvent(new Event("renderPromotion"));
     },
-    pieceStyle (pieceStyle) {
-      this.updatePieceCSS(pieceStyle)
-      document.dispatchEvent(new Event('renderPromotion'))
+    pieceStyle(pieceStyle) {
+      this.updatePieceCSS(pieceStyle);
+      document.dispatchEvent(new Event("renderPromotion"));
     },
-    boardStyle (boardStyle) {
-      this.updateBoardCSS(boardStyle)
+    boardStyle(boardStyle) {
+      this.updateBoardCSS(boardStyle);
     },
-    multipv () {
-      const multipv = this.multipv
-      const shapes = []
-      const pieceShapes = []
+    multipv() {
+      const multipv = this.multipv;
+      const shapes = [];
+      const pieceShapes = [];
 
       for (const [i, pvline] of multipv.entries()) {
-        if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
-          const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
-          const move = pvline.ucimove
-          let orig = move.substring(0, 2)
-          let dest = move.substring(2, 4)
-          let drawShape
+        if (pvline && "ucimove" in pvline && pvline.ucimove.length > 0) {
+          const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8;
+          const move = pvline.ucimove;
+          let orig = move.substring(0, 2);
+          let dest = move.substring(2, 4);
+          let drawShape;
           if (this.dimensionNumber === 3) {
-            const extract = this.extractMoves(move)
-            orig = extract[0].replace('10', ':')
-            dest = extract[1].replace('10', ':')
+            const extract = this.extractMoves(move);
+            orig = extract[0].replace("10", ":");
+            dest = extract[1].replace("10", ":");
           }
-          if (move.includes('@')) {
-            const pieceType = move[0].toLowerCase()
-            const pieceConv = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }
+          if (move.includes("@")) {
+            const pieceType = move[0].toLowerCase();
+            const pieceConv = {
+              p: "pawn",
+              n: "knight",
+              b: "bishop",
+              r: "rook",
+              q: "queen",
+              k: "king",
+            };
             pieceShapes.unshift({
               orig: dest,
               dest: dest,
-              brush: 'paleBlue',
+              brush: "paleBlue",
               modifiers: { lineWidth },
               piece: {
                 role: pieceConv[pieceType],
-                color: this.turn
-              }
-            })
-            drawShape = { orig: dest, brush: 'paleBlue', modifiers: { lineWidth } }
+                color: this.turn,
+              },
+            });
+            drawShape = {
+              orig: dest,
+              brush: "paleBlue",
+              modifiers: { lineWidth },
+            };
           } else {
-            drawShape = { orig, dest, brush: 'paleBlue', modifiers: { lineWidth } }
+            drawShape = {
+              orig,
+              dest,
+              brush: "paleBlue",
+              modifiers: { lineWidth },
+            };
           }
 
           // adjust color if pv line is hovered
           if (i === this.hoveredpv) {
-            drawShape.brush = 'blue'
+            drawShape.brush = "blue";
           }
           if (i === 0) {
             drawShape.brush = 'yellow'
           }
           // put item in front of list, so that the best move is drawn last
-          shapes.unshift(drawShape)
+          shapes.unshift(drawShape);
         }
       }
-      this.pieceShapes = pieceShapes
-      this.shapes = shapes
-      this.drawShapes()
+      this.pieceShapes = pieceShapes;
+      this.shapes = shapes;
+      this.drawShapes();
     },
-    hoveredpv () {
-      const index = this.shapes.length - this.hoveredpv - 1
+    hoveredpv() {
+      const index = this.shapes.length - this.hoveredpv - 1;
       for (const [i, shape] of this.shapes.entries()) {
         shape.brush = i === index ? 'blue' : 'paleBlue'
         if (i === this.shapes.length - 1) {
           this.shapes[this.shapes.length - 1].brush = 'yellow'
         }
       }
-      this.drawShapes()
+      this.drawShapes();
     },
     variant () {
       if (this.variant === 'shogi') {
         this.piecesW = this.shogiPiecesW
         this.piecesB = this.shogiPiecesB
       }
-      if (this.variant === 'crazyhouse') {
-        this.piecesW = this.chessPiecesW
-        this.piecesB = this.chessPiecesB
+      if (this.variant === "crazyhouse") {
+        this.piecesW = this.chessPiecesW;
+        this.piecesB = this.chessPiecesB;
       }
-      this.resetPockets(this.piecesW)
-      this.resetPockets(this.piecesB)
+      this.resetPockets(this.piecesW);
+      this.resetPockets(this.piecesB);
       if (this.board.state.geometry !== this.dimensionNumber) {
         this.board = Chessground(this.$refs.board, {
           coordinates: false,
           fen: this.fen,
-          turnColor: 'white',
+          turnColor: "white",
           resizable: true,
           highlight: {
             lastMove: true, // add last-move class to squares
-            check: false // add check class to squares
+            check: false, // add check class to squares
           },
           drawable: {
             enabled: true, // can draw
             visible: true, // can view
-            eraseOnClick: false
+            eraseOnClick: false,
           },
           movable: {
-            events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
-            color: 'white',
-            free: false
+            events: {
+              after: this.changeTurn(),
+              afterNewPiece: this.afterDrag(),
+            },
+            color: "white",
+            free: false,
           },
           orientation: this.orientation,
-          geometry: this.$store.getters.dimensionNumber
-        })
+          geometry: this.$store.getters.dimensionNumber,
+        });
 
-        document.body.dispatchEvent(new Event('chessground.resize'))
+        document.body.dispatchEvent(new Event("chessground.resize"));
       }
-      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
-        document.body.dispatchEvent(new Event('chessground.resize'))
+      if (this.variant === "crazyhouse" || this.variant === "shogi") {
+        document.body.dispatchEvent(new Event("chessground.resize"));
       }
       this.board.set({
         variant: this.variant,
@@ -360,32 +403,32 @@ export default {
     this.board = Chessground(this.$refs.board, {
       coordinates: false,
       fen: this.fen,
-      turnColor: 'white',
+      turnColor: "white",
       resizable: true,
       highlight: {
         lastMove: true, // add last-move class to squares
-        check: true // add check class to squares
+        check: true, // add check class to squares
       },
       drawable: {
         enabled: true, // can draw
         visible: true, // can view
-        eraseOnClick: false
+        eraseOnClick: false,
       },
       movable: {
         events: { after: this.changeTurn(), afterNewPiece: this.afterDrag() },
-        color: 'white',
+        color: "white",
         free: false,
-        rookCastle: true
+        rookCastle: true,
       },
       premovable: {
-        enabled: false
+        enabled: false,
       },
       events: {
         select: () => this.removeFocusFromInputs(),
-        move: () => this.removeFocusFromInputs()
+        move: () => this.removeFocusFromInputs(),
       },
-      orientation: this.orientation
-    })
+      orientation: this.orientation,
+    });
 
     // inject stylesheet placeholders into head
     this.boardStyleEl = document.createElement('link')
@@ -515,25 +558,36 @@ export default {
     updatePieceCSS (pieceStyle) {
       const node = this.pieceStyleEl
       if (this.$store.getters.isInternational) {
-        node.href = 'static/piece-css/international/' + pieceStyle + '.css'
+        node.href = "static/piece-css/international/" + pieceStyle + ".css";
       } else if (this.$store.getters.isSEA) {
-        node.href = 'static/piece-css/sea/' + pieceStyle + '.css'
-      } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
-        node.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
+        node.href = "static/piece-css/sea/" + pieceStyle + ".css";
+      } else if (
+        this.$store.getters.isXiangqi ||
+        this.$store.getters.isJanggi
+      ) {
+        node.href = "static/piece-css/xiangqi/" + pieceStyle + ".css";
       } else if (this.$store.getters.isShogi) {
-        node.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
+        node.href = "static/piece-css/shogi/" + pieceStyle + ".css";
       }
     },
-    updateBoardCSS (boardStyle) {
-      const node = this.boardStyleEl
+    updateBoardCSS(boardStyle) {
+      const node = this.boardStyleEl;
       if (this.$store.getters.isInternational) {
-        node.href = 'static/board-css/international/' + boardStyle + '.css'
-      } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
-        node.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+        node.href = "static/board-css/international/" + boardStyle + ".css";
+      } else if (
+        this.$store.getters.isXiangqi ||
+        this.$store.getters.isJanggi
+      ) {
+        node.href =
+          "static/board-css/xiangqi/" +
+          this.variant +
+          "/" +
+          boardStyle +
+          ".css";
       } else if (this.$store.getters.isSEA) {
-        node.href = 'static/board-css/sea/' + boardStyle + '.css'
+        node.href = "static/board-css/sea/" + boardStyle + ".css";
       } else if (this.$store.getters.isShogi) {
-        node.href = 'static/board-css/shogi/' + boardStyle + '.css'
+        node.href = "static/board-css/shogi/" + boardStyle + ".css";
       }
       document.body.dispatchEvent(new Event('chessground.resize'))
     },
@@ -550,218 +604,218 @@ export default {
       let firstcomplete = false
       for (const i in letters) {
         if (isNaN(parseInt(letters[i])) && first.length !== 0) {
-          firstcomplete = true
+          firstcomplete = true;
         }
         if (firstcomplete === false) {
-          first += letters[i]
+          first += letters[i];
         }
         if (firstcomplete) {
-          second += letters[i]
+          second += letters[i];
         }
       }
-      const ret = [first, second]
-      return ret
+      const ret = [first, second];
+      return ret;
     },
-    increaseNumbers (move) {
-      const letters = move.split(/(\d+)/)
-      letters[1] = String(parseInt(letters[1]) + 1)
-      letters[3] = String(parseInt(letters[3]) + 1)
-      const ret = letters.join('')
-      return ret
+    increaseNumbers(move) {
+      const letters = move.split(/(\d+)/);
+      letters[1] = String(parseInt(letters[1]) + 1);
+      letters[3] = String(parseInt(letters[3]) + 1);
+      const ret = letters.join("");
+      return ret;
     },
-    lowerNumbers (move) {
-      const letters = move.split(/(\D)/)
-      letters[2] = String(parseInt(letters[2]) - 1)
-      letters[4] = String(parseInt(letters[4]) - 1)
-      const ret = letters.join('')
-      return ret
+    lowerNumbers(move) {
+      const letters = move.split(/(\D)/);
+      letters[2] = String(parseInt(letters[2]) - 1);
+      letters[4] = String(parseInt(letters[4]) - 1);
+      const ret = letters.join("");
+      return ret;
     },
-    possibleMoves () {
-      const dests = {}
+    possibleMoves() {
+      const dests = {};
 
-      let fromSq
-      let toSq
+      let fromSq;
+      let toSq;
       for (let i = 0; i < this.legalMoves.length; i++) {
         // don't include dropping moves
         if (this.legalMoves[i].length !== 3) {
-          const Move = this.legalMoves[i]
-          fromSq = Move.substring(0, 2)
-          toSq = Move.substring(2, 4)
+          const Move = this.legalMoves[i];
+          fromSq = Move.substring(0, 2);
+          toSq = Move.substring(2, 4);
           if (this.dimensionNumber === 3) {
-            const extract = this.extractMoves(Move)
-            fromSq = extract[0].replace('10', ':')
-            toSq = extract[1].replace('10', ':')
+            const extract = this.extractMoves(Move);
+            fromSq = extract[0].replace("10", ":");
+            toSq = extract[1].replace("10", ":");
           }
         }
         if (fromSq in dests) {
-          dests[fromSq].push(toSq)
+          dests[fromSq].push(toSq);
         } else {
-          dests[fromSq] = [toSq]
+          dests[fromSq] = [toSq];
         }
       }
-      return dests
+      return dests;
     },
-    isPromotion (uciMove) {
+    isPromotion(uciMove) {
       for (let i = 0; i < this.legalMoves.length; i++) {
         if (this.dimensionNumber === 3) {
-          return false
+          return false;
         }
         if (this.legalMoves[i].length === 5) {
           if (this.legalMoves[i].includes(uciMove)) {
-            return true
+            return true;
           }
         }
       }
-      return false
+      return false;
     },
-    setPromotionOptions (uciMove) {
+    setPromotionOptions(uciMove) {
       if (this.$store.getters.isInternational) {
-        if (this.variant === 'antichess') {
+        if (this.variant === "antichess") {
           this.promotions = [
-            { type: 'k-piece' },
-            { type: 'q-piece' },
-            { type: 'r-piece' },
-            { type: 'b-piece' },
-            { type: 'n-piece' }
-          ]
+            { type: "k-piece" },
+            { type: "q-piece" },
+            { type: "r-piece" },
+            { type: "b-piece" },
+            { type: "n-piece" },
+          ];
         } else {
           this.promotions = [
-            { type: 'q-piece' },
-            { type: 'r-piece' },
-            { type: 'b-piece' },
-            { type: 'n-piece' }
-          ]
+            { type: "q-piece" },
+            { type: "r-piece" },
+            { type: "b-piece" },
+            { type: "n-piece" },
+          ];
         }
       }
-      if (this.variant === 'shogi') {
-        const key = uciMove.substring(2, 4)
-        const type = this.board.state.pieces[key].role
-        let num = 0
-        let promo = false
+      if (this.variant === "shogi") {
+        const key = uciMove.substring(2, 4);
+        const type = this.board.state.pieces[key].role;
+        let num = 0;
+        let promo = false;
         for (let i = 0; i < this.legalMoves.length; i++) {
           if (this.legalMoves[i].includes(uciMove)) {
-            num = num + 1
-            if (this.legalMoves[i].includes('+')) {
-              promo = true
+            num = num + 1;
+            if (this.legalMoves[i].includes("+")) {
+              promo = true;
             }
           }
         }
-        if (type === 'p-piece') {
-          this.promotions = [
-            { type: 'p-piece' },
-            { type: 'pp-piece' }
-          ]
-        } else if (type === 'l-piece') {
-          this.promotions = [
-            { type: 'l-piece' },
-            { type: 'pl-piece' }
-          ]
-        } else if (type === 'n-piece') {
-          this.promotions = [
-            { type: 'n-piece' },
-            { type: 'pn-piece' }
-          ]
-        } else if (type === 's-piece') {
-          this.promotions = [
-            { type: 's-piece' },
-            { type: 'ps-piece' }
-          ]
-        } else if (type === 'b-piece') {
-          this.promotions = [
-            { type: 'b-piece' },
-            { type: 'pb-piece' }
-          ]
-        } else if (type === 'r-piece') {
-          this.promotions = [
-            { type: 'r-piece' },
-            { type: 'pr-piece' }
-          ]
+        if (type === "p-piece") {
+          this.promotions = [{ type: "p-piece" }, { type: "pp-piece" }];
+        } else if (type === "l-piece") {
+          this.promotions = [{ type: "l-piece" }, { type: "pl-piece" }];
+        } else if (type === "n-piece") {
+          this.promotions = [{ type: "n-piece" }, { type: "pn-piece" }];
+        } else if (type === "s-piece") {
+          this.promotions = [{ type: "s-piece" }, { type: "ps-piece" }];
+        } else if (type === "b-piece") {
+          this.promotions = [{ type: "b-piece" }, { type: "pb-piece" }];
+        } else if (type === "r-piece") {
+          this.promotions = [{ type: "r-piece" }, { type: "pr-piece" }];
         }
         if (num === 1 && promo) {
-          this.promotions = [this.promotions[1]]
+          this.promotions = [this.promotions[1]];
         }
       }
     },
-    resetPockets (pieces) {
+    resetPockets(pieces) {
       for (let idx = 0; idx < pieces.length; idx++) {
-        pieces[idx].count = 0
+        pieces[idx].count = 0;
       }
     },
-    afterDrag () {
+    afterDrag() {
       return (role, key) => {
-        const pieces = { 'p-piece': 'P', 'n-piece': 'N', 'b-piece': 'B', 'r-piece': 'R', 'q-piece': 'Q', 's-piece': 'S', 'g-piece': 'G', 'l-piece': 'L' }
-        const move = pieces[role] + '@' + key
-        const prevMov = this.currentMove
+        const pieces = {
+          "p-piece": "P",
+          "n-piece": "N",
+          "b-piece": "B",
+          "r-piece": "R",
+          "q-piece": "Q",
+          "s-piece": "S",
+          "g-piece": "G",
+          "l-piece": "L",
+        };
+        const move = pieces[role] + "@" + key;
+        const prevMov = this.currentMove;
         if (this.$store.getters.legalMoves.includes(move)) {
-          this.$store.dispatch('push', { move: move, prev: prevMov })
-          this.updateHand()
+          this.$store.dispatch("push", { move: move, prev: prevMov });
+          this.updateHand();
         } else {
-          this.updateBoard()
+          this.updateBoard();
         }
-      }
+      };
     },
-    changeTurn () {
+    changeTurn() {
       return (orig, dest, metadata) => {
-        let uciMove = orig + dest
+        let uciMove = orig + dest;
         if (this.dimensionNumber === 3) {
-          uciMove = uciMove.replaceAll(':', '10') // Convert the ':' back to '10'
+          uciMove = uciMove.replaceAll(":", "10"); // Convert the ':' back to '10'
         }
         if (this.isPromotion(uciMove)) {
-          if (this.variant === 'makruk') {
-            const move = uciMove + 'm'
-            const prevMov = this.currentMove
-            this.$store.dispatch('push', { move: move, prev: prevMov })
+          if (this.variant === "makruk") {
+            const move = uciMove + "m";
+            const prevMov = this.currentMove;
+            this.$store.dispatch("push", { move: move, prev: prevMov });
           } else {
-            this.setPromotionOptions(uciMove)
-            this.promotionMove = uciMove
-            this.showPromotionModal()
+            this.setPromotionOptions(uciMove);
+            this.promotionMove = uciMove;
+            this.showPromotionModal();
           }
         } else {
-          this.lastMoveSan = this.$store.getters.sanMove(uciMove)
-          const prevMov = this.currentMove
-          this.$store.dispatch('push', { move: uciMove, prev: prevMov })
-          this.updateHand()
-          this.afterMove()
-          console.log(this.turn)
+          this.lastMoveSan = this.$store.getters.sanMove(uciMove);
+          const prevMov = this.currentMove;
+          this.$store.dispatch("push", { move: uciMove, prev: prevMov });
+          this.updateHand();
+          this.afterMove();
+          console.log(this.turn);
         }
-      }
+      };
     },
-    updatePocket (pocket, pocketPieces, color) {
+    updatePocket(pocket, pocketPieces, color) {
       for (let idx = 0; idx < pocketPieces.length; ++idx) {
-        let pieceIdx
-        if (this.variant === 'shogi') {
+        let pieceIdx;
+        if (this.variant === "shogi") {
           if (color === WHITE) {
-            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx].toUpperCase()]
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx].toUpperCase()];
           } else {
-            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx]]
+            pieceIdx = this.shogiPiecesToIdx[pocketPieces[idx]];
           }
         } else {
           if (color === WHITE) {
-            pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()]
+            pieceIdx = this.piecesToIdx[pocketPieces[idx].toUpperCase()];
           } else {
-            pieceIdx = this.piecesToIdx[pocketPieces[idx]]
+            pieceIdx = this.piecesToIdx[pocketPieces[idx]];
           }
         }
-        pocket[pieceIdx].count += 1
+        pocket[pieceIdx].count += 1;
       }
     },
-    updateHand () {
+    updateHand() {
       // Crazyhouse pocket pieces
-      this.resetPockets(this.piecesW)
-      this.resetPockets(this.piecesB)
+      this.resetPockets(this.piecesW);
+      this.resetPockets(this.piecesB);
       if (this.fen === this.lastFen) {
-        this.updatePocket(this.piecesW, this.$store.getters.pocket(WHITE), WHITE)
-        this.updatePocket(this.piecesB, this.$store.getters.pocket(BLACK), BLACK)
+        this.updatePocket(
+          this.piecesW,
+          this.$store.getters.pocket(WHITE),
+          WHITE
+        );
+        this.updatePocket(
+          this.piecesB,
+          this.$store.getters.pocket(BLACK),
+          BLACK
+        );
       } else {
-        let i = 0
-        for (let num = 0; num < this.moves.length; num++) { // i will have the index of the currently displayed move
+        let i = 0;
+        for (let num = 0; num < this.moves.length; num++) {
+          // i will have the index of the currently displayed move
           if (this.moves[num].fen === this.fen) {
-            i = num
-            break
+            i = num;
+            break;
           }
         }
-        this.updatePocket(this.piecesW, this.moves[i].whitePocket, WHITE) // load the pocketpieces from the currently displayed move
-        this.updatePocket(this.piecesB, this.moves[i].blackPocket, BLACK)
+        this.updatePocket(this.piecesW, this.moves[i].whitePocket, WHITE); // load the pocketpieces from the currently displayed move
+        this.updatePocket(this.piecesB, this.moves[i].blackPocket, BLACK);
       }
     },
     afterMove () {
@@ -771,29 +825,35 @@ export default {
       // this.$emit('onMove', events)
       this.$store.dispatch('lastFen', this.fen)
     },
-    updateBoard () {
+    updateBoard() {
       // logic to find out if a check should be displayed:
-      let isCheck = false // ensures that no check is displayed when the current move was not a check
-      if (this.currentMove !== undefined && (this.currentMove.name.includes('+') || this.currentMove.name.includes('#'))) { // the last move was check iff the san notation of the last move contained a '+'
-        this.moves[this.moves.length - 1].check = this.turn // the check property of the board accepts a color or a boolean
-        isCheck = this.currentMove.check
+      let isCheck = false; // ensures that no check is displayed when the current move was not a check
+      if (
+        this.currentMove !== undefined &&
+        (this.currentMove.name.includes("+") ||
+          this.currentMove.name.includes("#"))
+      ) {
+        // the last move was check iff the san notation of the last move contained a '+'
+        this.moves[this.moves.length - 1].check = this.turn; // the check property of the board accepts a color or a boolean
+        isCheck = this.currentMove.check;
       }
       // logic to find out which move was last and should thus be highlighted:
       if (this.currentMove === undefined || this.moves.length === 0) {
-        this.board.state.lastMove = undefined
+        this.board.state.lastMove = undefined;
       } else {
-        const string = String(this.currentMove.uci)
-        let first = string.substring(0, 2)
-        let second = string.substring(2, 4)
+        const string = String(this.currentMove.uci);
+        let first = string.substring(0, 2);
+        let second = string.substring(2, 4);
         if (this.dimensionNumber === 3) {
-          const extract = this.extractMoves(string)
-          first = extract[0].replace('10', ':')
-          second = extract[1].replace('10', ':') // the 10th rank is represented as ":"
+          const extract = this.extractMoves(string);
+          first = extract[0].replace("10", ":");
+          second = extract[1].replace("10", ":"); // the 10th rank is represented as ":"
         }
-        if (string.includes('@')) { // no longer displays a green box in the corner
-          this.board.state.lastMove = [second]
+        if (string.includes("@")) {
+          // no longer displays a green box in the corner
+          this.board.state.lastMove = [second];
         } else {
-          this.board.state.lastMove = [first, second]
+          this.board.state.lastMove = [first, second];
         }
       }
       this.board.set({
@@ -802,21 +862,23 @@ export default {
         turnColor: this.turn,
         highlight: {
           lastMove: true,
-          check: true
+          check: true,
         },
-        movable: this.fen === this.lastFen || this.analysisMode
-          ? { // moving is possible at the end of the line and in analysis mode
-              dests: this.possibleMoves(),
-              color: this.turn
-            }
-          : {
-              dests: {},
-              color: this.turn
-            },
-        orientation: this.orientation
-      })
-      if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
-        this.updateHand()
+        movable:
+          this.fen === this.lastFen || this.analysisMode
+            ? {
+                // moving is possible at the end of the line and in analysis mode
+                dests: this.possibleMoves(),
+                color: this.turn,
+              }
+            : {
+                dests: {},
+                color: this.turn,
+              },
+        orientation: this.orientation,
+      });
+      if (this.variant === "crazyhouse" || this.variant === "shogi") {
+        this.updateHand();
       }
     },
     drawShapes () {
@@ -824,20 +886,20 @@ export default {
         this.board.setAutoShapes([...this.shapes, ...this.pieceShapes])
       }
     },
-    removeFocusFromInputs () {
-      if (document.activeElement.nodeName.toLowerCase() === 'input') {
-        document.activeElement.blur()
+    removeFocusFromInputs() {
+      if (document.activeElement.nodeName.toLowerCase() === "input") {
+        document.activeElement.blur();
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>
-@import '../assets/chessground.css';
-@import '../assets/dim9x9.css';
-@import '../assets/dim8x8.css';
-@import '../assets/dim9x10.css';
+@import "../assets/chessground.css";
+@import "../assets/dim9x9.css";
+@import "../assets/dim8x8.css";
+@import "../assets/dim9x10.css";
 
 .resizer{
   padding-left: 15px;
@@ -851,8 +913,8 @@ export default {
   bottom: -1px;
   right: -1px;
   cursor: se-resize;
-  opacity: 0.0;
-  }
+  opacity: 0;
+}
 #PromotionModal {
   position: absolute;
   z-index: 4;
@@ -868,7 +930,7 @@ export default {
 }
 .grid-parent {
   display: grid;
-  grid-template-columns: auto 1fr
+  grid-template-columns: auto 1fr;
 }
 .pockets {
   margin-right: 1.5px;
@@ -876,19 +938,18 @@ export default {
   background-color: var(--second-bg-color);
   border-radius: 5px;
 }
-.pockets.shogi{
-  display:grid;
-  grid-template-columns: 1fr 1fr ;
-
+.pockets.shogi {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 coords.ranks {
   height: 100%;
-  width: .8em;
+  width: 0.8em;
   margin-bottom: 10px;
 }
 coords.files {
   height: 100%;
-  width: .8em;
+  width: 0.8em;
   width: 10px;
   padding-left: 30px;
   margin-right: 10px;
@@ -915,9 +976,9 @@ coords {
 .koth cg-container::before {
   width: 25%;
   height: 25%;
-  box-shadow: 0 0 10px rgba(0,0,0,0.7);
-  background: rgba(230,230,230,0.2);
-  content: '';
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  background: rgba(230, 230, 230, 0.2);
+  content: "";
   position: absolute;
   top: 37.5%;
   left: 37.5%;
@@ -925,20 +986,19 @@ coords {
   pointer-events: none;
   border-radius: 0px 0px 0px 0px;
 }
-.rk cg-board::before{
-    background: rgba(230,230,230,0.2);
-    width: 100%;
-    height: 12.5%;
-    box-shadow: 0 0 10px rgba(0,0,0,0.7);
-    content: '';
-    position: absolute;
-    left: 0;
-    z-index: 1;
-    pointer-events: none;
-    border-radius: 4px 4px 0px 0px;
+.rk cg-board::before {
+  background: rgba(230, 230, 230, 0.2);
+  width: 100%;
+  height: 12.5%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  content: "";
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 4px 4px 0px 0px;
 }
 /*
   CSS for 9x10 board e.g. xiangqi/janggi etc.
 */
-
 </style>
