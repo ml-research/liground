@@ -22,9 +22,7 @@
 </template>
 
 <script>
-import fs from 'fs'
 import { mapGetters } from 'vuex'
-import ffish from 'ffish'
 import AboutTabModal from './AboutTabModal'
 
 export default {
@@ -51,30 +49,29 @@ export default {
         visible: true,
         title: 'LiGround'
       }
-    },
+    }
   }
 }
 </script>
 
 <style scoped>
 .bar {
-  margin: 10px auto;
   position: relative;
   background-color: var(--button-color);
   font-size: 11px;
-  width: 33.3%;
-  border-radius: 8px;
+  width: 100%;
+  display: flex;
 }
 .item {
   padding-left: 16px;
   padding-right: 16px;
-  padding-top: 1.5%;
-  padding-bottom: 1.5%;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  text-align: left;
   display: inline-block;
   color: var(--light-text-color);;
   font-size: 11px;
   text-decoration: none;
-  text-align: center;
   cursor: pointer;
 }
 .item:hover {

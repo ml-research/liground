@@ -1,4 +1,5 @@
-<template>                                <!-- All components but menubar -->
+<template>
+  <!-- All components but menubar -->
   <div id="inner">
     <div>
       <div class="main-grid">
@@ -21,7 +22,7 @@
               name="lname"
               placeholder="fen position"
               :value="fen"
-              :size = 'setFenSize()'
+              :size="setFenSize()"
               @change="checkValidFEN"
             >
           </div>
@@ -153,7 +154,7 @@ export default {
     }, false)
   },
   methods: {
-    setFenSize(){
+    setFenSize () {
       return this.fen.length + 3
     },
     scroll (event) { // TODO: also moves back and forth when being slightly next to the board and for example over the pockets

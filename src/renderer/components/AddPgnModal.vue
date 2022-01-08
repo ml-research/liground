@@ -8,23 +8,28 @@
       <header class="header">
         {{ title }}
       </header>
-      <div class ="body">
+      <div class="body">
         <div
-         class="item"
-         @click="openPgn"
-         >
+          class="item"
+          @click="openPgn"
+        >
           <em class="icon mdi mdi-checkerboard" /> Open PGN from file System
         </div>
-          <div class ="Textbox">
-           <textarea rows="15" cols="80" v-model="pgnString" placeholder="or Input the PGN String here"></textarea>
-          </div>
+        <div class="Textbox">
+          <textarea
+            v-model="pgnString"
+            rows="15"
+            cols="80"
+            placeholder="or Input the PGN String here"
+          />
         </div>
+      </div>
       <footer class="footer">
         <button
           type="button"
           class="btn green"
           @click="openPGNFromString"
-          >
+        >
           confirm
         </button>
         <button
@@ -41,13 +46,11 @@
 
 <script>
 import fs from 'fs'
-import { shell } from 'electron'
 import { mapGetters } from 'vuex'
 import ffish from 'ffish'
 
-
 export default {
-  name: 'addPgnModal',
+  name: 'AddPgnModal',
   props: {
     title: {
       required: true,
@@ -76,7 +79,7 @@ export default {
     close () {
       this.$emit('close')
     },
-        openPgn () {
+    openPgn () {
       this.$electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
         properties: ['openFile'],
@@ -105,31 +108,30 @@ export default {
         this.close()
       })
     },
-    openPGNFromString() {
-      if (this.pgnString == "") {
-        //alert('please enter a game String')
-      }else {
-        let data
+    openPGNFromString () {
+      if (this.pgnString === '') {
+        // alert('please enter a game String')
+      } else {
         // convert CRLF to LF
-        data = this.pgnString.replace(/\r\n/g, '\n')
+        const data = this.pgnString.replace(/\r\n/g, '\n')
         this.convertAndStorePgn(data)
         this.close()
       }
     },
-    convertAndStorePgn(data) {
+    convertAndStorePgn (data) {
       const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
       let games = []
-      if(this.$store.getters.loadedGames) {
+      if (this.$store.getters.loadedGames) {
         games = this.$store.getters.loadedGames
       }
       let numOfUnparseableGames = 0
       let m
-
-      while ((m = regex.exec(data)) !== null) {
+      const maxGames = 30
+      let currentGameCount = 0
+      while ((m = regex.exec(data)) !== null && currentGameCount !== maxGames) {
         if (m.index === regex.lastIndex) {
           regex.lastIndex++
         }
-
         m.forEach((match, groupIndex) => {
           let game
           try {
@@ -137,7 +139,8 @@ export default {
           } catch (error) {
             numOfUnparseableGames = numOfUnparseableGames + 1
             return
-          }            
+          }
+          currentGameCount++
           games.push(game)
         })
       }
