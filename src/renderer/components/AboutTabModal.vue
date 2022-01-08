@@ -1,83 +1,96 @@
 <template>
-    <div class="modal">
-        <div
-            class="backdrop"
-            @click="cancel"
-        />
-        <div class="contents">
-            <header class="header">
-               <em class="icon mdi mdi-information-outline" /> {{ "    "+ title +"    " }} <em class="icon mdi mdi-github" />
-            </header>
-            <section class="body">
-                <div class="item">
-                    <span>
-                        {{"A free, open-source and modern Chess Variant Analysis GUI for the 21 century"}}
-                    </span>
-                </div>
-                <div class="item" style="white-space: pre-line">
-                    <span>
-                        {{"Version: 0.2.0"}}
-                    </span>
-                </div>
-                 <div class="item">
-                    <span>
-                        {{"License: AGPL-3.0"}}
-                    </span>
-                </div>
-                <div class="item">
-                    <span>
-                        {{"Find our official"}}
-                    </span>
-                    <button
-                      class="btn aboutTab"
-                      @click="openGitHub"
-                    >
-                        GitHub
-                    </button>
-                </div>
-                <div class="item">
-                    <span>
-                        {{"Read more about our"}}
-                    </span>
-                    <button
-                      class="btn aboutTab"
-                      @click="openLicense"
-                    >
-                        License
-                    </button>
-                </div>
-                 <div class="item" style="white-space: pre-line">
-                    <span>
-                        {{"Our Authors:"}}
-                    </span>
-                </div>
-                <div class="item">
-                    <span>
-                        {{"Johannes Czech"}}
-                    </span>
-                </div>
-                <div class="item">
-                    <span>
-                        {{"Laurin Bielich, Jannik Holmer, Peter Mader, Simon Muchau, Martin Ruzicka,"}}
-                    </span>
-                </div>
-                <div class="item">
-                    <span>
-                        {{"Daniel Creß, Samuel Gajdos, Gökay Karaahmetli, Lena-Marie Munderich, Leif Schwaß"}}
-                    </span>
-                </div>
-            </section>
-            <footer class="footer">
-                <button
-                    type="button"
-                    class="btn aboutTab"
-                    @click="cancel"
-                >
-                    Close
-                </button>
-            </footer>
+  <div class="modal">
+    <div
+      class="backdrop"
+      @click="cancel"
+    />
+    <div class="contents">
+      <header class="header">
+        <em class="icon mdi mdi-information-outline" />
+        {{ "    " + title + "    " }} <em class="icon mdi mdi-github" />
+      </header>
+      <section class="body">
+        <div class="item">
+          <span>
+            {{
+              'A free, open-source and modern Chess Variant Analysis GUI for the 21 century'
+            }}
+          </span>
         </div>
-     </div>
+        <div
+          class="item"
+          style="white-space: pre-line"
+        >
+          <span>
+            {{ 'Version: 0.2.0' }}
+          </span>
+        </div>
+        <div class="item">
+          <span>
+            {{ 'License: AGPL-3.0' }}
+          </span>
+        </div>
+        <div class="item">
+          <span>
+            {{ 'Find our official' }}
+          </span>
+          <button
+            class="btn aboutTab"
+            @click="openGitHub"
+          >
+            GitHub
+          </button>
+        </div>
+        <div class="item">
+          <span>
+            {{ "Read more about our" }}
+          </span>
+          <button
+            class="btn aboutTab"
+            @click="openLicense"
+          >
+            License
+          </button>
+        </div>
+        <div
+          class="item"
+          style="white-space: pre-line"
+        >
+          <span>
+            {{ 'Our Authors:' }}
+          </span>
+        </div>
+        <div class="item">
+          <span>
+            {{ 'Johannes Czech' }}
+          </span>
+        </div>
+        <div class="item">
+          <span>
+            {{
+              'Laurin Bielich, Jannik Holmer, Peter Mader, Simon Muchau, Martin Ruzicka,'
+            }}
+          </span>
+        </div>
+        <div class="item">
+          <span>
+            {{
+              'Daniel Creß, Samuel Gajdos, Gökay Karaahmetli, Lena-Marie Munderich, Leif Schwaß'
+            }}
+          </span>
+        </div>
+      </section>
+      <footer class="footer">
+        <button
+          type="button"
+          class="btn aboutTab"
+          @click="cancel"
+        >
+          Close
+        </button>
+      </footer>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -99,7 +112,9 @@ export default {
       shell.openExternal('https://github.com/ml-research/liground')
     },
     openLicense () {
-      shell.openExternal('https://github.com/ml-research/liground/blob/master/LICENSE')
+      shell.openExternal(
+        'https://github.com/ml-research/liground/blob/master/LICENSE'
+      )
     }
   }
 }
@@ -123,7 +138,7 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, .3);
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: -1;
 }
 .contents {

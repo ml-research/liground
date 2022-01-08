@@ -181,19 +181,19 @@ export const store = new Vuex.Store({
     darkMode: false,
     fenply: 1,
     internationalVariants: [
-      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
+      '+ Add Custom', 'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
     seaVariants: [
-      'makruk'
+      '+ Add Custom', 'makruk'
     ],
     xiangqiVariants: [
-      'xiangqi'
+      '+ Add Custom', 'xiangqi'
     ],
     janggiVariants: [
-      'janggi'
+      '+ Add Custom', 'janggi'
     ],
     shogiVariants: [
-      'shogi'
+      '+ Add Custom', 'shogi'
     ],
     clock: null
   },

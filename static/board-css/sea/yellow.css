@@ -1,11 +1,7 @@
 .cg-board-wrap {
-<<<<<<< HEAD
   background-image: url('../../board/svg/makrukCoords.svg');
   width: 100%;
   background-size: cover;
   height: 100%;
   padding:0;
-=======
-  background-image: url('../../board/svg/makruk.svg');
->>>>>>> 6b523702fb4e823fb38a65d4f76250646721bc5f
 }
