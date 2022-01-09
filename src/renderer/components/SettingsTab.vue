@@ -5,7 +5,15 @@
       <div class="switch-container">
         <span>Dark Mode</span>
         <DarkModeSwitch />
+        <span>Mute</span>
+        <MuteButton />
       </div>
+      <a
+        class="btn green"
+        @click="saveStandartSettings"
+      >
+        Save as standart
+      </a>
     </div>
     <div class="panel">
       <span class="title">Engine Settings</span>
@@ -123,11 +131,12 @@ import { mapGetters } from 'vuex'
 import EngineSelect from './EngineSelect'
 import EngineModal from './EngineModal'
 import DarkModeSwitch from './DarkModeSwitch'
+import MuteButton from './MuteButton'
 import defaultLogo from '../assets/images/engines/chess_engine.svg'
 
 export default {
   name: 'SettingsTab',
-  components: { EngineSelect, EngineModal, DarkModeSwitch },
+  components: { EngineSelect, EngineModal, DarkModeSwitch, MuteButton },
   data () {
     return {
       settings: {},
@@ -147,6 +156,10 @@ export default {
     }
   },
   methods: {
+    saveStandartSettings () {
+      this.$store.dispatch('saveSettings')
+      this.$store.commit('viewAnalysis', true)
+    },
     save () {
       this.updateSettings()
       this.$store.commit('viewAnalysis', true)

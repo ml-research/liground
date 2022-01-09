@@ -44,6 +44,10 @@
 import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
 import fs from 'fs'
+<<<<<<< HEAD
+=======
+
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
 export default {
   name: 'BoardStyleSelector',
   components: {
@@ -57,7 +61,11 @@ export default {
       xiangqiCounter: 0,
       seaCounter: 0,
       boardStyles: [
+<<<<<<< HEAD
         'Add Custom',
+=======
+        'Add custom',
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         'blue',
         'brown',
         'green',
@@ -65,17 +73,36 @@ export default {
         'purple'
       ],
       internationalStyles: [
+<<<<<<< HEAD
         'Add Custom',
+=======
+        'Add custom',
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         'blue',
         'brown',
         'green',
         'lightgreen',
         'purple'
       ],
+<<<<<<< HEAD
       seaStyles: ['Add Custom', 'orange', 'yellow'],
       shogiStyles: ['Add Custom', 'bluechess', 'traditional'],
       janggiStyles: [
         'Add Custom',
+=======
+      seaStyles: [
+        'Add custom',
+        'orange',
+        'yellow'
+      ],
+      shogiStyles: [
+        'Add custom',
+        'bluechess',
+        'traditional'
+      ],
+      janggiStyles: [
+        'Add custom',
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         'brown',
         'dark',
         'darkwood',
@@ -83,7 +110,11 @@ export default {
         'stone'
       ],
       xiangqiStyles: [
+<<<<<<< HEAD
         'Add Custom',
+=======
+        'Add custom',
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         'dark',
         'lightbrown',
         'orange',
@@ -134,10 +165,16 @@ export default {
         }
         this.boardStyles = []
         let i
+<<<<<<< HEAD
         for (i = 0; i < this.shogiCounter; i++) {
           const custom = 'customShogi' + (i + 1)
           this.shogiStyles.push(custom)
           console.log('test')
+=======
+        for (i = 0; i < this.counter; i++) {
+          const custom = 'custom' + (i + 1)
+          this.internationalStyles.push(custom)
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         }
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
@@ -198,8 +235,14 @@ export default {
       let board = ''
       if (name === 'Add Custom') {
         board = 'addCustom'
+<<<<<<< HEAD
       } else if (this.isInternational) {
         board = name === 'lightgreen' ? 'lightgreen' : `${name}`
+=======
+      }
+      if (this.isInternational) {
+        board = name === 'lightgreen' ? 'ic' : `${name}`
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
       } else if (this.isShogi) {
         const conv = {
           traditional: 'shogi',
@@ -252,6 +295,7 @@ export default {
       }
       return `url(static/board/svg/${board}.svg`
     },
+<<<<<<< HEAD
 
     async reWriteSvgs (counter) {
       const svgFile = await this.addCustom(counter)
@@ -267,6 +311,11 @@ export default {
         } else if (this.isJanggi) {
           this.janggiCounter--
         }
+=======
+    async reWriteSvgs () {
+      const svgFile = await this.addCustom()
+      if (svgFile === undefined) {
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         return false
       }
       if (!svgFile.canceled) {
@@ -275,6 +324,7 @@ export default {
             alert('An error ocurred reading the file :' + err.message)
             return
           }
+<<<<<<< HEAD
           let path
           if (this.isInternational) {
             path = 'static/board/svg/custom' + this.counter + '.svg'
@@ -290,6 +340,10 @@ export default {
           }
 
           fs.writeFile(path, data, err => {
+=======
+          const path = 'static/board/svg/custom' + this.counter + '.svg'
+          fs.writeFile(path, data, (err) => {
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
             if (err) {
               alert('An error ocurred updating the file' + err.message)
               console.log(err)
@@ -298,6 +352,7 @@ export default {
         })
         return true
       } else if (svgFile.canceled) {
+<<<<<<< HEAD
         if (this.isInternational) {
           this.counter--
         } else if (this.isShogi) {
@@ -309,6 +364,9 @@ export default {
         } else if (this.isJanggi) {
           this.janggiCounter--
         }
+=======
+        this.counter--
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         return false
       }
     },
@@ -316,6 +374,7 @@ export default {
       const reWritten = await this.reWriteSvgs(counter)
       if (reWritten) {
         setTimeout(() => {
+<<<<<<< HEAD
           let boardStyleCustom
 
           if (this.isInternational) {
@@ -341,13 +400,25 @@ export default {
           } else if (this.isJanggi) {
             localStorage.janggiBoardStyle = boardStyleCustom
           }
+=======
+          const boardStyleCustom = 'custom' + counter
+          this.boardStyles.push(boardStyleCustom)
+          localStorage.internationalBoardStyle = boardStyleCustom
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
           this.$store.dispatch('boardStyle', boardStyleCustom)
         }, 50)
       }
     },
+<<<<<<< HEAD
     addCustom (counter) {
       if (counter > 5) {
         alert("You can't add more than 5 Custom Designs")
+=======
+    addCustom () {
+      if (this.counter > 5) {
+        alert("You can't add more than 5 Custom Designs")
+        this.counter--
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         return
       }
       return this.$electron.remote.dialog.showOpenDialog({
@@ -358,6 +429,7 @@ export default {
     },
     updateBoardStyle (payload) {
       if (payload === 'Add Custom') {
+<<<<<<< HEAD
         let testCounter = 0
 
         if (this.isInternational) {
@@ -380,6 +452,12 @@ export default {
         return
       } else if (this.isInternational) {
         // localStorage for all different groups of board stylings
+=======
+        this.counter++
+        this.updateCustom(this.counter)
+        return
+      } else if (this.isInternational) { // localStorage for all different groups of board stylings
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         localStorage.internationalBoardStyle = payload
       } else if (this.isShogi) {
         localStorage.shogiBoardStyle = payload

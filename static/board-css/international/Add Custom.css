@@ -1,5 +1,9 @@
 .cg-board-wrap {
+<<<<<<< HEAD
     background-image: url('../../board/svg/addCustom.svg');
+=======
+    background-image: url('../../board/svg/custom2.svg');
+>>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
     width: 100%;
     background-size: cover;
     height: 100%;
