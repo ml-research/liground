@@ -276,7 +276,7 @@ export default {
 }
 
 .icon:hover {
-  background-color: var(--hover-background-color);
+  background-color: var(--hover-color);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -284,7 +284,7 @@ export default {
 .search {
   background-color: var(--button-color);
   border-bottom: 1px solid var(--main-border-color);
-  padding: 1px 2px 3px 4px;
+  padding: 2px 2px;
   white-space: nowrap;
   width: 100%;
 }

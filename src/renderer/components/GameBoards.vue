@@ -377,7 +377,7 @@ input {
 }
 #pgnbrowser {
   grid-area: pgnbrowser;
-  border: 1px solid black;
+  border: 1px solid var(--main-border-color);
   border-radius: 4px;
   margin-left: 1em;
   max-height: 60vh;
