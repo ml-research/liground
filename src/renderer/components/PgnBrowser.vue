@@ -10,28 +10,28 @@
           placeholder="filter games"
         >
         <span
-          id = "icon"
+          id="icon"
           slot="extra"
           class="icon mdi mdi-magnify"
         />
         <i
-          id = "icon"
+          id="icon"
           class="icon mdi mdi-filter-menu-outline"
           @click="openContextMenu()"
         />
         <i
-          id = "icon"
+          id="icon"
           class="icon mdi mdi-plus-box-outline"
           @click="openAddPgnModal()"
         />
       </div>
       <div>
-          <AddPgnModal
-           v-if="addPgnModal.visible"
-           :title="addPgnModal.title"
-           @close="addPgnModal.visible = false"
-           />
-        </div>
+        <AddPgnModal
+          v-if="AddPgnModal.visible"
+          :title="AddPgnModal.title"
+          @close="AddPgnModal.visible = false"
+        />
+      </div>
       <template v-if="groupByRound">
         <div
           v-for="round in rounds"
@@ -94,11 +94,11 @@ import { bus } from '../main'
 import AddPgnModal from './AddPgnModal'
 
 export default {
-  components: { AddPgnModal },
   name: 'PgnBrowser',
+  components: { AddPgnModal },
   data: function () {
     return {
-      addPgnModal: {
+      AddPgnModal: {
         visible: false,
         title: ''
       },
@@ -215,10 +215,10 @@ export default {
         round.visible = value
       })
     },
-    openAddPgnModal() {
-      this.addPgnModal = {
+    openAddPgnModal () {
+      this.AddPgnModal = {
         visible: true,
-        title: 'Add new PGN',
+        title: 'Add new PGN'
       }
     }
   }

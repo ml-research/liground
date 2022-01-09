@@ -22,9 +22,7 @@
 </template>
 
 <script>
-import fs from 'fs'
 import { mapGetters } from 'vuex'
-import ffish from 'ffish'
 import AboutTabModal from './AboutTabModal'
 
 export default {
@@ -51,7 +49,7 @@ export default {
         visible: true,
         title: 'LiGround'
       }
-    },
+    }
   }
 }
 </script>

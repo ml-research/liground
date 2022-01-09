@@ -94,9 +94,9 @@ export default {
           this.updateBoardStyle(this.internationalStyles[0]);
         }
         this.boardStyles = [];
-        var i;
+        let i;
         for (i = 0; i < this.counter; i++) {
-          var custom = "custom" + (i + 1);
+          let custom = "custom" + (i + 1);
           this.internationalStyles.push(custom);
           console.log("test");
         }
@@ -187,9 +187,9 @@ export default {
     },
 
     async reWriteSvgs() {
-      var svgFile = await this.addCustom();
-      if(svgFile === undefined){
-       return false;
+      const svgFile = await this.addCustom();
+      if (svgFile === undefined) {
+        return false;
       }
       if (!svgFile.canceled) {
         fs.readFile(svgFile.filePaths[0], "utf-8", (err, data) => {
@@ -214,7 +214,6 @@ export default {
     },
     async updateCustom(counter) {
       const reWritten = await this.reWriteSvgs(counter);
-     
       if (reWritten) {
         setTimeout(() => {
           const boardStyleCustom = "custom" + counter;
@@ -227,7 +226,6 @@ export default {
     addCustom() {
       if (this.counter > 5) {
         alert("You can't add more than 5 Custom Designs");
-        this.counter--;
         return;
       }
       return this.$electron.remote.dialog.showOpenDialog({
