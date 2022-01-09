@@ -10,9 +10,9 @@
       </div>
       <a
         class="btn green"
-        @click="saveStandartSettings"
+        @click="saveStandardSettings"
       >
-        Save as standart
+        Save as standard
       </a>
     </div>
     <div class="panel">
@@ -156,7 +156,7 @@ export default {
     }
   },
   methods: {
-    saveStandartSettings () {
+    saveStandardSettings () {
       this.$store.dispatch('saveSettings')
       this.$store.commit('viewAnalysis', true)
     },
