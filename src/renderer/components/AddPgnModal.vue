@@ -9,13 +9,6 @@
         {{ title }}
       </header>
       <div class="body">
-<<<<<<< HEAD
-        <div
-          class="item"
-          @click="openPgn"
-        >
-          <em class="icon mdi mdi-checkerboard" /> Open PGN from file System
-=======
         <div class="bar">
           <div
             class="item"
@@ -23,7 +16,6 @@
           >
             <em class="icon mdi mdi-checkerboard" /> Open PGN from file System
           </div>
->>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
         </div>
         <div class="Textbox">
           <textarea
@@ -195,13 +187,8 @@ export default {
 }
 
 .contents {
-<<<<<<< HEAD
-  min-width: 60%;
-  min-height: 50%;
-=======
   min-width: 45%;
   min-height: 45%;
->>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
   display: flex;
   flex-direction: column;
   background: var(--second-bg-color);
@@ -218,13 +205,10 @@ export default {
   user-select: none;
 }
 
-<<<<<<< HEAD
-=======
 .bar {
   background-color: var(--button-color);
 }
 
->>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
 .Textbox {
   padding: 10px;
   border-top: 1px solid var(--main-border-color);
@@ -273,11 +257,7 @@ export default {
   cursor: pointer;
 }
 .item:hover {
-<<<<<<< HEAD
-  background-color: var(--hover-background-color);
-=======
   background-color: var(--hover-color);
->>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
 }
 .item.active {
   background-color: #00af89;

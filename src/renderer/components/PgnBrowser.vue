@@ -276,11 +276,7 @@ export default {
 }
 
 .icon:hover {
-<<<<<<< HEAD
-  background-color: var(--hover-background-color);
-=======
   background-color: var(--hover-color);
->>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
   border-radius: 8px;
   cursor: pointer;
 }
@@ -288,11 +284,7 @@ export default {
 .search {
   background-color: var(--button-color);
   border-bottom: 1px solid var(--main-border-color);
-<<<<<<< HEAD
-  padding: 1px 2px 3px 4px;
-=======
   padding: 2px 2px;
->>>>>>> 80d97d5314bf035e105f055d76b744cd66b54cf2
   white-space: nowrap;
   width: 100%;
 }
