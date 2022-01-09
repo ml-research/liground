@@ -18,18 +18,21 @@
       >
     </div>
     <Mode960 />
+    PvE
+    <PvESwitch />
   </div>
 </template>
 
 <script>
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
+import PvESwitch from './PvESwitch.vue'
 import { mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960
+    Multiselect, Mode960, PvESwitch
   },
   data () {
     return {
@@ -92,7 +95,7 @@ export default {
 
 .grid-parent {
   display: grid;
-  grid-template-columns: auto auto auto auto auto;
+  grid-template-columns: auto auto auto auto auto auto;
   align: center;
   text-align: bottom;
   align-items: center;

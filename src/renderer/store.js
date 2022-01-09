@@ -107,6 +107,7 @@ export const store = new Vuex.Store({
   state: {
     initialized: false,
     active: false,
+    PvE: false,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
@@ -130,7 +131,7 @@ export const store = new Vuex.Store({
       Shogi: 'shogi',
       Janggi: 'janggi',
       Xiangqi: 'xiangqi',
-      //  Chess960: 'chess960',
+      Chess960: 'chess960',
       Fischerandom: 'fischerandom'
 
     }),
@@ -240,6 +241,9 @@ export const store = new Vuex.Store({
     },
     orientation (state, payload) {
       state.orientation = payload
+    },
+    PvE (state, payload) {
+      state.PvE = payload
     },
     active (state, payload) {
       state.active = payload
@@ -585,6 +589,28 @@ export const store = new Vuex.Store({
       context.commit('setEngineClock')
       context.commit('active', true)
     },
+    goEnginePvE (context) {
+      engine.send('go movetime 3000')
+      context.commit('setEngineClock')
+      context.commit('active', true)
+    },
+    setActiveTrue (context) {
+      context.commit('active', true)
+    },
+    setActiveFalse (context) {
+      context.commit('active', false)
+    },
+    PvEtrue (context) {
+      context.commit('PvE', true)
+    },
+    stopEnginePvE (context) {
+      engine.send('stop')
+    },
+    PvEfalse (context) {
+      context.commit('PvE', false)
+      context.dispatch('stopEngine')
+      context.dispatch('resetEngineData')
+    },
     stopEngine (context) {
       engine.send('stop')
       context.commit('resetEngineTime')
@@ -592,10 +618,14 @@ export const store = new Vuex.Store({
     },
     restartEngine (context) {
       context.dispatch('resetEngineData')
-      if (context.getters.active) {
+      if (context.getters.active && !context.getters.PvE) {
         context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEngine')
+      } else if (context.getters.active && context.getters.PvE) {
+        context.dispatch('stopEngine')
+        context.dispatch('position')
+        context.dispatch('goEnginePvE')
       }
     },
     position (context) {
@@ -646,6 +676,9 @@ export const store = new Vuex.Store({
     },
     active (context, payload) {
       context.commit('active', payload)
+    },
+    PvE (context, payload) {
+      context.commit('PvE', payload)
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
@@ -836,7 +869,6 @@ export const store = new Vuex.Store({
       if (!context.state.active) {
         return
       }
-
       // update engine stats
       const stats = { ...context.state.engineStats }
       for (const key of Object.keys(stats)) {
@@ -997,6 +1029,9 @@ export const store = new Vuex.Store({
     },
     active (state) {
       return state.active
+    },
+    PvE (state) {
+      return state.PvE
     },
     started (state) {
       return state.started

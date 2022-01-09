@@ -207,7 +207,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime'])
   },
   watch: {
     initialized () {
@@ -231,7 +231,6 @@ export default {
       const multipv = this.multipv
       const shapes = []
       const pieceShapes = []
-
       for (const [i, pvline] of multipv.entries()) {
         if (pvline && 'ucimove' in pvline && pvline.ucimove.length > 0) {
           const lineWidth = 2 + ((multipv.length - i) / multipv.length) * 8
@@ -261,7 +260,6 @@ export default {
           } else {
             drawShape = { orig, dest, brush: 'paleBlue', modifiers: { lineWidth } }
           }
-
           // adjust color if pv line is hovered
           if (i === this.hoveredpv) {
             drawShape.brush = 'blue'

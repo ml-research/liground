@@ -1,9 +1,8 @@
-<!-- https://www.w3schools.com/howto/howto_css_switch.asp -->
 <template>
   <label class="switch">
     <input
       type="checkbox"
-      :checked="active"
+      :checked="PvE"
       @click="onClick"
     >
     <span class="slider round" />
@@ -14,21 +13,25 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'RoundedSwitch',
+  name: 'PvESwitch',
   computed: {
-    ...mapGetters(['active', 'PvE', 'turn'])
+    ...mapGetters(['PvE', 'active', 'turn', 'multipv'])
+  },
+  watch: {
+    turn () {
+      if (this.turn) {
+        this.$store.dispatch('stopEnginePvE')
+      } else {
+        this.$store.dispatch('restartEngine')
+      }
+    }
   },
   methods: {
     onClick () {
-      if (!this.active) {
-        this.$store.dispatch('position')
-        if (this.PvE) {
-          this.$store.dispatch('setActiveTrue')
-        } else {
-          this.$store.dispatch('goEngine')
-        }
+      if (!this.PvE) {
+        this.$store.dispatch('PvEtrue')
       } else {
-        this.$store.dispatch('stopEngine')
+        this.$store.dispatch('PvEfalse')
       }
     }
   }

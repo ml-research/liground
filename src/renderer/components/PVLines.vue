@@ -94,7 +94,7 @@ export default {
       }
       return null
     },
-    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove'])
+    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime'])
   },
   watch: {
     multipv () {
@@ -102,6 +102,13 @@ export default {
     },
     engineSettings () {
       this.updateLines()
+    },
+    enginetime () {
+      if (this.active && this.PvE) {
+        if (this.enginetime === 4000) {
+          this.onClick(this.lines[0])
+        }
+      }
     }
   },
   methods: {
