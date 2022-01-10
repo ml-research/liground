@@ -20,7 +20,7 @@ export default {
   },
   watch: {
     active () {
-      if(this.active){
+      if (this.active) {
         this.$store.dispatch('restartEngine')
       }
     }
