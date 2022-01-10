@@ -18,6 +18,13 @@ export default {
   computed: {
     ...mapGetters(['active', 'PvE', 'turn'])
   },
+  watch: {
+    active () {
+      if(this.active){
+        this.$store.dispatch('restartEngine')
+      }
+    }
+  },
   methods: {
     onClick () {
       if (!this.active) {
