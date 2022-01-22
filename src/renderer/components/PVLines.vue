@@ -104,7 +104,7 @@ export default {
       this.updateLines()
     },
     enginetime () {
-      if (this.active && this.PvE) {
+      if (this.active && this.PvE && !this.turn) {
         if (this.enginetime === 4000) {
           this.onClick(this.lines[0])
         }
