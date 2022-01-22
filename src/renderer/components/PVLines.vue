@@ -94,7 +94,7 @@ export default {
       }
       return null
     },
-    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime'])
+    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
     multipv () {
@@ -105,11 +105,42 @@ export default {
     },
     enginetime () {
       if (this.active && this.PvE && !this.turn) {
-        if (this.enginetime === 4000) {
-          this.onClick(this.lines[0])
+        if (this.PvEValue === 'time'){
+          if (this.enginetime === (this.PvEInput)) {
+            this.onClick(this.lines[0])
+          }
+        } else if(this.PvEValue === 'nodes') {
+          if(this.enginetime === 45000) {
+            this.onClick(this.lines[0])
+          }
+        } else if(this.PvEValue === 'depth') {
+          if(this.enginetime === 45000) {
+            this.onClick(this.lines[0])
+          }
+          if(this.enginetime >= 5000 && this.depth === this.seldepth) {
+            this.onClick(this.lines[0])
+          }
         }
       }
-    }
+    },
+    nodes () {
+      if(this.active && this.PvE && !this.turn) {
+        if(this.PvEValue === 'nodes') {
+          if(this.nodes >= (this.PvEInput)) {
+            this.onClick(this.lines[0])
+          }
+        }
+      }
+    },
+    depth () {
+      if(this.active && this.PvE && !this.turn) {
+        if(this.PvEValue === 'depth') {
+          if(this.depth >= (this.PvEInput)) {
+            this.onClick(this.lines[0])
+          }
+        }
+      }
+    },
   },
   methods: {
     asMain (target, data) {

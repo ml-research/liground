@@ -108,6 +108,9 @@ export const store = new Vuex.Store({
     initialized: false,
     active: false,
     PvE: false,
+    PvEParam: 'go btime 5000',
+    PvEValue: 'time',
+    PvEInput: 5000,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
@@ -244,6 +247,15 @@ export const store = new Vuex.Store({
     },
     PvE (state, payload) {
       state.PvE = payload
+    },
+    PvEParam (state, payload) {
+      state.PvEParam = payload
+    },
+    PvEValue (state, payload) {
+      state.PvEValue = payload
+    },
+    PvEInput (state, payload) {
+      state.PvEInput = payload
     },
     active (state, payload) {
       state.active = payload
@@ -584,13 +596,22 @@ export const store = new Vuex.Store({
       context.commit('resetMultiPV')
       context.commit('resetEngineStats')
     },
+    setPvEParam (context, payload) {
+      context.commit('PvEParam', payload)
+    },
+    setPvEValue (context, payload) {
+      context.commit('PvEValue', payload)
+    },
+    setPvEInput (context, payload) {
+      context.commit('PvEInput', payload)
+    },
     goEngine (context) {
       engine.send('go infinite')
       context.commit('setEngineClock')
       context.commit('active', true)
     },
     goEnginePvE (context) {
-      engine.send('go btime 3000')
+      engine.send(context.getters.PvEParam)
       context.commit('setEngineClock')
       context.commit('active', true)
     },
@@ -679,6 +700,15 @@ export const store = new Vuex.Store({
     },
     PvE (context, payload) {
       context.commit('PvE', payload)
+    },
+    PvEParam (context, payload) {
+      context.commit('PvEParam', payload)
+    },
+    PvEValue (context, payload) {
+      context.commit('PvEValue', payload)
+    },
+    PvEInput (context, payload) {
+      context.commit('PvEInput', payload)
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
@@ -1032,6 +1062,15 @@ export const store = new Vuex.Store({
     },
     PvE (state) {
       return state.PvE
+    },
+    PvEParam (state) {
+      return state.PvEParam
+    },
+    PvEValue (state) {
+      return state.PvEValue
+    },
+    PvEInput (state) {
+      return state.PvEInput
     },
     started (state) {
       return state.started

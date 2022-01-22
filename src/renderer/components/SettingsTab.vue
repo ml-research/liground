@@ -100,7 +100,42 @@
           </template>
         </tr>
       </table>
-      <a
+      <EngineModal
+        v-if="modal.visible"
+        :title="modal.title"
+        :initial-name="modal.name"
+        :initial-binary="modal.binary"
+        :initial-cwd="modal.cwd"
+        :initial-logo="modal.logo"
+        @close="modal.visible = false"
+        @save="modal.save"
+      />
+      <div>
+      <span class="title">PvE Settings</span>
+      <Multiselect 
+        class="multiselect"
+        v-model="value"
+        :options="options"
+        @input="showSettings"
+      >
+      </Multiselect>
+      <table class="table">
+        <tr>
+          <td>{{ settingsName }}</td>
+          <td>
+            <input
+                v-model.number="PvEInput"
+                type="number"
+                :step="1"
+                :min="5"
+                :max="45"
+                class="input"
+              >
+              </td>
+        </tr>
+      </table>
+    </div>
+    <a
         class="btn green"
         @click="save"
       >
@@ -112,16 +147,6 @@
       >
         Cancel
       </a>
-      <EngineModal
-        v-if="modal.visible"
-        :title="modal.title"
-        :initial-name="modal.name"
-        :initial-binary="modal.binary"
-        :initial-cwd="modal.cwd"
-        :initial-logo="modal.logo"
-        @close="modal.visible = false"
-        @save="modal.save"
-      />
     </div>
   </div>
 </template>
@@ -133,10 +158,11 @@ import EngineModal from './EngineModal'
 import DarkModeSwitch from './DarkModeSwitch'
 import MuteButton from './MuteButton'
 import defaultLogo from '../assets/images/engines/chess_engine.svg'
+import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'SettingsTab',
-  components: { EngineSelect, EngineModal, DarkModeSwitch, MuteButton },
+  components: { EngineSelect, EngineModal, DarkModeSwitch, MuteButton, Multiselect },
   data () {
     return {
       settings: {},
@@ -144,7 +170,11 @@ export default {
         visible: false,
         title: '',
         save: () => {}
-      }
+      },
+      value: 'time',
+      options: ['time', 'nodes', 'depth'],
+      settingsName: 'Time in seconds',
+      PvEInput: 5
     }
   },
   computed: {
@@ -156,6 +186,21 @@ export default {
     }
   },
   methods: {
+    showSettings (payload) {
+      if(payload === 'nodes'){
+        this.settingsName = 'Number of nodes in Million'
+        this.value = 'nodes'
+        this.PvEInput = 5
+      } else if (payload === 'time') {
+        this.settingsName = 'Time in seconds'
+        this.value = 'time'
+        this.PvEInput = 5
+      } else if (payload === 'depth') {
+        this.PvEInput = 20
+        this.settingsName = 'depth of'
+        this.value = 'depth'
+      }
+    },
     saveStandardSettings () {
       this.$store.dispatch('saveSettings')
       this.$store.commit('viewAnalysis', true)
@@ -176,6 +221,23 @@ export default {
         }
       }
       this.$store.dispatch('setEngineOptions', changed)
+      this.$store.dispatch('setPvEValue', this.value)
+      switch (this.value) {
+        case 'time':
+          this.$store.dispatch('setPvEParam', 'go btime ' + this.PvEInput*1000)
+          this.$store.dispatch('setPvEInput', this.PvEInput*1000)
+          break
+        case 'nodes':
+          this.$store.dispatch('setPvEParam', 'go nodes ' + this.PvEInput*1000000)
+          this.$store.dispatch('setPvEInput', this.PvEInput*1000000)
+          break
+        case 'depth':
+          this.$store.dispatch('setPvEParam', 'go depth ' + this.PvEInput)
+          this.$store.dispatch('setPvEInput', this.PvEInput)
+          break
+        default:
+          break
+      }
     },
     triggerButtonSetting (optionName) {
       this.$store.dispatch('setEngineOptions', { [optionName]: null })

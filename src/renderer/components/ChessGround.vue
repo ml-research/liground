@@ -402,7 +402,6 @@ export default {
   },
   methods: {
     reRender (event) {
-      console.log('test')
       document.body.dispatchEvent(new Event('chessground.resize'))
     },
     hideShade () {
