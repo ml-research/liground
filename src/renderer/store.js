@@ -590,7 +590,7 @@ export const store = new Vuex.Store({
       context.commit('active', true)
     },
     goEnginePvE (context) {
-      engine.send('go movetime 3000')
+      engine.send('go btime 3000')
       context.commit('setEngineClock')
       context.commit('active', true)
     },
