@@ -355,6 +355,7 @@ export default {
     window.addEventListener('mouseup', this.stopDragging)
     window.addEventListener('mousemove', this.doResize)
     window.addEventListener('wheel', this.reRender)
+    window.addEventListener('mouseup', this.reRender)
 
     this.board = Chessground(this.$refs.board, {
       coordinates: false,
@@ -401,6 +402,7 @@ export default {
   },
   methods: {
     reRender (event) {
+      console.log('test')
       document.body.dispatchEvent(new Event('chessground.resize'))
     },
     hideShade () {
