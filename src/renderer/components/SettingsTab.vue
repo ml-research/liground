@@ -111,19 +111,18 @@
         @save="modal.save"
       />
       <div>
-      <span class="title">PvE Settings</span>
-      <Multiselect 
-        class="multiselect"
-        v-model="value"
-        :options="options"
-        @input="showSettings"
-      >
-      </Multiselect>
-      <table class="table">
-        <tr>
-          <td>{{ settingsName }}</td>
-          <td>
-            <input
+        <span class="title">PvE Settings</span>
+        <Multiselect
+          v-model="value"
+          class="multiselect"
+          :options="options"
+          @input="showSettings"
+        />
+        <table class="table">
+          <tr>
+            <td>{{ settingsName }}</td>
+            <td>
+              <input
                 v-model.number="PvEInput"
                 type="number"
                 :step="1"
@@ -131,11 +130,11 @@
                 :max="45"
                 class="input"
               >
-              </td>
-        </tr>
-      </table>
-    </div>
-    <a
+            </td>
+          </tr>
+        </table>
+      </div>
+      <a
         class="btn green"
         @click="save"
       >
@@ -162,7 +161,13 @@ import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'SettingsTab',
-  components: { EngineSelect, EngineModal, DarkModeSwitch, MuteButton, Multiselect },
+  components: {
+    EngineSelect,
+    EngineModal,
+    DarkModeSwitch,
+    MuteButton,
+    Multiselect
+  },
   data () {
     return {
       settings: {},
@@ -178,7 +183,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'engineOptions', 'engineSettings', 'selectedEngine'])
+    ...mapGetters([
+      'variant',
+      'engineOptions',
+      'engineSettings',
+      'selectedEngine'
+    ])
   },
   watch: {
     engineOptions () {
@@ -187,7 +197,7 @@ export default {
   },
   methods: {
     showSettings (payload) {
-      if(payload === 'nodes'){
+      if (payload === 'nodes') {
         this.settingsName = 'Number of nodes in Million'
         this.value = 'nodes'
         this.PvEInput = 5
@@ -224,12 +234,18 @@ export default {
       this.$store.dispatch('setPvEValue', this.value)
       switch (this.value) {
         case 'time':
-          this.$store.dispatch('setPvEParam', 'go btime ' + this.PvEInput*1000)
-          this.$store.dispatch('setPvEInput', this.PvEInput*1000)
+          this.$store.dispatch(
+            'setPvEParam',
+            'go btime ' + this.PvEInput * 1000
+          )
+          this.$store.dispatch('setPvEInput', this.PvEInput * 1000)
           break
         case 'nodes':
-          this.$store.dispatch('setPvEParam', 'go nodes ' + this.PvEInput*1000000)
-          this.$store.dispatch('setPvEInput', this.PvEInput*1000000)
+          this.$store.dispatch(
+            'setPvEParam',
+            'go nodes ' + this.PvEInput * 1000000
+          )
+          this.$store.dispatch('setPvEInput', this.PvEInput * 1000000)
           break
         case 'depth':
           this.$store.dispatch('setPvEParam', 'go depth ' + this.PvEInput)
@@ -259,10 +275,11 @@ export default {
         binary,
         logo,
         cwd,
-        save: data => this.$store.dispatch('editEngine', {
-          old: this.selectedEngine.name,
-          changed: data
-        })
+        save: data =>
+          this.$store.dispatch('editEngine', {
+            old: this.selectedEngine.name,
+            changed: data
+          })
       }
     },
     deleteEngine () {
@@ -303,7 +320,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  align-self: center
+  align-self: center;
 }
 .switch-container > * {
   margin: 0 5px;
@@ -353,11 +370,11 @@ export default {
   text-align: left;
 }
 
-input[type=number] {
+input[type='number'] {
   text-align: right;
 }
 /* make arrows of number input always visible */
-input[type=number]::-webkit-inner-spin-button {
+input[type='number']::-webkit-inner-spin-button {
   opacity: 0.5;
 }
 
