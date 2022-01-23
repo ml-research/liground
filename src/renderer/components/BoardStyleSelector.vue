@@ -19,7 +19,37 @@
               :style="{ backgroundImage: preview(props.option) }"
             />
           </div>
-          <span class="name">{{ props.option }}</span>
+          <span
+            class="name"
+          >
+            {{ props.option }}
+            <button
+              v-if="
+                props.option !== 'Add Custom' &&
+                  // dont show remove button of standard designs
+                  props.option !== 'blue' &&
+                  props.option !== 'brown' &&
+                  props.option !== 'green' &&
+                  props.option !== 'lightgreen' &&
+                  props.option !== 'purple' &&
+                  // dont show remove button of standard makruk designs
+                  props.option !== 'yellow' &&
+                  props.option !== 'orange' &&
+                  // dont show remove button of standard Janggi and Xiangqi designs
+                  props.option !== 'dark' &&
+                  props.option !== 'darkwood' &&
+                  props.option !== 'lightbrown' &&
+                  props.option !== 'stone' &&
+                  props.option !== 'riverbanks' &&
+                  // dont show remove button of standard shogi designs
+                  props.option !== 'bluechess' &&
+                  props.option !== 'traditional'
+              "
+              id="DeleteButton"
+              @click="deleteCustom(props.option)"
+            >
+              Remove
+            </button></span>
         </div>
       </template>
       <template
@@ -51,11 +81,58 @@ export default {
   },
   data () {
     return {
-      counter: 0,
-      shogiCounter: 0,
-      janggiCounter: 0,
-      xiangqiCounter: 0,
-      seaCounter: 0,
+      freeCustomID: 1,
+      maxCustomStandardCounter: 0,
+      overWriteSVGStandardcounter: 0,
+
+      overWriteSVGshogiCounter: 0,
+      maxCustomShogiCounter: 0,
+
+      overWriteSVGjanggiCounter: 0,
+      maxCustomJanggiCounter: 0,
+
+      overWriteSVGxiangqiCounter: 0,
+      maxCustomXiangqiCounter: 0,
+
+      overWriteSVGseaCounter: 0,
+      maxCustomSeaCounter: 0,
+
+      map: new Map([
+        [1, true],
+        [2, true],
+        [3, true],
+        [4, true],
+        [5, true]
+      ]),
+      shogiMap: new Map([
+        [1, true],
+        [2, true],
+        [3, true],
+        [4, true],
+        [5, true]
+      ]),
+      xiangqiMap: new Map([
+        [1, true],
+        [2, true],
+        [3, true],
+        [4, true],
+        [5, true]
+      ]),
+      janggiMap: new Map([
+        [1, true],
+        [2, true],
+        [3, true],
+        [4, true],
+        [5, true]
+      ]),
+      seaMap: new Map([
+        [1, true],
+        [2, true],
+        [3, true],
+        [4, true],
+        [5, true]
+      ]),
+
       boardStyles: [
         'Add Custom',
         'blue',
@@ -117,14 +194,16 @@ export default {
           this.updateBoardStyle(this.internationalStyles[1])
         }
         this.boardStyles = []
-        let i
-        for (i = 0; i < this.counter; i++) {
-          const custom = 'custom' + (i + 1)
-          this.internationalStyles.push(custom)
-          console.log('test')
-        }
+
         this.internationalStyles.forEach(element => {
           this.boardStyles.push(element)
+        })
+
+        this.map.forEach((value, key) => {
+          if (value === false) {
+            const custom = 'custom' + (key + 1)
+            this.boardStyles.push(custom)
+          }
         })
       } else if (this.isShogi) {
         if (localStorage.shogiBoardStyle) {
@@ -133,12 +212,13 @@ export default {
           this.updateBoardStyle(this.shogiStyles[1])
         }
         this.boardStyles = []
-        let i
-        for (i = 0; i < this.shogiCounter; i++) {
-          const custom = 'customShogi' + (i + 1)
-          this.shogiStyles.push(custom)
-          console.log('test')
-        }
+
+        this.shogiMap.forEach((value, key) => {
+          if (value === false) {
+            const custom = 'custom' + (key + 1)
+            this.shogiStyles.push(custom)
+          }
+        })
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -149,12 +229,12 @@ export default {
           this.updateBoardStyle(this.seaStyles[1])
         }
         this.boardStyles = []
-        let i
-        for (i = 0; i < this.seaCounter; i++) {
-          const custom = 'customSea' + (i + 1)
-          this.seaStyles.push(custom)
-          console.log('test')
-        }
+        this.seaMap.forEach((value, key) => {
+          if (value === false) {
+            const custom = 'custom' + (key + 1)
+            this.seaStyles.push(custom)
+          }
+        })
         this.seaStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -165,12 +245,12 @@ export default {
           this.updateBoardStyle(this.xiangqiStyles[1])
         }
         this.boardStyles = []
-        let i
-        for (i = 0; i < this.xiangqiCounter; i++) {
-          const custom = 'customXiangqi' + (i + 1)
-          this.xiangqiStyles.push(custom)
-          console.log('test')
-        }
+        this.xiangqiMap.forEach((value, key) => {
+          if (value === false) {
+            const custom = 'custom' + (key + 1)
+            this.xiangqiStyles.push(custom)
+          }
+        })
         this.xiangqiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -181,12 +261,12 @@ export default {
           this.updateBoardStyle(this.janggiStyles[3])
         }
         this.boardStyles = []
-        let i
-        for (i = 0; i < this.janggiCounter; i++) {
-          const custom = 'customJanggi' + (i + 1)
-          this.janggiStyles.push(custom)
-          console.log('test')
-        }
+        this.janggiMap.forEach((value, key) => {
+          if (value === false) {
+            const custom = 'custom' + (key + 1)
+            this.janggiStyles.push(custom)
+          }
+        })
         this.janggiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -257,15 +337,15 @@ export default {
       const svgFile = await this.addCustom(counter)
       if (svgFile === undefined) {
         if (this.isInternational) {
-          this.counter--
+          this.maxCustomStandardCounter--
         } else if (this.isShogi) {
-          this.shogiCounter--
+          this.maxCustomShogiCounter--
         } else if (this.isXiangqi) {
-          this.xiangqiCounter--
+          this.maxCustomXiangqiCounter--
         } else if (this.isSEA) {
-          this.seaCounter--
+          this.maxCustomSeaCounter--
         } else if (this.isJanggi) {
-          this.janggiCounter--
+          this.maxCustomJanggiCounter--
         }
         return false
       }
@@ -277,18 +357,66 @@ export default {
           }
           let path
           if (this.isInternational) {
-            path = 'static/board/svg/custom' + this.counter + '.svg'
+            let bool = false
+            this.map.forEach((value, key) => {
+              if (bool === false) {
+                if (value === true) {
+                  bool = true
+                  this.freeCustomID = key
+                  console.log(this.freeCustomID)
+                }
+              }
+            })
+            path = 'static/board/svg/custom' + this.freeCustomID + '.svg'
           } else if (this.isShogi) {
-            path = 'static/board/svg/customShogi' + this.shogiCounter + '.svg'
+            let bool = false
+            this.shogiMap.forEach((value, key) => {
+              if (bool === false) {
+                if (value === true) {
+                  bool = true
+                  this.freeCustomID = key
+                  console.log(this.freeCustomID)
+                }
+              }
+            })
+            path = 'static/board/svg/customShogi' + this.freeCustomID + '.svg'
           } else if (this.isXiangqi) {
-            path =
-              'static/board/svg/customXiangqi' + this.xiangqiCounter + '.svg'
+            let bool = false
+            this.xiangqiMap.forEach((value, key) => {
+              if (bool === false) {
+                if (value === true) {
+                  bool = true
+                  this.freeCustomID = key
+                  console.log(this.freeCustomID)
+                }
+              }
+            })
+            path = 'static/board/svg/customXiangqi' + this.freeCustomID + '.svg'
           } else if (this.isSEA) {
-            path = 'static/board/svg/customSea' + this.seaCounter + '.svg'
+            let bool = false
+            this.seaMap.forEach((value, key) => {
+              if (bool === false) {
+                if (value === true) {
+                  bool = true
+                  this.freeCustomID = key
+                  console.log(this.freeCustomID)
+                }
+              }
+            })
+            path = 'static/board/svg/customSea' + this.freeCustomID + '.svg'
           } else if (this.isJanggi) {
-            path = 'static/board/svg/customJanggi' + this.janggiCounter + '.svg'
+            let bool = false
+            this.janggiMap.forEach((value, key) => {
+              if (bool === false) {
+                if (value === true) {
+                  bool = true
+                  this.freeCustomID = key
+                  console.log(this.freeCustomID)
+                }
+              }
+            })
+            path = 'static/board/svg/customJanggi' + this.freeCustomID + '.svg'
           }
-
           fs.writeFile(path, data, err => {
             if (err) {
               alert('An error ocurred updating the file' + err.message)
@@ -299,17 +427,100 @@ export default {
         return true
       } else if (svgFile.canceled) {
         if (this.isInternational) {
-          this.counter--
+          this.maxCustomStandardCounter--
         } else if (this.isShogi) {
-          this.shogiCounter--
+          this.maxCustomShogiCounter--
         } else if (this.isXiangqi) {
-          this.xiangqiCounter--
+          this.maxCustomXiangqiCounter--
         } else if (this.isSEA) {
-          this.seaCounter--
+          this.maxCustomSeaCounter--
         } else if (this.isJanggi) {
-          this.janggiCounter--
+          this.maxCustomJanggiCounter--
         }
         return false
+      }
+    },
+    deleteCustom (payload) {
+      const number = parseInt(payload.slice(-1))
+      let path
+      if (this.isInternational) {
+        path = 'static/board/svg/' + payload + '.svg'
+        this.maxCustomStandardCounter--
+        let bool = false
+        this.map.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGStandardcounter = key - 1
+              console.log(this.overWriteSVGStandardcounter)
+              this.map.set(key, true)
+              console.log(this.map)
+              this.boardStyles = this.boardStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isShogi) {
+        path = 'static/board/svg/customShogi' + payload + '.svg'
+        this.maxCustomShogiCounter--
+        let bool = false
+        this.shogiMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGshogiCounter = key - 1
+              this.shogiMap.set(key, true)
+              this.shogiStyles = this.shogiStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isXiangqi) {
+        path = 'static/board/svg/customXiangqi' + payload + '.svg'
+        this.maxCustomXiangqiCounter--
+        let bool = false
+        this.xiangqiMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGxiangqiCounter = key - 1
+              this.xiangqiMap.set(key, true)
+              this.xiangqiStyles = this.xiangqiStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isSEA) {
+        path = 'static/board/svg/customSea' + payload + '.svg'
+        this.maxCustomSeaCounter--
+        let bool = false
+        this.seaMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGseaCounter = key - 1
+              this.seaMap.set(key, true)
+              this.seaStyles = this.seaStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isJanggi) {
+        path = 'static/board/svg/customJanggi' + payload + '.svg'
+        this.maxCustomJanggiCounter--
+        let bool = false
+        this.janggiMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGjanggiCounter = key - 1
+              this.janggiMap.set(key, true)
+              this.janggiStyles = this.janggiStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      }
+      try {
+        fs.unlinkSync(path)
+        //  file removed
+      } catch (err) {
+        console.error(err)
       }
     },
     async updateCustom (counter) {
@@ -319,27 +530,32 @@ export default {
           let boardStyleCustom
 
           if (this.isInternational) {
-            boardStyleCustom = 'custom' + counter
+            boardStyleCustom = 'custom' + this.freeCustomID
           } else if (this.isShogi) {
-            boardStyleCustom = 'customShogi' + counter
+            boardStyleCustom = 'customShogi' + this.freeCustomID
           } else if (this.isXiangqi) {
-            boardStyleCustom = 'customXiangqi' + counter
+            boardStyleCustom = 'customXiangqi' + this.freeCustomID
           } else if (this.isSEA) {
-            boardStyleCustom = 'customSea' + counter
+            boardStyleCustom = 'customSea' + this.freeCustomID
           } else if (this.isJanggi) {
-            boardStyleCustom = 'customJanggi' + counter
+            boardStyleCustom = 'customJanggi' + this.freeCustomID
           }
           this.boardStyles.push(boardStyleCustom)
           if (this.isInternational) {
             localStorage.internationalBoardStyle = boardStyleCustom
+            this.map.set(this.freeCustomID, false)
           } else if (this.isShogi) {
             localStorage.shogiBoardStyle = boardStyleCustom
+            this.shogiMap.set(this.freeCustomID, false)
           } else if (this.isXiangqi) {
             localStorage.xiangqiBoardStyle = boardStyleCustom
+            this.xiangqiMap.set(this.freeCustomID, false)
           } else if (this.isSEA) {
             localStorage.seaBoardStyle = boardStyleCustom
+            this.seaMap.set(this.freeCustomID, false)
           } else if (this.isJanggi) {
             localStorage.janggiBoardStyle = boardStyleCustom
+            this.janggiMap.set(this.freeCustomID, false)
           }
           this.$store.dispatch('boardStyle', boardStyleCustom)
         }, 50)
@@ -361,20 +577,41 @@ export default {
         let testCounter = 0
 
         if (this.isInternational) {
-          this.counter++
-          testCounter = this.counter
+          this.maxCustomStandardCounter++
+          this.overWriteSVGStandardcounter++
+          if (this.overWriteSVGStandardcounter > 5) {
+            this.overWriteSVGStandardcounter--
+          }
+          testCounter = this.maxCustomStandardCounter
         } else if (this.isShogi) {
-          this.shogiCounter++
-          testCounter = this.shogiCounter
+          this.maxCustomShogiCounter++
+          this.overWriteSVGshogiCounter++
+          if (this.overWriteSVGshogiCounter > 5) {
+            this.overWriteSVGshogiCounter--
+          }
+          testCounter = this.maxCustomShogiCounter
         } else if (this.isXiangqi) {
-          this.xiangqiCounter++
-          testCounter = this.xiangqiCounter
+          this.overWriteSVGxiangqiCounter++
+          this.maxCustomXiangqiCounter++
+          if (this.overWriteSVGxiangqiCounter > 5) {
+            this.overWriteSVGxiangqiCounter--
+          }
+
+          testCounter = this.maxCustomXiangqiCounter
         } else if (this.isSEA) {
-          this.seaCounter++
-          testCounter = this.seaCounter
+          this.maxCustomSeaCounter++
+          this.overWriteSVGseaCounter++
+          if (this.overWriteSVGseaCounter > 5) {
+            this.overWriteSVGseaCounter--
+          }
+          testCounter = this.maxCustomSeaCounter
         } else if (this.isJanggi) {
-          this.janggiCounter++
-          testCounter = this.janggiCounter
+          this.maxCustomJanggiCounter++
+          this.overWriteSVGjanggiCounter++
+          if (this.overWriteSVGjanggiCounter > 5) {
+            this.overWriteSVGjanggiCounter--
+          }
+          testCounter = this.maxCustomJanggiCounter
         }
         this.updateCustom(testCounter)
         return
@@ -417,5 +654,22 @@ export default {
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
+}
+#DeleteButton {
+  background-color: #dc143c; /* Green */
+  border: none;
+  color: white;
+  padding: 5px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 13px;
+  border-radius: 5px;
+  position: absolute;
+  right: 4px;
+}
+#DeleteButton:hover {
+  background-color: #8b0000;
+  cursor: pointer;
 }
 </style>
