@@ -134,7 +134,6 @@ export const store = new Vuex.Store({
       Shogi: 'shogi',
       Janggi: 'janggi',
       Xiangqi: 'xiangqi',
-      Chess960: 'chess960',
       Fischerandom: 'fischerandom'
 
     }),
