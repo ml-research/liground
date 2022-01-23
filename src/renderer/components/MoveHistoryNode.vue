@@ -304,18 +304,18 @@ export default {
 
 <style scoped>
 .move-name:hover {
-  background-color: #2196F3;
+  background-color: var(--dark-highlight-color);
   cursor: pointer;
   border-radius: 4px 4px 4px 4px;
-  color: #fff;
+  color: var(--light-text-color);
 }
 .move-name.current{
-  background-color:#2196F3;
+  background-color: var(--dark-highlight-color);
   border-radius: 4px 4px 4px 4px;
-  color: #fff;
+  color: var(--light-text-color);
 }
 .move-number {
-  color: #777;
+  color: var(--light-text-color);
 }
 .move-name {
   margin-right: 4px;

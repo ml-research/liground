@@ -10,12 +10,26 @@
           placeholder="filter games"
         >
         <span
+          id="icon"
           slot="extra"
           class="icon mdi mdi-magnify"
         />
         <i
-          class="icon mdi mdi-cog-outline"
+          id="icon"
+          class="icon mdi mdi-filter-menu-outline"
           @click="openContextMenu()"
+        />
+        <i
+          id="icon"
+          class="icon mdi mdi-plus-box-outline"
+          @click="openAddPgnModal()"
+        />
+      </div>
+      <div>
+        <AddPgnModal
+          v-if="AddPgnModal.visible"
+          :title="AddPgnModal.title"
+          @close="AddPgnModal.visible = false"
         />
       </div>
       <template v-if="groupByRound">
@@ -77,11 +91,17 @@
 import { remote } from 'electron'
 import { mapGetters } from 'vuex'
 import { bus } from '../main'
+import AddPgnModal from './AddPgnModal'
 
 export default {
   name: 'PgnBrowser',
+  components: { AddPgnModal },
   data: function () {
     return {
+      AddPgnModal: {
+        visible: false,
+        title: ''
+      },
       gameFilter: '',
       rounds: [],
       groupByRound: true,
@@ -194,6 +214,12 @@ export default {
       this.rounds.forEach(round => {
         round.visible = value
       })
+    },
+    openAddPgnModal () {
+      this.AddPgnModal = {
+        visible: true,
+        title: 'Add new PGN'
+      }
     }
   }
 }
@@ -203,7 +229,8 @@ export default {
 #gameselect {
   overflow-y: auto;
   overflow-x: auto;
-  height: 100%
+  height: 100%;
+  border: 0px solid var(--main-border-color);
 }
 
 .optionlabel {
@@ -211,7 +238,7 @@ export default {
 }
 
 #gamefilter {
-  max-width: 65%;
+  max-width: 55%;
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
@@ -243,26 +270,21 @@ export default {
   color: white;
 }
 
-.icon.mdi-magnify {
-  padding: 0px 6px;
-  margin: 0px 1px;
-  border-radius: 5px;
-  background-color: var(--button-color);
-  box-shadow: 1px 1px 1px 1px black;
+.icon {
   color: white;
-}
-
-.icon.mdi-magnify:hover {
-  background-color: #22303d;
   cursor: pointer;
 }
 
-.icon.mdi-cog-outline:hover {
+.icon:hover {
+  background-color: var(--hover-color);
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .search {
-  padding: 5px 0px;
+  background-color: var(--button-color);
+  border-bottom: 1px solid var(--main-border-color);
+  padding: 2px 2px;
   white-space: nowrap;
   width: 100%;
 }

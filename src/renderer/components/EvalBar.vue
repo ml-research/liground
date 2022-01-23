@@ -26,7 +26,7 @@ export default {
   position: relative;
   width: 17px;
   height: 600px;
-  background: #fff;
+  background: var(--light-text-color);;
   border: 1px solid #888;
   border-radius: 5px;
   overflow: hidden;
@@ -39,7 +39,7 @@ export default {
   right: 0;
   height: 2px;
   margin-top: -1px;
-  background: #ff4400;
+  background: var(--eval-line-color);
   opacity: .7;
 }
 .flip {

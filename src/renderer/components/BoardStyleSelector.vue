@@ -43,7 +43,7 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
-
+import fs from 'fs'
 export default {
   name: 'BoardStyleSelector',
   components: {
@@ -51,7 +51,13 @@ export default {
   },
   data () {
     return {
+      counter: 0,
+      shogiCounter: 0,
+      janggiCounter: 0,
+      xiangqiCounter: 0,
+      seaCounter: 0,
       boardStyles: [
+        'Add Custom',
         'blue',
         'brown',
         'green',
@@ -59,21 +65,17 @@ export default {
         'purple'
       ],
       internationalStyles: [
+        'Add Custom',
         'blue',
         'brown',
         'green',
         'lightgreen',
         'purple'
       ],
-      seaStyles: [
-        'orange',
-        'yellow'
-      ],
-      shogiStyles: [
-        'bluechess',
-        'traditional'
-      ],
+      seaStyles: ['Add Custom', 'orange', 'yellow'],
+      shogiStyles: ['Add Custom', 'bluechess', 'traditional'],
       janggiStyles: [
+        'Add Custom',
         'brown',
         'dark',
         'darkwood',
@@ -81,6 +83,7 @@ export default {
         'stone'
       ],
       xiangqiStyles: [
+        'Add Custom',
         'dark',
         'lightbrown',
         'orange',
@@ -89,7 +92,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['variant', 'boardStyle', 'isInternational', 'isShogi', 'isXiangqi', 'isSEA', 'isJanggi']),
+    ...mapGetters([
+      'variant',
+      'boardStyle',
+      'isInternational',
+      'isShogi',
+      'isXiangqi',
+      'isSEA',
+      'isJanggi'
+    ]),
     displayStyle () {
       return this.boardStyle
     }
@@ -98,11 +109,20 @@ export default {
     variant () {
       if (this.isInternational) {
         if (localStorage.internationalBoardStyle) {
-          this.$store.dispatch('boardStyle', localStorage.internationalBoardStyle)
+          this.$store.dispatch(
+            'boardStyle',
+            localStorage.internationalBoardStyle
+          )
         } else {
-          this.updateBoardStyle(this.internationalStyles[0])
+          this.updateBoardStyle(this.internationalStyles[1])
         }
         this.boardStyles = []
+        let i
+        for (i = 0; i < this.counter; i++) {
+          const custom = 'custom' + (i + 1)
+          this.internationalStyles.push(custom)
+          console.log('test')
+        }
         this.internationalStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -113,6 +133,12 @@ export default {
           this.updateBoardStyle(this.shogiStyles[1])
         }
         this.boardStyles = []
+        let i
+        for (i = 0; i < this.shogiCounter; i++) {
+          const custom = 'customShogi' + (i + 1)
+          this.shogiStyles.push(custom)
+          console.log('test')
+        }
         this.shogiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -123,6 +149,12 @@ export default {
           this.updateBoardStyle(this.seaStyles[1])
         }
         this.boardStyles = []
+        let i
+        for (i = 0; i < this.seaCounter; i++) {
+          const custom = 'customSea' + (i + 1)
+          this.seaStyles.push(custom)
+          console.log('test')
+        }
         this.seaStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -133,6 +165,12 @@ export default {
           this.updateBoardStyle(this.xiangqiStyles[1])
         }
         this.boardStyles = []
+        let i
+        for (i = 0; i < this.xiangqiCounter; i++) {
+          const custom = 'customXiangqi' + (i + 1)
+          this.xiangqiStyles.push(custom)
+          console.log('test')
+        }
         this.xiangqiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -143,6 +181,12 @@ export default {
           this.updateBoardStyle(this.janggiStyles[3])
         }
         this.boardStyles = []
+        let i
+        for (i = 0; i < this.janggiCounter; i++) {
+          const custom = 'customJanggi' + (i + 1)
+          this.janggiStyles.push(custom)
+          console.log('test')
+        }
         this.janggiStyles.forEach(element => {
           this.boardStyles.push(element)
         })
@@ -152,18 +196,30 @@ export default {
   methods: {
     preview (name) {
       let board = ''
-      if (this.isInternational) {
-        board = name === 'lightgreen' ? 'ic' : `${name}`
+      if (name === 'Add Custom') {
+        board = 'addCustom'
+      } else if (this.isInternational) {
+        board = name === 'lightgreen' ? 'lightgreen' : `${name}`
       } else if (this.isShogi) {
         const conv = {
           traditional: 'shogi',
-          bluechess: 'shogic'
+          bluechess: 'shogic',
+          customShogi1: 'customShogi1',
+          customShogi2: 'customShogi2',
+          customShogi3: 'customShogi3',
+          customShogi4: 'customShogi4',
+          customShogi5: 'customShogi5'
         }
         board = conv[name]
       } else if (this.isSEA) {
         const conv = {
           yellow: 'makruk',
-          orange: 'makruk2'
+          orange: 'makruk2',
+          customSea1: 'customSea1',
+          customSea2: 'customSea2',
+          customSea3: 'customSea3',
+          customSea4: 'customSea4',
+          customSea5: 'customSea5'
         }
         board = conv[name]
       } else if (this.isXiangqi) {
@@ -171,7 +227,12 @@ export default {
           dark: 'xiangqiDark',
           lightbrown: 'xiangqi',
           orange: 'xiangqiWikimedia',
-          riverbanks: 'xiangqic'
+          riverbanks: 'xiangqic',
+          customXiangqi1: 'customXiangqi1',
+          customXiangqi2: 'customXiangqi2',
+          customXiangqi3: 'customXiangqi3',
+          customXiangqi4: 'customXiangqi4',
+          customXiangqi5: 'customXiangqi5'
         }
         board = conv[name]
       } else if (this.isJanggi) {
@@ -180,14 +241,145 @@ export default {
           dark: 'JanggiDark',
           darkwood: 'JanggiWoodDark',
           lightbrown: 'Janggi',
-          stone: 'JanggiStone'
+          stone: 'JanggiStone',
+          customJanggi1: 'customJanggi1',
+          customJanggi2: 'customJanggi2',
+          customJanggi3: 'customJanggi3',
+          customJanggi4: 'customJanggi4',
+          customJanggi5: 'customJanggi5'
         }
         board = conv[name]
       }
       return `url(static/board/svg/${board}.svg`
     },
+
+    async reWriteSvgs (counter) {
+      const svgFile = await this.addCustom(counter)
+      if (svgFile === undefined) {
+        if (this.isInternational) {
+          this.counter--
+        } else if (this.isShogi) {
+          this.shogiCounter--
+        } else if (this.isXiangqi) {
+          this.xiangqiCounter--
+        } else if (this.isSEA) {
+          this.seaCounter--
+        } else if (this.isJanggi) {
+          this.janggiCounter--
+        }
+        return false
+      }
+      if (!svgFile.canceled) {
+        fs.readFile(svgFile.filePaths[0], 'utf-8', (err, data) => {
+          if (err) {
+            alert('An error ocurred reading the file :' + err.message)
+            return
+          }
+          let path
+          if (this.isInternational) {
+            path = 'static/board/svg/custom' + this.counter + '.svg'
+          } else if (this.isShogi) {
+            path = 'static/board/svg/customShogi' + this.shogiCounter + '.svg'
+          } else if (this.isXiangqi) {
+            path =
+              'static/board/svg/customXiangqi' + this.xiangqiCounter + '.svg'
+          } else if (this.isSEA) {
+            path = 'static/board/svg/customSea' + this.seaCounter + '.svg'
+          } else if (this.isJanggi) {
+            path = 'static/board/svg/customJanggi' + this.janggiCounter + '.svg'
+          }
+
+          fs.writeFile(path, data, err => {
+            if (err) {
+              alert('An error ocurred updating the file' + err.message)
+              console.log(err)
+            }
+          })
+        })
+        return true
+      } else if (svgFile.canceled) {
+        if (this.isInternational) {
+          this.counter--
+        } else if (this.isShogi) {
+          this.shogiCounter--
+        } else if (this.isXiangqi) {
+          this.xiangqiCounter--
+        } else if (this.isSEA) {
+          this.seaCounter--
+        } else if (this.isJanggi) {
+          this.janggiCounter--
+        }
+        return false
+      }
+    },
+    async updateCustom (counter) {
+      const reWritten = await this.reWriteSvgs(counter)
+      if (reWritten) {
+        setTimeout(() => {
+          let boardStyleCustom
+
+          if (this.isInternational) {
+            boardStyleCustom = 'custom' + counter
+          } else if (this.isShogi) {
+            boardStyleCustom = 'customShogi' + counter
+          } else if (this.isXiangqi) {
+            boardStyleCustom = 'customXiangqi' + counter
+          } else if (this.isSEA) {
+            boardStyleCustom = 'customSea' + counter
+          } else if (this.isJanggi) {
+            boardStyleCustom = 'customJanggi' + counter
+          }
+          this.boardStyles.push(boardStyleCustom)
+          if (this.isInternational) {
+            localStorage.internationalBoardStyle = boardStyleCustom
+          } else if (this.isShogi) {
+            localStorage.shogiBoardStyle = boardStyleCustom
+          } else if (this.isXiangqi) {
+            localStorage.xiangqiBoardStyle = boardStyleCustom
+          } else if (this.isSEA) {
+            localStorage.seaBoardStyle = boardStyleCustom
+          } else if (this.isJanggi) {
+            localStorage.janggiBoardStyle = boardStyleCustom
+          }
+          this.$store.dispatch('boardStyle', boardStyleCustom)
+        }, 50)
+      }
+    },
+    addCustom (counter) {
+      if (counter > 5) {
+        alert("You can't add more than 5 Custom Designs")
+        return
+      }
+      return this.$electron.remote.dialog.showOpenDialog({
+        title: 'Choose Custom Board Style',
+        properties: ['openFile'],
+        filters: [{ name: 'SVG Files', extensions: ['svg'] }]
+      })
+    },
     updateBoardStyle (payload) {
-      if (this.isInternational) { // localStorage for all different groups of board stylings
+      if (payload === 'Add Custom') {
+        let testCounter = 0
+
+        if (this.isInternational) {
+          this.counter++
+          testCounter = this.counter
+        } else if (this.isShogi) {
+          this.shogiCounter++
+          testCounter = this.shogiCounter
+        } else if (this.isXiangqi) {
+          this.xiangqiCounter++
+          testCounter = this.xiangqiCounter
+        } else if (this.isSEA) {
+          this.seaCounter++
+          testCounter = this.seaCounter
+        } else if (this.isJanggi) {
+          this.janggiCounter++
+          testCounter = this.janggiCounter
+        }
+        this.updateCustom(testCounter)
+        return
+      } else if (this.isInternational) {
+        // localStorage for all different groups of board stylings
         localStorage.internationalBoardStyle = payload
       } else if (this.isShogi) {
         localStorage.shogiBoardStyle = payload
@@ -201,12 +393,10 @@ export default {
       this.$store.dispatch('boardStyle', payload)
     }
   }
-
 }
 </script>
 
 <style scoped>
-
 .item {
   display: flex;
   flex-direction: row;

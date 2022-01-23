@@ -1,11 +1,12 @@
 <template>
+  <!-- All components but menubar -->
   <div id="inner">
     <div>
       <div class="main-grid">
         <div class="chessboard-grid">
           <PgnBrowser id="pgnbrowser" />
           <div class="board">
-            <div @mousewheel.prevent="scroll($event)">
+            <div @mousewheel.prevent.exact="scroll($event)">
               <ChessGround
                 id="chessboard"
                 :orientation="orientation"
@@ -21,7 +22,7 @@
               name="lname"
               placeholder="fen position"
               :value="fen"
-              size="60"
+              :size="setFenSize()"
               @change="checkValidFEN"
             >
           </div>
@@ -153,6 +154,9 @@ export default {
     }, false)
   },
   methods: {
+    setFenSize () {
+      return this.fen.length + 3
+    },
     scroll (event) { // TODO: also moves back and forth when being slightly next to the board and for example over the pockets
       if (event.deltaY < 0) {
         this.moveBackOne()
@@ -319,7 +323,7 @@ export default {
     "evalplot analysisview";
 }
 .chessboard-grid {
-  min-width: 925px;
+  min-width: 1050px;
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% auto;
@@ -330,6 +334,7 @@ export default {
     ". selector";
 }
 #analysisview {
+  grid-area: analysisview;
   height: 100%;
   width: 100%;
 }
@@ -343,7 +348,6 @@ export default {
 }
 input {
   font-size: 12pt;
-  max-width: 60vw;
 }
 #fen-field {
   grid-area: fenfield;
@@ -373,7 +377,7 @@ input {
 }
 #pgnbrowser {
   grid-area: pgnbrowser;
-  border: 1px solid black;
+  border: 1px solid var(--main-border-color);
   border-radius: 4px;
   margin-left: 1em;
   max-height: 60vh;
@@ -395,6 +399,7 @@ input {
 }
 .evalbar {
   margin-left: 8px;
+  height: 99%;
 }
 #analysisview {
   margin-left: 15px;

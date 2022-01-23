@@ -191,7 +191,7 @@ input[type=number] {
   font-size: 25px;
 }
 .button:hover {
-  background-color: #22303d;
+  background-color: var(--hover-color);
   cursor: pointer;
 }
 .board960 {

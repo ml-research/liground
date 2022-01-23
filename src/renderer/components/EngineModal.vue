@@ -213,7 +213,7 @@ export default {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid var(--main-border-color);
-  color: #4AAE9B;
+  color: var(--tab-header-color);
   user-select: none;
 }
 
@@ -255,7 +255,7 @@ export default {
   margin-left: 20px;
   width: 120px;
   height: 60px;
-  background-color: #fff;
+  background-color: var(--light-text-color);
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -285,12 +285,12 @@ export default {
   cursor: pointer;
 }
 .btn.grey {
-  background: #333;
+  background: var(--tab-btn-color);
 }
 .btn.green {
-  background: #4AAE9B;
+  background: var(--save-btn-color);
 }
 .btn.red {
-  background: #b22222;
+  background: var(--cancel-btn-color);
 }
 </style>

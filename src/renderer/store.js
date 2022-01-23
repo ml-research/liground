@@ -107,6 +107,10 @@ export const store = new Vuex.Store({
   state: {
     initialized: false,
     active: false,
+    PvE: false,
+    PvEParam: 'go btime 5000',
+    PvEValue: 'time',
+    PvEInput: 5000,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
@@ -130,7 +134,6 @@ export const store = new Vuex.Store({
       Shogi: 'shogi',
       Janggi: 'janggi',
       Xiangqi: 'xiangqi',
-      Chess960: 'chess960',
       Fischerandom: 'fischerandom'
 
     }),
@@ -179,21 +182,22 @@ export const store = new Vuex.Store({
     menuAtMove: null,
     displayMenu: true,
     darkMode: false,
+    muteButton: false,
     fenply: 1,
     internationalVariants: [
-      'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
+      '+ Add Custom', 'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
     ],
     seaVariants: [
-      'makruk'
+      '+ Add Custom', 'makruk'
     ],
     xiangqiVariants: [
-      'xiangqi'
+      '+ Add Custom', 'xiangqi'
     ],
     janggiVariants: [
-      'janggi'
+      '+ Add Custom', 'janggi'
     ],
     shogiVariants: [
-      'shogi'
+      '+ Add Custom', 'shogi'
     ],
     clock: null
   },
@@ -239,6 +243,18 @@ export const store = new Vuex.Store({
     },
     orientation (state, payload) {
       state.orientation = payload
+    },
+    PvE (state, payload) {
+      state.PvE = payload
+    },
+    PvEParam (state, payload) {
+      state.PvEParam = payload
+    },
+    PvEValue (state, payload) {
+      state.PvEValue = payload
+    },
+    PvEInput (state, payload) {
+      state.PvEInput = payload
     },
     active (state, payload) {
       state.active = payload
@@ -406,11 +422,13 @@ export const store = new Vuex.Store({
       if (state.openedPGN) {
         return
       }
-      let note = new Audio(moveAudio)
-      if (move.toString().includes('x')) {
-        note = new Audio(captureAudio)
+      if (!state.muteButton) {
+        let note = new Audio(moveAudio)
+        if (move.toString().includes('x')) {
+          note = new Audio(captureAudio)
+        }
+        note.play()
       }
-      note.play()
     },
     gameInfo (state, payload) {
       state.gameInfo = payload
@@ -439,11 +457,12 @@ export const store = new Vuex.Store({
     },
     switchDarkMode (state) {
       state.darkMode = !state.darkMode
-      localStorage.darkMode = state.darkMode
+    },
+    switchMuteButton (state) {
+      state.muteButton = !state.muteButton
     },
     evalPlotDepth (state, payload) {
       state.evalPlotDepth = payload
-      localStorage.evalPlotDepth = payload
     },
     fenply (state, payload) {
       state.fenply = payload
@@ -457,6 +476,12 @@ export const store = new Vuex.Store({
     },
     resetEngineTime (state) {
       clearInterval(state.clock)
+    },
+    saveSettings (state) {
+      localStorage.darkMode = state.darkMode
+      localStorage.muteButton = state.muteButton
+      localStorage.evalPlotDepth = state.evalPlotDepth
+      localStorage.variant = state.variant
     }
   },
   actions: { // async
@@ -482,6 +507,11 @@ export const store = new Vuex.Store({
       if (localStorage.darkMode) {
         if (localStorage.darkMode === 'true') {
           context.commit('switchDarkMode')
+        }
+      }
+      if (localStorage.muteButton) {
+        if (localStorage.muteButton === 'true') {
+          context.commit('switchMuteButton')
         }
       }
       if (localStorage.internationalPieceStyle) {
@@ -565,10 +595,41 @@ export const store = new Vuex.Store({
       context.commit('resetMultiPV')
       context.commit('resetEngineStats')
     },
+    setPvEParam (context, payload) {
+      context.commit('PvEParam', payload)
+    },
+    setPvEValue (context, payload) {
+      context.commit('PvEValue', payload)
+    },
+    setPvEInput (context, payload) {
+      context.commit('PvEInput', payload)
+    },
     goEngine (context) {
       engine.send('go infinite')
       context.commit('setEngineClock')
       context.commit('active', true)
+    },
+    goEnginePvE (context) {
+      engine.send(context.getters.PvEParam)
+      context.commit('setEngineClock')
+      context.commit('active', true)
+    },
+    setActiveTrue (context) {
+      context.commit('active', true)
+    },
+    setActiveFalse (context) {
+      context.commit('active', false)
+    },
+    PvEtrue (context) {
+      context.commit('PvE', true)
+    },
+    stopEnginePvE (context) {
+      engine.send('stop')
+    },
+    PvEfalse (context) {
+      context.commit('PvE', false)
+      context.dispatch('stopEngine')
+      context.dispatch('resetEngineData')
     },
     stopEngine (context) {
       engine.send('stop')
@@ -577,10 +638,14 @@ export const store = new Vuex.Store({
     },
     restartEngine (context) {
       context.dispatch('resetEngineData')
-      if (context.getters.active) {
+      if (context.getters.active && !context.getters.PvE) {
         context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEngine')
+      } else if (context.getters.active && context.getters.PvE) {
+        context.dispatch('stopEngine')
+        context.dispatch('position')
+        context.dispatch('goEnginePvE')
       }
     },
     position (context) {
@@ -632,6 +697,18 @@ export const store = new Vuex.Store({
     active (context, payload) {
       context.commit('active', payload)
     },
+    PvE (context, payload) {
+      context.commit('PvE', payload)
+    },
+    PvEParam (context, payload) {
+      context.commit('PvEParam', payload)
+    },
+    PvEValue (context, payload) {
+      context.commit('PvEValue', payload)
+    },
+    PvEInput (context, payload) {
+      context.commit('PvEInput', payload)
+    },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
         // prepare engine
@@ -643,7 +720,6 @@ export const store = new Vuex.Store({
 
         // update variant
         context.commit('variant', payload)
-        localStorage.variant = payload
         const variants = ['chess', 'crazyhouse', 'racingkings', '3check', 'antichess', 'atomic']
         if (variants.includes(payload)) {
           const varFen = context.getters.curVar960Fen
@@ -822,7 +898,6 @@ export const store = new Vuex.Store({
       if (!context.state.active) {
         return
       }
-
       // update engine stats
       const stats = { ...context.state.engineStats }
       for (const key of Object.keys(stats)) {
@@ -948,8 +1023,14 @@ export const store = new Vuex.Store({
     switchDarkMode (context) {
       context.commit('switchDarkMode')
     },
+    switchMuteButton (context) {
+      context.commit('switchMuteButton')
+    },
     evalPlotDepth (context, payload) {
       context.commit('evalPlotDepth', payload)
+    },
+    saveSettings (context) {
+      context.commit('saveSettings')
     }
   },
   getters: {
@@ -977,6 +1058,18 @@ export const store = new Vuex.Store({
     },
     active (state) {
       return state.active
+    },
+    PvE (state) {
+      return state.PvE
+    },
+    PvEParam (state) {
+      return state.PvEParam
+    },
+    PvEValue (state) {
+      return state.PvEValue
+    },
+    PvEInput (state) {
+      return state.PvEInput
     },
     started (state) {
       return state.started
@@ -1219,6 +1312,9 @@ export const store = new Vuex.Store({
     },
     darkMode (state) {
       return state.darkMode
+    },
+    muteButton (state) {
+      return state.muteButton
     }
   }
 })

@@ -71,7 +71,7 @@ export default {
   box-sizing: content-box;
   width: 120px;
   height: 60px;
-  background-color: #fff;
+  background-color: var(--light-text-color);;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;

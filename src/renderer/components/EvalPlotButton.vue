@@ -98,7 +98,7 @@ input::-webkit-inner-spin-button {
   outline: none;
 }
 .button:hover {
-  background-color: #22303d;
+  background-color: var(--hover-color);
   cursor: pointer;
 }
 .EvalPlotButton {

@@ -98,7 +98,7 @@ export default {
 
 #players {
   display: flex;
-  border-bottom: 1px solid rgb(192, 192, 192);
+  border-bottom: 1px solid var(--main-border-color);
 }
 
 #gameinfo {

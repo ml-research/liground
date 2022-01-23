@@ -16,13 +16,24 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'RoundedSwitch',
   computed: {
-    ...mapGetters(['active'])
+    ...mapGetters(['active', 'PvE', 'turn'])
+  },
+  watch: {
+    active () {
+      if (this.active) {
+        this.$store.dispatch('restartEngine')
+      }
+    }
   },
   methods: {
     onClick () {
       if (!this.active) {
         this.$store.dispatch('position')
-        this.$store.dispatch('goEngine')
+        if (this.PvE) {
+          this.$store.dispatch('setActiveTrue')
+        } else {
+          this.$store.dispatch('goEngine')
+        }
       } else {
         this.$store.dispatch('stopEngine')
       }
@@ -73,11 +84,11 @@ export default {
 }
 
 input:checked + .slider {
- background-color: #2196F3;
+ background-color: var(--highlight-color);
 }
 
 input:focus + .slider {
- box-shadow: 0 0 1px #2196F3;
+ box-shadow: 0 0 1px var(--highlight-color);
 }
 
 input:checked + .slider:before {

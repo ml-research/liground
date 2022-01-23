@@ -68,10 +68,11 @@ input {
 .game-window {
   height: 20%;
   overflow-y: scroll;
+  background-color: var(--second-bg-color);
 }
 .panel {
   border-radius: 3px 3px 3px 3px;
-  border: 1px solid #888;
+  border: 1px solid var(--main-border-color);
   font-family: sans-serif;
   font-weight: 200;
 }
@@ -113,7 +114,7 @@ input {
   animation-play-state: paused;
 }
 .processing-bar.animate {
-  background-color: #2196F3;
+  background-color: var(--highlight-color);
   animation-play-state: running;
 }
 @keyframes bar-anim {
@@ -130,6 +131,7 @@ input {
   margin: 1em 0em;
   border: 1px solid var(--main-border-color);
   border-radius: 5px;
+  background-color: var(--second-bg-color);
 }
 #move-history {
   text-align: left;
