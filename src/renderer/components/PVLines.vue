@@ -110,11 +110,11 @@ export default {
             this.onClick(this.lines[0])
           }
         } else if (this.PvEValue === 'nodes') {
-          if (this.enginetime === 45000) {
+          if (this.enginetime === 60000) {
             this.onClick(this.lines[0])
           }
         } else if (this.PvEValue === 'depth') {
-          if (this.enginetime === 45000) {
+          if (this.enginetime === 60000) {
             this.onClick(this.lines[0])
           }
           if (this.enginetime >= 5000 && this.depth === this.seldepth) {
