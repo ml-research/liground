@@ -21,7 +21,7 @@ export default {
     turn () {
       if (this.turn && this.PvE) {
         this.$store.dispatch('stopEnginePvE')
-      } else if (!this.turn && this.PvE){
+      } else if (!this.turn && this.PvE) {
         this.$store.dispatch('restartEngine')
       }
     }
