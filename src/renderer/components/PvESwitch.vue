@@ -19,9 +19,9 @@ export default {
   },
   watch: {
     turn () {
-      if (this.turn) {
+      if (this.turn && this.PvE) {
         this.$store.dispatch('stopEnginePvE')
-      } else {
+      } else if (!this.turn && this.PvE){
         this.$store.dispatch('restartEngine')
       }
     }

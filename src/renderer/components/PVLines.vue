@@ -106,15 +106,15 @@ export default {
     enginetime () {
       if (this.active && this.PvE && !this.turn) {
         if (this.PvEValue === 'time') {
-          if (this.enginetime === (this.PvEInput)) {
+          if (this.enginetime === (this.PvEInput+1000)) {
             this.onClick(this.lines[0])
           }
         } else if (this.PvEValue === 'nodes') {
-          if (this.enginetime === 45000) {
+          if (this.enginetime === 60000) {
             this.onClick(this.lines[0])
           }
         } else if (this.PvEValue === 'depth') {
-          if (this.enginetime === 45000) {
+          if (this.enginetime === 60000) {
             this.onClick(this.lines[0])
           }
           if (this.enginetime >= 5000 && this.depth === this.seldepth) {

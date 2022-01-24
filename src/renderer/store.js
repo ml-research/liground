@@ -642,7 +642,7 @@ export const store = new Vuex.Store({
         context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEngine')
-      } else if (context.getters.active && context.getters.PvE) {
+      } else if (context.getters.active && context.getters.PvE && !context.getters.turn) {
         context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEnginePvE')
