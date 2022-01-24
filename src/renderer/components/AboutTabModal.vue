@@ -22,7 +22,7 @@
           style="white-space: pre-line"
         >
           <span>
-            {{ 'Version: 0.2.0' }}
+            {{ 'Version: 0.3.0' }}
           </span>
         </div>
         <div class="item">
