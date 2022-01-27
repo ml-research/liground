@@ -236,7 +236,7 @@ export default {
         case 'time':
           this.$store.dispatch(
             'setPvEParam',
-            'go btime ' + this.PvEInput * 1000
+            'go movetime ' + this.PvEInput * 1000
           )
           this.$store.dispatch('setPvEInput', this.PvEInput * 1000)
           break

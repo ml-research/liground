@@ -108,7 +108,7 @@ export const store = new Vuex.Store({
     initialized: false,
     active: false,
     PvE: false,
-    PvEParam: 'go btime 5000',
+    PvEParam: 'go movetime 5000',
     PvEValue: 'time',
     PvEInput: 5000,
     turn: true,

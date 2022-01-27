@@ -74,6 +74,7 @@
 import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
 import fs from 'fs'
+import absolutePath from 'path'
 export default {
   name: 'BoardStyleSelector',
   components: {
@@ -332,7 +333,6 @@ export default {
       }
       return `url(static/board/svg/${board}.svg`
     },
-
     async reWriteSvgs (counter) {
       const svgFile = await this.addCustom(counter)
       if (svgFile === undefined) {
@@ -367,7 +367,7 @@ export default {
                 }
               }
             })
-            path = 'static/board/svg/custom' + this.freeCustomID + '.svg'
+            path = absolutePath.join(__static, 'static/board/svg/custom' + this.freeCustomID + '.svg')
           } else if (this.isShogi) {
             let bool = false
             this.shogiMap.forEach((value, key) => {
@@ -417,11 +417,14 @@ export default {
             })
             path = 'static/board/svg/customJanggi' + this.freeCustomID + '.svg'
           }
-          fs.writeFile(path, data, err => {
-            if (err) {
-              alert('An error ocurred updating the file' + err.message)
-              console.log(err)
-            }
+          fs.chmod(path, 0o600, () => {
+            console.log('Trying to write to file')
+            fs.writeFile(path, data, err => {
+              if (err) {
+                alert('An error ocurred updating the file' + err.message)
+                console.log(err)
+              }
+            })
           })
         })
         return true
@@ -438,89 +441,6 @@ export default {
           this.maxCustomJanggiCounter--
         }
         return false
-      }
-    },
-    deleteCustom (payload) {
-      const number = parseInt(payload.slice(-1))
-      let path
-      if (this.isInternational) {
-        path = 'static/board/svg/' + payload + '.svg'
-        this.maxCustomStandardCounter--
-        let bool = false
-        this.map.forEach((value, key) => {
-          if (bool === false) {
-            if (value === false && key === number) {
-              bool = true
-              this.overWriteSVGStandardcounter = key - 1
-              console.log(this.overWriteSVGStandardcounter)
-              this.map.set(key, true)
-              console.log(this.map)
-              this.boardStyles = this.boardStyles.filter(e => e !== payload)
-            }
-          }
-        })
-      } else if (this.isShogi) {
-        path = 'static/board/svg/customShogi' + payload + '.svg'
-        this.maxCustomShogiCounter--
-        let bool = false
-        this.shogiMap.forEach((value, key) => {
-          if (bool === false) {
-            if (value === false && key === number) {
-              bool = true
-              this.overWriteSVGshogiCounter = key - 1
-              this.shogiMap.set(key, true)
-              this.shogiStyles = this.shogiStyles.filter(e => e !== payload)
-            }
-          }
-        })
-      } else if (this.isXiangqi) {
-        path = 'static/board/svg/customXiangqi' + payload + '.svg'
-        this.maxCustomXiangqiCounter--
-        let bool = false
-        this.xiangqiMap.forEach((value, key) => {
-          if (bool === false) {
-            if (value === false && key === number) {
-              bool = true
-              this.overWriteSVGxiangqiCounter = key - 1
-              this.xiangqiMap.set(key, true)
-              this.xiangqiStyles = this.xiangqiStyles.filter(e => e !== payload)
-            }
-          }
-        })
-      } else if (this.isSEA) {
-        path = 'static/board/svg/customSea' + payload + '.svg'
-        this.maxCustomSeaCounter--
-        let bool = false
-        this.seaMap.forEach((value, key) => {
-          if (bool === false) {
-            if (value === false && key === number) {
-              bool = true
-              this.overWriteSVGseaCounter = key - 1
-              this.seaMap.set(key, true)
-              this.seaStyles = this.seaStyles.filter(e => e !== payload)
-            }
-          }
-        })
-      } else if (this.isJanggi) {
-        path = 'static/board/svg/customJanggi' + payload + '.svg'
-        this.maxCustomJanggiCounter--
-        let bool = false
-        this.janggiMap.forEach((value, key) => {
-          if (bool === false) {
-            if (value === false && key === number) {
-              bool = true
-              this.overWriteSVGjanggiCounter = key - 1
-              this.janggiMap.set(key, true)
-              this.janggiStyles = this.janggiStyles.filter(e => e !== payload)
-            }
-          }
-        })
-      }
-      try {
-        fs.unlinkSync(path)
-        //  file removed
-      } catch (err) {
-        console.error(err)
       }
     },
     async updateCustom (counter) {
