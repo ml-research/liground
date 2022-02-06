@@ -85,7 +85,8 @@ export default {
   },
   data () {
     return {
-      variantOnMount: null,
+      boardWidth: 0,
+      boardHeight: 0,
       startingPoint: 640,
       dragging: false,
       enlarged: 0,
@@ -176,7 +177,8 @@ export default {
       promotionMove: undefined,
       pieceStyleEl: null,
       boardStyleEl: null,
-      dimensionNumberBeforeSwap: null
+      dimensionNumberBeforeSwap: null,
+      start: true
     }
   },
   computed: {
@@ -213,28 +215,48 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime', 'resized', 'resized9x9', 'resized9x10', 'dimNumber'])
   },
   watch: {
     dimensionNumber () {
       const boardSize = document.querySelector('.cg-wrap')
-      this.enlarged = 0
-      this.enlarged9x9 = 0
-      this.enlarged9x10 = 0
-      this.startingPoint = 640
-      if (this.dimensionNumber === 0) {
-        boardSize.style.width = 600 + this.enlarged + 'px'
-        boardSize.style.height = 600 + this.enlarged + 'px'
-        document.body.dispatchEvent(new Event('chessground.resize'))
-      } else if (this.dimensionNumber === 1) {
+      if (this.start === true) {
+        if (this.dimensionNumber === 1) {
           boardSize.style.width = 520 + this.enlarged + 'px'
+          boardSize.style.height = 600 + this.enlarged9x9 + 'px'
+          this.startingPoint = this.enlarged9x9
+        } else if (this.dimensionNumber === 3) {
+            boardSize.style.width = 540 + this.enlarged + 'px'
+            boardSize.style.height = 600 + this.enlarged9x10 + 'px'
+            this.startingPoint = this.enlarged9x10
+        }
+        this.start = false
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      } else {
+          this.enlarged = 0
+          this.enlarged9x9 = 0
+          this.enlarged9x10 = 0
+          this.startingPoint = 640
+        if (this.dimensionNumber === 0) {
+          boardSize.style.width = 600 + this.enlarged + 'px'
           boardSize.style.height = 600 + this.enlarged + 'px'
           document.body.dispatchEvent(new Event('chessground.resize'))
+        } else if (this.dimensionNumber === 1) {
+            boardSize.style.width = 520 + this.enlarged + 'px'
+            boardSize.style.height = 600 + this.enlarged + 'px'
+            document.body.dispatchEvent(new Event('chessground.resize'))
         } else if (this.dimensionNumber === 3) {
             boardSize.style.width = 540 + this.enlarged + 'px'
             boardSize.style.height = 600 + this.enlarged + 'px'
             document.body.dispatchEvent(new Event('chessground.resize'))
         }
+      this.boardWidth = boardSize.style.width
+      this.boardHeight = boardSize.style.height
+      this.$store.dispatch('setResized', this.enlarged)
+      this.$store.dispatch('setResized9x9', this.enlarged9x9)
+      this.$store.dispatch('setResized9x10', this.enlarged9x10)
+      this.$store.dispatch('setDimNumber', this.dimensionNumber)
+      }
     },
     initialized () {
       this.updateBoard()
@@ -312,7 +334,6 @@ export default {
       this.drawShapes()
     },
     variant () {
-      console.log(this.variantBeforeSwap)
       if (this.variant === 'shogi') {
         this.piecesW = this.shogiPiecesW
         this.piecesB = this.shogiPiecesB
@@ -362,13 +383,15 @@ export default {
     }
   },
   mounted () {
-    this.dimensionNumberBeforeSwap = this.dimensionNumber
-    
+    this.enlarged = Number(localStorage.resized)
+    this.enlarged9x9 = Number(localStorage.resized9x9)
+    this.enlarged9x10 = Number(localStorage.resized9x10)
+
+    this.dimensionNumberBeforeSwap = Number(localStorage.dimNumber)
     window.addEventListener('mouseup', this.stopDragging)
     window.addEventListener('mousemove', this.doResize)
     window.addEventListener('wheel', this.reRender)
     window.addEventListener('mouseup', this.reRender)
-
     this.board = Chessground(this.$refs.board, {
       coordinates: false,
       fen: this.fen,
@@ -410,6 +433,13 @@ export default {
     this.updateBoardCSS(this.boardStyle)
     this.updatePieceCSS(this.pieceStyle)
     // force initial resize
+    document.body.dispatchEvent(new Event('chessground.resize'))
+    const boardSize = document.querySelector('.cg-wrap')
+    if (Number(localStorage.dimNumber) === 0) {
+      boardSize.style.width = 600 + this.enlarged + 'px'
+      boardSize.style.height = 600 + this.enlarged + 'px'
+      this.startingPoint = this.enlarged
+    }
     document.body.dispatchEvent(new Event('chessground.resize'))
   },
   methods: {
@@ -468,7 +498,6 @@ export default {
         } else if (this.dimensionNumber === 1 && this.enlarged < 200) {
           boardSize.style.width = 520 + this.enlarged + 'px'
           boardSize.style.height = 600 + this.enlarged9x9 + 'px'
-          console.log(boardSize.style.height)
           document.body.dispatchEvent(new Event('chessground.resize'))
         } else if (this.dimensionNumber === 3) {
           boardSize.style.width = 540 + this.enlarged + 'px'
@@ -476,6 +505,11 @@ export default {
           document.body.dispatchEvent(new Event('chessground.resize'))
         }
       }
+      this.boardWidth = boardSize.style.width
+      this.boardHeight = boardSize.style.height
+      this.$store.dispatch('setResized', this.enlarged)
+      this.$store.dispatch('setResized9x9', this.enlarged9x9)
+      this.$store.dispatch('setResized9x10', this.enlarged9x10)
     },
     resize (event) {
       const boardSize = document.querySelector('.cg-wrap')
@@ -514,7 +548,6 @@ export default {
         } else if (this.dimensionNumber === 1 && this.enlarged < 200) {
           boardSize.style.width = 520 + this.enlarged + 'px'
           boardSize.style.height = 600 + this.enlarged9x9 + 'px'
-          console.log(boardSize.style.height)
           document.body.dispatchEvent(new Event('chessground.resize'))
         } else if (this.dimensionNumber === 3) {
           boardSize.style.width = 540 + this.enlarged + 'px'
@@ -522,6 +555,11 @@ export default {
           document.body.dispatchEvent(new Event('chessground.resize'))
         }
       }
+      this.boardWidth = boardSize.style.width
+      this.boardHeight = boardSize.style.height
+      this.$store.dispatch('setResized', this.enlarged)
+      this.$store.dispatch('setResized9x9', this.enlarged9x9)
+      this.$store.dispatch('setResized9x10', this.enlarged9x10)
     },
     showPromotionModal () {
       this.isPromotionModalVisible = true

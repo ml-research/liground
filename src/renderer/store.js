@@ -111,6 +111,10 @@ export const store = new Vuex.Store({
     PvEParam: 'go movetime 1000',
     PvEValue: 'time',
     PvEInput: 1000,
+    resized: 0,
+    resized9x9: 0,
+    resized9x10: 0,
+    dimNumber: 0,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
@@ -255,6 +259,18 @@ export const store = new Vuex.Store({
     },
     PvEInput (state, payload) {
       state.PvEInput = payload
+    },
+    dimNumber (state, payload) {
+      state.dimNumber = payload
+    },
+    resized (state, payload) {
+      state.resized = payload
+    },
+    resized9x9 (state, payload) {
+      state.resized9x9 = payload
+    },
+    resized9x10 (state, payload) {
+      state.resized9x10 = payload
     },
     active (state, payload) {
       state.active = payload
@@ -482,6 +498,10 @@ export const store = new Vuex.Store({
       localStorage.muteButton = state.muteButton
       localStorage.evalPlotDepth = state.evalPlotDepth
       localStorage.variant = state.variant
+      localStorage.resized = state.resized
+      localStorage.resized9x9 = state.resized9x9
+      localStorage.resized9x10 = state.resized9x10
+      localStorage.dimNumber = state.dimNumber
     }
   },
   actions: { // async
@@ -604,6 +624,18 @@ export const store = new Vuex.Store({
     setPvEInput (context, payload) {
       context.commit('PvEInput', payload)
     },
+    setDimNumber (context, payload) {
+      context.commit('dimNumber', payload)
+    },
+    setResized (context, payload) {
+      context.commit('resized', payload)
+    },
+    setResized9x9 (context, payload) {
+      context.commit('resized9x9', payload)
+    },
+    setResized9x10 (context, payload) {
+      context.commit('resized9x10', payload)
+    },
     goEngine (context) {
       engine.send('go infinite')
       context.commit('setEngineClock')
@@ -708,6 +740,18 @@ export const store = new Vuex.Store({
     },
     PvEInput (context, payload) {
       context.commit('PvEInput', payload)
+    },
+    dimNumber (context, payload) {
+      context.commit('dimNumber', payload)
+    },
+    resized (context, payload) {
+      context.commit('resized', payload)
+    },
+    resized9x9 (context, payload) {
+      context.commit('resized9x9', payload)
+    },
+    resized9x10 (context, payload) {
+      context.commit('resized9x10', payload)
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
@@ -1070,6 +1114,18 @@ export const store = new Vuex.Store({
     },
     PvEInput (state) {
       return state.PvEInput
+    },
+    dimNumber (state) {
+      return state.dimNumber
+    },
+    resized (state) {
+      return state.resized
+    },
+    resized9x9 (state) {
+      return state.resized9x9
+    },
+    resized9x10 (state) {
+      return state.resized9x10
     },
     started (state) {
       return state.started
