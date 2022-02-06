@@ -126,8 +126,7 @@
                 v-model.number="PvEInput"
                 type="number"
                 :step="1"
-                :min="5"
-                :max="45"
+                :min="1"
                 class="input"
               >
             </td>
@@ -179,7 +178,7 @@ export default {
       value: 'time',
       options: ['time', 'nodes', 'depth'],
       settingsName: 'Time in seconds',
-      PvEInput: 5
+      PvEInput: 1
     }
   },
   computed: {
@@ -204,7 +203,7 @@ export default {
       } else if (payload === 'time') {
         this.settingsName = 'Time in seconds'
         this.value = 'time'
-        this.PvEInput = 5
+        this.PvEInput = 1
       } else if (payload === 'depth') {
         this.PvEInput = 20
         this.settingsName = 'depth of'

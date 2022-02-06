@@ -108,9 +108,9 @@ export const store = new Vuex.Store({
     initialized: false,
     active: false,
     PvE: false,
-    PvEParam: 'go movetime 5000',
+    PvEParam: 'go movetime 1000',
     PvEValue: 'time',
-    PvEInput: 5000,
+    PvEInput: 1000,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
