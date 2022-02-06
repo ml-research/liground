@@ -25,7 +25,11 @@
         class="selectedClasses"
         @mousewheel.ctrl.prevent="resize($event)"
       >
-        <div class="cg-board-wrap">
+        <div
+          class="cg-board-wrap"
+          @mousedown="closeCursorHand"
+          @mouseup="openCursorHand"
+        >
           <div
             class="resizer"
             @mouseover="shade"
@@ -81,6 +85,7 @@ export default {
   },
   data () {
     return {
+      variantOnMount: null,
       startingPoint: 640,
       dragging: false,
       enlarged: 0,
@@ -170,7 +175,8 @@ export default {
       isPromotionModalVisible: false,
       promotionMove: undefined,
       pieceStyleEl: null,
-      boardStyleEl: null
+      boardStyleEl: null,
+      dimensionNumberBeforeSwap: null
     }
   },
   computed: {
@@ -210,6 +216,26 @@ export default {
     ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime'])
   },
   watch: {
+    dimensionNumber () {
+      const boardSize = document.querySelector('.cg-wrap')
+      this.enlarged = 0
+      this.enlarged9x9 = 0
+      this.enlarged9x10 = 0
+      this.startingPoint = 640
+      if (this.dimensionNumber === 0) {
+        boardSize.style.width = 600 + this.enlarged + 'px'
+        boardSize.style.height = 600 + this.enlarged + 'px'
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      } else if (this.dimensionNumber === 1) {
+          boardSize.style.width = 520 + this.enlarged + 'px'
+          boardSize.style.height = 600 + this.enlarged + 'px'
+          document.body.dispatchEvent(new Event('chessground.resize'))
+        } else if (this.dimensionNumber === 3) {
+            boardSize.style.width = 540 + this.enlarged + 'px'
+            boardSize.style.height = 600 + this.enlarged + 'px'
+            document.body.dispatchEvent(new Event('chessground.resize'))
+        }
+    },
     initialized () {
       this.updateBoard()
     },
@@ -286,6 +312,7 @@ export default {
       this.drawShapes()
     },
     variant () {
+      console.log(this.variantBeforeSwap)
       if (this.variant === 'shogi') {
         this.piecesW = this.shogiPiecesW
         this.piecesB = this.shogiPiecesB
@@ -329,29 +356,14 @@ export default {
         variant: this.variant,
         lastMove: false
       })
-      const boardSize = document.querySelector('.cg-wrap')
-      this.enlarged = 0
-      this.enlarged9x9 = 0
-      this.enlarged9x10 = 0
-      this.startingPoint = 640
-      if (this.dimensionNumber === 0) {
-        boardSize.style.width = 600 + this.enlarged + 'px'
-        boardSize.style.height = 600 + this.enlarged + 'px'
-        document.body.dispatchEvent(new Event('chessground.resize'))
-      } else if (this.dimensionNumber === 1) {
-        boardSize.style.width = 520 + this.enlarged + 'px'
-        boardSize.style.height = 600 + this.enlarged + 'px'
-        document.body.dispatchEvent(new Event('chessground.resize'))
-      } else if (this.dimensionNumber === 3) {
-        boardSize.style.width = 540 + this.enlarged + 'px'
-        boardSize.style.height = 600 + this.enlarged + 'px'
-        document.body.dispatchEvent(new Event('chessground.resize'))
-      }
       this.updateBoard()
       this.isPromotionModalVisible = false
+      this.dimensionNumberBeforeSwap = this.dimensionNumber
     }
   },
   mounted () {
+    this.dimensionNumberBeforeSwap = this.dimensionNumber
+    
     window.addEventListener('mouseup', this.stopDragging)
     window.addEventListener('mousemove', this.doResize)
     window.addEventListener('wheel', this.reRender)
@@ -401,6 +413,14 @@ export default {
     document.body.dispatchEvent(new Event('chessground.resize'))
   },
   methods: {
+    closeCursorHand () {
+       const board = document.querySelector('.cg-wrap')
+       board.style.cursor = 'grabbing'
+    },
+    openCursorHand () {
+       const board = document.querySelector('.cg-wrap')
+       board.style.cursor = 'grab'
+    },
     reRender (event) {
       document.body.dispatchEvent(new Event('chessground.resize'))
     },
