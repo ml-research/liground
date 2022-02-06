@@ -106,8 +106,6 @@ export default {
     enginetime () {
       if (this.active && this.PvE && !this.turn) {
         if (this.PvEValue === 'time') {
-                console.log(this.PvEValue)
-      console.log(this.PvEInput)
           if (this.enginetime === (this.PvEInput)) {
             this.onClick(this.lines[0])
           }
