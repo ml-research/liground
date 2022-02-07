@@ -383,10 +383,11 @@ export default {
     }
   },
   mounted () {
-    this.enlarged = Number(localStorage.resized)
-    this.enlarged9x9 = Number(localStorage.resized9x9)
-    this.enlarged9x10 = Number(localStorage.resized9x10)
-
+    if (localStorage.resized !== undefined) {
+      this.enlarged = Number(localStorage.resized)
+      this.enlarged9x9 = Number(localStorage.resized9x9)
+      this.enlarged9x10 = Number(localStorage.resized9x10)
+    }
     this.dimensionNumberBeforeSwap = Number(localStorage.dimNumber)
     window.addEventListener('mouseup', this.stopDragging)
     window.addEventListener('mousemove', this.doResize)

@@ -7,10 +7,15 @@
   "files": [
     "dist/electron/**/*"
   ],
+  "asar": false,
   "extraResources": [
     {
       "from": "engines",
       "to": "engines"
+    },
+    {
+      "from": "static",
+      "to": "static"
     }
   ],
   "dmg": {
