@@ -42,7 +42,7 @@ export default {
   },
   watch: {
     selected () {
-      this.$store.dispatch('changeEngine', this.selected.name)
+      //this.$store.dispatch('changeEngine', this.selected.name)
     },
     selectedEngine () {
       this.selected = this.selectedEngine

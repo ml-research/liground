@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
-import engine from './engine'
+import { engine } from './engine'
 import allEngines from './store/engines'
 
 import moveAudio from './assets/audio/Move.mp3'
@@ -105,6 +105,8 @@ const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
 
 export const store = new Vuex.Store({
   state: {
+    engineIndex: 1,
+    enginesActive: [false],
     initialized: false,
     active: false,
     PvE: false,
@@ -154,6 +156,7 @@ export const store = new Vuex.Store({
       options: []
     },
     engineSettings: {},
+    listOfEngineStats: [],
     engineStats: {
       depth: 0,
       seldepth: 0,
@@ -171,6 +174,12 @@ export const store = new Vuex.Store({
         ucimove: ''
       }
     ],
+    numberOfEngines: [
+      {
+        number: 1
+      }
+    ],
+    engineCounter: 1,
     hoveredpv: -1,
     counter: 0,
     pieceStyle: 'cburnett',
@@ -206,6 +215,10 @@ export const store = new Vuex.Store({
     clock: null
   },
   mutations: { // sync
+    increaseEngineNumber(state) {
+      state.numberOfEngines.push({ number: 2 })
+      state.engineCounter++
+    },
     curVar960Fen (state, payload) {
       state.curVar960Fen = payload
     },
@@ -214,6 +227,12 @@ export const store = new Vuex.Store({
     },
     fen (state, payload) {
       state.fen = payload
+    },
+    engineIndex(state, payload) {
+      state.engineIndex = payload;
+    },
+    enginesActive(state, payload) {
+      state.enginesActive = payload
     },
     startFen (state, payload) {
       state.startFen = payload
@@ -652,6 +671,12 @@ export const store = new Vuex.Store({
     setActiveFalse (context) {
       context.commit('active', false)
     },
+    engineIndex(context, payload) {
+      context.commit('engineIndex', payload)
+    },
+    enginesActive(context, payload) {
+      context.commit('enginesActive', payload)
+    },
     PvEtrue (context) {
       context.commit('PvE', true)
     },
@@ -731,6 +756,12 @@ export const store = new Vuex.Store({
     },
     PvE (context, payload) {
       context.commit('PvE', payload)
+    },
+    engineIndex(context, payload) {
+      context.commit('engineIndex', payload)
+    },
+    enginesActive(context, payload) {
+      context.commit('enginesActive', payload)
     },
     PvEParam (context, payload) {
       context.commit('PvEParam', payload)
@@ -1078,6 +1109,15 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    engineNumber(state) {
+      return state.numberOfEngines
+    },
+    engineIndex(state) {
+      return state.engineIndex
+    },
+    enginesActive(state) {
+      return state.enginesActive
+    },
     currentMove (state) {
       return state.moves.filter(moves => moves.fen === state.fen)
     },

@@ -88,7 +88,7 @@ import GameInfo from './GameInfo'
 import MoveHistoryNode from './MoveHistoryNode'
 import RoundedSwitch from './RoundedSwitch'
 import EngineSelect from './EngineSelect'
-import engine from '../engine'
+import { Engine, engine } from '../engine'
 
 
 export default {
@@ -115,7 +115,7 @@ export default {
       isEngineActive: false,
       engineID: 1,
       input: '',
-      io: [],
+      io: Object.freeze([]),
       rendered: [],
       elSize: 0,
       lastScrollPosition: 0,
@@ -123,19 +123,23 @@ export default {
       renderLength: 0,
       autoScroll: true,
       scrollbarSize: 0,
+      newEngine: null
     }
   },
   mounted () {
-    engine.send('uci')
+    this.newEngine = new Engine()
+    // TODO : set Engine Run
+    //this.newEngine.run()
+    //this.newEngine.send('uci')
+    //console.log(this.newEngine)
     this.$store.commit('resetMultiPV')
     this.engineID = this.engineIndex
-    console.log(this.engineID)
 
     // TODO: more elegant way?
     // clear io on store event
     this.$store.subscribe((mutation) => {
       if (mutation.type === 'clearIO') {
-        this.io = []
+        this.io = Object.freeze([])
         this.lastScrollPosition = 0
         this.fullWidth = 0
         this.rerender()
@@ -143,7 +147,7 @@ export default {
     })
 
     // append incoming io
-    engine.on('io', io => this.append(io))
+    this.newEngine.on('io', io => this.append(io))
 
     // discover sizes
     const { scroller } = this.$refs
@@ -152,7 +156,7 @@ export default {
     this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove','cpForWhiteStr', 'engineIndex']),
+    ...mapGetters(['active', 'mainFirstMove','cpForWhiteStr', 'engineIndex', 'PvE']),
     movesExist() {
       const moves = this.$store.getters.moves
       return moves.length !== 0
@@ -183,7 +187,7 @@ export default {
       }
 
       // append io
-      this.io = this.io.concat(io)
+      this.io = Object.freeze(this.io.concat(io))
 
       // scroll to bottom if auto scroll enabled
       if (this.autoScroll) {
@@ -234,9 +238,13 @@ export default {
     },
     onSwitch() {
       if (!this.isEngineActive) {
-        engine.send('go movetime 2000')
+        if (this.PvE) {
+          this.$store.dispatch('setActiveTrue')
+        } else {
+          this.$store.dispatch('goEngine')
+        }
       } else {
-        engine.send('stop')
+        this.$store.dispatch('stopEngine')
       }
       this.isEngineActive = !this.isEngineActive
     }

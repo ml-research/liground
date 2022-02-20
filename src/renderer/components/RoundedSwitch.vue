@@ -2,10 +2,9 @@
 <template>
   <label class="switch">
     <input
-      type="checkbox"
-      :checked="active"
-      @click="onClick"
-    >
+      type="checkbox">
+      <!--  :checked="active"
+      @click="onClick" -->
     <span class="slider round" />
   </label>
 </template>
@@ -19,14 +18,14 @@ export default {
     ...mapGetters(['active', 'PvE', 'turn'])
   },
   watch: {
-    active () {
+    /* active () {
       if ((this.active && !this.PvE) || (this.active && this.PvE && !this.turn)) {
         this.$store.dispatch('restartEngine')
       }
-    }
+    } */
   },
   methods: {
-    onClick () {
+   /*  onClick () {
       if (!this.active) {
         this.$store.dispatch('position')
         if (this.PvE) {
@@ -37,7 +36,7 @@ export default {
       } else {
         this.$store.dispatch('stopEngine')
       }
-    }
+    } */
   }
 }
 </script>

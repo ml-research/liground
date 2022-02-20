@@ -9,7 +9,7 @@ function arrayify (data) {
  * Class to handle communication with engine.
  * Emits `debug`, `error`, `io`, `info` events.
  */
-class Engine extends EventEmitter {
+export class Engine extends EventEmitter {
   constructor (...args) {
     super(...args)
 
@@ -132,5 +132,4 @@ class Engine extends EventEmitter {
     })
   }
 }
-
-export default new Engine()
+export let engine = new Engine()

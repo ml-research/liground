@@ -231,6 +231,13 @@ export default {
           this.startingPoint = this.enlarged9x10
         }
         this.start = false
+        //console.log(document.querySelector('.cg-wrap'))
+        //console.log(document.querySelector('.cg-wrap cg-container'))
+        //console.log(document.querySelector('cg-container'))
+        //console.log(document.querySelector('cg-helper'))
+        //console.log(document.querySelector('.cg-wrap piece'))
+        //console.log(document.querySelector('cg-board square'))
+        
         document.body.dispatchEvent(new Event('chessground.resize'))
       } else {
         this.enlarged = 0

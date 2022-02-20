@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import engine from '../engine'
+import { engine } from '../engine'
 
 export default {
   name: 'EngineConsole',

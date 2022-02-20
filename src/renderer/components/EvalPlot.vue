@@ -12,7 +12,7 @@
 <script>
 import VueApexCharts from 'vue-apexcharts'
 import { mapGetters } from 'vuex'
-import Engine from '../engine'
+import { engine } from '../engine'
 
 export default {
   name: 'EvalPlot',
@@ -308,7 +308,7 @@ export default {
           this.series[0].data.splice(0, xlength)
         }
         if (depth > this.depthArr[index] || this.series[0].data[index + 1] === undefined) {
-          points = await Engine.evaluate(this.mainMoves[index].fen, depth)
+          points = await engine.evaluate(this.mainMoves[index].fen, depth)
           if (this.break) { // stops evaluating
             this.break = false
             return
