@@ -367,7 +367,7 @@ export default {
                 }
               }
             })
-            path = absolutePath.join(__static, '/board/svg/custom' + this.freeCustomID + '.svg')
+            path = 'static/board/svg/custom' + this.freeCustomID + '.svg'
           } else if (this.isShogi) {
             let bool = false
             this.shogiMap.forEach((value, key) => {
@@ -418,16 +418,11 @@ export default {
             path = absolutePath.join(__static, '/board/svg/customJanggi' + this.freeCustomID + '.svg')
           }
           const fs = require('fs')
-          fs.chmod(__static, '755', function (err) {
+          fs.writeFile(path, data, err => {
             if (err) {
-              console.log('Something went wrong' + __static)
+              alert('An error ocurred updating the file' + err.message)
+              console.log(err)
             }
-            fs.writeFile(path, data, err => {
-              if (err) {
-                alert('An error ocurred updating the file' + err.message)
-                console.log(err)
-              }
-            })
           })
         })
         return true
