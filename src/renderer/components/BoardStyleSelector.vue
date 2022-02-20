@@ -367,8 +367,7 @@ export default {
                 }
               }
             })
-            path = boards + '/board/svg/custom' + this.freeCustomID + '.svg'
-            console.log(path)
+            path = absolutePath.join(__static, '/board/svg/custom' + this.freeCustomID + '.svg')
           } else if (this.isShogi) {
             let bool = false
             this.shogiMap.forEach((value, key) => {
@@ -418,9 +417,10 @@ export default {
             })
             path = absolutePath.join(__static, '/board/svg/customJanggi' + this.freeCustomID + '.svg')
           }
-          fs.chmod(absolutePath.join(__static, '/board/svg'), '755', function (err) {
+          const fs = require('fs')
+          fs.chmod(__static, '755', function (err) {
             if (err) {
-              console.log('something went wrong ' + err)
+              console.log('Something went wrong' + __static)
             }
             fs.writeFile(path, data, err => {
               if (err) {

@@ -7,6 +7,10 @@
   "files": [
     "dist/electron/**/*"
   ],
+<<<<<<< HEAD
+=======
+
+>>>>>>> 096199a26dc3867d438af3d7216c41203d326aec
   "extraResources": [
     {
       "from": "engines",
