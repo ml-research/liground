@@ -114,8 +114,10 @@ export const store = new Vuex.Store({
     PvEValue: 'time',
     PvEInput: 1000,
     resized: 0,
-    resized9x9: 0,
-    resized9x10: 0,
+    resized9x9height: 0,
+    resized9x9width: 0,
+    resized9x10height: 0,
+    resized9x10width: 0,
     dimNumber: 0,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -285,11 +287,17 @@ export const store = new Vuex.Store({
     resized (state, payload) {
       state.resized = payload
     },
-    resized9x9 (state, payload) {
-      state.resized9x9 = payload
+    resized9x9width (state, payload) {
+      state.resized9x9width = payload
     },
-    resized9x10 (state, payload) {
-      state.resized9x10 = payload
+    resized9x9height (state, payload) {
+      state.resized9x9height = payload
+    },
+    resized9x10width (state, payload) {
+      state.resized9x10width = payload
+    },
+    resized9x10height (state, payload) {
+      state.resized9x10height = payload
     },
     active (state, payload) {
       state.active = payload
@@ -518,8 +526,10 @@ export const store = new Vuex.Store({
       localStorage.evalPlotDepth = state.evalPlotDepth
       localStorage.variant = state.variant
       localStorage.resized = state.resized
-      localStorage.resized9x9 = state.resized9x9
-      localStorage.resized9x10 = state.resized9x10
+      localStorage.resized9x9width = state.resized9x9width
+      localStorage.resized9x9height = state.resized9x9height
+      localStorage.resized9x10width = state.resized9x10width
+      localStorage.resized9x10height = state.resized9x10height
       localStorage.dimNumber = state.dimNumber
     }
   },
@@ -649,11 +659,17 @@ export const store = new Vuex.Store({
     setResized (context, payload) {
       context.commit('resized', payload)
     },
-    setResized9x9 (context, payload) {
-      context.commit('resized9x9', payload)
+    setResized9x9width (context, payload) {
+      context.commit('resized9x9width', payload)
     },
-    setResized9x10 (context, payload) {
-      context.commit('resized9x10', payload)
+    setResized9x9height (context, payload) {
+      context.commit('resized9x9height', payload)
+    },
+    setResized9x10width (context, payload) {
+      context.commit('resized9x10width', payload)
+    },
+    setResized9x10height (context, payload) {
+      context.commit('resized9x10height', payload)
     },
     goEngine (context) {
       engine.send('go infinite')
@@ -778,11 +794,17 @@ export const store = new Vuex.Store({
     resized (context, payload) {
       context.commit('resized', payload)
     },
-    resized9x9 (context, payload) {
-      context.commit('resized9x9', payload)
+    resized9x9width (context, payload) {
+      context.commit('resized9x9width', payload)
     },
-    resized9x10 (context, payload) {
-      context.commit('resized9x10', payload)
+    resized9x9height (context, payload) {
+      context.commit('resized9x9height', payload)
+    },
+    resized9x10width (context, payload) {
+      context.commit('resized9x10width', payload)
+    },
+    resized9x10height (context, payload) {
+      context.commit('resized9x10height', payload)
     },
     variant (context, payload) {
       if (context.getters.variant !== payload) {
@@ -1161,11 +1183,17 @@ export const store = new Vuex.Store({
     resized (state) {
       return state.resized
     },
-    resized9x9 (state) {
-      return state.resized9x9
+    resized9x9width (state) {
+      return state.resized9x9width
     },
-    resized9x10 (state) {
-      return state.resized9x10
+    resized9x9height (state) {
+      return state.resized9x9height
+    },
+    resized9x10width (state) {
+      return state.resized9x10width
+    },
+    resized9x10height (state) {
+      return state.resized9x10height
     },
     started (state) {
       return state.started

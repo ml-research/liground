@@ -22,8 +22,8 @@
       </div>
       <div
         id="chessboard"
-        class="selectedClasses"
         @mousewheel.ctrl.prevent="resize($event)"
+        :class="{ koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1 }"
       >
         <div
           class="cg-board-wrap"
@@ -90,8 +90,10 @@ export default {
       startingPoint: 640,
       dragging: false,
       enlarged: 0,
-      enlarged9x9: 0,
-      enlarged9x10: 0,
+      enlarged9x9width: 0,
+      enlarged9x9height: 0,
+      enlarged9x10width: 0,
+       enlarged9x10height: 0,
       ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
       selectedPiece: null,
@@ -177,14 +179,10 @@ export default {
       promotionMove: undefined,
       pieceStyleEl: null,
       boardStyleEl: null,
-      dimensionNumberBeforeSwap: null,
       start: true
     }
   },
   computed: {
-    selectedClasses () {
-      return { koth: this.variant === 'kingofthehill', rk: this.variant === 'racingkings', dim8x8: this.dimensionNumber === 0, dim9x10: this.dimensionNumber === 3, dim9x9: this.dimensionNumber === 1 }
-    },
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
       for (let num = 0; num < this.moves.length; num++) {
         if (this.moves[num].fen === this.fen) {
@@ -219,51 +217,35 @@ export default {
   },
   watch: {
     dimensionNumber () {
-      const boardSize = document.querySelector('.cg-wrap')
-      if (this.start === true) {
-        if (this.dimensionNumber === 1) {
-          boardSize.style.width = 520 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged9x9 + 'px'
-          this.startingPoint = this.enlarged9x9
-        } else if (this.dimensionNumber === 3) {
-          boardSize.style.width = 540 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged9x10 + 'px'
-          this.startingPoint = this.enlarged9x10
-        }
-        this.start = false
-        //console.log(document.querySelector('.cg-wrap'))
-        //console.log(document.querySelector('.cg-wrap cg-container'))
-        //console.log(document.querySelector('cg-container'))
-        //console.log(document.querySelector('cg-helper'))
-        //console.log(document.querySelector('.cg-wrap piece'))
-        //console.log(document.querySelector('cg-board square'))
-        
-        document.body.dispatchEvent(new Event('chessground.resize'))
-      } else {
-        this.enlarged = 0
-        this.enlarged9x9 = 0
-        this.enlarged9x10 = 0
-        this.startingPoint = 640
-        if (this.dimensionNumber === 0) {
+      const boardSize = document.querySelector('.cg-wrap')   
+      switch (this.dimensionNumber) {
+        case 0:
           boardSize.style.width = 600 + this.enlarged + 'px'
           boardSize.style.height = 600 + this.enlarged + 'px'
+          this.startingPoint = this.enlarged
           document.body.dispatchEvent(new Event('chessground.resize'))
-        } else if (this.dimensionNumber === 1) {
-          boardSize.style.width = 520 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged + 'px'
+          break
+        case 1:
+          boardSize.style.width = 520 + this.enlarged9x9width + 'px'
+          boardSize.style.height = 600 + this.enlarged9x9height + 'px'
+          this.startingPoint = this.enlarged9x9height
           document.body.dispatchEvent(new Event('chessground.resize'))
-        } else if (this.dimensionNumber === 3) {
-          boardSize.style.width = 540 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged + 'px'
+          break
+        case 3:
+          boardSize.style.width = 540 + this.enlarged9x10width + 'px'
+          boardSize.style.height = 600 + this.enlarged9x10height + 'px'
+          this.startingPoint = this.enlarged9x10height
           document.body.dispatchEvent(new Event('chessground.resize'))
-        }
-        this.boardWidth = boardSize.style.width
-        this.boardHeight = boardSize.style.height
-        this.$store.dispatch('setResized', this.enlarged)
-        this.$store.dispatch('setResized9x9', this.enlarged9x9)
-        this.$store.dispatch('setResized9x10', this.enlarged9x10)
-        this.$store.dispatch('setDimNumber', this.dimensionNumber)
+          break    
       }
+      this.boardWidth = boardSize.style.width
+      this.boardHeight = boardSize.style.height
+      this.$store.dispatch('setResized', this.enlarged)
+      this.$store.dispatch('setResized9x9width', this.enlarged9x9width)
+      this.$store.dispatch('setResized9x10width', this.enlarged9x10width)
+      this.$store.dispatch('setResized9x9height', this.enlarged9x9height)
+      this.$store.dispatch('setResized9x10height', this.enlarged9x10height)
+      this.$store.dispatch('setDimNumber', this.dimensionNumber)
     },
     initialized () {
       this.updateBoard()
@@ -386,16 +368,10 @@ export default {
       })
       this.updateBoard()
       this.isPromotionModalVisible = false
-      this.dimensionNumberBeforeSwap = this.dimensionNumber
     }
   },
   mounted () {
-    if (localStorage.resized !== undefined) {
-      this.enlarged = Number(localStorage.resized)
-      this.enlarged9x9 = Number(localStorage.resized9x9)
-      this.enlarged9x10 = Number(localStorage.resized9x10)
-    }
-    this.dimensionNumberBeforeSwap = Number(localStorage.dimNumber)
+   
     window.addEventListener('mouseup', this.stopDragging)
     window.addEventListener('mousemove', this.doResize)
     window.addEventListener('wheel', this.reRender)
@@ -483,91 +459,142 @@ export default {
       if (this.dragging === false) {
         return
       }
+
       if (event.clientY - this.startingPoint > 40) {
-        if (this.enlarged < 200) {
-          this.enlarged += 40
-          this.enlarged9x9 += 46.7
-          this.enlarged9x10 += 44.46 // damit breite immer 90% der Länge ist
-          this.startingPoint = event.clientY
+        switch(this.dimensionNumber) {
+          case 0:
+            if (this.enlarged < 200) {
+              this.enlarged += 40
+            }
+            break
+          case 1:
+            if (this.enlarged9x9width < 200) {
+              this.enlarged9x9width += 35
+              this.enlarged9x9height += (35*1.153846153846154) //to get the aspect ration of 1.153 width to height
+            }
+            break  
+          case 3:
+            if (this.enlarged9x10width < 200) {
+                this.enlarged9x10width += 35
+                this.enlarged9x10height += (35*1.111111111111111)
+            }
+            break  
         }
+        this.startingPoint = event.clientY
       } else if (event.clientY - this.startingPoint < -40) {
-        if (this.enlarged > -200) {
-          this.enlarged -= 40
-          this.enlarged9x9 -= 46.7
-          this.enlarged9x10 -= 44.46
-          this.startingPoint = event.clientY
+        switch(this.dimensionNumber) {
+          case 0:
+            if (this.enlarged > -200) {
+              this.enlarged -= 40
+            }
+            break
+          case 1:
+            if (this.enlarged9x9width > -200) {
+              this.enlarged9x9width += 35
+              this.enlarged9x9height += (35*1.153846153846154)
+            }
+            break  
+          case 3:
+            if (this.enlarged9x10width > -200) {
+              this.enlarged9x10width -= 35
+              this.enlarged9x10height -= (35*1.111111111111111)
+            }
+            break  
         }
+        this.startingPoint = event.clientY
       }
-      if (this.enlarged <= 200 && this.enlarged >= -200) {
-        if (this.dimensionNumber === 0) {
-          boardSize.style.width = 600 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged + 'px'
-          document.body.dispatchEvent(new Event('chessground.resize'))
-        } else if (this.dimensionNumber === 1 && this.enlarged < 200) {
-          boardSize.style.width = 520 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged9x9 + 'px'
-          document.body.dispatchEvent(new Event('chessground.resize'))
-        } else if (this.dimensionNumber === 3) {
-          boardSize.style.width = 540 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged9x10 + 'px'
-          document.body.dispatchEvent(new Event('chessground.resize'))
-        }
+      if (this.dimensionNumber === 0 && (this.enlarged <= 200 && this.enlarged >= -200)) {
+        boardSize.style.width = 600 + this.enlarged + 'px'
+        boardSize.style.height = 600 + this.enlarged + 'px'
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      } else if (this.dimensionNumber === 1 && (this.enlarged9x9width <= 200 && this.enlarged9x9width >= -200)) {
+        boardSize.style.width = 520 + this.enlarged9x9width + 'px'
+        boardSize.style.height = 600 + this.enlarged9x9height + 'px'
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      } else if (this.dimensionNumber === 3 && (this.enlarged9x10width <= 200 && this.enlarged9x10width >= -200)) {
+        boardSize.style.width = 540 + this.enlarged9x10width + 'px'
+        boardSize.style.height = 600 + this.enlarged9x10height + 'px'
+        document.body.dispatchEvent(new Event('chessground.resize'))
       }
+
       this.boardWidth = boardSize.style.width
       this.boardHeight = boardSize.style.height
       this.$store.dispatch('setResized', this.enlarged)
-      this.$store.dispatch('setResized9x9', this.enlarged9x9)
-      this.$store.dispatch('setResized9x10', this.enlarged9x10)
+      this.$store.dispatch('setResized9x9height', this.enlarged9x9height)
+      this.$store.dispatch('setResized9x10height', this.enlarged9x10height)
+      this.$store.dispatch('setResized9x9width', this.enlarged9x9width)
+      this.$store.dispatch('setResized9x10width', this.enlarged9x10width)
     },
     resize (event) {
       const boardSize = document.querySelector('.cg-wrap')
       if (event.deltaY > 0) {
-        if (this.enlarged < 200) {
-          this.enlarged += 40
-          this.enlarged9x9 += 46.7
-          this.enlarged9x10 += 44.46 // damit breite immer 90% der Länge ist
-          if (this.dimensionNumber === 0) {
-            this.startingPoint += 40
-          } else if (this.dimensionNumber === 1) {
-            this.startingPoint += 46.7
-          } else if (this.dimensionNumber === 3) {
-            this.startingPoint += 44.46
+          switch(this.dimensionNumber) {
+            case 0:
+              if (this.enlarged < 200) {
+                this.enlarged += 40
+                this.startingPoint += 40
+              }
+              break
+            case 1:
+              if (this.enlarged9x9width < 200) {
+                this.enlarged9x9width += 35
+                this.enlarged9x9height += (35*1.153846153846154)
+                this.startingPoint += (35*1.153846153846154)
+              }
+              break  
+            case 3:
+              if (this.enlarged9x10width < 200) {
+                  this.enlarged9x10width += 35
+                  this.enlarged9x10height += (35*1.111111111111111) //to get the aspect ration of 1.11111 width to height
+                  this.startingPoint += (35*1.111111111111111)
+              }
+              break  
           }
-        }
       } else if (event.deltaY < 0) {
-        if (this.enlarged > -200) {
-          this.enlarged -= 40
-          this.enlarged9x9 -= 46.7
-          this.enlarged9x10 -= 44.46
-          if (this.dimensionNumber === 0) {
-            this.startingPoint -= 40
-          } else if (this.dimensionNumber === 1) {
-            this.startingPoint -= 46.7
-          } else if (this.dimensionNumber === 3) {
-            this.startingPoint -= 44.46
-          }
+        switch(this.dimensionNumber) {
+          case 0:
+            if (this.enlarged > -200) {
+              this.enlarged -= 40
+              this.startingPoint -= 40
+            }
+            break
+          case 1:
+            if (this.enlarged9x9width > -200) {
+              this.enlarged9x9width -= 35
+              this.enlarged9x9height -= (35*1.153846153846154)
+              this.startingPoint -= (35*1.153846153846154)
+            }
+            break  
+          case 3:
+            if (this.enlarged9x10width > -200) {
+              this.enlarged9x10width -= 35
+              this.enlarged9x10height -= (35*1.111111111111111)
+              this.startingPoint -= (35*1.111111111111111)
+            }
+            break  
         }
       }
-      if (this.enlarged <= 200 && this.enlarged >= -200) {
-        if (this.dimensionNumber === 0) {
-          boardSize.style.width = 600 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged + 'px'
-          document.body.dispatchEvent(new Event('chessground.resize'))
-        } else if (this.dimensionNumber === 1 && this.enlarged < 200) {
-          boardSize.style.width = 520 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged9x9 + 'px'
-          document.body.dispatchEvent(new Event('chessground.resize'))
-        } else if (this.dimensionNumber === 3) {
-          boardSize.style.width = 540 + this.enlarged + 'px'
-          boardSize.style.height = 600 + this.enlarged9x10 + 'px'
-          document.body.dispatchEvent(new Event('chessground.resize'))
-        }
+
+      if (this.dimensionNumber === 0 && (this.enlarged <= 200 && this.enlarged >= -200)) {
+        boardSize.style.width = 600 + this.enlarged + 'px'
+        boardSize.style.height = 600 + this.enlarged + 'px'
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      } else if (this.dimensionNumber === 1 && (this.enlarged9x9width <= 200 && this.enlarged9x9width >= -200)) {
+        boardSize.style.width = 520 + this.enlarged9x9width + 'px'
+        boardSize.style.height = 600 + this.enlarged9x9height + 'px'
+        document.body.dispatchEvent(new Event('chessground.resize'))
+      } else if (this.dimensionNumber === 3 && (this.enlarged9x10width <= 200 && this.enlarged9x10width >= -200)) {
+        boardSize.style.width = 540 + this.enlarged9x10width + 'px'
+        boardSize.style.height = 600 + this.enlarged9x10height + 'px'
+        document.body.dispatchEvent(new Event('chessground.resize'))
       }
       this.boardWidth = boardSize.style.width
       this.boardHeight = boardSize.style.height
       this.$store.dispatch('setResized', this.enlarged)
-      this.$store.dispatch('setResized9x9', this.enlarged9x9)
-      this.$store.dispatch('setResized9x10', this.enlarged9x10)
+      this.$store.dispatch('setResized9x9height', this.enlarged9x9height)
+      this.$store.dispatch('setResized9x10height', this.enlarged9x10height)
+      this.$store.dispatch('setResized9x9width', this.enlarged9x9width)
+      this.$store.dispatch('setResized9x10width', this.enlarged9x10width)
     },
     showPromotionModal () {
       this.isPromotionModalVisible = true

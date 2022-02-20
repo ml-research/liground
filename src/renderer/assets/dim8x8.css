@@ -11,8 +11,8 @@
 
 
 .dim8x8 cg-helper {
-    width: 12.5%;
-    height: 12.5%;
+    width: calc(100% / 8);
+    height: calc(100% / 8);
 }
 
 .dim8x8 cg-container {
@@ -20,10 +20,10 @@
     height: 800%;
 }
 .dim8x8 .cg-wrap piece {
-    width: 12.5%;
-    height: 12.5%; 
+    width: calc(100% / 8);
+    height: calc(100% / 8); 
 }
 .dim8x8 cg-board square {
-    width: 12.5%;
-    height: 12.5%;
+    width: calc(100% / 8);
+    height: calc(100% / 8);
 }

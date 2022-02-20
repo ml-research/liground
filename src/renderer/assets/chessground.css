@@ -15,8 +15,8 @@
 
 cg-helper {
   position: absolute;
-  width: 12.5%;
-  height: 12.5%;
+  width: calc(100% / 8);
+  height: calc(100% / 8);
   display: table; /* hack: round to full pixel size in chrome */
   bottom: 0;
 }
@@ -46,8 +46,8 @@ cg-board square {
   position: absolute;
   top: 0;
   left: 0;
-  width: 12.5%;
-  height: 12.5%;
+  width: calc(100% / 8);
+  height: calc(100% / 8);
   pointer-events: none;
 }
 cg-board square.move-dest {
@@ -86,8 +86,8 @@ cg-board square.current-premove {
   position: absolute;
   top: 0;
   left: 0;
-  width: 12.5%;
-  height: 12.5%;
+  width: calc(100% / 8);
+  height: calc(100% / 8);
   background-size: cover;
   z-index: 2;
   will-change: transform;
