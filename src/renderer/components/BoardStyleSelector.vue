@@ -370,7 +370,7 @@ export default {
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
               path = 'static/board/svg/custom' + this.freeCustomID + '.svg'
             } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-              path = absolutePath.join(__static , '../../../../../static/board/svg/custom' + this.freeCustomID + '.svg')
+              path = absolutePath.join(__static, '../../../../../static/board/svg/custom' + this.freeCustomID + '.svg')
             }
           } else if (this.isShogi) {
             let bool = false
@@ -386,7 +386,7 @@ export default {
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
               path = 'static/board/svg/customShogi' + this.freeCustomID + '.svg'
             } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-              path = absolutePath.join(__static , '../../../../../static/board/svg/customShogi' + this.freeCustomID + '.svg')
+              path = absolutePath.join(__static, '../../../../../static/board/svg/customShogi' + this.freeCustomID + '.svg')
             }
           } else if (this.isXiangqi) {
             let bool = false
@@ -402,7 +402,7 @@ export default {
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
               path = 'static/board/svg/customXiangji' + this.freeCustomID + '.svg'
             } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-              path = absolutePath.join(__static , '../../../../../static/board/svg/customXiangji' + this.freeCustomID + '.svg')
+              path = absolutePath.join(__static, '../../../../../static/board/svg/customXiangji' + this.freeCustomID + '.svg')
             }
           } else if (this.isSEA) {
             let bool = false
@@ -418,7 +418,7 @@ export default {
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
               path = 'static/board/svg/customSea' + this.freeCustomID + '.svg'
             } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-              path = absolutePath.join(__static , '../../../../../static/board/svg/customSea' + this.freeCustomID + '.svg')
+              path = absolutePath.join(__static, '../../../../../static/board/svg/customSea' + this.freeCustomID + '.svg')
             }
           } else if (this.isJanggi) {
             let bool = false
@@ -434,7 +434,7 @@ export default {
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
               path = 'static/board/svg/customJanggi' + this.freeCustomID + '.svg'
             } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-              path = absolutePath.join(__static , '../../../../../static/board/svg/customJanggi' + this.freeCustomID + '.svg')
+              path = absolutePath.join(__static, '../../../../../static/board/svg/customJanggi' + this.freeCustomID + '.svg')
             }
           }
           const fs = require('fs')
@@ -574,7 +574,7 @@ export default {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
           path = 'static/board/svg/' + payload + '.svg'
         } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static , '../../../../../static/board/svg/' + payload + '.svg')
+          path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomStandardCounter--
         let bool = false
@@ -594,7 +594,7 @@ export default {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
           path = 'static/board/svg/customShogi' + payload + '.svg'
         } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static , '../../../../../static/board/svg/customShogi' + payload + '.svg')
+          path = absolutePath.join(__static, '../../../../../static/board/svg/customShogi' + payload + '.svg')
         }
         this.maxCustomShogiCounter--
         let bool = false
@@ -612,7 +612,7 @@ export default {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
           path = 'static/board/svg/customXiangqi' + payload + '.svg'
         } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static , '../../../../../static/board/svg/customXiangqi' + payload + '.svg')
+          path = absolutePath.join(__static, '../../../../../static/board/svg/customXiangqi' + payload + '.svg')
         }
         this.maxCustomXiangqiCounter--
         let bool = false
@@ -630,7 +630,7 @@ export default {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
           path = 'static/board/svg/customSea' + payload + '.svg'
         } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static , '../../../../../static/board/svg/customSea' + payload + '.svg')
+          path = absolutePath.join(__static, '../../../../../static/board/svg/customSea' + payload + '.svg')
         }
         this.maxCustomSeaCounter--
         let bool = false
@@ -648,7 +648,7 @@ export default {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
           path = 'static/board/svg/customJanggi' + payload + '.svg'
         } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static , '../../../../../static/board/svg/customJanggi' + payload + '.svg')
+          path = absolutePath.join(__static, '../../../../../static/board/svg/customJanggi' + payload + '.svg')
         }
         this.maxCustomJanggiCounter--
         let bool = false
