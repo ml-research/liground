@@ -1,12 +1,17 @@
 <template>
   <div class="analysis">
     <AnalysisHead />
-    <analysis-container
+    <AnalysisContainer
       v-for="engine in Engines"
       :key="engine.number"
-    ></analysis-container>
+    />
     <div class="b">
-      <button @click="addEngine" class="button"><b>Add Engine </b></button>
+      <button
+        class="button"
+        @click="addEngine"
+      >
+        <b>Add Engine </b>
+      </button>
     </div>
   </div>
 </template>
@@ -16,7 +21,12 @@ import AnalysisHead from './AnalysisHead'
 import AnalysisContainer from './AnalysisContainer.vue'
 
 export default {
-  data() {
+  name: 'AnalysisView',
+  components: {
+    AnalysisHead,
+    AnalysisContainer
+  },
+  data () {
     return {
       Engines: [
         {
@@ -26,14 +36,8 @@ export default {
       counter: 1
     }
   },
-  name: 'AnalysisView',
-
-  components: {
-    AnalysisHead,
-    AnalysisContainer
-  },
   methods: {
-    addEngine() {
+    addEngine () {
       this.counter++
       this.Engines.push({ Engine: this.counter })
       this.$store.dispatch('increaseEngineNumber')

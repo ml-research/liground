@@ -22,8 +22,8 @@
       </div>
       <div
         id="chessboard"
-        @mousewheel.ctrl.prevent="resize($event)"
         :class="{ koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1 }"
+        @mousewheel.ctrl.prevent="resize($event)"
       >
         <div
           class="cg-board-wrap"
@@ -93,7 +93,7 @@ export default {
       enlarged9x9width: 0,
       enlarged9x9height: 0,
       enlarged9x10width: 0,
-       enlarged9x10height: 0,
+      enlarged9x10height: 0,
       ranks: ['1', '2', '3', '4', '5', '6', '7', '8'],
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
       selectedPiece: null,
@@ -217,7 +217,7 @@ export default {
   },
   watch: {
     dimensionNumber () {
-      const boardSize = document.querySelector('.cg-wrap')   
+      const boardSize = document.querySelector('.cg-wrap')
       switch (this.dimensionNumber) {
         case 0:
           boardSize.style.width = 600 + this.enlarged + 'px'
@@ -236,7 +236,7 @@ export default {
           boardSize.style.height = 600 + this.enlarged9x10height + 'px'
           this.startingPoint = this.enlarged9x10height
           document.body.dispatchEvent(new Event('chessground.resize'))
-          break    
+          break
       }
       this.boardWidth = boardSize.style.width
       this.boardHeight = boardSize.style.height
@@ -371,7 +371,6 @@ export default {
     }
   },
   mounted () {
-   
     window.addEventListener('mouseup', this.stopDragging)
     window.addEventListener('mousemove', this.doResize)
     window.addEventListener('wheel', this.reRender)
@@ -461,7 +460,7 @@ export default {
       }
 
       if (event.clientY - this.startingPoint > 40) {
-        switch(this.dimensionNumber) {
+        switch (this.dimensionNumber) {
           case 0:
             if (this.enlarged < 200) {
               this.enlarged += 40
@@ -470,19 +469,19 @@ export default {
           case 1:
             if (this.enlarged9x9width < 200) {
               this.enlarged9x9width += 35
-              this.enlarged9x9height += (35*1.153846153846154) //to get the aspect ration of 1.153 width to height
+              this.enlarged9x9height += (35 * 1.153846153846154) // to get the aspect ration of 1.153 width to height
             }
-            break  
+            break
           case 3:
             if (this.enlarged9x10width < 200) {
-                this.enlarged9x10width += 35
-                this.enlarged9x10height += (35*1.111111111111111)
+              this.enlarged9x10width += 35
+              this.enlarged9x10height += (35 * 1.111111111111111)
             }
-            break  
+            break
         }
         this.startingPoint = event.clientY
       } else if (event.clientY - this.startingPoint < -40) {
-        switch(this.dimensionNumber) {
+        switch (this.dimensionNumber) {
           case 0:
             if (this.enlarged > -200) {
               this.enlarged -= 40
@@ -491,15 +490,15 @@ export default {
           case 1:
             if (this.enlarged9x9width > -200) {
               this.enlarged9x9width += 35
-              this.enlarged9x9height += (35*1.153846153846154)
+              this.enlarged9x9height += (35 * 1.153846153846154)
             }
-            break  
+            break
           case 3:
             if (this.enlarged9x10width > -200) {
               this.enlarged9x10width -= 35
-              this.enlarged9x10height -= (35*1.111111111111111)
+              this.enlarged9x10height -= (35 * 1.111111111111111)
             }
-            break  
+            break
         }
         this.startingPoint = event.clientY
       }
@@ -528,30 +527,30 @@ export default {
     resize (event) {
       const boardSize = document.querySelector('.cg-wrap')
       if (event.deltaY > 0) {
-          switch(this.dimensionNumber) {
-            case 0:
-              if (this.enlarged < 200) {
-                this.enlarged += 40
-                this.startingPoint += 40
-              }
-              break
-            case 1:
-              if (this.enlarged9x9width < 200) {
-                this.enlarged9x9width += 35
-                this.enlarged9x9height += (35*1.153846153846154)
-                this.startingPoint += (35*1.153846153846154)
-              }
-              break  
-            case 3:
-              if (this.enlarged9x10width < 200) {
-                  this.enlarged9x10width += 35
-                  this.enlarged9x10height += (35*1.111111111111111) //to get the aspect ration of 1.11111 width to height
-                  this.startingPoint += (35*1.111111111111111)
-              }
-              break  
-          }
+        switch (this.dimensionNumber) {
+          case 0:
+            if (this.enlarged < 200) {
+              this.enlarged += 40
+              this.startingPoint += 40
+            }
+            break
+          case 1:
+            if (this.enlarged9x9width < 200) {
+              this.enlarged9x9width += 35
+              this.enlarged9x9height += (35 * 1.153846153846154)
+              this.startingPoint += (35 * 1.153846153846154)
+            }
+            break
+          case 3:
+            if (this.enlarged9x10width < 200) {
+              this.enlarged9x10width += 35
+              this.enlarged9x10height += (35 * 1.111111111111111) // to get the aspect ration of 1.11111 width to height
+              this.startingPoint += (35 * 1.111111111111111)
+            }
+            break
+        }
       } else if (event.deltaY < 0) {
-        switch(this.dimensionNumber) {
+        switch (this.dimensionNumber) {
           case 0:
             if (this.enlarged > -200) {
               this.enlarged -= 40
@@ -561,17 +560,17 @@ export default {
           case 1:
             if (this.enlarged9x9width > -200) {
               this.enlarged9x9width -= 35
-              this.enlarged9x9height -= (35*1.153846153846154)
-              this.startingPoint -= (35*1.153846153846154)
+              this.enlarged9x9height -= (35 * 1.153846153846154)
+              this.startingPoint -= (35 * 1.153846153846154)
             }
-            break  
+            break
           case 3:
             if (this.enlarged9x10width > -200) {
               this.enlarged9x10width -= 35
-              this.enlarged9x10height -= (35*1.111111111111111)
-              this.startingPoint -= (35*1.111111111111111)
+              this.enlarged9x10height -= (35 * 1.111111111111111)
+              this.startingPoint -= (35 * 1.111111111111111)
             }
-            break  
+            break
         }
       }
 

@@ -1,114 +1,118 @@
 <template>
   <div>
     <div class="containerEvalBar">
-    <div
-      class="eval"
-      :class="{ smaller: cpForWhiteStr.includes('/') }"
-    >
-      {{ cpForWhiteStr }}
-    </div>
-    <EngineSelect class="select" />
-    <div @input="onSwitch">
-      <RoundedSwitch class="switch"/>
-    </div>
-  </div>
-  <div class="analysis">
-    <!-- <AnalysisEvalRow /> -->
-    <EngineStats />
-    <div class="processing-bar" :class="{ animate: active }" />
-    <PVLines class="panel" />
-    <div class="game-window panel noselect">
-      <div id="move-history">
-        <MoveHistoryNode v-if="movesExist" :move="mainFirstMove" />
+      <div
+        class="eval"
+        :class="{ smaller: cpForWhiteStr.includes('/') }"
+      >
+        {{ cpForWhiteStr }}
+      </div>
+      <EngineSelect class="select" />
+      <div @input="onSwitch">
+        <RoundedSwitch class="switch" />
       </div>
     </div>
-    <JumpButtons
-      @flip-board="$emit('flip-board', 0)"
-      @move-to-start="$emit('move-to-start', 0)"
-      @move-back-one="$emit('move-back-one', 0)"
-      @move-forward-one="$emit('move-forward-one', 0)"
-      @move-to-end="$emit('move-to-end', 0)"
-    />
-    <GameInfo id="gameinfo" />
-  </div>
-
-  <div class="container-console">
-    <div
-      ref="scroller"
-      class="console"
-      @scroll.passive="onScroll"
-    >
+    <div class="analysis">
+      <!-- <AnalysisEvalRow /> -->
+      <EngineStats />
       <div
-        class="spacer"
-        :style="{
-          height: `${fullHeight}em`,
-          width: `${fullWidth}ch`
-        }"
-      >
-        <div
-          v-for="el in rendered"
-          :key="el.id"
-          class="line"
-          :style="{ top: `${el.id}em` }"
-        >
-          {{ el.content }}
+        class="processing-bar"
+        :class="{ animate: active }"
+      />
+      <PVLines class="panel" />
+      <div class="game-window panel noselect">
+        <div id="move-history">
+          <MoveHistoryNode
+            v-if="movesExist"
+            :move="mainFirstMove"
+          />
         </div>
       </div>
+      <JumpButtons
+        @flip-board="$emit('flip-board', 0)"
+        @move-to-start="$emit('move-to-start', 0)"
+        @move-back-one="$emit('move-back-one', 0)"
+        @move-forward-one="$emit('move-forward-one', 0)"
+        @move-to-end="$emit('move-to-end', 0)"
+      />
+      <GameInfo id="gameinfo" />
     </div>
-    <div class="footer">
+    <div class="container-console">
       <div
-        class="button"
-        :class="{ visible: !autoScroll }"
-        :style="{ bottom: `${scrollbarSize}px` }"
-        @click="onClick"
+        ref="scroller"
+        class="console"
+        @scroll.passive="onScroll"
       >
-        Jump to bottom
+        <div
+          class="spacer"
+          :style="{
+            height: `${fullHeight}em`,
+            width: `${fullWidth}ch`
+          }"
+        >
+          <div
+            v-for="el in rendered"
+            :key="el.id"
+            class="line"
+            :style="{ top: `${el.id}em` }"
+          >
+            {{ el.content }}
+          </div>
+        </div>
       </div>
+      <div class="footer">
+        <div
+          class="button"
+          :class="{ visible: !autoScroll }"
+          :style="{ bottom: `${scrollbarSize}px` }"
+          @click="onClick"
+        >
+          Jump to bottom
+        </div>
+      </div>
+      <input
+        v-model="input"
+        class="input"
+        type="text"
+        size="60"
+        @keyup="onKeyup"
+      >
     </div>
-    <input
-      v-model="input"
-      class="input"
-      type="text"
-      size="60"
-      @keyup="onKeyup"
-    >
-  </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
-//import AnalysisEvalRow from './AnalysisEvalRow'
+// import AnalysisEvalRow from './AnalysisEvalRow'
 import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
 import GameInfo from './GameInfo'
-//import EngineConsole from './EngineConsole'
+// import EngineConsole from './EngineConsole'
 import MoveHistoryNode from './MoveHistoryNode'
 import RoundedSwitch from './RoundedSwitch'
 import EngineSelect from './EngineSelect'
 import { Engine, engine } from '../engine'
 
-
 export default {
   name: 'AnalysisContainer',
+  components: {
+    // AnalysisEvalRow,
+    JumpButtons,
+    EngineStats,
+    PVLines,
+    GameInfo,
+    // EngineConsole,
+    MoveHistoryNode,
+    RoundedSwitch,
+    EngineSelect
+  },
   props: {
     bufferSize: {
       type: Number,
       default: 10
     }
-  },
-  components: {
-    //AnalysisEvalRow,
-    JumpButtons,
-    EngineStats,
-    PVLines,
-    GameInfo,
-    //EngineConsole,
-    MoveHistoryNode,
-    RoundedSwitch, 
-    EngineSelect
   },
   data () {
     return {
@@ -126,12 +130,27 @@ export default {
       newEngine: null
     }
   },
+  computed: {
+    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE']),
+    movesExist () {
+      const moves = this.$store.getters.moves
+      return moves.length !== 0
+    },
+    fullHeight () {
+      return this.io.length
+    }
+  },
+  watch: {
+    reset () {
+      this.$store.commit('resetMultiPV')
+    }
+  },
   mounted () {
     this.newEngine = new Engine()
     // TODO : set Engine Run
-    //this.newEngine.run()
-    //this.newEngine.send('uci')
-    //console.log(this.newEngine)
+    // this.newEngine.run()
+    // this.newEngine.send('uci')
+    // console.log(this.newEngine)
     this.$store.commit('resetMultiPV')
     this.engineID = this.engineIndex
 
@@ -154,21 +173,6 @@ export default {
     this.elSize = parseFloat(window.getComputedStyle(scroller).fontSize)
     this.renderLength = Math.ceil((scroller.clientHeight / this.elSize) + 2 * this.bufferSize)
     this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
-  },
-  computed: {
-    ...mapGetters(['active', 'mainFirstMove','cpForWhiteStr', 'engineIndex', 'PvE']),
-    movesExist() {
-      const moves = this.$store.getters.moves
-      return moves.length !== 0
-    },
-    fullHeight () {
-      return this.io.length
-    }
-  },
-  watch: {
-    reset() {
-      this.$store.commit('resetMultiPV')
-    }
   },
   methods: {
     getScrollTopMax () {
@@ -233,10 +237,10 @@ export default {
         this.input = ''
       }
     },
-    changeState() {
+    changeState () {
       this.isEngineActive = !this.isEngineActive
     },
-    onSwitch() {
+    onSwitch () {
       if (!this.isEngineActive) {
         if (this.PvE) {
           this.$store.dispatch('setActiveTrue')

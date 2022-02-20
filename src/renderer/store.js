@@ -217,7 +217,7 @@ export const store = new Vuex.Store({
     clock: null
   },
   mutations: { // sync
-    increaseEngineNumber(state) {
+    increaseEngineNumber (state) {
       state.numberOfEngines.push({ number: 2 })
       state.engineCounter++
     },
@@ -230,10 +230,10 @@ export const store = new Vuex.Store({
     fen (state, payload) {
       state.fen = payload
     },
-    engineIndex(state, payload) {
-      state.engineIndex = payload;
+    engineIndex (state, payload) {
+      state.engineIndex = payload
     },
-    enginesActive(state, payload) {
+    enginesActive (state, payload) {
       state.enginesActive = payload
     },
     startFen (state, payload) {
@@ -687,10 +687,7 @@ export const store = new Vuex.Store({
     setActiveFalse (context) {
       context.commit('active', false)
     },
-    engineIndex(context, payload) {
-      context.commit('engineIndex', payload)
-    },
-    enginesActive(context, payload) {
+    enginesActive (context, payload) {
       context.commit('enginesActive', payload)
     },
     PvEtrue (context) {
@@ -773,11 +770,8 @@ export const store = new Vuex.Store({
     PvE (context, payload) {
       context.commit('PvE', payload)
     },
-    engineIndex(context, payload) {
+    engineIndex (context, payload) {
       context.commit('engineIndex', payload)
-    },
-    enginesActive(context, payload) {
-      context.commit('enginesActive', payload)
     },
     PvEParam (context, payload) {
       context.commit('PvEParam', payload)
@@ -1131,13 +1125,13 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
-    engineNumber(state) {
+    engineNumber (state) {
       return state.numberOfEngines
     },
-    engineIndex(state) {
+    engineIndex (state) {
       return state.engineIndex
     },
-    enginesActive(state) {
+    enginesActive (state) {
       return state.enginesActive
     },
     currentMove (state) {

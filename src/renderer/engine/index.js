@@ -132,4 +132,4 @@ export class Engine extends EventEmitter {
     })
   }
 }
-export let engine = new Engine()
+export const engine = new Engine()

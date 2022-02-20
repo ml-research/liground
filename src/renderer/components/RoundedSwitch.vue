@@ -2,9 +2,8 @@
 <template>
   <label class="switch">
     <input
-      type="checkbox">
-      <!--  :checked="active"
-      @click="onClick" -->
+      type="checkbox"
+    >
     <span class="slider round" />
   </label>
 </template>
@@ -25,7 +24,7 @@ export default {
     } */
   },
   methods: {
-   /*  onClick () {
+    onClick () {
       if (!this.active) {
         this.$store.dispatch('position')
         if (this.PvE) {
@@ -36,7 +35,7 @@ export default {
       } else {
         this.$store.dispatch('stopEngine')
       }
-    } */
+    }
   }
 }
 </script>

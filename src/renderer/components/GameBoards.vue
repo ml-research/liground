@@ -399,7 +399,7 @@ input {
 }
 .evalbar {
   margin-left: 8px;
-  height: 99%;
+  height: 100%;
 }
 #analysisview {
   margin-left: 15px;
