@@ -74,7 +74,6 @@
 import Multiselect from 'vue-multiselect'
 import { mapGetters } from 'vuex'
 import fs from 'fs'
-import absolutePath from 'path'
 export default {
   name: 'BoardStyleSelector',
   components: {
@@ -379,7 +378,7 @@ export default {
                 }
               }
             })
-            path = absolutePath.join(__static, '/board/svg/customShogi' + this.freeCustomID + '.svg')
+            path = 'static/board/svg/customShogi' + this.freeCustomID + '.svg'
           } else if (this.isXiangqi) {
             let bool = false
             this.xiangqiMap.forEach((value, key) => {
@@ -391,7 +390,7 @@ export default {
                 }
               }
             })
-            path = absolutePath.join(__static, '/board/svg/customXiangji' + this.freeCustomID + '.svg')
+            path = 'static/board/svg/customXiangji' + this.freeCustomID + '.svg'
           } else if (this.isSEA) {
             let bool = false
             this.seaMap.forEach((value, key) => {
@@ -403,7 +402,7 @@ export default {
                 }
               }
             })
-            path = absolutePath.join(__static, '/board/svg/customSea' + this.freeCustomID + '.svg')
+            path = 'static/board/svg/customSea' + this.freeCustomID + '.svg'
           } else if (this.isJanggi) {
             let bool = false
             this.janggiMap.forEach((value, key) => {
@@ -415,7 +414,7 @@ export default {
                 }
               }
             })
-            path = absolutePath.join(__static, '/board/svg/customJanggi' + this.freeCustomID + '.svg')
+            path = 'static/board/svg/customJanggi' + this.freeCustomID + '.svg'
           }
           const fs = require('fs')
           fs.writeFile(path, data, err => {
@@ -546,6 +545,89 @@ export default {
         localStorage.janggiBoardStyle = payload
       }
       this.$store.dispatch('boardStyle', payload)
+    },
+    deleteCustom (payload) {
+      const number = parseInt(payload.slice(-1))
+      let path
+      if (this.isInternational) {
+        path = 'static/board/svg/' + payload + '.svg'
+        this.maxCustomStandardCounter--
+        let bool = false
+        this.map.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGStandardcounter = key - 1
+              console.log(this.overWriteSVGStandardcounter)
+              this.map.set(key, true)
+              console.log(this.map)
+              this.boardStyles = this.boardStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isShogi) {
+        path = 'static/board/svg/customShogi' + payload + '.svg'
+        this.maxCustomShogiCounter--
+        let bool = false
+        this.shogiMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGshogiCounter = key - 1
+              this.shogiMap.set(key, true)
+              this.shogiStyles = this.shogiStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isXiangqi) {
+        path = 'static/board/svg/customXiangqi' + payload + '.svg'
+        this.maxCustomXiangqiCounter--
+        let bool = false
+        this.xiangqiMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGxiangqiCounter = key - 1
+              this.xiangqiMap.set(key, true)
+              this.xiangqiStyles = this.xiangqiStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isSEA) {
+        path = 'static/board/svg/customSea' + payload + '.svg'
+        this.maxCustomSeaCounter--
+        let bool = false
+        this.seaMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGseaCounter = key - 1
+              this.seaMap.set(key, true)
+              this.seaStyles = this.seaStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      } else if (this.isJanggi) {
+        path = 'static/board/svg/customJanggi' + payload + '.svg'
+        this.maxCustomJanggiCounter--
+        let bool = false
+        this.janggiMap.forEach((value, key) => {
+          if (bool === false) {
+            if (value === false && key === number) {
+              bool = true
+              this.overWriteSVGjanggiCounter = key - 1
+              this.janggiMap.set(key, true)
+              this.janggiStyles = this.janggiStyles.filter(e => e !== payload)
+            }
+          }
+        })
+      }
+      try {
+        fs.unlinkSync(path)
+        //  file removed
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }

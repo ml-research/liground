@@ -14,7 +14,9 @@
     {
       "from": "engines",
       "to": "engines"
-    },
+    }
+  ],
+  "extraFiles":[
     {
       "from": "static",
       "to": "static"
