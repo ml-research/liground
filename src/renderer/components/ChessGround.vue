@@ -623,6 +623,7 @@ export default {
       const node = this.boardStyleEl
       if (this.$store.getters.isInternational) {
         node.href = 'static/board-css/international/' + boardStyle + '.css'
+        console.log('the url is: ' + node.href)
       } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
         node.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
       } else if (this.$store.getters.isSEA) {
