@@ -610,26 +610,26 @@ export default {
     updatePieceCSS (pieceStyle) {
       const node = this.pieceStyleEl
       if (this.$store.getters.isInternational) {
-        node.href = 'static/piece-css/international/' + pieceStyle + '.css'
+        node.href = '../../../../static/piece-css/international/' + pieceStyle + '.css'
       } else if (this.$store.getters.isSEA) {
-        node.href = 'static/piece-css/sea/' + pieceStyle + '.css'
+        node.href = '../../../../static/piece-css/sea/' + pieceStyle + '.css'
       } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
-        node.href = 'static/piece-css/xiangqi/' + pieceStyle + '.css'
+        node.href = '../../../../static/piece-css/xiangqi/' + pieceStyle + '.css'
       } else if (this.$store.getters.isShogi) {
-        node.href = 'static/piece-css/shogi/' + pieceStyle + '.css'
+        node.href = '../../../../static/piece-css/shogi/' + pieceStyle + '.css'
       }
     },
     updateBoardCSS (boardStyle) {
       const node = this.boardStyleEl
+      console.log(navigator.platform)
       if (this.$store.getters.isInternational) {
-        node.href = 'static/board-css/international/' + boardStyle + '.css'
-        console.log('the url is: ' + node.href)
+        node.href = '../../../../static/board-css/international/' + boardStyle + '.css'
       } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
-        node.href = 'static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
+        node.href = '../../../../static/board-css/xiangqi/' + this.variant + '/' + boardStyle + '.css'
       } else if (this.$store.getters.isSEA) {
-        node.href = 'static/board-css/sea/' + boardStyle + '.css'
+        node.href = '../../../../static/board-css/sea/' + boardStyle + '.css'
       } else if (this.$store.getters.isShogi) {
-        node.href = 'static/board-css/shogi/' + boardStyle + '.css'
+        node.href = '../../../../static/board-css/shogi/' + boardStyle + '.css'
       }
       document.body.dispatchEvent(new Event('chessground.resize'))
     },
