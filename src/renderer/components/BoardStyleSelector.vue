@@ -367,7 +367,8 @@ export default {
                 }
               }
             })
-            path = absolutePath.join(__static, 'static/board/svg/custom' + this.freeCustomID + '.svg')
+            path = boards + '/board/svg/custom' + this.freeCustomID + '.svg'
+            console.log(path)
           } else if (this.isShogi) {
             let bool = false
             this.shogiMap.forEach((value, key) => {
@@ -379,7 +380,7 @@ export default {
                 }
               }
             })
-            path = 'static/board/svg/customShogi' + this.freeCustomID + '.svg'
+            path = absolutePath.join(__static, '/board/svg/customShogi' + this.freeCustomID + '.svg')
           } else if (this.isXiangqi) {
             let bool = false
             this.xiangqiMap.forEach((value, key) => {
@@ -391,7 +392,7 @@ export default {
                 }
               }
             })
-            path = 'static/board/svg/customXiangqi' + this.freeCustomID + '.svg'
+            path = absolutePath.join(__static, '/board/svg/customXiangji' + this.freeCustomID + '.svg')
           } else if (this.isSEA) {
             let bool = false
             this.seaMap.forEach((value, key) => {
@@ -403,7 +404,7 @@ export default {
                 }
               }
             })
-            path = 'static/board/svg/customSea' + this.freeCustomID + '.svg'
+            path = absolutePath.join(__static, '/board/svg/customSea' + this.freeCustomID + '.svg')
           } else if (this.isJanggi) {
             let bool = false
             this.janggiMap.forEach((value, key) => {
@@ -415,10 +416,12 @@ export default {
                 }
               }
             })
-            path = 'static/board/svg/customJanggi' + this.freeCustomID + '.svg'
+            path = absolutePath.join(__static, '/board/svg/customJanggi' + this.freeCustomID + '.svg')
           }
-          fs.chmod(path, 0o600, () => {
-            console.log('Trying to write to file')
+          fs.chmod(absolutePath.join(__static, '/board/svg'), '755', function (err) {
+            if (err) {
+              console.log('something went wrong ' + err)
+            }
             fs.writeFile(path, data, err => {
               if (err) {
                 alert('An error ocurred updating the file' + err.message)

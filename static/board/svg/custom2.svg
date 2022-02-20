@@ -1,74 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg" xmlns:ns1="http://sozi.baierouge.fr" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg1396" sodipodi:docname="international tidyman.svg" viewBox="0 0 260 333" sodipodi:version="0.32" version="1.0" inkscape:version="0.43" sodipodi:docbase="C:\Documents and Settings\Niels\Bureaublad\SVG">
-  <sodipodi:namedview id="base" bordercolor="#666666" inkscape:pageshadow="2" inkscape:window-y="116" pagecolor="#ffffff" inkscape:zoom="0.79204453" inkscape:window-x="88" borderopacity="1.0" inkscape:current-layer="svg1396" inkscape:cx="173.45925" inkscape:cy="154.84751" inkscape:window-height="540" inkscape:pageopacity="0.0" inkscape:window-width="874"/>
-  <g id="g2276">
-    <g id="g2260">
-      <g id="basket" transform="translate(-429.4 -46.152)">
-        <path id="path2280" style="stroke:#000000;stroke-linecap:round;stroke-width:14.152;fill:none" d="m436.25 213.1c125.37 0 125.37 0.5 125.37 0.5"/>
-        <path id="path1405" style="stroke-linejoin:round;stroke:#000000;stroke-width:9;fill:none" d="m557.79 218.91l-15.11 153.31h-73.35l-28.32-153.63"/>
-        <path id="path7527" style="stroke:#000000;stroke-width:8;fill:none" d="m445.07 242.53h111.22"/>
-        <path id="path7529" style="stroke:#000000;stroke-width:8;fill:none" d="m552.3 269.96h-101.74"/>
-        <path id="path7535" style="stroke:#000000;stroke-width:8;fill:none" d="m455.05 294.9h94.76"/>
-        <path id="path7539" style="stroke:#000000;stroke-width:8;fill:none" d="m460.03 319.84c87.28 0 87.28 0.99 87.28 0.99"/>
-        <path id="path7541" style="stroke:#000000;stroke-width:8;fill:none" d="m544.82 346.77h-80.3"/>
-        <path id="path7543" style="stroke:#000000;stroke-width:8;fill:none" d="m468.51 213.6l19.45 157.11"/>
-        <path id="path7545" style="stroke:#000000;stroke-width:8;fill:none" d="m504.92 370.21l-4.99-156.11"/>
-        <path id="path7547" style="stroke:#000000;stroke-width:8;fill:none" d="m530.36 214.6l-5.99 157.11"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:x="http://www.w3.org/1999/xlink"
+     viewBox="0 0 8 8" shape-rendering="crispEdges">
+<g id="a">
+  <g id="b">
+    <g id="c">
+      <g id="d">
+        <rect width="1" height="1" fill="#9f90b0" id="e"/>
+        <use x="1" y="1" href="#e" x:href="#e"/>
+        <rect y="1" width="1" height="1" fill="#7d4a8d" id="f"/>
+        <use x="1" y="-1" href="#f" x:href="#f"/>
       </g>
-      <g id="g2256">
-        <path id="path9309" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:6;fill:none" d="m28.197 137.95c27.431-13.72 27.235-35.53 29.426-34.66 26.027 10.35 50.747 13.46 66.707 9.97-46.361 35.36-22.77 36.98-29.176 34.66-19.689-7.11-48.254 14.22-66.957-9.97z"/>
-        <path id="path11057" sodipodi:nodetypes="csc" style="stroke:#000000;stroke-width:6;fill:none" d="m77.07 109.55c25.29 0.02 26.01-8.04 30.68-10.009 0.32-0.137 2.63 10.729 8.97 14.959"/>
-      </g>
+      <use x="2" href="#d" x:href="#d"/>
     </g>
-    <g id="person" transform="translate(-46.602 -41.172)">
-      <g id="body" transform="translate(-.25438 -.24937)">
-        <path id="upper body" style="stroke-linejoin:round;fill-rule:evenodd;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#000000" d="m105.73 105.74l160.1 0.45c13.51 15.59 36.13 68.42 37.84 80.59l-79.74 3.99c-2.24-26.18-14.71-50.62-16.46-54.36l-101.74-30.67z"/>
-        <path id="lower body" style="stroke-linejoin:round;fill-rule:evenodd;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#000000" d="m223.29 196.24l-27.23 175.09 62.59-115.19 27.57 115.65 16.66-173.11-79.59-2.44z"/>
-      </g>
-      <path id="head" d="m33.856-8.1114c0 15.971-13.105 28.918-29.271 28.918s-29.272-12.947-29.272-28.918c0-15.972 13.106-28.919 29.272-28.919s29.271 12.947 29.271 28.919z" style="stroke-linejoin:round;fill-rule:evenodd;stroke:#000000;stroke-linecap:round;stroke-width:3;fill:#000000" transform="translate(228.76 79.838)"/>
-    </g>
+    <use x="4" href="#c" x:href="#c"/>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>International Tidyman logo</dc:title>
-        <dc:date>2006-11-03T06:50:51</dc:date>
-        <dc:description>International Tidyman logo from http://commons.wikimedia.org/wiki/Image:International_tidyman.svg</dc:description>
-        <dc:source>https://openclipart.org/detail/1208/international-tidyman-logo-by-liftarn</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>liftarn</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>bin</rdf:li>
-            <rdf:li>externalsource</rdf:li>
-            <rdf:li>garbage</rdf:li>
-            <rdf:li>icon</rdf:li>
-            <rdf:li>man</rdf:li>
-            <rdf:li>people</rdf:li>
-            <rdf:li>recycle</rdf:li>
-            <rdf:li>symbol</rdf:li>
-            <rdf:li>trash</rdf:li>
-            <rdf:li>wikimedia commons</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
+  <use y="2" href="#b" x:href="#b"/>
+</g>
+<use y="4" href="#a" x:href="#a"/>
 </svg>
