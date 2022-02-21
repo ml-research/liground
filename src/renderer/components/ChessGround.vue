@@ -213,7 +213,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime', 'resized', 'resized9x9', 'resized9x10', 'dimNumber'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime', 'resized', 'resized9x9width', 'resized9x9height', 'resized9x10width', 'resized9x10height', 'dimNumber'])
   },
   watch: {
     dimensionNumber () {
@@ -371,10 +371,22 @@ export default {
     }
   },
   mounted () {
+    if (Number(localStorage.resized) !== 'NaN') {
+      this.enlarged = Number(localStorage.resized)
+    }
+    if (Number(localStorage.resized9x9width) !== 'NaN') {
+      this.enlarged9x9width = Number(localStorage.resized9x9width)
+      this.enlarged9x9height = Number(localStorage.resized9x9height)
+    }
+    if (Number(localStorage.resized9x10width) !== 'NaN') {
+      this.enlarged9x10width = Number(localStorage.resized9x10width)
+      this.enlarged9x10height = Number(localStorage.resized9x10height)
+    }
     window.addEventListener('mouseup', this.stopDragging)
     window.addEventListener('mousemove', this.doResize)
     window.addEventListener('wheel', this.reRender)
     window.addEventListener('mouseup', this.reRender)
+
     this.board = Chessground(this.$refs.board, {
       coordinates: false,
       fen: this.fen,
