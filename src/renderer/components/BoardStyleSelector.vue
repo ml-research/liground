@@ -367,9 +367,9 @@ export default {
                 }
               }
             })
-            if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
+            if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/custom' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
+            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/custom' + this.freeCustomID + '.svg')
             }
           } else if (this.isShogi) {
@@ -383,9 +383,9 @@ export default {
                 }
               }
             })
-            if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
+            if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customShogi' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
+            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customShogi' + this.freeCustomID + '.svg')
             }
           } else if (this.isXiangqi) {
@@ -399,9 +399,9 @@ export default {
                 }
               }
             })
-            if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
+            if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customXiangji' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
+            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customXiangji' + this.freeCustomID + '.svg')
             }
           } else if (this.isSEA) {
@@ -415,9 +415,9 @@ export default {
                 }
               }
             })
-            if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
+            if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customSea' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
+            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV === 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customSea' + this.freeCustomID + '.svg')
             }
           } else if (this.isJanggi) {
@@ -431,9 +431,9 @@ export default {
                 }
               }
             })
-            if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
+            if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customJanggi' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
+            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customJanggi' + this.freeCustomID + '.svg')
             }
           }
@@ -496,7 +496,7 @@ export default {
             this.janggiMap.set(this.freeCustomID, false)
           }
           this.$store.dispatch('boardStyle', boardStyleCustom)
-        }, 50)
+        }, 1500)
       }
     },
     addCustom (counter) {
@@ -571,9 +571,9 @@ export default {
       const number = parseInt(payload.slice(-1))
       let path
       if (this.isInternational) {
-        if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
+        if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
           path = 'static/board/svg/' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
+        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
           path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomStandardCounter--
@@ -583,18 +583,16 @@ export default {
             if (value === false && key === number) {
               bool = true
               this.overWriteSVGStandardcounter = key - 1
-              console.log(this.overWriteSVGStandardcounter)
               this.map.set(key, true)
-              console.log(this.map)
               this.boardStyles = this.boardStyles.filter(e => e !== payload)
             }
           }
         })
       } else if (this.isShogi) {
-        if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
-          path = 'static/board/svg/customShogi' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static, '../../../../../static/board/svg/customShogi' + payload + '.svg')
+        if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
+          path = 'static/board/svg/' + payload + '.svg'
+        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+          path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomShogiCounter--
         let bool = false
@@ -609,10 +607,10 @@ export default {
           }
         })
       } else if (this.isXiangqi) {
-        if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
-          path = 'static/board/svg/customXiangqi' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static, '../../../../../static/board/svg/customXiangqi' + payload + '.svg')
+        if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
+          path = 'static/board/svg/' + payload + '.svg'
+        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+          path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomXiangqiCounter--
         let bool = false
@@ -627,10 +625,10 @@ export default {
           }
         })
       } else if (this.isSEA) {
-        if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
-          path = 'static/board/svg/customSea' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static, '../../../../../static/board/svg/customSea' + payload + '.svg')
+        if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
+          path = 'static/board/svg/' + payload + '.svg'
+        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+          path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomSeaCounter--
         let bool = false
@@ -645,10 +643,10 @@ export default {
           }
         })
       } else if (this.isJanggi) {
-        if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
-          path = 'static/board/svg/customJanggi' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
-          path = absolutePath.join(__static, '../../../../../static/board/svg/customJanggi' + payload + '.svg')
+        if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
+          path = 'static/board/svg/' + payload + '.svg'
+        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+          path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomJanggiCounter--
         let bool = false
