@@ -621,7 +621,6 @@ export default {
     },
     updateBoardCSS (boardStyle) {
       const node = this.boardStyleEl
-      console.log(navigator.platform)
       if (this.$store.getters.isInternational) {
         node.href = '../../../../static/board-css/international/' + boardStyle + '.css'
       } else if (this.$store.getters.isXiangqi || this.$store.getters.isJanggi) {
