@@ -108,9 +108,9 @@ export const store = new Vuex.Store({
     initialized: false,
     active: false,
     PvE: false,
-    PvEParam: 'go btime 5000',
+    PvEParam: 'go movetime 1000',
     PvEValue: 'time',
-    PvEInput: 5000,
+    PvEInput: 1000,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
@@ -612,7 +612,6 @@ export const store = new Vuex.Store({
     goEnginePvE (context) {
       engine.send(context.getters.PvEParam)
       context.commit('setEngineClock')
-      context.commit('active', true)
     },
     setActiveTrue (context) {
       context.commit('active', true)
@@ -628,7 +627,12 @@ export const store = new Vuex.Store({
     },
     PvEfalse (context) {
       context.commit('PvE', false)
-      context.dispatch('stopEngine')
+      if (!context.getters.turn) {
+        context.dispatch('stopEngine')
+      } else {
+        context.commit('resetEngineTime')
+        context.commit('active', false)
+      }
       context.dispatch('resetEngineData')
     },
     stopEngine (context) {
@@ -643,7 +647,6 @@ export const store = new Vuex.Store({
         context.dispatch('position')
         context.dispatch('goEngine')
       } else if (context.getters.active && context.getters.PvE && !context.getters.turn) {
-        context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEnginePvE')
       }

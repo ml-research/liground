@@ -107,7 +107,9 @@ export default {
       if (this.active && this.PvE && !this.turn) {
         if (this.PvEValue === 'time') {
           if (this.enginetime === (this.PvEInput)) {
-            this.onClick(this.lines[0])
+            if (this.lines[0] != null) {
+              this.onClick(this.lines[0])
+            }
           }
         } else if (this.PvEValue === 'nodes') {
           if (this.enginetime === 60000) {

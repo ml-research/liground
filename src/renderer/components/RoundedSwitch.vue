@@ -20,8 +20,8 @@ export default {
   },
   watch: {
     active () {
-      if ((this.active && !this.PvE) || (this.active && this.PvE && !this.turn)) {
-        this.$store.dispatch('restartEngine')
+      if (this.active && !this.turn && this.PvE) {
+        this.$store.dispatch('goEnginePvE')
       }
     }
   },
