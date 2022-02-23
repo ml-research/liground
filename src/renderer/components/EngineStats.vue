@@ -12,9 +12,23 @@ export default {
   components: {
     VueTableDynamic
   },
+  data () {
+    return {
+      parentEngineStats: {
+        depth: 0,
+        seldepth: 0,
+        nodes: 0,
+        nps: 0,
+        hashfull: 0,
+        tbhits: 0,
+        enginetime: 0
+      }
+    }
+  },
+
   computed: {
     params () {
-      const { depth, seldepth, nps, nodes, enginetime, hashfull, tbhits } = this.$store.getters
+      const { depth, seldepth, nps, nodes, enginetime, hashfull, tbhits } = this.parentEngineStats
       return {
         data: [
           ['Depth / Sel. Depth', 'Nodes/s', 'Nodes', 'Time', 'Hash', 'TB Hits'],
@@ -26,9 +40,11 @@ export default {
         stripe: true
       }
     }
-
   },
   methods: {
+    fillStats (payload) {
+      this.parentEngineStats = payload
+    },
     parse (value) {
       if (value > 1000000) {
         value /= 1000000

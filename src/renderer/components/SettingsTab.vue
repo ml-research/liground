@@ -18,7 +18,7 @@
     <div class="panel">
       <span class="title">Engine Settings</span>
       <div class="bar">
-        <EngineSelect class="select" />
+        <EngineSelect class="select"  @sendSelected="changeEngine($event)"/>
         <div
           class="icon blue mdi mdi-pencil"
           @click="editEngine"
@@ -186,7 +186,8 @@ export default {
       'variant',
       'engineOptions',
       'engineSettings',
-      'selectedEngine'
+      'selectedEngine',
+      'engineIndex'
     ])
   },
   watch: {
@@ -195,6 +196,11 @@ export default {
     }
   },
   methods: {
+    changeEngine (event) {
+      if (this.engineIndex > 1) {
+        this.$store.dispatch('changeEngine', event)
+      }
+    },
     showSettings (payload) {
       if (payload === 'nodes') {
         this.settingsName = 'Number of nodes in Million'

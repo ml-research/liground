@@ -43,7 +43,8 @@
 </template>
 
 <script>
-import { engine } from '../engine'
+import { mapGetters } from 'vuex'
+import { Engine, engine } from '../engine'
 
 export default {
   name: 'EngineConsole',
@@ -51,7 +52,7 @@ export default {
     bufferSize: {
       type: Number,
       default: 10
-    }
+    },
   },
   data () {
     return {
@@ -63,15 +64,44 @@ export default {
       fullWidth: 0,
       renderLength: 0,
       autoScroll: true,
-      scrollbarSize: 0
+      scrollbarSize: 0,
+      newEngine: null,
+      engineActive: false,
+      engineStats: {
+        depth: 0,
+        seldepth: 0,
+        nodes: 0,
+        nps: 0,
+        hashfull: 0,
+        tbhits: 0,
+        enginetime: 0
+      },
+      enginetime: 0,
+      enginetimeID: null,
+      engineInfo: {
+      name: '',
+      author: '',
+      options: []
+      }
+    }
+  },
+  watch: {
+    enginetime () {
+      this.engineStats.enginetime = this.enginetime
+      this.$emit('calculateEngineStats', this.engineStats)
     }
   },
   computed: {
+    ...mapGetters(['active', 'PvE', 'availableEngines', 'engineIndex']),
     fullHeight () {
       return this.io.length
     }
   },
   mounted () {
+    this.newEngine = new Engine()
+    this.engineInfo = this.newEngine.run(this.availableEngines[0].binary, this.availableEngines[0].cwd)
+    this.$store.commit('resetMultiPV')
+
     // TODO: more elegant way?
     // clear io on store event
     this.$store.subscribe((mutation) => {
@@ -84,15 +114,68 @@ export default {
     })
 
     // append incoming io
-    engine.on('io', io => this.append(io))
+    this.newEngine.on('io', io => this.append(io))
 
     // discover sizes
     const { scroller } = this.$refs
     this.elSize = parseFloat(window.getComputedStyle(scroller).fontSize)
     this.renderLength = Math.ceil((scroller.clientHeight / this.elSize) + 2 * this.bufferSize)
     this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
+
+    // setup debug and error output
+    this.newEngine.on('debug', (...msgs) => console.log('%c[Main Engine] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
+    this.newEngine.on('error', (...msgs) => console.error('%c[Main Engine]', 'color: #82aaff; font-weight: 700;', ...msgs))
+    this.newEngine.on('eval-debug', (...msgs) => console.log('%c[Eval Engine] Debug:', 'color: #9580ff; font-weight: 700;', ...msgs))
+    this.newEngine.on('eval-error', (...msgs) => console.error('%c[Eval Engine]', 'color: #9580ff; font-weight: 700;', ...msgs))
+    // capture engine info
+    this.newEngine.on('info', info => this.calculateEngineStats(info))
+  },
+  beforeDestroy () {
+    clearInterval(this.enginetimeID)
+    this.newEngine.send('stop')
   },
   methods: {
+    startClock () {
+      this.enginetimeID = setInterval(() => {
+        if(this.engineActive) {
+          this.enginetime = this.enginetime + 1000
+        }
+      }, 1000)
+    },
+    calculateEngineStats (payload) {
+      // ignore pv updates when engine is expected to be inactive
+      if (!this.engineActive) {
+        return
+      }
+      // update engine stats
+      const stats = { ...this.engineStats }
+      for (const key of Object.keys(stats)) {
+        if (key in payload) {
+          stats[key] = payload[key]
+        }
+      }
+      this.engineStats = stats
+      this.$emit('calculateEngineStats', this.engineStats)
+    },
+    changeBinary (event) {
+      const currentEngine = event
+      if (currentEngine !== null) {
+        let index = 0
+        for (index ; index < this.availableEngines.length; index++) {
+          if (this.availableEngines[index].name === currentEngine) {
+            break
+          }
+        }
+        if (currentEngine === this.availableEngines[index].name) {
+          this.io = Object.freeze([])
+          this.lastScrollPosition = 0
+          this.fullWidth = 0
+          this.rerender()
+          this.newEngine.run(this.availableEngines[index].binary, this.availableEngines[index].cwd)
+          console.log(this.engineInfo.name)
+        }
+      }
+    },
     getScrollTopMax () {
       const { scroller } = this.$refs
       return scroller.scrollHeight - scroller.clientHeight
@@ -107,7 +190,6 @@ export default {
           this.fullWidth = line.length
         }
       }
-
       // append io
       this.io = Object.freeze(this.io.concat(io))
 
@@ -151,9 +233,33 @@ export default {
     },
     onKeyup (event) {
       if (event.key === 'Enter') {
-        this.$store.dispatch('sendEngineCommand', this.input)
+        this.newEngine.send(this.input)
         this.input = ''
       }
+    },
+    activateEngine (payload) {
+      const switchOn = payload
+      if (!switchOn) {
+        if(this.enginetime === 0) {
+          this.startClock()
+        }
+        if (this.PvE) {
+          this.$store.dispatch('setActiveTrue')
+        } else {
+          if(this.engineIndex < 2) {
+            this.$store.dispatch('goEngine')
+          }
+          this.newEngine.send('go infinite')
+          // this.$store.dispatch('setActiveTrue')
+          // this.$store.commit('setEngineClock')
+        }
+      } else{
+        // this.$store.dispatch('stopEngine')
+        this.newEngine.send('stop')
+        this.$store.dispatch('setActiveFalse')
+        this.$store.commit('resetEngineTime')
+      }
+      this.engineActive = !this.engineActive
     }
   }
 }

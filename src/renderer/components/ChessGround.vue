@@ -470,7 +470,6 @@ export default {
       if (this.dragging === false) {
         return
       }
-
       if (event.clientY - this.startingPoint > 40) {
         switch (this.dimensionNumber) {
           case 0:
@@ -501,8 +500,8 @@ export default {
             break
           case 1:
             if (this.enlarged9x9width > -200) {
-              this.enlarged9x9width += 35
-              this.enlarged9x9height += (35 * 1.153846153846154)
+              this.enlarged9x9width -= 35
+              this.enlarged9x9height -= (35 * 1.153846153846154)
             }
             break
           case 3:

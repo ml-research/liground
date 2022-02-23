@@ -36,6 +36,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['engineIndex']),
     engineLogo () {
       return `url(${this.selectedEngine.logo || defaultLogo})`
     },
@@ -43,7 +44,9 @@ export default {
   },
   watch: {
     selected () {
-      // this.$store.dispatch('changeEngine', this.selected.name)
+      if (this.engineIndex < 2) {
+         this.$store.dispatch('changeEngine', this.selected.name)
+      }
       this.sendSelected()
     },
     selectedEngine () {
