@@ -7,7 +7,7 @@
       >
         {{ cpForWhiteStr }}
       </div>
-      <EngineSelect class="select" />
+      <EngineSelect class="select" @sendSelected="changeBinary($event)"/>
       <div @input="onSwitch">
         <RoundedSwitch class="switch" />
       </div>
@@ -131,7 +131,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE']),
+    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'selectedEngine', 'availableEngines']),
     movesExist () {
       const moves = this.$store.getters.moves
       return moves.length !== 0
@@ -148,9 +148,9 @@ export default {
   mounted () {
     this.newEngine = new Engine()
     // TODO : set Engine Run
-    // this.newEngine.run()
     // this.newEngine.send('uci')
-    // console.log(this.newEngine)
+    // this.$store.dispatch('runBinary',  {binary: this.availableEngines[0].binary, cwd: this.availableEngines[0].cwd})
+    this.newEngine.run(this.availableEngines[0].binary, this.availableEngines[0].cwd)
     this.$store.commit('resetMultiPV')
     this.engineID = this.engineIndex
 
@@ -175,6 +175,25 @@ export default {
     this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
   },
   methods: {
+    changeBinary (event) {
+      const currentEngine = event
+      if (currentEngine !== null) {
+        let index = 0
+        for (index ; index < this.availableEngines.length; index++) {
+          if (this.availableEngines[index].name === currentEngine) {
+            break
+          }
+        }
+        if (currentEngine === this.availableEngines[index].name) {
+          this.io = Object.freeze([])
+          this.lastScrollPosition = 0
+          this.fullWidth = 0
+          this.rerender()
+          this.newEngine.run(this.availableEngines[index].binary, this.availableEngines[index].cwd)
+          console.log(currentEngine)
+        }
+      }
+    },
     getScrollTopMax () {
       const { scroller } = this.$refs
       return scroller.scrollHeight - scroller.clientHeight
@@ -245,10 +264,16 @@ export default {
         if (this.PvE) {
           this.$store.dispatch('setActiveTrue')
         } else {
-          this.$store.dispatch('goEngine')
+          // this.$store.dispatch('goEngine')
+          this.newEngine.send('go infinite')
+          this.$store.dispatch('setActiveTrue')
+          this.$store.commit('setEngineClock')
         }
       } else {
-        this.$store.dispatch('stopEngine')
+        // this.$store.dispatch('stopEngine')
+        this.newEngine.send('stop')
+        this.$store.dispatch('setActiveFalse')
+        this.$store.commit('resetEngineTime')
       }
       this.isEngineActive = !this.isEngineActive
     }

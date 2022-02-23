@@ -10,6 +10,7 @@
     </div>
     <Multiselect
       v-model="selected"
+      @change="sendSelected"
       class="multiselect"
       label="name"
       track-by="name"
@@ -43,6 +44,7 @@ export default {
   watch: {
     selected () {
       // this.$store.dispatch('changeEngine', this.selected.name)
+      this.sendSelected()
     },
     selectedEngine () {
       this.selected = this.selectedEngine
@@ -50,6 +52,11 @@ export default {
   },
   created () {
     this.selected = this.selectedEngine
+  },
+  methods: {
+    sendSelected () {
+      this.$emit('sendSelected', this.selected.name)
+    }
   }
 }
 </script>
