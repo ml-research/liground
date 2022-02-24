@@ -5,7 +5,7 @@
         class="eval"
         :class="{ smaller: cpForWhiteStr.includes('/') }"
       >
-        {{ cpForWhiteStr }}
+        {{ engineID === 1? cpForWhiteStr: cpStr }}
       </div>
       <EngineSelect class="select" @sendSelected="changeConsole($event)"/>
       <div @input="onSwitch">
@@ -17,9 +17,9 @@
       <EngineStats ref="enginestats"/>
       <div
         class="processing-bar"
-        :class="{ animate: active }"
+        :class="{ animate: isEngineActive }"
       />
-      <PVLines class="panel" />
+      <PVLines class="panel" ref="pvlines"/>
       <div class="game-window panel noselect">
         <div id="move-history">
           <MoveHistoryNode
@@ -36,7 +36,7 @@
         @move-to-end="$emit('move-to-end', 0)"
       />
       <GameInfo id="gameinfo" />
-      <EngineConsole ref="console" @calculateEngineStats="fillEngineStats($event)"/>
+      <EngineConsole ref="console" @calculateEngineStats="fillEngineStats($event)" @calculateEngineInfo="fillEngineInfo($event)" @calculateMultiPV="fillMultiPV($event)"/>
     </div>
   </div>
 </template>
@@ -79,17 +79,66 @@ export default {
         hashfull: 0,
         tbhits: 0,
         enginetime: 0
-      }
+      },
+      engineInfo: {
+        name: '',
+        author: '',
+        options: []
+      },
+      multipv: [
+        {
+          cp: 0,
+          pv: '',
+          ucimove: ''
+        }
+      ]
     }
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines']),
+    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove']),
     movesExist () {
       const moves = this.$store.getters.moves
       return moves.length !== 0
     },
     fullHeight () {
       return this.io.length
+    },
+    cpStr () {
+      const currentMove = this.currentMove[0]
+      const { mate } = this.multipv[0]
+
+      // TODO: Update this block when ffish.board.is_terminal() or ffish.board.check_result() is available
+      // Temporary fix, as lang as we don't have an `is_terminal()` or `check_result` function
+      // if the SAN in the pgn is the same than the SAN in states.moves
+      // and we are at the last move, return pgn result
+      if (this.$store.state.selectedGame) {
+        let pgnBoard
+        if (this.$store.state.selectedGame.headers('FEN')) {
+          pgnBoard = new ffish.Board(this.$store.state.variant, this.$store.state.selectedGame.headers('FEN'))
+        } else {
+          pgnBoard = this.$store.state.board
+        }
+        const pgnMoves = this.$store.state.selectedGame.mainlineMoves()
+        const san = pgnBoard.variationSan(pgnMoves, ffish.Notation.SAN, false)
+        let str = ''
+        this.$store.state.moves.forEach(move => { str += move.name })
+        const lastMove = state.moves[state.moves.length - 1]
+        if (san.replace(/ /g, '') === str.replace(/ /g, '')) {
+          if (lastMove === currentMove && lastMove.ply === currentMove.ply) {
+            return this.$store.state.selectedGame.headers('Result')
+          }
+        }
+      }
+
+      if (typeof mate === 'number') {
+        return `#${calcForSide(mate, this.$store.state.turn)}`
+      } else if (currentMove && currentMove.name.includes('#')) {
+        return this.$store.state.turn ? '0-1' : '1-0'
+      } else if (this.$store.state.legalMoves.length === 0) {
+        return '1/2-1/2'
+      } else {
+        return this.cpToString(calcForSide(this.multipv[0].cp, this.$store.state.turn))
+      }
     }
   },
   watch: {
@@ -99,8 +148,18 @@ export default {
   },
   mounted () {
     this.engineID = this.engineIndex
+    this.$refs.pvlines.currentEngineIndex(this.engineID)
+    this.$refs.console.setEngineIndex(this.engineID)
   },
   methods: {
+    fillMultiPV (event) {
+      this.multipv = event
+      this.$refs.pvlines.fillPV(this.multipv)
+    },
+    fillEngineInfo (event) {
+      this.engineInfo = event
+      this.$refs.pvlines.fillInfo(this.engineInfo)
+    },
     fillEngineStats (event) {
       this.engineStats = event
       this.$refs.enginestats.fillStats(this.engineStats)
@@ -114,6 +173,32 @@ export default {
     onSwitch () {
       this.$refs.console.activateEngine(this.isEngineActive)
       this.changeState()
+    },
+    /**
+    * Calculate the value for current side to move.
+    * @param {number} value CP or Mate value
+    * @param {boolean} sideToMove Current side to move (true = white)
+    */
+    calcForSide (value, sideToMove) {
+      return sideToMove ? value : -value
+    },
+    /**
+    * Convert a CP value to a display string.
+    * @param {number} cp CP value
+    */
+    cpToString (cp) {
+      if (isNaN(cp)) {
+        return ''
+      }
+      if (cp === 0) {
+        return '0.00'
+      }
+      const normalizedEval = (cp / 100).toFixed(2)
+      if (cp > 0) {
+        return `+${normalizedEval}`
+      } else {
+        return normalizedEval
+      }
     }
   }
 }

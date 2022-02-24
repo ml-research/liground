@@ -78,12 +78,26 @@ export default {
   },
   data () {
     return {
-      lines: []
+      lines: [],
+      engineInfo: {
+        name: '',
+        author: '',
+        options: []
+      },
+      multipvMulti: [
+        {
+          cp: 0,
+          pv: '',
+          ucimove: ''
+        }
+      ],
+      currentEngine: 1
     }
   },
   computed: {
     engineDetails () {
-      const { engineName, engineAuthor } = this.$store.getters
+      const engineName = this.engineInfo.name
+      const engineAuthor = this.engineInfo.author
       return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
     },
     currentMove () {
@@ -97,6 +111,9 @@ export default {
     ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
+    multipvMulti () {
+      this.updateMultiLines()
+    },
     multipv () {
       this.updateLines()
     },
@@ -143,6 +160,15 @@ export default {
     }
   },
   methods: {
+    currentEngineIndex (payload) {
+      this.currentEngine = payload
+    },
+    fillPV (payload) {
+      this.multipvMulti = payload
+    },
+    fillInfo (payload) {
+      this.engineInfo = payload
+    },
     asMain (target, data) {
       const mainLine = data.line.pvUCI.split(' ')
       const prevMov = this.currentMove
@@ -166,9 +192,18 @@ export default {
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     },
     updateLines () {
-      const count = this.engineSettings.MultiPV
-      const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+      if(this.currentEngine === 1) {
+        const count = this.engineSettings.MultiPV
+        const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+        this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
+      }
+    },
+    updateMultiLines () {
+      if(this.currentEngine != 1) {
+      const count = 1
+      const lines = this.multipvMulti.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
       this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
+      }
     }
   }
 }

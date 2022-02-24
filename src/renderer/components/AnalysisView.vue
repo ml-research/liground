@@ -40,7 +40,6 @@ export default {
     addEngine () {
       this.counter++
       this.Engines.push({ Engine: this.counter })
-      this.$store.dispatch('increaseEngineNumber')
       this.$store.dispatch('engineIndex', this.counter)
     }
   }

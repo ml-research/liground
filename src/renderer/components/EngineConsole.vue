@@ -79,10 +79,18 @@ export default {
       enginetime: 0,
       enginetimeID: null,
       engineInfo: {
-      name: '',
-      author: '',
-      options: []
-      }
+        name: '',
+        author: '',
+        options: []
+      },
+      multipv: [
+        {
+          cp: 0,
+          pv: '',
+          ucimove: ''
+        }
+      ],
+      engineIndex: 1
     }
   },
   watch: {
@@ -92,14 +100,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['active', 'PvE', 'availableEngines', 'engineIndex']),
+    ...mapGetters(['active', 'PvE', 'availableEngines', 'fen', 'turn']),
     fullHeight () {
       return this.io.length
     }
   },
-  mounted () {
+  async mounted () {
     this.newEngine = new Engine()
-    this.engineInfo = this.newEngine.run(this.availableEngines[0].binary, this.availableEngines[0].cwd)
+    // this.engineInfo = this.newEngine.run(this.availableEngines[0].binary, this.availableEngines[0].cwd)
+    // this.engineInfo = await this.changeBinary(this.availableEngines[0].name)
+    await this.changeBinary(this.availableEngines[0].name)
     this.$store.commit('resetMultiPV')
 
     // TODO: more elegant way?
@@ -122,19 +132,32 @@ export default {
     this.renderLength = Math.ceil((scroller.clientHeight / this.elSize) + 2 * this.bufferSize)
     this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
 
-    // setup debug and error output
-    this.newEngine.on('debug', (...msgs) => console.log('%c[Main Engine] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
-    this.newEngine.on('error', (...msgs) => console.error('%c[Main Engine]', 'color: #82aaff; font-weight: 700;', ...msgs))
-    this.newEngine.on('eval-debug', (...msgs) => console.log('%c[Eval Engine] Debug:', 'color: #9580ff; font-weight: 700;', ...msgs))
-    this.newEngine.on('eval-error', (...msgs) => console.error('%c[Eval Engine]', 'color: #9580ff; font-weight: 700;', ...msgs))
-    // capture engine info
-    this.newEngine.on('info', info => this.calculateEngineStats(info))
+    await this.initiliseEngineOptions()
   },
   beforeDestroy () {
     clearInterval(this.enginetimeID)
     this.newEngine.send('stop')
   },
   methods: {
+    setEngineIndex (payload) {
+      this.engineIndex = payload
+    },
+    async calculateEngineInfo (payload) {
+      this.engineInfo = payload
+      this.$emit('calculateEngineInfo', this.engineInfo)
+      
+    },
+    async initiliseEngineOptions () {
+       (async () => {
+          // setup debug and error output
+          this.newEngine.on('debug', (...msgs) => console.log('%c[Main Engine] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
+          this.newEngine.on('error', (...msgs) => console.error('%c[Main Engine]', 'color: #82aaff; font-weight: 700;', ...msgs))
+          this.newEngine.on('eval-debug', (...msgs) => console.log('%c[Eval Engine] Debug:', 'color: #9580ff; font-weight: 700;', ...msgs))
+          this.newEngine.on('eval-error', (...msgs) => console.error('%c[Eval Engine]', 'color: #9580ff; font-weight: 700;', ...msgs))
+          // capture engine info
+          this.newEngine.on('info', info => this.calculateEngineStats(info))
+        })()
+    },
     startClock () {
       this.enginetimeID = setInterval(() => {
         if(this.engineActive) {
@@ -156,8 +179,50 @@ export default {
       }
       this.engineStats = stats
       this.$emit('calculateEngineStats', this.engineStats)
+
+       // update pvline
+      if ('pv' in payload) {
+        const multipv = this.multipv.slice(0)
+
+        // handle checkmate
+        if (payload.mate === 0) {
+          multipv[0] = { mate: payload.mate }
+        } else {
+          const ucimove = payload.pv.split(/\s/)[0]
+          const { board } = this.$store.state
+
+          // assert first move is valid
+          if (board.legalMoves().includes(ucimove)) {
+            const pvline = {
+              cp: payload.cp,
+              mate: payload.mate,
+              pvUCI: payload.pv,
+              ucimove
+            }
+            try {
+              pvline.pv = board.variationSan(payload.pv)
+            } catch (err) {
+              // currently invalid moves cause ffish to error mid calculation and fail to reset the fen
+              // so to avoid getting stuck with a future fen, we reset the board fen on error
+              board.setFen(this.fen)
+              console.warn('Invalid engine pv move.\nFEN:', board.fen(), '\nPV:', payload.pv)
+            }
+            multipv[payload.multipv - 1] = pvline
+          }
+        }
+        this.calculateMultiPV(multipv)
+      }
     },
-    changeBinary (event) {
+    calculateMultiPV (payload) {
+      for (const pvline of payload) {
+        if (pvline) {
+          pvline.cpDisplay = typeof pvline.mate === 'number' ? `#${this.calcForSide(pvline.mate, this.turn)}` : this.cpToString(this.calcForSide(pvline.cp, this.turn))
+        }
+      }
+      this.multipv = payload
+      this.$emit('calculateMultiPV', this.multipv)
+    },
+    async changeBinary (event) {
       const currentEngine = event
       if (currentEngine !== null) {
         let index = 0
@@ -171,9 +236,34 @@ export default {
           this.lastScrollPosition = 0
           this.fullWidth = 0
           this.rerender()
-          this.newEngine.run(this.availableEngines[index].binary, this.availableEngines[index].cwd)
-          console.log(this.engineInfo.name)
+          this.calculateEngineInfo(await this.newEngine.run(this.availableEngines[index].binary, this.availableEngines[index].cwd))
         }
+      }
+    },
+    /**
+    * Calculate the value for current side to move.
+    * @param {number} value CP or Mate value
+    * @param {boolean} sideToMove Current side to move (true = white)
+    */
+    calcForSide (value, sideToMove) {
+      return sideToMove ? value : -value
+    },
+    /**
+    * Convert a CP value to a display string.
+    * @param {number} cp CP value
+    */
+    cpToString (cp) {
+      if (isNaN(cp)) {
+        return ''
+      }
+      if (cp === 0) {
+        return '0.00'
+      }
+      const normalizedEval = (cp / 100).toFixed(2)
+      if (cp > 0) {
+        return `+${normalizedEval}`
+      } else {
+        return normalizedEval
       }
     },
     getScrollTopMax () {
@@ -250,11 +340,8 @@ export default {
             this.$store.dispatch('goEngine')
           }
           this.newEngine.send('go infinite')
-          // this.$store.dispatch('setActiveTrue')
-          // this.$store.commit('setEngineClock')
         }
       } else{
-        // this.$store.dispatch('stopEngine')
         this.newEngine.send('stop')
         this.$store.dispatch('setActiveFalse')
         this.$store.commit('resetEngineTime')
