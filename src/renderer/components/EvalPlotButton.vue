@@ -79,10 +79,10 @@ input::-webkit-inner-spin-button {
 .inputDepth {
   position: relative;
   display: inline-block;
-  width: 50px;
+  width: 40px;
 }
 .inputField {
-  width: 30px;
+  width: 25px;
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
@@ -90,8 +90,8 @@ input::-webkit-inner-spin-button {
   color: var(--main-text-color);
 }
 .button {
-  padding: 5px;
-  border-radius: 5px;
+  padding: 3px;
+  border-radius: 3px;
   background-color:var(--button-color);
   color: white;
   box-shadow: 1px 1px 1px 1px black;
@@ -104,8 +104,6 @@ input::-webkit-inner-spin-button {
 .EvalPlotButton {
   display: inline-block;
   position: relative;
-  padding-top: 5px;
-  padding-left: 10px;
 }
 .EvalPlotButton::before{
   content: attr(data-text);

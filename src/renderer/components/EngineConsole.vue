@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div
+      v-show="showConsole"
       ref="scroller"
       class="console"
       @scroll.passive="onScroll"
@@ -32,13 +33,29 @@
         Jump to bottom
       </div>
     </div>
-    <input
-      v-model="input"
-      class="input"
-      type="text"
-      size="60"
-      @keyup="onKeyup"
-    >
+    <div class="consoleInput">
+      <input
+        v-model="input"
+        class="input"
+        type="text"
+        size="60"
+        placeholder="Console Input"
+        @keyup="onKeyup"
+      >
+      <div
+        class="collapsible"
+        @click="toggle"
+      >
+        <em
+          v-show="showExpandIcon"
+          class="icon mdi mdi-arrow-expand-down"
+        />
+        <em
+          v-show="showMinimizeIcon"
+          class="icon mdi mdi-arrow-expand-up"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -63,7 +80,10 @@ export default {
       fullWidth: 0,
       renderLength: 0,
       autoScroll: true,
-      scrollbarSize: 0
+      scrollbarSize: 0,
+      showConsole: true, // Flag to show Console
+      showExpandIcon: false, // Flag to show expand-down icon
+      showMinimizeIcon: true // Flag to show expand-up icon
     }
   },
   computed: {
@@ -93,6 +113,11 @@ export default {
     this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
   },
   methods: {
+    toggle () {
+      this.showConsole = !this.showConsole
+      this.showExpandIcon = !this.showExpandIcon
+      this.showMinimizeIcon = !this.showMinimizeIcon
+    },
     getScrollTopMax () {
       const { scroller } = this.$refs
       return scroller.scrollHeight - scroller.clientHeight
@@ -211,9 +236,33 @@ export default {
 .button.visible {
   display: block;
 }
+
+.consoleInput {
+  display: flex;
+}
+
 .input {
+  flex-grow: 1;
   outline: none;
   border: 1px solid var(--main-border-color);
   background-color: var(--second-bg-color);
+}
+.collapsible {
+  color: var(--light-text-color);
+  background-color: var(--button-color);
+  padding: 1px;
+  border: 2px solid var(--main-border-color);
+  text-decoration: none;
+  cursor: pointer;
+  width: 20px;
+  border: none;
+  text-align: right;
+  outline: none;
+  font-size: 12px;
+  text-align: center;
+}
+
+.collapsible:hover {
+  background-color: var(--hover-color);
 }
 </style>
