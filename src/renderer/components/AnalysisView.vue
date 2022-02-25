@@ -25,7 +25,6 @@
       @move-forward-one="$emit('move-forward-one', 0)"
       @move-to-end="$emit('move-to-end', 0)"
     />
-    <GameInfo id="gameinfo" />
     <EngineConsole />
   </div>
 </template>
@@ -37,14 +36,13 @@ import AnalysisEvalRow from './AnalysisEvalRow'
 import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
-import GameInfo from './GameInfo'
 import EngineConsole from './EngineConsole'
 import MoveHistoryNode from './MoveHistoryNode'
 
 export default {
   name: 'AnalysisView',
   components: {
-    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, GameInfo, EngineConsole, MoveHistoryNode
+    AnalysisHead, AnalysisEvalRow, JumpButtons, EngineStats, PVLines, EngineConsole, MoveHistoryNode
   },
   computed: {
     ...mapGetters(['active', 'mainFirstMove']),
@@ -126,13 +124,6 @@ input {
   }
 }
 
-#gameinfo {
-  height: auto;
-  margin: 1em 0em;
-  border: 1px solid var(--main-border-color);
-  border-radius: 5px;
-  background-color: var(--second-bg-color);
-}
 #move-history {
   text-align: left;
 }

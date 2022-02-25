@@ -29,7 +29,7 @@ export default {
         document.documentElement.style.setProperty('--scroll-track-color', '#32363b')
         document.documentElement.style.setProperty('--scroll-thumb-color', '#23272a')
         document.documentElement.style.setProperty('--variation-color', '#99aab5')
-        document.documentElement.style.setProperty('--tooltip-color', '#99aab5')
+        document.documentElement.style.setProperty('--tooltip-color', '#40434a')
         document.documentElement.style.setProperty('--button-color', '#535a6e')
         document.documentElement.style.setProperty('--hover-color', '#99aab5')
         document.documentElement.style.setProperty('--highlight-color', '#7289da')

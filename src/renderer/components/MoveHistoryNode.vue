@@ -315,7 +315,7 @@ export default {
   color: var(--light-text-color);
 }
 .move-number {
-  color: var(--light-text-color);
+  color: var(--main-text-color);
 }
 .move-name {
   margin-right: 4px;

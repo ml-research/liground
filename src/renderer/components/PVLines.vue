@@ -29,48 +29,62 @@
           >Play entire line</a>
         </li>
       </VueContext>
-      <div class="list">
-        <template
-          v-for="(line, id) in lines"
+      <template
+        v-for="(line, id) in lines"
+      >
+        <div
+          v-if="line"
+          :key="id"
+          class="item clickable"
+          @mouseenter="onMouseEnter(id)"
+          @mouseleave="onMouseLeave(id)"
+          @click="onClick(line)"
         >
-          <div
-            v-if="line"
-            :key="id"
-            class="item clickable"
-            @mouseenter="onMouseEnter(id)"
-            @mouseleave="onMouseLeave(id)"
-            @click="onClick(line)"
+          <span class="left">{{ line.cpDisplay }}</span>
+          <span
+            class="right"
+            @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
           >
-            <span class="left">{{ line.cpDisplay }}</span>
-            <span
-              class="right"
-              @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
-            >
-              {{ line.pv }}
-            </span>
-          </div>
-          <div
-            v-else
-            :key="id"
-            class="item placeholder"
-          >
-            ...
-          </div>
-        </template>
+            {{ line.pv }}
+          </span>
+        </div>
+        <div
+          v-else
+          :key="id"
+          class="item placeholder"
+        >
+          ...
+        </div>
+      </template>
+    </div>
+    <footer class="footer">
+      <div
+        v-if="engineDetails.length > 0"
+        class="details"
+      >
+        {{ engineDetails }}
       </div>
-    </div>
-    <div
-      v-if="engineDetails.length > 0"
-      class="details"
-    >
-      {{ engineDetails }}
-    </div>
+      <div
+        class="collapsible"
+        @click="toggle"
+      >
+        <em
+          v-show="showExpandIcon"
+          class="icon mdi mdi-arrow-expand-down"
+        />
+        <em
+          v-show="showMinimizeIcon"
+          class="icon mdi mdi-arrow-expand-up"
+        />
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import VueContext from 'vue-context/src/js/index'
+import engine from '../engine'
 
 export default {
   components: {
@@ -78,7 +92,11 @@ export default {
   },
   data () {
     return {
-      lines: []
+      lines: [],
+      originalMultiPV: 5,
+      showOnlyOnePvLine: false, // Flag to show only one PvLine
+      showExpandIcon: false, // Flag to show expand-down icon
+      showMinimizeIcon: true // Flag to show expand-up icon
     }
   },
   computed: {
@@ -106,8 +124,8 @@ export default {
     enginetime () {
       if (this.active && this.PvE && !this.turn) {
         if (this.PvEValue === 'time') {
-                console.log(this.PvEValue)
-      console.log(this.PvEInput)
+          console.log(this.PvEValue)
+          console.log(this.PvEInput)
           if (this.enginetime === (this.PvEInput)) {
             this.onClick(this.lines[0])
           }
@@ -171,6 +189,23 @@ export default {
       const count = this.engineSettings.MultiPV
       const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
       this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
+    },
+    toggle () {
+      if (!this.active) {
+        this.showExpandIcon = !this.showExpandIcon
+        this.showMinimizeIcon = !this.showMinimizeIcon
+        if (!this.showOnlyOnePvLine) {
+          this.originalMultiPV = this.engineSettings.MultiPV
+          engine.send('setoption name MultiPV value 1')
+          this.engineSettings.MultiPV = 1
+          this.updateLines()
+        } else {
+          engine.send('setoption name MultiPV value ' + this.originalMultiPV)
+          this.engineSettings.MultiPV = this.originalMultiPV
+          this.updateLines()
+        }
+        this.showOnlyOnePvLine = !this.showOnlyOnePvLine
+      }
     }
   }
 }
@@ -224,10 +259,34 @@ export default {
   justify-content: center;
 }
 
+.footer {
+  display: flex;
+}
+
 .details {
   border-top: 1px solid var(--main-border-color);
   font-size: 8pt;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   font-style: oblique;
+  flex-grow: 1;
+}
+
+.collapsible {
+  color: var(--light-text-color);
+  background-color: var(--button-color);
+  padding: 1px;
+  border: 2px solid var(--main-border-color);
+  text-decoration: none;
+  cursor: pointer;
+  width: 20px;
+  border: none;
+  text-align: right;
+  outline: none;
+  font-size: 12px;
+  text-align: center;
+}
+
+.collapsible:hover {
+  background-color: var(--hover-color);
 }
 </style>

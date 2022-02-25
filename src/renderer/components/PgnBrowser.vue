@@ -84,6 +84,12 @@
         </div>
       </template>
     </div>
+    <div
+      class="footer"
+      @click="removeSafedPGN"
+    >
+      <em class="icon mdi mdi-trash-can-outline" />
+    </div>
   </div>
 </template>
 
@@ -220,6 +226,16 @@ export default {
         visible: true,
         title: 'Add new PGN'
       }
+    },
+    removeSafedPGN () {
+      if (confirm('Do you really want to remove the safed PGNs and reset the board?')) {
+        document.dispatchEvent(new Event('resetPlot'))
+        this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
+      }
+      if (this.$store.getters.loadedGames) {
+        const games = []
+        this.$store.dispatch('loadedGames', games)
+      }
     }
   }
 }
@@ -229,7 +245,7 @@ export default {
 #gameselect {
   overflow-y: auto;
   overflow-x: auto;
-  height: 100%;
+  height: 96%;
   border: 0px solid var(--main-border-color);
 }
 
@@ -287,6 +303,19 @@ export default {
   padding: 2px 2px;
   white-space: nowrap;
   width: 100%;
+}
+
+.footer {
+  border-top: 1px solid var(--main-border-color);
+  background-color: var(--button-color);
+  height: 4%;
+}
+.footer:hover {
+  background-color: var(--hover-color);
+}
+.icon.mdi-trash-can-outline {
+  font-size: 100%;
+
 }
 
 .unsupported {

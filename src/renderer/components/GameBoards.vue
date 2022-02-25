@@ -5,15 +5,21 @@
       <div class="main-grid">
         <div class="chessboard-grid">
           <PgnBrowser id="pgnbrowser" />
-          <div class="board">
-            <div @mousewheel.prevent.exact="scroll($event)">
-              <ChessGround
-                id="chessboard"
-                :orientation="orientation"
-                @onMove="showInfo"
-              />
+          <div class="board-grid">
+            <div class="board">
+              <span><GameInfo id="gameinfo" /></span>
+              <div
+                class="scrollable"
+                @mousewheel.prevent.exact="scroll($event)"
+              >
+                <ChessGround
+                  id="chessboard"
+                  :orientation="orientation"
+                  @onMove="showInfo"
+                />
+              </div>
+              <EvalBar class="evalbar" />
             </div>
-            <EvalBar class="evalbar" />
           </div>
           <div id="fen-field">
             FEN <input
@@ -67,8 +73,7 @@ import Vue from 'vue'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
 import EvalPlotButton from './EvalPlotButton'
-// TODO: use GameInfo component?
-// import GameInfo from './GameInfo.vue'
+import GameInfo from './GameInfo.vue'
 
 export default {
   name: 'GameBoards',
@@ -79,7 +84,7 @@ export default {
     PieceStyleSelector,
     BoardStyleSelector,
     EvalPlot,
-    // GameInfo,
+    GameInfo,
     PgnBrowser,
     SettingsTab,
     EvalPlotButton
@@ -327,11 +332,28 @@ export default {
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% auto;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: 80% auto auto;
   grid-template-areas:
-    "pgnbrowser ."
-    ". fenfield"
-    ". selector";
+    "pgnbrowser board-grid"
+    "selector board-grid "
+    ". fenfield";
+}
+
+.board-grid {
+  grid-area: board-grid;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#gameinfo {
+  grid-area: gameinfo;
+  height: auto;
+  border: 1px solid var(--main-border-color);
+  margin-bottom: 5px;
+  margin-left: 5px;
+  border-radius: 5px;
+  background-color: var(--second-bg-color);
 }
 #analysisview {
   grid-area: analysisview;
@@ -360,10 +382,11 @@ input {
 #selector-container {
   grid-area: selector;
   display: grid;
-  grid-template-columns: 5% 30% 5% 30%  30%;
   grid-template-areas:
-  ". piecestyle . boardstyle evalButton";
-  height: 60px;
+  "piecestyle"
+  "boardstyle"
+  "evalButton";
+  margin-left: 5px;
 }
 #piece-style {
   grid-area: piecestyle;
@@ -379,13 +402,24 @@ input {
   grid-area: pgnbrowser;
   border: 1px solid var(--main-border-color);
   border-radius: 4px;
-  margin-left: 1em;
-  max-height: 60vh;
+  margin-left: 5px;
+  max-height: 700vh;
 }
-.board {
+
+.scrollable {
+  grid-area: scrollable;
   display: flex;
   flex-direction: row;
   justify-content: center;
+  width: max-content
+}
+
+.board {
+  grid-area: board;
+  display: grid;
+  grid-template-areas:
+  "gameinfo ."
+  "scrollable evalbar";
 }
 #chessboard {
   display: inline-block;
@@ -398,6 +432,7 @@ input {
   margin: 0 auto;
 }
 .evalbar {
+  grid-area: evalbar;
   margin-left: 8px;
   height: 99%;
 }
