@@ -23,11 +23,11 @@ export default {
     ...mapGetters(['active', 'PvE', 'turn'])
   },
   watch: {
-    /* active () {
-      if ((this.active && !this.PvE) || (this.active && this.PvE && !this.turn)) {
-        this.$store.dispatch('restartEngine')
+    active () {
+      if (this.active && !this.turn && this.PvE) {
+        this.$store.dispatch('goEnginePvE')
       }
-    } */
+    }
   },
   methods: {
     changeActiveState (payload) {
@@ -42,7 +42,6 @@ export default {
           this.$store.dispatch('goEngine')
         }
       } else {
-        console.log('hier kommts rein')
         this.$store.dispatch('stopEngine')
       }
     }

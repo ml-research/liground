@@ -20,9 +20,8 @@ export default {
   watch: {
     turn () {
       if (this.turn && this.PvE) {
-        this.$store.dispatch('stopEnginePvE')
-      } else if (!this.turn && this.PvE) {
-        this.$store.dispatch('restartEngine')
+        this.$store.dispatch('resetEngineData')
+        this.$store.commit('resetEngineTime')
       }
     }
   },

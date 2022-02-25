@@ -442,6 +442,7 @@ export default {
     activateEngine (payload) {
       const switchOn = payload
       if (!switchOn) {
+        this.$store.dispatch('position')
         if(this.enginetime === 0) {
           this.startClock()
         }
