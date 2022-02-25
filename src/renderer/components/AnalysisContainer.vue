@@ -7,9 +7,9 @@
       >
         {{ engineID === 1? cpForWhiteStr: cpStr }}
       </div>
-      <EngineSelect class="select" @sendSelected="changeConsole($event)"/>
+      <EngineSelect ref="engineselect" class="select" @sendSelected="changeConsole($event)"/>
       <div @input="onSwitch">
-        <RoundedSwitch class="switch" />
+        <RoundedSwitch ref ="roundedswitch" class="switch" />
       </div>
     </div>
     <div class="analysis">
@@ -36,7 +36,7 @@
         @move-to-end="$emit('move-to-end', 0)"
       />
       <GameInfo id="gameinfo" />
-      <EngineConsole ref="console" @calculateEngineStats="fillEngineStats($event)" @calculateEngineInfo="fillEngineInfo($event)" @calculateMultiPV="fillMultiPV($event)"/>
+      <EngineConsole ref="console" @reInitEngineOptions="changeState" @calculateEngineStats="fillEngineStats($event)" @calculateEngineInfo="fillEngineInfo($event)" @calculateMultiPV="fillMultiPV($event)" @sendMultiPvCount="fillMultiPVCount($event)"/>
     </div>
   </div>
 </template>
@@ -69,6 +69,7 @@ export default {
   },
   data () {
     return {
+      canceltwice: true,
       isEngineActive: false,
       engineID: 1,
       engineStats: {
@@ -91,11 +92,12 @@ export default {
           pv: '',
           ucimove: ''
         }
-      ]
+      ],
+      multipvCount: 5
     }
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove']),
+    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove', 'active']),
     movesExist () {
       const moves = this.$store.getters.moves
       return moves.length !== 0
@@ -131,17 +133,27 @@ export default {
       }
 
       if (typeof mate === 'number') {
-        return `#${calcForSide(mate, this.$store.state.turn)}`
+        return `#${this.calcForSide(mate, this.$store.state.turn)}`
       } else if (currentMove && currentMove.name.includes('#')) {
         return this.$store.state.turn ? '0-1' : '1-0'
       } else if (this.$store.state.legalMoves.length === 0) {
         return '1/2-1/2'
       } else {
-        return this.cpToString(calcForSide(this.multipv[0].cp, this.$store.state.turn))
+        return this.cpToString(this.calcForSide(this.multipv[0].cp, this.$store.state.turn))
       }
     }
   },
   watch: {
+    isEngineActive () {
+      this.$refs.roundedswitch.changeActiveState(this.isEngineActive)
+    },
+    active () {
+      if (this.engineID === 1) {
+        if(this.isEngineActive && !this.active) {
+          this.changeState()
+        }
+      }
+    },
     reset () {
       this.$store.commit('resetMultiPV')
     }
@@ -150,8 +162,14 @@ export default {
     this.engineID = this.engineIndex
     this.$refs.pvlines.currentEngineIndex(this.engineID)
     this.$refs.console.setEngineIndex(this.engineID)
+    this.$refs.enginestats.fillID(this.engineID)
+    this.$refs.engineselect.setEngineIndex(this.engineIndex)
   },
   methods: {
+    fillMultiPVCount (event) {
+      this.multipvCount = event
+      this.$refs.pvlines.fillpvCount(this.multipvCount)
+    },
     fillMultiPV (event) {
       this.multipv = event
       this.$refs.pvlines.fillPV(this.multipv)
@@ -165,7 +183,12 @@ export default {
       this.$refs.enginestats.fillStats(this.engineStats)
     },
     changeConsole (event) {
-      this.$refs.console.changeBinary(event)
+      if (this.engineID === 1 && this.canceltwice) {
+        this.$refs.console.changeBinary(event)
+        this.canceltwice = false
+      } else if(this.engineID !== 1) {
+        this.$refs.console.changeBinary(event)
+      }
     },
     changeState () {
       this.isEngineActive = !this.isEngineActive

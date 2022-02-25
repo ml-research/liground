@@ -187,7 +187,8 @@ export default {
       'engineOptions',
       'engineSettings',
       'selectedEngine',
-      'engineIndex'
+      'engineIndex',
+      'active'
     ])
   },
   watch: {
@@ -197,7 +198,7 @@ export default {
   },
   methods: {
     changeEngine (event) {
-      if (this.engineIndex > 1) {
+      if (this.engineIndex < 2) {
         this.$store.dispatch('changeEngine', event)
       }
     },

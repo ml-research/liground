@@ -371,14 +371,14 @@ export default {
     }
   },
   mounted () {
-    if (Number(localStorage.resized) !== 'NaN') {
+    if (!isNaN(Number(localStorage.resized))) {
       this.enlarged = Number(localStorage.resized)
     }
-    if (Number(localStorage.resized9x9width) !== 'NaN') {
+    if (!isNaN(Number(localStorage.resized9x9width))) {
       this.enlarged9x9width = Number(localStorage.resized9x9width)
       this.enlarged9x9height = Number(localStorage.resized9x9height)
     }
-    if (Number(localStorage.resized9x10width) !== 'NaN') {
+    if (!isNaN(Number(localStorage.resized9x10width))) {
       this.enlarged9x10width = Number(localStorage.resized9x10width)
       this.enlarged9x10height = Number(localStorage.resized9x10height)
     }

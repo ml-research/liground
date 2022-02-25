@@ -83,60 +83,64 @@ export default {
         author: '',
         options: []
       },
-      multipv: [
+      multiPV: [
         {
           cp: 0,
           pv: '',
           ucimove: ''
         }
       ],
-      engineIndex: 1
+      engineIndex: 1,
+      enginesettings: {},
+      filteredSettings: ['UCI_Variant', 'UCI_Chess960'],
+      engineName: null,
+      localStorageSettings: null
     }
   },
   watch: {
+    async multipv () {
+      if (this.engineIndex !== 1) {
+        if(this.engineName === this.$store.getters.selectedEngine.name) {
+          if(this.localStorageSettings !== localStorage.getItem('engine' + this.engineName)) {
+            if (this.engineActive) {
+              this.$emit('reInitEngineOptions')
+            }
+            await this.initEngineOptions()
+          }
+        }
+      }
+    },
     enginetime () {
-      this.engineStats.enginetime = this.enginetime
-      this.$emit('calculateEngineStats', this.engineStats)
+      if (this.engineIndex !== 1) {
+        this.engineStats.enginetime = this.enginetime
+        this.$emit('calculateEngineStats', this.engineStats)
+      }
+    },
+    active () {
+      if(this.engineIndex === 1) {
+        if(this.engineActive && !this.active) {
+          this.engineActive = !this.engineActive
+        }
+      }
+    },
+    fen () {
+      if (this.engineIndex !== 1) {
+        this.restartEngine()
+      } 
     }
   },
   computed: {
-    ...mapGetters(['active', 'PvE', 'availableEngines', 'fen', 'turn']),
+    ...mapGetters(['active', 'PvE', 'availableEngines', 'fen', 'turn', 'multipv']),
     fullHeight () {
       return this.io.length
     }
   },
-  async mounted () {
-    this.newEngine = new Engine()
-    // this.engineInfo = this.newEngine.run(this.availableEngines[0].binary, this.availableEngines[0].cwd)
-    // this.engineInfo = await this.changeBinary(this.availableEngines[0].name)
-    await this.changeBinary(this.availableEngines[0].name)
-    this.$store.commit('resetMultiPV')
 
-    // TODO: more elegant way?
-    // clear io on store event
-    this.$store.subscribe((mutation) => {
-      if (mutation.type === 'clearIO') {
-        this.io = Object.freeze([])
-        this.lastScrollPosition = 0
-        this.fullWidth = 0
-        this.rerender()
-      }
-    })
-
-    // append incoming io
-    this.newEngine.on('io', io => this.append(io))
-
-    // discover sizes
-    const { scroller } = this.$refs
-    this.elSize = parseFloat(window.getComputedStyle(scroller).fontSize)
-    this.renderLength = Math.ceil((scroller.clientHeight / this.elSize) + 2 * this.bufferSize)
-    this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
-
-    await this.initiliseEngineOptions()
-  },
   beforeDestroy () {
-    clearInterval(this.enginetimeID)
-    this.newEngine.send('stop')
+    if (this.engineIndex !== 1) {
+      clearInterval(this.enginetimeID)
+      this.newEngine.send('stop')
+    }
   },
   methods: {
     setEngineIndex (payload) {
@@ -145,7 +149,24 @@ export default {
     async calculateEngineInfo (payload) {
       this.engineInfo = payload
       this.$emit('calculateEngineInfo', this.engineInfo)
-      
+      const settings = {}
+      for (const option of payload.options) {
+        if (!this.filteredSettings.includes(option.name)) {
+          switch (option.type) {
+            case 'check':
+              settings[option.name] = option.default === 'true'
+              break
+            case 'spin':
+            case 'combo':
+              settings[option.name] = option.default
+              break
+            case 'string':
+              settings[option.name] = option.default || ''
+              break
+          }
+        }
+      }
+      this.enginesettings = settings
     },
     async initiliseEngineOptions () {
        (async () => {
@@ -157,13 +178,16 @@ export default {
           // capture engine info
           this.newEngine.on('info', info => this.calculateEngineStats(info))
         })()
+        // this.newEngine.send('setoption name MultiPV value 5')
     },
     startClock () {
-      this.enginetimeID = setInterval(() => {
+      if (this.engineIndex !== 1) {
+        this.enginetimeID = setInterval(() => {
         if(this.engineActive) {
           this.enginetime = this.enginetime + 1000
         }
-      }, 1000)
+        }, 1000)
+      }
     },
     calculateEngineStats (payload) {
       // ignore pv updates when engine is expected to be inactive
@@ -172,6 +196,7 @@ export default {
       }
       // update engine stats
       const stats = { ...this.engineStats }
+      
       for (const key of Object.keys(stats)) {
         if (key in payload) {
           stats[key] = payload[key]
@@ -182,7 +207,7 @@ export default {
 
        // update pvline
       if ('pv' in payload) {
-        const multipv = this.multipv.slice(0)
+        const multipv = this.multiPV.slice(0)
 
         // handle checkmate
         if (payload.mate === 0) {
@@ -219,26 +244,109 @@ export default {
           pvline.cpDisplay = typeof pvline.mate === 'number' ? `#${this.calcForSide(pvline.mate, this.turn)}` : this.cpToString(this.calcForSide(pvline.cp, this.turn))
         }
       }
-      this.multipv = payload
-      this.$emit('calculateMultiPV', this.multipv)
+      this.multiPV = payload
+      this.$emit('calculateMultiPV', this.multiPV)
     },
     async changeBinary (event) {
-      const currentEngine = event
-      if (currentEngine !== null) {
-        let index = 0
-        for (index ; index < this.availableEngines.length; index++) {
-          if (this.availableEngines[index].name === currentEngine) {
-            break
+      if(this.engineIndex !== 1) {
+        this.newEngine = new Engine()
+        // this.newEngine = new Engine()
+        // TODO: more elegant way?
+        // clear io on store event
+        this.$store.subscribe((mutation) => {
+          if (mutation.type === 'clearIO') {
+            this.io = Object.freeze([])
+            this.lastScrollPosition = 0
+            this.fullWidth = 0
+            this.rerender()
+          }
+        })
+
+        // append incoming io
+        this.newEngine.on('io', io => this.append(io))
+
+        // discover sizes
+        const { scroller } = this.$refs
+        this.elSize = parseFloat(window.getComputedStyle(scroller).fontSize)
+        this.renderLength = Math.ceil((scroller.clientHeight / this.elSize) + 2 * this.bufferSize)
+        this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
+        await this.initiliseEngineOptions()
+        const currentEngine = event
+        this.engineName = currentEngine
+        if (currentEngine !== null) {
+          let index = 0
+          for (index ; index < this.availableEngines.length; index++) {
+            if (this.availableEngines[index].name === currentEngine) {
+              break
+            }
+          }
+          if (currentEngine === this.availableEngines[index].name) {
+            this.io = Object.freeze([])
+            this.lastScrollPosition = 0
+            this.fullWidth = 0
+            this.rerender()
+            this.calculateEngineInfo(await this.newEngine.run(this.availableEngines[index].binary, this.availableEngines[index].cwd))
+            await this.initEngineOptions()
           }
         }
-        if (currentEngine === this.availableEngines[index].name) {
+      } else if(this.engineIndex === 1) {
+        this.$store.subscribe((mutation) => {
+        if (mutation.type === 'clearIO') {
           this.io = Object.freeze([])
           this.lastScrollPosition = 0
           this.fullWidth = 0
           this.rerender()
-          this.calculateEngineInfo(await this.newEngine.run(this.availableEngines[index].binary, this.availableEngines[index].cwd))
+        }
+      })
+
+        // append incoming io
+        engine.on('io', io => this.append(io))
+
+        // discover sizes
+        const { scroller } = this.$refs
+        this.elSize = parseFloat(window.getComputedStyle(scroller).fontSize)
+        this.renderLength = Math.ceil((scroller.clientHeight / this.elSize) + 2 * this.bufferSize)
+        this.scrollbarSize = scroller.offsetHeight - scroller.clientHeight
+      }
+    },
+    async initEngineOptions () {
+      const options = {
+        // variant & 960 are handled separately and always set
+        UCI_Variant: this.$store.getters.variant,
+        UCI_Chess960: this.$store.state.board.is960(),
+
+        // multi pv 5 is default
+        MultiPV: 5
+      }
+      const stored = localStorage.getItem('engine' + this.engineName)
+      if (stored) {
+        Object.assign(options, JSON.parse(stored))
+      }
+
+      // this will update the settings
+      this.setEngineOptions(options)
+    },
+    setEngineOptions (payload) {
+      if (this.engineActive) {
+        this.newEngine.send('stop')
+        this.resetEngineData()
+        this.resetEngineTime()
+        this.engineActive = false
+      }
+      // context.dispatch('resetEngineData')
+      for (const [name, value] of Object.entries(payload)) {
+        // checkOption(context.state.engineInfo.options, name, value)
+        if (value !== undefined && value !== null) {
+          if (!this.filteredSettings.includes(name)) {
+            this.enginesettings[name] = value
+          }
+          this.newEngine.send(`setoption name ${name} value ${value}`)
+        } else {
+          this.newEngine.send(`setoption name ${name}`)
         }
       }
+      this.$emit('sendMultiPvCount', this.enginesettings.MultiPV)
+      this.localStorageSettings = localStorage.getItem('engine' + this.engineName)
     },
     /**
     * Calculate the value for current side to move.
@@ -323,7 +431,11 @@ export default {
     },
     onKeyup (event) {
       if (event.key === 'Enter') {
-        this.newEngine.send(this.input)
+        if (this.engineIndex !== 1) {
+          this.newEngine.send(this.input)
+        } else if(this.engineIndex === 1) {
+          engine.send(this.input)
+        }
         this.input = ''
       }
     },
@@ -338,15 +450,58 @@ export default {
         } else {
           if(this.engineIndex < 2) {
             this.$store.dispatch('goEngine')
+          } else {
+            this.newEngine.send('go infinite')
           }
-          this.newEngine.send('go infinite')
         }
       } else{
-        this.newEngine.send('stop')
-        this.$store.dispatch('setActiveFalse')
-        this.$store.commit('resetEngineTime')
+        if (this.engineIndex !== 1) {
+          this.newEngine.send('stop')
+        } else if (this.engineIndex === 1) {
+          this.$store.dispatch('stopEngine')
+        }
       }
       this.engineActive = !this.engineActive
+    },
+    resetEngineData () {
+      this.resetEngineStats()
+      this.resetMultiPV()
+    },
+    resetMultiPV () {
+      this.multiPV = [
+        {
+          cp: 0,
+          pv: '',
+          ucimove: ''
+        }
+      ]
+      this.$emit('calculateMultiPV', this.multiPV)
+    },
+    resetEngineStats () {
+      this.enginetime = 0
+      this.engineStats = {
+        depth: 0,
+        seldepth: 0,
+        nodes: 0,
+        nps: 0,
+        hashfull: 0,
+        tbhits: 0,
+        enginetime: 0
+      }
+      this.$emit('calculateEngineStats', this.engineStats)
+    },
+    resetEngineTime () {
+      clearInterval(this.enginetimeID)
+    },
+    restartEngine () {
+      this.resetEngineData()
+      if (this.engineActive) {
+        this.newEngine.send('stop')
+        this.resetEngineTime()
+        this.newEngine.send(`position fen ${this.$store.getters.fen}`)
+        this.engineActive = false
+        this.activateEngine(false)
+      }
     }
   }
 }

@@ -32,11 +32,11 @@ export default {
   components: { Multiselect },
   data () {
     return {
-      selected: null // this will be set on created
+      selected: null,
+      engineIndex: 1 // this will be set on created
     }
   },
   computed: {
-    ...mapGetters(['engineIndex']),
     engineLogo () {
       return `url(${this.selectedEngine.logo || defaultLogo})`
     },
@@ -45,7 +45,7 @@ export default {
   watch: {
     selected () {
       if (this.engineIndex < 2) {
-         this.$store.dispatch('changeEngine', this.selected.name)
+        this.$store.dispatch('changeEngine', this.selected.name)
       }
       this.sendSelected()
     },
@@ -57,6 +57,9 @@ export default {
     this.selected = this.selectedEngine
   },
   methods: {
+    setEngineIndex (payload) {
+      this.engineIndex = payload
+    },
     sendSelected () {
       this.$emit('sendSelected', this.selected.name)
     }

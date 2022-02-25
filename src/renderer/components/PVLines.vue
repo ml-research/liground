@@ -59,18 +59,34 @@
         </template>
       </div>
     </div>
-    <div
-      v-if="engineDetails.length > 0"
-      class="details"
-    >
-      {{ engineDetails }}
-    </div>
+    <footer class="footer">
+      <div
+        v-if="engineDetails.length > 0"
+        class="details"
+      >
+        {{ engineDetails }}
+      </div>
+      <div
+        class="collapsible"
+        @click="toggle"
+      >
+        <em
+          v-show="showExpandIcon"
+          class="icon mdi mdi-arrow-expand-down"
+        />
+        <em
+          v-show="showMinimizeIcon"
+          class="icon mdi mdi-arrow-expand-up"
+       />
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import VueContext from 'vue-context/src/js/index'
+import {engine} from '../engine'
 
 export default {
   components: {
@@ -91,14 +107,24 @@ export default {
           ucimove: ''
         }
       ],
-      currentEngine: 1
+      currentEngine: 1,
+      pvcount: 0,
+      originalMultiPV: 1,
+      showOnlyOnePvLine: false, // Flag to show only one PvLine
+      showExpandIcon: false, // Flag to show expand-down icon
+      showMinimizeIcon: true // Flag to show expand-up icon
     }
   },
   computed: {
     engineDetails () {
-      const engineName = this.engineInfo.name
-      const engineAuthor = this.engineInfo.author
-      return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
+      if (this.currentEngine === 1) {
+        const { engineName, engineAuthor } = this.$store.getters
+        return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
+      } else {
+        const engineName = this.engineInfo.name
+        const engineAuthor = this.engineInfo.author
+        return `"${engineName}" ${engineAuthor ? 'by ' + engineAuthor : ''}`
+      }
     },
     currentMove () {
       for (let num = 0; num < this.moves.length; num++) {
@@ -111,6 +137,13 @@ export default {
     ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
+    pvcount () {
+      let i
+      this.lines = []
+      for(i = 0; i < this.pvcount; i++) {
+        this.lines.push(0)
+      }
+    },
     multipvMulti () {
       this.updateMultiLines()
     },
@@ -118,6 +151,7 @@ export default {
       this.updateLines()
     },
     engineSettings () {
+      this.originalMultiPV = this.engineSettings.MultiPV
       this.updateLines()
     },
     enginetime () {
@@ -160,6 +194,10 @@ export default {
     }
   },
   methods: {
+    fillpvCount (payload) {
+      this.pvcount = payload
+      this.originalMultiPV = payload
+    },
     currentEngineIndex (payload) {
       this.currentEngine = payload
     },
@@ -196,13 +234,29 @@ export default {
         const count = this.engineSettings.MultiPV
         const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
         this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
+        if(this.showOnlyOnePvLine) {
+          this.lines = this.lines.slice(1, 2)
+        }
       }
     },
     updateMultiLines () {
       if(this.currentEngine != 1) {
-      const count = 1
-      const lines = this.multipvMulti.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
-      this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
+        const count = this.pvcount
+        const lines = this.multipvMulti.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
+        this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
+        if(this.showOnlyOnePvLine) {
+          this.lines = this.lines.slice(1, 2)
+        }
+      }
+    },
+    toggle () {
+      this.showExpandIcon = !this.showExpandIcon
+      this.showMinimizeIcon = !this.showMinimizeIcon
+      this.showOnlyOnePvLine = !this.showOnlyOnePvLine
+      if (this.currentEngine === 1) {
+        this.updateLines()
+      } else {
+        this.updateMultiLines()
       }
     }
   }
@@ -257,10 +311,34 @@ export default {
   justify-content: center;
 }
 
+.footer {
+  display: flex;
+}
+
 .details {
   border-top: 1px solid var(--main-border-color);
   font-size: 8pt;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   font-style: oblique;
+  flex-grow: 1;
+}
+
+.collapsible {
+  color: var(--light-text-color);
+  background-color: var(--button-color);
+  padding: 1px;
+  border: 2px solid var(--main-border-color);
+  text-decoration: none;
+  cursor: pointer;
+  width: 20px;
+  border: none;
+  text-align: right;
+  outline: none;
+  font-size: 12px;
+  text-align: center;
+}
+
+.collapsible:hover {
+  background-color: var(--hover-color);
 }
 </style>
