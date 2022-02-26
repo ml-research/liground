@@ -142,6 +142,8 @@ export default {
       clearInterval(this.enginetimeID)
       this.newEngine.send('stop')
       this.newEngine.send('quit')
+    } else if (this.engineIndex === 1) {
+      engine.send('quit')
     }
   },
   methods: {
