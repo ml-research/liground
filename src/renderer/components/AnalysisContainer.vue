@@ -7,19 +7,29 @@
       >
         {{ engineID === 1? cpForWhiteStr: cpStr }}
       </div>
-      <EngineSelect ref="engineselect" class="select" @sendSelected="changeConsole($event)"/>
+      <EngineSelect
+        ref="engineselect"
+        class="select"
+        @sendSelected="changeConsole($event)"
+      />
       <div @input="onSwitch">
-        <RoundedSwitch ref ="roundedswitch" class="switch" />
+        <RoundedSwitch
+          ref="roundedswitch"
+          class="switch"
+        />
       </div>
     </div>
     <div class="analysis">
       <!-- <AnalysisEvalRow /> -->
-      <EngineStats ref="enginestats"/>
+      <EngineStats ref="enginestats" />
       <div
         class="processing-bar"
         :class="{ animate: isEngineActive }"
       />
-      <PVLines class="panel" ref="pvlines"/>
+      <PVLines
+        ref="pvlines"
+        class="panel"
+      />
       <div class="game-window panel noselect">
         <div id="move-history">
           <MoveHistoryNode
@@ -36,7 +46,14 @@
         @move-to-end="$emit('move-to-end', 0)"
       />
       <GameInfo id="gameinfo" />
-      <EngineConsole ref="console" @reInitEngineOptions="changeState" @calculateEngineStats="fillEngineStats($event)" @calculateEngineInfo="fillEngineInfo($event)" @calculateMultiPV="fillMultiPV($event)" @sendMultiPvCount="fillMultiPVCount($event)"/>
+      <EngineConsole
+        ref="console"
+        @reInitEngineOptions="changeState"
+        @calculateEngineStats="fillEngineStats($event)"
+        @calculateEngineInfo="fillEngineInfo($event)"
+        @calculateMultiPV="fillMultiPV($event)"
+        @sendMultiPvCount="fillMultiPVCount($event)"
+      />
     </div>
   </div>
 </template>
@@ -53,6 +70,7 @@ import EngineConsole from './EngineConsole'
 import MoveHistoryNode from './MoveHistoryNode'
 import RoundedSwitch from './RoundedSwitch'
 import EngineSelect from './EngineSelect'
+import ffish from 'ffish'
 
 export default {
   name: 'AnalysisContainer',
@@ -69,6 +87,7 @@ export default {
   },
   data () {
     return {
+      currentVariant: null,
       canceltwice: true,
       isEngineActive: false,
       engineID: 1,
@@ -97,7 +116,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove', 'active']),
+    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove', 'active', 'variant']),
     movesExist () {
       const moves = this.$store.getters.moves
       return moves.length !== 0
@@ -124,7 +143,7 @@ export default {
         const san = pgnBoard.variationSan(pgnMoves, ffish.Notation.SAN, false)
         let str = ''
         this.$store.state.moves.forEach(move => { str += move.name })
-        const lastMove = state.moves[state.moves.length - 1]
+        const lastMove = this.$store.state.moves[this.$store.moves.length - 1]
         if (san.replace(/ /g, '') === str.replace(/ /g, '')) {
           if (lastMove === currentMove && lastMove.ply === currentMove.ply) {
             return this.$store.state.selectedGame.headers('Result')
@@ -149,7 +168,7 @@ export default {
     },
     active () {
       if (this.engineID === 1) {
-        if(this.isEngineActive && !this.active) {
+        if (this.isEngineActive && !this.active) {
           this.changeState()
         }
       }
@@ -159,6 +178,7 @@ export default {
     }
   },
   mounted () {
+    this.currentVariant = this.variant
     this.engineID = this.engineIndex
     this.$refs.pvlines.currentEngineIndex(this.engineID)
     this.$refs.console.setEngineIndex(this.engineID)
@@ -166,6 +186,12 @@ export default {
     this.$refs.engineselect.setEngineIndex(this.engineIndex)
   },
   methods: {
+    async resetThisEngine () {
+      await this.$refs.console.resetEngine(this.isEngineActive)
+      if (this.isEngineActive) {
+        this.changeState()
+      }
+    },
     fillMultiPVCount (event) {
       this.multipvCount = event
       this.$refs.pvlines.fillpvCount(this.multipvCount)
@@ -182,12 +208,17 @@ export default {
       this.engineStats = event
       this.$refs.enginestats.fillStats(this.engineStats)
     },
-    changeConsole (event) {
+    async changeConsole (event) {
       if (this.engineID === 1 && this.canceltwice) {
         this.$refs.console.changeBinary(event)
         this.canceltwice = false
-      } else if(this.engineID !== 1) {
-        this.$refs.console.changeBinary(event)
+      } else if (this.engineID !== 1) {
+        if (this.currentVariant !== this.variant) {
+          this.$refs.console.stopEngine()
+          this.currentVariant = this.variant
+        }
+        this.isEngineActive = false
+        await this.$refs.console.changeBinary(event)
       }
     },
     changeState () {

@@ -52,10 +52,11 @@ export default {
     bufferSize: {
       type: Number,
       default: 10
-    },
+    }
   },
   data () {
     return {
+      resetting: false,
       input: '',
       io: Object.freeze([]),
       rendered: [],
@@ -94,14 +95,21 @@ export default {
       enginesettings: {},
       filteredSettings: ['UCI_Variant', 'UCI_Chess960'],
       engineName: null,
-      localStorageSettings: null
+      localStorageSettings: null,
+      currentlySwitchingVariant: false
+    }
+  },
+  computed: {
+    ...mapGetters(['active', 'PvE', 'availableEngines', 'fen', 'turn', 'multipv', 'variant', 'is960']),
+    fullHeight () {
+      return this.io.length
     }
   },
   watch: {
     async multipv () {
       if (this.engineIndex !== 1) {
-        if(this.engineName === this.$store.getters.selectedEngine.name) {
-          if(this.localStorageSettings !== localStorage.getItem('engine' + this.engineName)) {
+        if (this.engineName === this.$store.getters.selectedEngine.name) {
+          if (this.localStorageSettings !== localStorage.getItem('engine' + this.engineName)) {
             if (this.engineActive) {
               this.$emit('reInitEngineOptions')
             }
@@ -117,8 +125,8 @@ export default {
       }
     },
     active () {
-      if(this.engineIndex === 1) {
-        if(this.engineActive && !this.active) {
+      if (this.engineIndex === 1) {
+        if (this.engineActive && !this.active) {
           this.engineActive = !this.engineActive
         }
       }
@@ -126,25 +134,35 @@ export default {
     fen () {
       if (this.engineIndex !== 1) {
         this.restartEngine()
-      } 
+      }
     }
   },
-  computed: {
-    ...mapGetters(['active', 'PvE', 'availableEngines', 'fen', 'turn', 'multipv']),
-    fullHeight () {
-      return this.io.length
-    }
-  },
-
   beforeDestroy () {
     if (this.engineIndex !== 1) {
       clearInterval(this.enginetimeID)
       this.newEngine.send('stop')
       this.newEngine.send('quit')
-      console.log('removed')
     }
   },
   methods: {
+    async resetEngine (payload) {
+      if (payload) {
+        await this.newEngine.send('stop')
+        this.engineActive = false
+      }
+      this.resetEngineData()
+      this.resetEngineTime()
+      this.newEngine.send('setoption name UCI_Chess960 value ' + this.is960)
+      this.$emit('calculateEngineStats', this.engineStats)
+      this.$emit('calculateMultiPV', this.multiPV)
+      console.log(this.multipv)
+      console.log(this.engineStats)
+    },
+    stopEngine () {
+      this.resetEngineData()
+      this.newEngine.send('quit')
+      this.currentlySwitchingVariant = true
+    },
     setEngineIndex (payload) {
       this.engineIndex = payload
     },
@@ -171,23 +189,23 @@ export default {
       this.enginesettings = settings
     },
     async initiliseEngineOptions () {
-       (async () => {
-          // setup debug and error output
-          this.newEngine.on('debug', (...msgs) => console.log('%c[Main Engine] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
-          this.newEngine.on('error', (...msgs) => console.error('%c[Main Engine]', 'color: #82aaff; font-weight: 700;', ...msgs))
-          this.newEngine.on('eval-debug', (...msgs) => console.log('%c[Eval Engine] Debug:', 'color: #9580ff; font-weight: 700;', ...msgs))
-          this.newEngine.on('eval-error', (...msgs) => console.error('%c[Eval Engine]', 'color: #9580ff; font-weight: 700;', ...msgs))
-          // capture engine info
-          this.newEngine.on('info', info => this.calculateEngineStats(info))
-        })()
-        // this.newEngine.send('setoption name MultiPV value 5')
+      (async () => {
+        // setup debug and error output
+        this.newEngine.on('debug', (...msgs) => console.log('%c[Main Engine] Debug:', 'color: #82aaff; font-weight: 700;', ...msgs))
+        this.newEngine.on('error', (...msgs) => console.error('%c[Main Engine]', 'color: #82aaff; font-weight: 700;', ...msgs))
+        this.newEngine.on('eval-debug', (...msgs) => console.log('%c[Eval Engine] Debug:', 'color: #9580ff; font-weight: 700;', ...msgs))
+        this.newEngine.on('eval-error', (...msgs) => console.error('%c[Eval Engine]', 'color: #9580ff; font-weight: 700;', ...msgs))
+        // capture engine info
+        this.newEngine.on('info', info => this.calculateEngineStats(info))
+      })()
+      // this.newEngine.send('setoption name MultiPV value 5')
     },
     startClock () {
       if (this.engineIndex !== 1) {
         this.enginetimeID = setInterval(() => {
-        if(this.engineActive) {
-          this.enginetime = this.enginetime + 1000
-        }
+          if (this.engineActive) {
+            this.enginetime = this.enginetime + 1000
+          }
         }, 1000)
       }
     },
@@ -198,7 +216,6 @@ export default {
       }
       // update engine stats
       const stats = { ...this.engineStats }
-      
       for (const key of Object.keys(stats)) {
         if (key in payload) {
           stats[key] = payload[key]
@@ -207,7 +224,7 @@ export default {
       this.engineStats = stats
       this.$emit('calculateEngineStats', this.engineStats)
 
-       // update pvline
+      // update pvline
       if ('pv' in payload) {
         const multipv = this.multiPV.slice(0)
 
@@ -250,7 +267,12 @@ export default {
       this.$emit('calculateMultiPV', this.multiPV)
     },
     async changeBinary (event) {
-      if(this.engineIndex !== 1) {
+      if (this.engineIndex !== 1) {
+        if (this.engineActive) {
+          this.engineActive = false
+          this.newEngine.send('quit')
+          this.resetEngineData()
+        }
         this.newEngine = new Engine()
         // this.newEngine = new Engine()
         // TODO: more elegant way?
@@ -277,7 +299,7 @@ export default {
         this.engineName = currentEngine
         if (currentEngine !== null) {
           let index = 0
-          for (index ; index < this.availableEngines.length; index++) {
+          for (index; index < this.availableEngines.length; index++) {
             if (this.availableEngines[index].name === currentEngine) {
               break
             }
@@ -291,15 +313,15 @@ export default {
             await this.initEngineOptions()
           }
         }
-      } else if(this.engineIndex === 1) {
+      } else if (this.engineIndex === 1) {
         this.$store.subscribe((mutation) => {
-        if (mutation.type === 'clearIO') {
-          this.io = Object.freeze([])
-          this.lastScrollPosition = 0
-          this.fullWidth = 0
-          this.rerender()
-        }
-      })
+          if (mutation.type === 'clearIO') {
+            this.io = Object.freeze([])
+            this.lastScrollPosition = 0
+            this.fullWidth = 0
+            this.rerender()
+          }
+        })
 
         // append incoming io
         engine.on('io', io => this.append(io))
@@ -330,7 +352,9 @@ export default {
     },
     setEngineOptions (payload) {
       if (this.engineActive) {
-        this.newEngine.send('stop')
+        if (this.currentlySwitchingVariant === false) {
+          this.newEngine.send('stop')
+        }
         this.resetEngineData()
         this.resetEngineTime()
         this.engineActive = false
@@ -381,7 +405,7 @@ export default {
       return scroller.scrollHeight - scroller.clientHeight
     },
     scrollToBottom (smooth) {
-      if(this.$refs.scroller !== undefined) {
+      if (this.$refs.scroller !== undefined) {
         this.$refs.scroller.scrollTo({ top: this.getScrollTopMax(), behavior: smooth ? 'smooth' : 'auto' })
       }
     },
@@ -437,32 +461,37 @@ export default {
       if (event.key === 'Enter') {
         if (this.engineIndex !== 1) {
           this.newEngine.send(this.input)
-        } else if(this.engineIndex === 1) {
+        } else if (this.engineIndex === 1) {
           engine.send(this.input)
         }
         this.input = ''
       }
     },
     activateEngine (payload) {
+      if (this.currentlySwitchingVariant === true) {
+        this.currentlySwitchingVariant = false
+        return
+      }
       const switchOn = payload
       if (!switchOn) {
-        if(this.enginetime === 0 && this.engineIndex !== 1) {
+        if (this.enginetime === 0 && this.engineIndex !== 1) {
           this.startClock()
         }
         if (this.PvE) {
           this.$store.dispatch('setActiveTrue')
         } else {
-          if(this.engineIndex < 2) {
+          if (this.engineIndex < 2) {
+            this.$store.dispatch('position')
             this.$store.dispatch('goEngine')
           } else {
             this.newEngine.send(`position fen ${this.$store.getters.fen}`)
             this.newEngine.send('go infinite')
           }
         }
-      } else{
+      } else {
         if (this.engineIndex !== 1) {
           this.newEngine.send('stop')
-        } else if (this.engineIndex === 1) {
+        } else if (this.engineIndex === 1 && this.currentlySwitchingVariant === false) {
           this.$store.dispatch('stopEngine')
         }
       }
@@ -501,9 +530,10 @@ export default {
     restartEngine () {
       this.resetEngineData()
       if (this.engineActive) {
-        this.newEngine.send('stop')
+        if (this.currentlySwitchingVariant === false) {
+          this.newEngine.send('stop')
+        }
         this.resetEngineTime()
-        this.newEngine.send(`position fen ${this.$store.getters.fen}`)
         this.engineActive = false
         this.activateEngine(false)
       }

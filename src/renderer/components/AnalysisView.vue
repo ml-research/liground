@@ -1,8 +1,9 @@
 <template>
   <div class="analysis">
-    <AnalysisHead />
+    <AnalysisHead @resetMultiEngine="resetEngines" />
     <AnalysisContainer
       v-for="engine in Engines"
+      ref="analysiscontainer"
       :key="engine.number"
     />
     <div class="b">
@@ -43,8 +44,14 @@ export default {
     }
   },
   methods: {
+    resetEngines () {
+      let i = 1
+      for (i; i < this.counter; i++) {
+        this.$refs.analysiscontainer[i].resetThisEngine()
+      }
+    },
     removeEngine () {
-      if(this.counter > 1) {
+      if (this.counter > 1) {
         this.counter--
         this.Engines.pop()
         this.$store.dispatch('engineIndex', this.counter)

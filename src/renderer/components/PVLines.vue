@@ -77,7 +77,7 @@
         <em
           v-show="showMinimizeIcon"
           class="icon mdi mdi-arrow-expand-up"
-       />
+        />
       </div>
     </footer>
   </div>
@@ -86,7 +86,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import VueContext from 'vue-context/src/js/index'
-import {engine} from '../engine'
 
 export default {
   components: {
@@ -140,7 +139,7 @@ export default {
     pvcount () {
       let i
       this.lines = []
-      for(i = 0; i < this.pvcount; i++) {
+      for (i = 0; i < this.pvcount; i++) {
         this.lines.push(0)
       }
     },
@@ -232,21 +231,21 @@ export default {
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     },
     updateLines () {
-      if(this.currentEngine === 1) {
+      if (this.currentEngine === 1) {
         const count = this.engineSettings.MultiPV
         const lines = this.multipv.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
         this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
-        if(this.showOnlyOnePvLine) {
+        if (this.showOnlyOnePvLine) {
           this.lines = this.lines.slice(1, 2)
         }
       }
     },
     updateMultiLines () {
-      if(this.currentEngine != 1) {
+      if (this.currentEngine !== 1) {
         const count = this.pvcount
         const lines = this.multipvMulti.filter(el => typeof el.pv === 'string' && el.pv.length > 0)
         this.lines = lines.concat(Array(count ? Math.max(0, count - lines.length) : 0).fill(null))
-        if(this.showOnlyOnePvLine) {
+        if (this.showOnlyOnePvLine) {
           this.lines = this.lines.slice(1, 2)
         }
       }

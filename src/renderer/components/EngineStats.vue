@@ -23,7 +23,7 @@ export default {
         tbhits: 0,
         enginetime: 0
       },
-      engineIndex : 1
+      engineIndex: 1
     }
   },
 
@@ -62,6 +62,7 @@ export default {
     },
     fillStats (payload) {
       this.parentEngineStats = payload
+      console.log(payload)
     },
     parse (value) {
       if (value > 1000000) {

@@ -19,7 +19,7 @@ export default {
   },
   watch: {
     depth () {
-       if (this.active && this.PvE && this.turn && this.depth > 0) {
+      if (this.active && this.PvE && this.turn && this.depth > 0) {
         this.$store.dispatch('resetEngineData')
         this.$store.commit('resetEngineTime')
         this.$store.dispatch('stopEnginePvE')

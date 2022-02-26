@@ -10,7 +10,6 @@
     </div>
     <Multiselect
       v-model="selected"
-      @change="sendSelected"
       class="multiselect"
       label="name"
       track-by="name"
@@ -18,6 +17,7 @@
       :allow-empty="false"
       :show-labels="false"
       :placeholder="selected.name"
+      @change="sendSelected"
     />
   </div>
 </template>

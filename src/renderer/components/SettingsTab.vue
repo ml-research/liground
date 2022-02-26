@@ -18,7 +18,10 @@
     <div class="panel">
       <span class="title">Engine Settings</span>
       <div class="bar">
-        <EngineSelect class="select"  @sendSelected="changeEngine($event)"/>
+        <EngineSelect
+          class="select"
+          @sendSelected="changeEngine($event)"
+        />
         <div
           class="icon blue mdi mdi-pencil"
           @click="editEngine"
