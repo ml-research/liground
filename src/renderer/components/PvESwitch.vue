@@ -11,6 +11,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { engine } from '../engine'
 
 export default {
   name: 'PvESwitch',
@@ -22,7 +23,6 @@ export default {
       if (this.active && this.PvE && this.turn && this.depth > 0) {
         this.$store.dispatch('resetEngineData')
         this.$store.commit('resetEngineTime')
-        this.$store.dispatch('stopEnginePvE')
       }
     },
     turn () {
@@ -39,6 +39,11 @@ export default {
         this.$store.dispatch('resetEngineData')
         this.$store.commit('resetEngineTime')
         this.$store.dispatch('stopEnginePvE')
+      }
+      if (this.active && this.PvE && !this.turn) {
+        // may lead to an inconsistent engine 
+        engine.send('stop')
+        this.$store.dispatch('goEnginePvE')
       }
     }
   },
