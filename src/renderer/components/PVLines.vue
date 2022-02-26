@@ -157,7 +157,7 @@ export default {
     enginetime () {
       if (this.active && this.PvE && !this.turn) {
         if (this.PvEValue === 'time') {
-          if (this.enginetime === (this.PvEInput)) {
+          if (this.enginetime >= this.PvEInput) {
             if (this.lines[0] != null) {
               this.onClick(this.lines[0])
             }

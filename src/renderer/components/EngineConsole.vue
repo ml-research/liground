@@ -140,6 +140,8 @@ export default {
     if (this.engineIndex !== 1) {
       clearInterval(this.enginetimeID)
       this.newEngine.send('stop')
+      this.newEngine.send('quit')
+      console.log('removed')
     }
   },
   methods: {
@@ -379,7 +381,9 @@ export default {
       return scroller.scrollHeight - scroller.clientHeight
     },
     scrollToBottom (smooth) {
-      this.$refs.scroller.scrollTo({ top: this.getScrollTopMax(), behavior: smooth ? 'smooth' : 'auto' })
+      if(this.$refs.scroller !== undefined) {
+        this.$refs.scroller.scrollTo({ top: this.getScrollTopMax(), behavior: smooth ? 'smooth' : 'auto' })
+      }
     },
     append (io) {
       // save largest line length
@@ -442,8 +446,7 @@ export default {
     activateEngine (payload) {
       const switchOn = payload
       if (!switchOn) {
-        this.newEngine.send(`position fen ${this.$store.getters.fen}`)
-        if(this.enginetime === 0) {
+        if(this.enginetime === 0 && this.engineIndex !== 1) {
           this.startClock()
         }
         if (this.PvE) {
@@ -452,6 +455,7 @@ export default {
           if(this.engineIndex < 2) {
             this.$store.dispatch('goEngine')
           } else {
+            this.newEngine.send(`position fen ${this.$store.getters.fen}`)
             this.newEngine.send('go infinite')
           }
         }

@@ -964,7 +964,9 @@ export const store = new Vuex.Store({
       context.dispatch('setEngineOptions', options)
     },
     setEngineOptions (context, payload) {
-      if (context.getters.active) {
+      if (context.getters.active && !context.getters.PvE) {
+        context.dispatch('stopEngine')
+      } else if (context.getters.active && context.getters.PvE && !context.getters.turn) {
         context.dispatch('stopEngine')
       }
       context.dispatch('resetEngineData')

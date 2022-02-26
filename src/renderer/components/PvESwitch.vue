@@ -15,13 +15,30 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'PvESwitch',
   computed: {
-    ...mapGetters(['PvE', 'active', 'turn', 'multipv'])
+    ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth'])
   },
   watch: {
+    depth () {
+       if (this.active && this.PvE && this.turn && this.depth > 0) {
+        this.$store.dispatch('resetEngineData')
+        this.$store.commit('resetEngineTime')
+        this.$store.dispatch('stopEnginePvE')
+      }
+    },
     turn () {
       if (this.turn && this.PvE) {
         this.$store.dispatch('resetEngineData')
         this.$store.commit('resetEngineTime')
+      }
+    },
+    PvE () {
+      if (!this.active && !this.PvE && this.turn) {
+        this.$store.dispatch('position')
+      }
+      if (this.active && this.PvE && this.turn) {
+        this.$store.dispatch('resetEngineData')
+        this.$store.commit('resetEngineTime')
+        this.$store.dispatch('stopEnginePvE')
       }
     }
   },
