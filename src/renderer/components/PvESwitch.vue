@@ -89,6 +89,7 @@ export default {
 <style scoped>
 /* The switch - the box around the slider */
 .switch {
+ margin-left: 8px;
  position: relative;
  display: inline-block;
  width: 60px;

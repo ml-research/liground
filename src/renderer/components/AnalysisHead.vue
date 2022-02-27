@@ -128,10 +128,12 @@ export default {
   border: 5px solid var(--quicktour-highlight);
 }
 #PvESwitch-qt{
+  margin-left: 8px;
   display: flex;
   border: 5px solid var(--quicktour-highlight);
 }
 #PvESwitch{
+  margin-top: 8px;
   display: flex;
 }
 .grid-parent {
