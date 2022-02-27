@@ -57,6 +57,7 @@ export default {
   },
   methods: {
     updateVariant (payload) {
+      this.$emit('updateVariant')
       this.$store.dispatch('variant', this.variantOptions.get(payload))
     },
     resetBoard () {
