@@ -245,7 +245,7 @@ export default {
 #gameselect {
   overflow-y: auto;
   overflow-x: auto;
-  height: 96%;
+  height: 95%;
   border: 0px solid var(--main-border-color);
 }
 
@@ -308,7 +308,7 @@ export default {
 .footer {
   border-top: 1px solid var(--main-border-color);
   background-color: var(--button-color);
-  height: 4%;
+  height: 5%;
 }
 .footer:hover {
   background-color: var(--hover-color);
