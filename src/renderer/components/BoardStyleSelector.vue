@@ -369,7 +369,7 @@ export default {
             })
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/custom' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+            } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/custom' + this.freeCustomID + '.svg')
             }
           } else if (this.isShogi) {
@@ -385,7 +385,7 @@ export default {
             })
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customShogi' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+            } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customShogi' + this.freeCustomID + '.svg')
             }
           } else if (this.isXiangqi) {
@@ -401,7 +401,7 @@ export default {
             })
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customXiangji' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+            } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customXiangji' + this.freeCustomID + '.svg')
             }
           } else if (this.isSEA) {
@@ -417,7 +417,7 @@ export default {
             })
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customSea' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+            } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customSea' + this.freeCustomID + '.svg')
             }
           } else if (this.isJanggi) {
@@ -433,7 +433,7 @@ export default {
             })
             if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
               path = 'static/board/svg/customJanggi' + this.freeCustomID + '.svg'
-            } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+            } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
               path = absolutePath.join(__static, '../../../../../static/board/svg/customJanggi' + this.freeCustomID + '.svg')
             }
           }
@@ -573,7 +573,7 @@ export default {
       if (this.isInternational) {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
           path = 'static/board/svg/' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+        } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
           path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomStandardCounter--
@@ -591,7 +591,7 @@ export default {
       } else if (this.isShogi) {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
           path = 'static/board/svg/' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+        } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
           path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomShogiCounter--
@@ -609,7 +609,7 @@ export default {
       } else if (this.isXiangqi) {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
           path = 'static/board/svg/' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+        } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
           path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomXiangqiCounter--
@@ -627,7 +627,7 @@ export default {
       } else if (this.isSEA) {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
           path = 'static/board/svg/' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+        } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
           path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomSeaCounter--
@@ -645,7 +645,7 @@ export default {
       } else if (this.isJanggi) {
         if (navigator.platform.toUpperCase().indexOf('WIN') > -1 || process.env.NODE_ENV === 'development') {
           path = 'static/board/svg/' + payload + '.svg'
-        } else if (navigator.platform.toUpperCase().indexOf('MAC') > -1 && process.env.NODE_ENV !== 'development') {
+        } else if ((navigator.platform.toUpperCase().indexOf('MAC') > -1 || navigator.platform.toUpperCase().indexOf('LINUX') > -1) && process.env.NODE_ENV !== 'development') {
           path = absolutePath.join(__static, '../../../../../static/board/svg/' + payload + '.svg')
         }
         this.maxCustomJanggiCounter--

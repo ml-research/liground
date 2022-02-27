@@ -1,20 +1,38 @@
 <template>
-  <label class="switch">
-    <input
-      type="checkbox"
-      :checked="PvE"
-      @click="onClick"
-    >
-    <span class="slider round" />
-  </label>
+  <div class="panel">
+    <label class="switch">
+      <input
+        type="checkbox"
+        :checked="PvE"
+        @click="onClick"
+      >
+      <span class="slider round" />
+    </label>
+    <OpeningSuitModal
+      v-if="modal.visible"
+      :title="modal.title"
+      @close="modal.visible = false"
+    />
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import { engine } from '../engine'
+import OpeningSuitModal from './OpeningSuitModal'
 
 export default {
   name: 'PvESwitch',
+  components: { OpeningSuitModal },
+  data () {
+    return {
+      modal: {
+        visible: false,
+        title: '',
+        save: () => {}
+      }
+    }
+  },
   computed: {
     ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth'])
   },
@@ -51,8 +69,17 @@ export default {
     onClick () {
       if (!this.PvE) {
         this.$store.dispatch('PvEtrue')
+        if (confirm('Do you want to start with opening suit?')) {
+          this.openingSuit()
+        }
       } else {
         this.$store.dispatch('PvEfalse')
+      }
+    },
+    openingSuit () {
+      this.modal = {
+        visible: true,
+        title: 'Select Opening Suit'
       }
     }
   }

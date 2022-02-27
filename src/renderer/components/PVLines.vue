@@ -29,35 +29,33 @@
           >Play entire line</a>
         </li>
       </VueContext>
-      <div class="list">
-        <template
-          v-for="(line, id) in lines"
+      <template
+        v-for="(line, id) in lines"
+      >
+        <div
+          v-if="line"
+          :key="id"
+          class="item clickable"
+          @mouseenter="onMouseEnter(id)"
+          @mouseleave="onMouseLeave(id)"
+          @click="onClick(line)"
         >
-          <div
-            v-if="line"
-            :key="id"
-            class="item clickable"
-            @mouseenter="onMouseEnter(id)"
-            @mouseleave="onMouseLeave(id)"
-            @click="onClick(line)"
+          <span class="left">{{ line.cpDisplay }}</span>
+          <span
+            class="right"
+            @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
           >
-            <span class="left">{{ line.cpDisplay }}</span>
-            <span
-              class="right"
-              @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
-            >
-              {{ line.pv }}
-            </span>
-          </div>
-          <div
-            v-else
-            :key="id"
-            class="item placeholder"
-          >
-            ...
-          </div>
-        </template>
-      </div>
+            {{ line.pv }}
+          </span>
+        </div>
+        <div
+          v-else
+          :key="id"
+          class="item placeholder"
+        >
+          ...
+        </div>
+      </template>
     </div>
     <footer class="footer">
       <div

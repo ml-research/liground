@@ -103,4 +103,17 @@ export default {
 .b {
   margin-top: 40px;
 }
+@keyframes bar-anim {
+  0% {
+      background-position: 0 0;
+  }
+  100% {
+      background-position: 100000px 0;
+  }
+}
+
+#move-history {
+  text-align: left;
+}
+
 </style>
