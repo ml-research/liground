@@ -41,7 +41,7 @@ export default {
         this.$store.dispatch('stopEnginePvE')
       }
       if (this.active && this.PvE && !this.turn) {
-        // may lead to an inconsistent engine 
+        // may lead to an inconsistent engine
         engine.send('stop')
         this.$store.dispatch('goEnginePvE')
       }
