@@ -332,7 +332,7 @@ export default {
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% auto;
-  grid-template-rows: 80% auto auto;
+  grid-template-rows: auto 120px auto;
   grid-template-areas:
     "pgnbrowser board-grid"
     "selector board-grid "
@@ -348,7 +348,6 @@ export default {
 
 #gameinfo {
   grid-area: gameinfo;
-  height: auto;
   border: 1px solid var(--main-border-color);
   margin-bottom: 5px;
   margin-left: 5px;
