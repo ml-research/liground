@@ -109,7 +109,7 @@ export default {
 }
 .resetButton {
   display: grid;
-  padding-left: 5px;
+  padding-left: 4px;
 }
 .reset:hover {
   background-color: var(--hover-color);
@@ -127,7 +127,11 @@ export default {
   border: 5px solid var(--quicktour-highlight);
 }
 #PvESwitch-qt{
+  display: flex;
   border: 5px solid var(--quicktour-highlight);
+}
+#PvESwitch{
+  display: flex;
 }
 .grid-parent {
   display: grid;
@@ -138,8 +142,8 @@ export default {
   /* vertical-align: middle; */
 }
 .logo {
-    font-size: 15pt;
-    font-family: sans-serif;
+  font-size: 15pt;
+  font-family: sans-serif;
 }
 
 </style>
