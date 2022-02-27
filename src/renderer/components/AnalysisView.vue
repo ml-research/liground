@@ -1,6 +1,6 @@
 <template>
   <div class="analysis">
-    <AnalysisHead @resetMultiEngine="resetEngines" />
+    <AnalysisHead @resetMultiEngine="resetEngines" @updateVariant="removeAllEngines"/>
     <AnalysisContainer
       v-for="engine in Engines"
       ref="analysiscontainer"
@@ -44,6 +44,14 @@ export default {
     }
   },
   methods: {
+    removeAllEngines () {
+      let i = this.counter
+      for (i; i > 1; i--) {
+        this.Engines.pop()
+      }
+      this.counter = 1
+      this.$store.dispatch('engineIndex', this.counter)
+    },
     resetEngines () {
       let i = 1
       for (i; i < this.counter; i++) {
