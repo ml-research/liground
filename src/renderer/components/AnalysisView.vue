@@ -1,6 +1,9 @@
 <template>
   <div class="analysis">
-    <AnalysisHead @resetMultiEngine="resetEngines" @updateVariant="removeAllEngines"/>
+    <AnalysisHead
+      @resetMultiEngine="resetEngines"
+      @updateVariant="removeAllEngines"
+    />
     <AnalysisContainer
       v-for="engine in Engines"
       ref="analysiscontainer"
