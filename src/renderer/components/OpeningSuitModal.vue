@@ -92,6 +92,7 @@ export default {
       }
       this.$store.state.fen = this.fens[this.number - 1]
       this.$store.dispatch('updateBoard')
+      this.$store.dispatch('position')
       this.$emit('close')
     },
     selectPath () {
