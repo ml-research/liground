@@ -4,24 +4,57 @@
     <div>
       <div class="main-grid">
         <div class="chessboard-grid">
-          <PgnBrowser id="pgnbrowser" />
+          <PgnBrowser
+            v-if="QuickTourIndex !== 1"
+            id="pgnbrowser"
+          />
+          <PgnBrowser
+            v-else
+            id="pgnbrowser-qt"
+          />
           <div class="board-grid">
             <div class="board">
-              <span><GameInfo id="gameinfo" /></span>
+              <span>
+                <GameInfo
+                  v-if="QuickTourIndex !== 15"
+                  id="gameinfo"
+                />
+                <GameInfo
+                  v-else
+                  id="gameinfo-qt"
+                />
+              </span>
               <div
                 class="scrollable"
                 @mousewheel.prevent.exact="scroll($event)"
               >
                 <ChessGround
+                  v-if="QuickTourIndex !== 2"
                   id="chessboard"
                   :orientation="orientation"
                   @onMove="showInfo"
                 />
+                <ChessGround
+                  v-else
+                  id="chessboard-qt"
+                  :orientation="orientation"
+                  @onMove="showInfo"
+                />
               </div>
-              <EvalBar class="evalbar" />
+              <EvalBar
+                v-if="QuickTourIndex !== 3"
+                class="evalbar"
+              />
+              <EvalBar
+                v-else
+                class="evalbar-qt"
+              />
             </div>
           </div>
-          <div id="fen-field">
+          <div
+            v-if="QuickTourIndex !== 4"
+            id="fen-field"
+          >
             FEN <input
               id="lname"
               type="text"
@@ -32,13 +65,45 @@
               @change="checkValidFEN"
             >
           </div>
-          <div id="selector-container">
+          <div
+            v-else
+            id="fen-field-qt"
+          >
+            FEN <input
+              id="lname"
+              type="text"
+              name="lname"
+              placeholder="fen position"
+              :value="fen"
+              :size="setFenSize()"
+              @change="checkValidFEN"
+            >
+          </div>
+          <div
+            v-if="QuickTourIndex !== 5"
+            id="selector-container"
+          >
+            <PieceStyleSelector id="piece-style" />
+            <BoardStyleSelector id="board-style" />
+            <EvalPlotButton id="evalbutton-style" />
+          </div>
+          <div
+            v-else
+            id="selector-container-qt"
+          >
             <PieceStyleSelector id="piece-style" />
             <BoardStyleSelector id="board-style" />
             <EvalPlotButton id="evalbutton-style" />
           </div>
         </div>
-        <EvalPlot id="evalplot" />
+        <EvalPlot
+          v-if="QuickTourIndex !== 6"
+          id="evalplot"
+        />
+        <EvalPlot
+          v-else
+          id="evalplot-qt"
+        />
         <div id="right-column">
           <AnalysisView
             id="analysisview"
@@ -74,6 +139,7 @@ import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
 import EvalPlotButton from './EvalPlotButton'
 import GameInfo from './GameInfo.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'GameBoards',
@@ -125,7 +191,8 @@ export default {
         }
       }
       return undefined
-    }
+    },
+    ...mapGetters(['QuickTourIndex'])
   },
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
@@ -332,7 +399,7 @@ export default {
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 20% auto;
-  grid-template-rows: auto 120px auto;
+  grid-template-rows: auto 150px auto;
   grid-template-areas:
     "pgnbrowser board-grid"
     "selector board-grid "
@@ -349,6 +416,14 @@ export default {
 #gameinfo {
   grid-area: gameinfo;
   border: 1px solid var(--main-border-color);
+  margin-bottom: 5px;
+  margin-left: 5px;
+  border-radius: 5px;
+  background-color: var(--second-bg-color);
+}
+#gameinfo-qt {
+  grid-area: gameinfo;
+  border: 5px solid var(--quicktour-highlight);
   margin-bottom: 5px;
   margin-left: 5px;
   border-radius: 5px;
@@ -374,6 +449,10 @@ input {
   grid-area: fenfield;
   /*margin-left: 48px;*/
 }
+#fen-field-qt {
+  grid-area: fenfield;
+  border: 5px solid var(--quicktour-highlight);
+}
 #lname {
   background-color: var(--second-bg-color);
   color: var(--main-text-color)
@@ -386,6 +465,16 @@ input {
   "boardstyle"
   "evalButton";
   margin-left: 5px;
+}
+#selector-container-qt {
+  grid-area: selector;
+  display: grid;
+  grid-template-areas:
+  "piecestyle"
+  "boardstyle"
+  "evalButton";
+  margin-left: 5px;
+  border: 5px solid var(--quicktour-highlight);
 }
 #piece-style {
   grid-area: piecestyle;
@@ -404,7 +493,13 @@ input {
   margin-left: 5px;
   max-height: 700vh;
 }
-
+#pgnbrowser-qt {
+  grid-area: pgnbrowser;
+  border: 5px solid var(--quicktour-highlight);
+  border-radius: 4px;
+  margin-left: 1em;
+  max-height: 60vh;
+}
 .scrollable {
   grid-area: scrollable;
   display: flex;
@@ -423,6 +518,10 @@ input {
 #chessboard {
   display: inline-block;
 }
+#chessboard-qt {
+  display: inline-block;
+  border: 5px solid var(--quicktour-highlight);
+}
 .bottom-margin {
   margin-bottom: 1.5em;
 }
@@ -435,11 +534,21 @@ input {
   margin-left: 8px;
   height: auto;
 }
+.evalbar-qt {
+  grid-area: evalbar;
+  margin-left: 8px;
+  height: auto;
+  border: 3px solid var(--quicktour-highlight);
+}
 #analysisview {
   margin-left: 15px;
 }
 #evalplot {
   grid-area: evalplot;
+}
+#evalplot-qt {
+  grid-area: evalplot;
+  border: 5px solid var(--quicktour-highlight);
 }
 #evalbutton-style {
   margin-top: 10px;
@@ -452,6 +561,11 @@ input {
   color: var(--main-text-color, white) !important;
   background-color: var(--second-bg-color, white) !important;
   border-color: var(--main-border-color, white) !important;
+}
+.multiselect-qt {
+  color: var(--main-text-color, white) !important;
+  background-color: var(--second-bg-color, white) !important;
+  border-color: var(--quicktour-highlight, white) !important;
 }
 .multiselect__content ,
 .multiselect__content-wrapper,

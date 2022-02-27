@@ -2,7 +2,17 @@
   <div class="ceval grid-parent">
     LiGround
     <Multiselect
+      v-if="QuickTourIndex !== 7"
       class="multiselect"
+      :value="displayVariant"
+      :options="options"
+      :allow-empty="false"
+      :show-labels="false"
+      @input="updateVariant"
+    />
+    <Multiselect
+      v-else
+      class="multiselect-qt"
       :value="displayVariant"
       :options="options"
       :allow-empty="false"
@@ -17,9 +27,25 @@
         @click="resetBoard"
       >
     </div>
-    <Mode960 />
-    PvE
-    <PvESwitch />
+    <Mode960 v-if="QuickTourIndex !== 8" />
+    <Mode960
+      v-else
+      id="Mode960-qt"
+    />
+    <div
+      v-if="QuickTourIndex !== 9"
+      id="PvESwitch"
+    >
+      PvE
+      <PvESwitch />
+    </div>
+    <div
+      v-else
+      id="PvESwitch-qt"
+    >
+      PvE
+      <PvESwitch />
+    </div>
   </div>
 </template>
 
@@ -27,7 +53,7 @@
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
 import PvESwitch from './PvESwitch.vue'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
@@ -53,7 +79,8 @@ export default {
     },
     displayVariant () { // retuns the "nice" name of the current variant
       return this.variantOptions.revGet(this.variant)
-    }
+    },
+    ...mapGetters(['QuickTourIndex'])
   },
   methods: {
     updateVariant (payload) {
@@ -93,7 +120,15 @@ export default {
   font-size: 15pt;
   height: 40px;
 }
-
+#Mode960-qt{
+  border: 5px solid var(--quicktour-highlight);
+}
+.multiselect-qt{
+  border: 5px solid var(--quicktour-highlight);
+}
+#PvESwitch-qt{
+  border: 5px solid var(--quicktour-highlight);
+}
 .grid-parent {
   display: grid;
   grid-template-columns: auto auto auto auto auto auto;

@@ -38,6 +38,7 @@ export default {
         document.documentElement.style.setProperty('--menubar-activetab-color', '#99aab5')
         document.documentElement.style.setProperty('--save-btn-color', '#7289da')
         document.documentElement.style.setProperty('--cancel-btn-color', '#8f3f43')
+        document.documentElement.style.setProperty('--quicktour-highlight', '#99ccff')
         document.documentElement.style.setProperty('--tab-header-color', '#7289da')
 
         /* original dark mode:
@@ -68,6 +69,7 @@ export default {
         document.documentElement.style.setProperty('--menubar-activetab-color', '#00af89')
         document.documentElement.style.setProperty('--save-btn-color', '#4AAE9B')
         document.documentElement.style.setProperty('--cancel-btn-color', '#b22222')
+        document.documentElement.style.setProperty('--quicktour-highlight', '#F47174')
         document.documentElement.style.setProperty('--tab-header-color', '#4AAE9B')
       }
     }

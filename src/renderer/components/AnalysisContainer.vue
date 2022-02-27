@@ -1,6 +1,31 @@
 <template>
   <div>
-    <div class="containerEvalBar">
+    <div
+      v-if="QuickTourIndex !== 10"
+      class="containerEvalBar"
+    >
+      <div
+        class="eval"
+        :class="{ smaller: cpForWhiteStr.includes('/') }"
+      >
+        {{ engineID === 1? cpForWhiteStr: cpStr }}
+      </div>
+      <EngineSelect
+        ref="engineselect"
+        class="select"
+        @sendSelected="changeConsole($event)"
+      />
+      <div @input="onSwitch">
+        <RoundedSwitch
+          ref="roundedswitch"
+          class="switch"
+        />
+      </div>
+    </div>
+    <div
+      v-else
+      class="containerEvalBar-qt"
+    >
       <div
         class="eval"
         :class="{ smaller: cpForWhiteStr.includes('/') }"
@@ -21,16 +46,33 @@
     </div>
     <div class="analysis">
       <!-- <AnalysisEvalRow /> -->
-      <EngineStats ref="enginestats" />
+      <EngineStats
+        v-if="QuickTourIndex !== 11"
+        ref="enginestats"
+      />
+      <EngineStats
+        v-else
+        id="EngineStats-qt"
+        ref="enginestats"
+      />
       <div
         class="processing-bar"
         :class="{ animate: isEngineActive }"
       />
       <PVLines
+        v-if="QuickTourIndex !== 12"
         ref="pvlines"
         class="panel"
       />
-      <div class="game-window panel noselect">
+      <PVLines
+        v-else
+        ref="pvlines"
+        class="panel-qt"
+      />
+      <div
+        v-if="QuickTourIndex !== 13"
+        class="game-window panel noselect"
+      >
         <div id="move-history">
           <MoveHistoryNode
             v-if="movesExist"
@@ -38,7 +80,30 @@
           />
         </div>
       </div>
+      <div
+        v-else
+        class="game-window-qt"
+      >
+        <div
+          id="move-history"
+        >
+          <MoveHistoryNode
+            v-if="movesExist"
+            :move="mainFirstMove"
+          />
+        </div>
+      </div>
       <JumpButtons
+        v-if="QuickTourIndex !== 14"
+        @flip-board="$emit('flip-board', 0)"
+        @move-to-start="$emit('move-to-start', 0)"
+        @move-back-one="$emit('move-back-one', 0)"
+        @move-forward-one="$emit('move-forward-one', 0)"
+        @move-to-end="$emit('move-to-end', 0)"
+      />
+      <JumpButtons
+        v-else
+        id="JumpButtons-qt"
         @flip-board="$emit('flip-board', 0)"
         @move-to-start="$emit('move-to-start', 0)"
         @move-back-one="$emit('move-back-one', 0)"
@@ -46,6 +111,17 @@
         @move-to-end="$emit('move-to-end', 0)"
       />
       <EngineConsole
+        v-if="QuickTourIndex !== 16"
+        ref="console"
+        @reInitEngineOptions="changeState"
+        @calculateEngineStats="fillEngineStats($event)"
+        @calculateEngineInfo="fillEngineInfo($event)"
+        @calculateMultiPV="fillMultiPV($event)"
+        @sendMultiPvCount="fillMultiPVCount($event)"
+      />
+      <EngineConsole
+        v-else
+        id="EngineConsole-qt"
         ref="console"
         @reInitEngineOptions="changeState"
         @calculateEngineStats="fillEngineStats($event)"
@@ -113,7 +189,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove', 'active', 'variant']),
+    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove', 'active', 'variant', 'QuickTourIndex']),
     movesExist () {
       const moves = this.$store.getters.moves
       return moves.length !== 0
@@ -259,14 +335,32 @@ export default {
 input {
   font-size: 11pt;
 }
+#EngineStats-qt{
+  border: 5px solid var(--quicktour-highlight);
+}
 .game-window {
   height: 20%;
   overflow-y: scroll;
   background-color: var(--second-bg-color);
 }
+.game-window-qt {
+  height: 20%;
+  overflow-y: scroll;
+  background-color: var(--second-bg-color);
+  border: 5px solid var(--quicktour-highlight);
+}
+#JumpButtons-qt {
+  border: 5px solid var(--quicktour-highlight);
+}
 .panel {
   border-radius: 3px 3px 3px 3px;
   border: 1px solid var(--main-border-color);
+  font-family: sans-serif;
+  font-weight: 200;
+}
+.panel-qt {
+  border-radius: 3px 3px 3px 3px;
+  border: 5px solid var(--quicktour-highlight);
   font-family: sans-serif;
   font-weight: 200;
 }
@@ -319,6 +413,23 @@ input {
     background-position: 100000px 0;
   }
 }
+#gameinfo {
+  height: auto;
+  margin: 1em 0em;
+  border: 1px solid var(--main-border-color);
+  border-radius: 5px;
+  background-color: var(--second-bg-color);
+}
+#gameinfo-qt {
+  height: auto;
+  margin: 1em 0em;
+  border: 5px solid var(--quicktour-highlight);
+  border-radius: 5px;
+  background-color: var(--second-bg-color);
+}
+#EngineConsole-qt {
+  border: 5px solid var(--quicktour-highlight);
+}
 #move-history {
   text-align: left;
 }
@@ -330,6 +441,15 @@ input {
   margin: 10px 0;
   border-radius: 3px;
   text-align: center;
+}.containerEvalBar-qt {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: stretch;
+  margin: 10px 0;
+  border-radius: 3px;
+  text-align: center;
+  border: 5px solid var(--quicktour-highlight);
 }
 .containerEvalBar > * {
   margin: 0 5px;

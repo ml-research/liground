@@ -146,6 +146,7 @@ export const store = new Vuex.Store({
 
     }),
     openedPGN: false,
+    QuickTourIndex: 0,
     evalPlotDepth: 20,
     orientation: 'white',
     message: 'hello from Vuex',
@@ -280,6 +281,15 @@ export const store = new Vuex.Store({
     },
     PvEInput (state, payload) {
       state.PvEInput = payload
+    },
+    quicktourIndexIncr (state) {
+      state.QuickTourIndex++
+    },
+    quicktourIndexDecr (state) {
+      state.QuickTourIndex--
+    },
+    quicktourSetZero (state) {
+      state.QuickTourIndex = 0
     },
     dimNumber (state, payload) {
       state.dimNumber = payload
@@ -1119,6 +1129,15 @@ export const store = new Vuex.Store({
     switchDarkMode (context) {
       context.commit('switchDarkMode')
     },
+    quicktourIndexIncr (context) {
+      context.commit('quicktourIndexIncr')
+    },
+    quicktourIndexDecr (context) {
+      context.commit('quicktourIndexDecr')
+    },
+    quicktourSetZero (context) {
+      context.commit('quicktourSetZero')
+    },
     switchMuteButton (context) {
       context.commit('switchMuteButton')
     },
@@ -1435,6 +1454,9 @@ export const store = new Vuex.Store({
     },
     darkMode (state) {
       return state.darkMode
+    },
+    QuickTourIndex (state) {
+      return state.QuickTourIndex
     },
     muteButton (state) {
       return state.muteButton

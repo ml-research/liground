@@ -19,6 +19,11 @@
     >
       <em class="icon mdi mdi-map-search" /> Quickguide
     </div>
+    <QuicktourModal
+      v-if="quicktourModal.visible"
+      :title="quicktourModal.title"
+      @close="quicktourModal.visible = false"
+    />
     <div
       class="item"
       @click="openAboutTabModal"
@@ -38,10 +43,11 @@ import fs from 'fs'
 import { mapGetters } from 'vuex'
 import ffish from 'ffish'
 import AboutTabModal from './AboutTabModal'
+import QuicktourModal from './QuicktourModal'
 
 export default {
   name: 'MenuBar',
-  components: { AboutTabModal },
+  components: { AboutTabModal, QuicktourModal },
   data () {
     return {
       modal: {
@@ -50,7 +56,12 @@ export default {
         save: () => {}
       },
       error: 'none',
-      pgnString: ''
+      pgnString: '',
+      quicktourModal: {
+        visible: false,
+        title: '',
+        save: () => {}
+      }
     }
   },
   computed: {
@@ -128,7 +139,10 @@ export default {
       this.$store.dispatch('loadedGames', games)
     },
     startQuickTour () {
-
+      this.quicktourModal = {
+        visible: true,
+        title: 'Welcome to our Quickguide'
+      }
     },
     openAboutTabModal () {
       this.modal = {
