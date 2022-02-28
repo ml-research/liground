@@ -113,15 +113,12 @@ export const store = new Vuex.Store({
     PvEParam: 'go movetime 1000',
     PvEValue: 'time',
     PvEInput: 1000,
-<<<<<<< HEAD
     resized: 0,
     resized9x9height: 0,
     resized9x9width: 0,
     resized9x10height: 0,
     resized9x10width: 0,
     dimNumber: 0,
-=======
->>>>>>> ab062616324ec2510a3ed7b99db8752c8f6594ca
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
