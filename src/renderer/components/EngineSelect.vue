@@ -50,7 +50,9 @@ export default {
       this.sendSelected()
     },
     selectedEngine () {
-      this.selected = this.selectedEngine
+      if (this.engineIndex < 2) {
+        this.selected = this.selectedEngine
+      }
     }
   },
   created () {

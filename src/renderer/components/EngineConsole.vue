@@ -290,12 +290,14 @@ export default {
     },
     async changeBinary (event) {
       if (this.engineIndex !== 1) {
-        if (this.engineActive) {
+        if (this.newEngine != null) {
           this.engineActive = false
           this.newEngine.send('quit')
           this.resetEngineData()
         }
-        this.newEngine = new Engine()
+        if (this.newEngine === null) {
+          this.newEngine = new Engine()
+        }
         // this.newEngine = new Engine()
         // TODO: more elegant way?
         // clear io on store event
