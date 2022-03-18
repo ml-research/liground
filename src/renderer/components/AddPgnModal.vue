@@ -112,7 +112,7 @@ export default {
     },
     openPGNFromString () {
       if (this.pgnString === '') {
-        // alert('please enter a game String')
+        // when input empty, do nothing
       } else {
         // convert CRLF to LF
         const data = this.pgnString.replace(/\r\n/g, '\n')
@@ -123,14 +123,14 @@ export default {
     convertAndStorePgn (data) {
       const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
       let games = []
-      if (this.$store.getters.loadedGames) {
+      if (this.$store.getters.loadedGames) { // keep already loaded pgns
         games = this.$store.getters.loadedGames
       }
       let numOfUnparseableGames = 0
       let m
-      const maxGames = 30
+      const maxGames = 30 // stops afer parsing 30 games, since large pgns crash liGround. reason so far not clear
       let currentGameCount = 0
-      while ((m = regex.exec(data)) !== null && currentGameCount !== maxGames) {
+      while ((m = regex.exec(data)) !== null && currentGameCount !== maxGames) { // parses over all games in the selected pgn file or String and pushes them onto the games array
         if (m.index === regex.lastIndex) {
           regex.lastIndex++
         }
