@@ -2,7 +2,8 @@
 
 > A free, open-source and modern Chess Variant Analysis GUI for the 21st century
 
-<img src="./media/screenshots/liground-0.0.1.png" alt="LiGround screenshot" title="LiGround screenshot." />
+![LiGround](https://github.com/LucyLMM/images/blob/main/LiGround_Screenshot.PNG)
+<!-- <img src="./media/screenshots/liground-0.0.1.png" alt="LiGround screenshot" title="LiGround screenshot." /> -->
 
 ### Build Setup
 ``` bash
