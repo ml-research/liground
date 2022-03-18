@@ -98,7 +98,7 @@ export default {
   cursor: pointer;
 }
 .buttonRed {
-  background-color: #b22222; /* Red */
+  background-color: #c72634; /* Red */
   border: none;
   color: white;
   padding: 15px 32px;

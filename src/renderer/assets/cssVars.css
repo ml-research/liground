@@ -1,24 +1,26 @@
 :root {
     --main-bg-color: white;
-    --second-bg-color: white;
-    --main-text-color:  #2c3e50; 
-    --second-text-color:  #2c3e50;
+    --second-bg-color: #f1f1f1;
+    --main-text-color:  #131310; 
+    --second-text-color:  #131310;
     --light-text-color: #fff; 
-    --main-border-color: black;
+    --main-border-color: #131310;
     --scroll-track-color: lightgrey;
     --scroll-thumb-color: grey;
     --variation-color: lightgrey;
-    --button-color: #34495e;
+    --button-color: #4f6a8e;
     --tooltip-color: lightgrey;
-    --hover-color: #22303d;
-    --save-btn-color: #4AAE9B;
-    --cancel-btn-color: #b22222;
-    --tab-btn-color:  #333;
-    --tab-header-color: #4AAE9B;
-    --highlight-color: #2196F3;
-    --hover-highlight-color: #2196F3;
-    --dark-highlight-color: #2196F3;
-    --menubar-activetab-color: #00af89;
+    --hover-color: #7287a4;
+    --save-btn-color: #7ec8ba;
+    --save-btn-hover: #3c8577;
+    --cancel-btn-color: #c72634;
+    --cancel-btn-hover: #8b1919;
+    --tab-btn-color:  #333; /* About-Tab */
+    --tab-header-color: #7ec8ba;
+    --highlight-color: #7289da;
+    --hover-highlight-color: #7289da;
+    --dark-highlight-color: #7289da;
+    --menubar-activetab-color: #7ec8ba;
     --eval-line-color: #ff4400;
     --quicktour-highlight: #F47174;
 }
