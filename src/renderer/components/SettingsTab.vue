@@ -362,7 +362,7 @@ export default {
   color: #4aae9b;
 }
 .icon.blue:hover {
-  color: #2470b6;
+  color: #7289da;
 }
 .icon.red:hover {
   color: #b22222;
@@ -406,13 +406,13 @@ input[type='number']::-webkit-inner-spin-button {
   background-color: var(--save-btn-color);
 }
 .btn.green:hover {
-  background-color: #3c8577;
+  background-color: var(--save-btn-hover);
 }
 .btn.red {
   color: white;
   background-color: var(--cancel-btn-color);
 }
 .btn.red:hover {
-  background-color: #8b1919;
+  background-color: var(--cancel-btn-hover);
 }
 </style>

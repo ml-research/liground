@@ -24,9 +24,14 @@
             class="btn grey"
             @click="selectPath"
           >
-            Select Path
+            Open epd
           </button>
-          <span class="path">{{ displayBinary }}</span>
+          <button
+            class="btn grey"
+            @click="openAddPgnModal"
+          >
+            Open pgn
+          </button>
         </div>
         <div class="item">
           <span class="label">Select number from custom opening Suits</span>
@@ -36,6 +41,13 @@
             type="text"
             size="2"
           >
+        </div>
+        <div>
+          <AddPgnModal
+            v-if="AddPgnModal.visible"
+            :title="AddPgnModal.title"
+            @close="AddPgnModal.visible = false"
+          />
         </div>
       </section>
       <footer class="footer">
@@ -61,9 +73,11 @@
 <script>
 
 import fs from 'fs'
+import AddPgnModal from './AddPgnModal'
 
 export default {
   name: 'OpeningSuitModal',
+  components: { AddPgnModal },
   props: {
     title: {
       required: true,
@@ -76,6 +90,10 @@ export default {
   },
   data () {
     return {
+      AddPgnModal: {
+        visible: false,
+        title: ''
+      },
       number: this.initialNumber,
       number2: this.initialNumber,
       loadedCustom: 'false',
@@ -127,6 +145,12 @@ export default {
       customFens = str.split(';')
       this.fens = customFens
       this.loadedCustom = 'true'
+    },
+    openAddPgnModal () {
+      this.AddPgnModal = {
+        visible: true,
+        title: 'Add new PGN'
+      }
     }
   }
 }

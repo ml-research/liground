@@ -71,7 +71,7 @@ export default {
     changeTab () {
       this.$store.commit('viewAnalysis', !this.viewAnalysis)
     },
-    openPgn () {
+    openPgn () { // TODO: seperate the openPgn Funktions from here and AddPgnModal and import instead
       this.$electron.remote.dialog.showOpenDialog({
         title: 'Open PGN file',
         properties: ['openFile'],

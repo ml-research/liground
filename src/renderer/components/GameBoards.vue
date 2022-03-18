@@ -491,7 +491,7 @@ input {
   border: 1px solid var(--main-border-color);
   border-radius: 4px;
   margin-left: 5px;
-  max-height: 700vh;
+  max-height: 490px;
 }
 #pgnbrowser-qt {
   grid-area: pgnbrowser;
