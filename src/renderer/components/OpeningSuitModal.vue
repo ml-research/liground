@@ -32,7 +32,6 @@
           >
             Open pgn
           </button>
-          <span class="path">{{ displayBinary }}</span>
         </div>
         <div class="item">
           <span class="label">Select number from custom opening Suits</span>
