@@ -43,12 +43,12 @@
           >
         </div>
         <div>
-        <AddPgnModal
-          v-if="AddPgnModal.visible"
-          :title="AddPgnModal.title"
-          @close="AddPgnModal.visible = false"
-        />
-      </div>
+          <AddPgnModal
+            v-if="AddPgnModal.visible"
+            :title="AddPgnModal.title"
+            @close="AddPgnModal.visible = false"
+          />
+        </div>
       </section>
       <footer class="footer">
         <button
@@ -90,7 +90,7 @@ export default {
   },
   data () {
     return {
-       AddPgnModal: {
+      AddPgnModal: {
         visible: false,
         title: ''
       },
