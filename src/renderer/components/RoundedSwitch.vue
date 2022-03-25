@@ -20,12 +20,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['active', 'PvE', 'turn'])
+    ...mapGetters(['active', 'PvE','Tournament', 'turn'])
   },
   watch: {
     active () {
       if (this.active && !this.turn && this.PvE) {
         this.$store.dispatch('goEnginePvE')
+      }
+      if (this.active && !this.turn && this.Tournament) {
+        this.$store.dispatch('goEngineTournament')
       }
     }
   },
@@ -34,9 +37,10 @@ export default {
       this.engineActive = payload
     },
     onClick () {
+      console.log("active")
       if (!this.active) {
         this.$store.dispatch('position')
-        if (this.PvE) {
+        if (this.PvE || this.Tournament) {
           this.$store.dispatch('setActiveTrue')
         } else {
           this.$store.dispatch('goEngine')
