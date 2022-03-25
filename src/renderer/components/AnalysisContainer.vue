@@ -189,7 +189,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'Tournament', 'availableEngines', 'currentMove', 'active', 'variant', 'QuickTourIndex']),
+    ...mapGetters(['active', 'mainFirstMove', 'cpForWhiteStr', 'engineIndex', 'PvE', 'availableEngines', 'currentMove', 'active', 'variant', 'QuickTourIndex']),
     movesExist () {
       const moves = this.$store.getters.moves
       return moves.length !== 0

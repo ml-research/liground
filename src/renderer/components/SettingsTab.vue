@@ -136,29 +136,6 @@
           </tr>
         </table>
       </div>
-      <div>
-        <span class="title">Tournament Settings</span>
-        <Multiselect
-          v-model="TournamentValue"
-          class="multiselect"
-          :options="TournamentOptions"
-          @input="showTournamentSettings"
-        />
-        <table class="table">
-          <tr>
-            <td>{{ settingsNameTournament }}</td>
-            <td>
-              <input
-                v-model.number="TournamentInput"
-                type="number"
-                :step="1"
-                :min="1"
-                class="input"
-              >
-            </td>
-          </tr>
-        </table>
-      </div>
       <a
         class="btn green"
         @click="save"
@@ -204,11 +181,7 @@ export default {
       value: 'time',
       options: ['time', 'nodes', 'depth'],
       settingsName: 'Time in seconds',
-      PvEInput: 1,
-      TournamentValue: 'time',
-      TournamentOptions: ['time', 'nodes', 'depth'],
-      settingsNameTournament: 'Time in seconds',
-      TournamentInput: 1
+      PvEInput: 1
     }
   },
   computed: {
@@ -247,28 +220,12 @@ export default {
         this.value = 'depth'
       }
     },
-    showTournamentSettings (payload) {
-      if (payload === 'nodes') {
-        this.settingsNameTournament = 'Number of nodes in Million'
-        this.TournamentValue = 'nodes'
-        this.TournamentInput = 5
-      } else if (payload === 'time') {
-        this.settingsNameTournament = 'Time in seconds'
-        this.TournamentValue = 'time'
-        this.TournamentInput = 1
-      } else if (payload === 'depth') {
-        this.TournamentInput = 20
-        this.settingsNameTournament = 'depth of'
-        this.TournamentValue = 'depth'
-      }
-    },
     saveStandardSettings () {
       this.$store.dispatch('saveSettings')
       this.$store.commit('viewAnalysis', true)
     },
     save () {
       this.updateSettings()
-      this.updateTournamentSettings()
       this.$store.commit('viewAnalysis', true)
     },
     cancel () {
@@ -302,31 +259,6 @@ export default {
         case 'depth':
           this.$store.dispatch('setPvEParam', 'go depth ' + this.PvEInput)
           this.$store.dispatch('setPvEInput', this.PvEInput)
-          break
-        default:
-          break
-      }
-    },
-    updateTournamentSettings () {
-      this.$store.dispatch('setTournamentValue', this.TournamentValue)
-      switch (this.TournamentValue) {
-        case 'time':
-          this.$store.dispatch(
-            'setTournamentParam',
-            'go movetime ' + this.TournamentInput * 1000
-          )
-          this.$store.dispatch('setTournamentInput', this.TournamentInput * 1000)
-          break
-        case 'nodes':
-          this.$store.dispatch(
-            'setTournamentParam',
-            'go nodes ' + this.TournamentInput * 1000000
-          )
-          this.$store.dispatch('setTournamentInput', this.TournamentInput * 1000000)
-          break
-        case 'depth':
-          this.$store.dispatch('setTournamentParam', 'go depth ' + this.TournamentInput)
-          this.$store.dispatch('setTournamentInput', this.TournamentInput)
           break
         default:
           break

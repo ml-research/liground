@@ -113,10 +113,6 @@ export const store = new Vuex.Store({
     PvEParam: 'go movetime 1000',
     PvEValue: 'time',
     PvEInput: 1000,
-    Tournament: false,
-    TournamentParam: 'go movetime 1000',
-    TournamentValue: 'time',
-    TournamentInput: 1000,
     resized: 0,
     resized9x9height: 0,
     resized9x9width: 0,
@@ -198,8 +194,6 @@ export const store = new Vuex.Store({
     boardStyle: 'blue',
     curVar960Fen: '',
     viewAnalysis: true,
-    viewSettings: false,
-    viewTournament: false,
     analysisMode: true,
     menuAtMove: null,
     displayMenu: true,
@@ -233,12 +227,6 @@ export const store = new Vuex.Store({
     },
     viewAnalysis (state, payload) {
       state.viewAnalysis = payload
-    },
-    viewSettings (state, payload) {
-      state.viewSettings = payload
-    },
-    viewTournament (state, payload) {
-      state.viewTournament = payload
     },
     fen (state, payload) {
       state.fen = payload
@@ -293,18 +281,6 @@ export const store = new Vuex.Store({
     },
     PvEInput (state, payload) {
       state.PvEInput = payload
-    },
-    Tournament (state, payload) {
-      state.Tournament = payload
-    },
-    TournamentParam (state, payload) {
-      state.TournamentParam = payload
-    },
-    TournamentValue (state, payload) {
-      state.TournamentValue = payload
-    },
-    TournamentInput (state, payload) {
-      state.TournamentInput = payload
     },
     quicktourIndexIncr (state) {
       state.QuickTourIndex++
@@ -687,15 +663,6 @@ export const store = new Vuex.Store({
     setPvEInput (context, payload) {
       context.commit('PvEInput', payload)
     },
-    setTournamentParam (context, payload) {
-      context.commit('TournamentParam', payload)
-    },
-    setTournamentValue (context, payload) {
-      context.commit('TournamentValue', payload)
-    },
-    setTournamentInput (context, payload) {
-      context.commit('TournamentInput', payload)
-    },
     setDimNumber (context, payload) {
       context.commit('dimNumber', payload)
     },
@@ -723,10 +690,6 @@ export const store = new Vuex.Store({
       engine.send(context.getters.PvEParam)
       context.commit('setEngineClock')
     },
-    goEngineTournament (context) {
-      engine.send(context.getters.TournamentParam)
-      context.commit('setEngineClock')
-    },
     setActiveTrue (context) {
       context.commit('active', true)
     },
@@ -739,29 +702,11 @@ export const store = new Vuex.Store({
     PvEtrue (context) {
       context.commit('PvE', true)
     },
-    Tournamenttrue (context) {
-      context.commit('Tournament', true)
-      engine.send(context.getters.TournamentParam)
-      context.commit('setEngineClock')
-    },
     stopEnginePvE (context) {
-      engine.send('stop')
-    },
-    stopEngineTournament (context) {
       engine.send('stop')
     },
     PvEfalse (context) {
       context.commit('PvE', false)
-      if (!context.getters.turn) {
-        context.dispatch('stopEngine')
-      } else {
-        context.commit('resetEngineTime')
-        context.commit('active', false)
-      }
-      context.dispatch('resetEngineData')
-    },
-    Tournamentfalse (context) {
-      context.commit('Tournament', false)
       if (!context.getters.turn) {
         context.dispatch('stopEngine')
       } else {
@@ -784,17 +729,6 @@ export const store = new Vuex.Store({
       } else if (context.getters.active && context.getters.PvE && !context.getters.turn) {
         context.dispatch('position')
         context.dispatch('goEnginePvE')
-      }
-    },
-    restartEngineTournament (context) {
-      context.dispatch('resetEngineData')
-      if (context.getters.active && !context.getters.Tournament) {
-        context.dispatch('stopEngine')
-        context.dispatch('position')
-        context.dispatch('goEngine')
-      } else if (context.getters.active && context.getters.Tournament && !context.getters.turn) {
-        context.dispatch('position')
-        context.dispatch('goEngineTournament')
       }
     },
     position (context) {
@@ -849,9 +783,6 @@ export const store = new Vuex.Store({
     PvE (context, payload) {
       context.commit('PvE', payload)
     },
-    Tournament (context, payload) {
-      context.commit('Tournament', payload)
-    },
     engineIndex (context, payload) {
       context.commit('engineIndex', payload)
     },
@@ -863,15 +794,6 @@ export const store = new Vuex.Store({
     },
     PvEInput (context, payload) {
       context.commit('PvEInput', payload)
-    },
-    TournamentParam (context, payload) {
-      context.commit('TournamentParam', payload)
-    },
-    TournamentValue (context, payload) {
-      context.commit('TournamentValue', payload)
-    },
-    TournamentInput (context, payload) {
-      context.commit('TournamentInput', payload)
     },
     dimNumber (context, payload) {
       context.commit('dimNumber', payload)
@@ -1071,26 +993,6 @@ export const store = new Vuex.Store({
       }
       localStorage.setItem('engine' + context.state.activeEngine, JSON.stringify(context.state.engineSettings))
     },
-    setEngineOptionsTournament (context, payload) {
-      if (context.getters.active && !context.getters.Tournament) {
-        context.dispatch('stopEngine')
-      } else if (context.getters.active && context.getters.Tournament && !context.getters.turn) {
-        context.dispatch('stopEngine')
-      }
-      context.dispatch('resetEngineData')
-      for (const [name, value] of Object.entries(payload)) {
-        checkOption(context.state.engineInfo.options, name, value)
-        if (value !== undefined && value !== null) {
-          if (!filteredSettings.includes(name)) {
-            context.state.engineSettings[name] = value
-          }
-          engine.send(`setoption name ${name} value ${value}`)
-        } else {
-          engine.send(`setoption name ${name}`)
-        }
-      }
-      localStorage.setItem('engine' + context.state.activeEngine, JSON.stringify(context.state.engineSettings))
-    },
     idName (context, payload) {
       context.commit('idName', payload)
     },
@@ -1209,12 +1111,6 @@ export const store = new Vuex.Store({
     viewAnalysis (context, payload) {
       context.commit('viewAnalysis', payload)
     },
-    viewSettings (context, payload) {
-      context.commit('viewSettings', payload)
-    },
-    viewTournament (context, payload) {
-      context.commit('viewTournament', payload)
-    },
     boardStyle (context, payload) {
       context.commit('boardStyle', payload)
     },
@@ -1298,18 +1194,6 @@ export const store = new Vuex.Store({
     },
     PvEInput (state) {
       return state.PvEInput
-    },
-    Tournament (state) {
-      return state.Tournament
-    },
-    TournamentParam (state) {
-      return state.TournamentParam
-    },
-    TournamentValue (state) {
-      return state.TournamentValue
-    },
-    TournamentInput (state) {
-      return state.TournamentInput
     },
     dimNumber (state) {
       return state.dimNumber
@@ -1552,12 +1436,6 @@ export const store = new Vuex.Store({
     },
     viewAnalysis (state) {
       return state.viewAnalysis
-    },
-    viewSettings (state) {
-      return state.viewSettings
-    },
-    viewTournament (state) {
-      return state.viewTournament
     },
     evalPlotDepth (state) {
       return state.evalPlotDepth
