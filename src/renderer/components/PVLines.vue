@@ -131,7 +131,7 @@ export default {
       }
       return null
     },
-    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE','Tournament', 'active', 'turn', 'enginetime', 'PvEValue','TournamentValue', 'PvEParam','TournamentParam', 'PvEInput','TournamentInput', 'nodes', 'depth', 'seldepth'])
+    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
     pvcount () {
@@ -172,27 +172,6 @@ export default {
           }
         }
       }
-      if (this.active && this.Tournament && !this.turn) {
-        console.log("ENGINE TIME SET TOURNAMENT")
-        if (this.TournamentValue === 'time') {
-          if (this.enginetime >= this.TournamentInput) {
-            if (this.lines[0] != null) {
-              this.onClick(this.lines[0])
-            }
-          }
-        } else if (this.TournamentValue === 'nodes') {
-          if (this.enginetime === 60000) {
-            this.onClick(this.lines[0])
-          }
-        } else if (this.TournamentValue === 'depth') {
-          if (this.enginetime === 60000) {
-            this.onClick(this.lines[0])
-          }
-          if (this.enginetime >= 5000 && this.depth === this.seldepth) {
-            this.onClick(this.lines[0])
-          }
-        }
-      }
     },
     nodes () {
       if (this.active && this.PvE && !this.turn) {
@@ -202,25 +181,11 @@ export default {
           }
         }
       }
-      if (this.active && this.Tournament && !this.turn) {
-        if (this.TournamentValue === 'nodes') {
-          if (this.nodes >= (this.TournamentInput)) {
-            this.onClick(this.lines[0])
-          }
-        }
-      }
     },
     depth () {
       if (this.active && this.PvE && !this.turn) {
         if (this.PvEValue === 'depth') {
           if (this.depth >= (this.PvEInput)) {
-            this.onClick(this.lines[0])
-          }
-        }
-      }
-      if (this.active && this.Tournament && !this.turn) {
-        if (this.TournamentValue === 'depth') {
-          if (this.depth >= (this.TournamentInput)) {
             this.onClick(this.lines[0])
           }
         }

@@ -2,7 +2,7 @@
   <div class="bar">
     <div
       class="item"
-      :class="{ active: !viewAnalysis && viewSettings }"
+      :class="{ active: !viewAnalysis }"
       @click="changeTab"
     >
       <em class="icon mdi mdi-hammer-screwdriver" /> Settings
@@ -35,13 +35,6 @@
       :title="modal.title"
       @close="modal.visible = false"
     />
-    <div
-      class="item"
-      :class="{ active: !viewAnalysis && !viewSettings }"
-      @click="changeTabTournament"
-    >
-     Tournament Client
-    </div>
   </div>
 </template>
 
@@ -72,16 +65,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['viewAnalysis', 'initialized', 'variantOptions', 'viewSettings', 'viewTournament'])
+    ...mapGetters(['viewAnalysis', 'initialized', 'variantOptions'])
   },
   methods: {
     changeTab () {
       this.$store.commit('viewAnalysis', !this.viewAnalysis)
-      this.$store.commit('viewSettings', !this.viewSettings)
-    },
-    changeTabTournament () {
-        this.$store.commit('viewAnalysis', !this.viewAnalysis)
-        this.$store.commit('viewTournament', !this.viewTournament)
     },
     openPgn () { // TODO: seperate the openPgn Funktions from here and AddPgnModal and import instead
       this.$electron.remote.dialog.showOpenDialog({
