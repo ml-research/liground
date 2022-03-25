@@ -119,7 +119,18 @@
           <SettingsTab
             id="settingstab"
             class="tab"
-            :class="{ visible: !viewAnalysis }"
+            :class="{ visible: !viewAnalysis && viewSettings }"
+          />
+           <TournamentView
+            id="tournamentview"
+            class="tab"
+            :class="{ visible: !viewAnalysis && viewTournament }"
+            :reset="resetAnalysis"
+            @move-to-start="moveToStart"
+            @move-to-end="moveToEnd"
+            @move-back-one="moveBackOne"
+            @move-forward-one="moveForwardOne"
+            @flip-board="flipBoard"
           />
         </div>
       </div>
@@ -129,6 +140,7 @@
 
 <script>
 import AnalysisView from './AnalysisView'
+import TournamentView from './TournamentView'
 import EvalBar from './EvalBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
@@ -145,6 +157,7 @@ export default {
   name: 'GameBoards',
   components: {
     AnalysisView,
+    TournamentView,
     EvalBar,
     ChessGround,
     PieceStyleSelector,
@@ -165,6 +178,12 @@ export default {
   computed: {
     viewAnalysis () {
       return this.$store.getters.viewAnalysis
+    },
+    viewSettings () {
+      return this.$store.getters.viewSettings
+    },
+    viewTournament () {
+      return this.$store.getters.viewTournament
     },
     variant () {
       return this.$store.getters.variant
