@@ -8,6 +8,11 @@
       v-for="engine in Engines"
       ref="analysiscontainer"
       :key="engine.number"
+      @flip-board="$emit('flip-board', 0)"
+      @move-to-start="$emit('move-to-start', 0)"
+      @move-back-one="$emit('move-back-one', 0)"
+      @move-forward-one="$emit('move-forward-one', 0)"
+      @move-to-end="$emit('move-to-end', 0)"
     />
     <div class="b">
       <button
