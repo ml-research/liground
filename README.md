@@ -5,6 +5,28 @@
 ![LiGround](https://github.com/LucyLMM/images/blob/main/LiGround_Screenshot.PNG)
 <!-- <img src="./media/screenshots/liground-0.0.1.png" alt="LiGround screenshot" title="LiGround screenshot." /> -->
 
+## Supported Games
+
+### Regional and Historical Games
+- [Chess](https://en.wikipedia.org/wiki/Chess)
+- [Janggi](https://en.wikipedia.org/wiki/Janggi)
+- [Makruk](https://en.wikipedia.org/wiki/Makruk)
+- [Shogi](https://en.wikipedia.org/wiki/Shogi)
+- [Xiangqi](https://en.wikipedia.org/wiki/Xiangqi)
+
+### Chess Variants
+
+- [Antichess](https://lichess.org/variant/antichess)
+- [Atomic](https://en.wikipedia.org/wiki/Atomic_chess)
+- [Chess960](https://en.wikipedia.org/wiki/Chess960)
+- [Crazyhouse](https://en.wikipedia.org/wiki/Crazyhouse)
+- [Horde](https://en.wikipedia.org/wiki/Dunsany%27s_Chess#Horde_Chess)
+- [King of the Hill](https://en.wikipedia.org/wiki/King_of_the_Hill_(chess))
+- [Racing Kings](https://en.wikipedia.org/wiki/V._R._Parton#Racing_Kings)
+- [Three-check](https://en.wikipedia.org/wiki/Three-check_chess)
+
+## Build Instructions
+
 ### Build Setup
 ``` bash
 # install dependencies
