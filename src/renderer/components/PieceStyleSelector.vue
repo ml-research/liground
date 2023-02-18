@@ -142,6 +142,7 @@ export default {
         'hanjablue',
         'hanjagreen',
         'hnz',
+        'hnz-simplified',
         'hnzw',
         'intlblue',
         'intlgreen',
