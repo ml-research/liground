@@ -5,6 +5,21 @@
 ![LiGround](https://github.com/LucyLMM/images/blob/main/LiGround_Screenshot.PNG)
 <!-- <img src="./media/screenshots/liground-0.0.1.png" alt="LiGround screenshot" title="LiGround screenshot." /> -->
 
+## Download
+
+### Binaries
+
+We provide binary releases for the following plattforms:
+
+Operating System | Version
+---              | ---
+Linux            | [**liground-0.4.0-linux.AppImage**](https://github.com/ml-research/liground/releases/download/0.4.0/liground-0.4.0-linux.AppImage)
+Windows          | [**liground-0.4.0-win.exe**](https://github.com/ml-research/liground/releases/download/0.4.0/liground-0.4.0-win.exe)                              
+Mac              | [**liground-0.4.0-mac.dmg**](https://github.com/ml-research/liground/releases/download/0.4.0/liground-0.4.0-mac.dmg)
+Mac              | [**liground-0.4.0-mac.zip**](https://github.com/ml-research/liground/releases/download/0.4.0/liground-0.4.0-mac.zip)
+
+The current _LiGround_ release and all its previous versions can also be found at [releases](https://github.com/ml-research/liground/releases).
+
 ## Supported Games
 
 ### Regional and Historical Games
