@@ -1314,12 +1314,8 @@ export const store = new Vuex.Store({
       // if the SAN in the pgn is the same than the SAN in states.moves
       // and we are at the last move, return pgn result
       if (state.selectedGame) {
-        let pgnBoard
-        if (state.selectedGame.headers('FEN')) {
-          pgnBoard = new ffish.Board(state.variant, state.selectedGame.headers('FEN'))
-        } else {
-          pgnBoard = state.board
-        }
+        let pgnBoard = new ffish.Board(state.variant, state.startFen)
+
         const pgnMoves = state.selectedGame.mainlineMoves()
         const san = pgnBoard.variationSan(pgnMoves, ffish.Notation.SAN, false)
         let str = ''
@@ -1334,10 +1330,8 @@ export const store = new Vuex.Store({
 
       if (typeof mate === 'number') {
         return `#${calcForSide(mate, state.turn)}`
-      } else if (currentMove && currentMove.name.includes('#')) {
-        return state.turn ? '0-1' : '1-0'
-      } else if (state.legalMoves.length === 0) {
-        return '1/2-1/2'
+      } else if (state.board != null && state.board.isGameOver()) {
+        return state.board.result()
       } else {
         return cpToString(getters.cpForWhite)
       }
