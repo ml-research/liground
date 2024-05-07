@@ -1314,7 +1314,7 @@ export const store = new Vuex.Store({
       // if the SAN in the pgn is the same than the SAN in states.moves
       // and we are at the last move, return pgn result
       if (state.selectedGame) {
-        let pgnBoard = new ffish.Board(state.variant, state.startFen)
+        const pgnBoard = new ffish.Board(state.variant, state.startFen)
 
         const pgnMoves = state.selectedGame.mainlineMoves()
         const san = pgnBoard.variationSan(pgnMoves, ffish.Notation.SAN, false)
