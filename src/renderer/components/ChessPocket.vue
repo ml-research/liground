@@ -66,8 +66,6 @@ export default {
       if (pieceCount === 0) {
         return
       }
-      console.log(`pieceType: ${pieceType}`)
-      console.log(`color: ${color}`)
       this.$emit('selection', event, pieceType, color)
     }
   }
