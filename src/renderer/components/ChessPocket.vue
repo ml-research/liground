@@ -14,6 +14,7 @@
         class="piece"
         :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' , orientation === 'white' && color === 'black' ? 'flipB' : '', orientation === 'black' ? 'flipW' : '']"
         @mousedown="clicked($event, piece.type, color, piece.count)"
+        @dragstart="(e) => e.preventDefault()"
       />
       <div
         class="piece-count noselect"
