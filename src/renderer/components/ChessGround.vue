@@ -646,8 +646,6 @@ export default {
     dropPiece (event, pieceType, color) {
       this.board.dragNewPiece({ role: pieceType, color: color, promoted: false }, event)
       this.selectedPiece = pieceType
-      console.log(`dropPiece: ${event} ${pieceType} ${color}`)
-      console.log(`dropPiece: ${this.board.getFen()}`)
     },
     extractMoves (move) {
       const letters = move.split(/(\d+)/)
@@ -828,7 +826,6 @@ export default {
           this.$store.dispatch('push', { move: uciMove, prev: prevMov })
           this.updateHand()
           this.afterMove()
-          console.log(this.turn)
         }
       }
     },

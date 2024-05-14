@@ -14,6 +14,7 @@
         class="piece"
         :class="[piece.type, color, piece.type === selectedPiece ? 'selected' : '' , orientation === 'white' && color === 'black' ? 'flipB' : '', orientation === 'black' ? 'flipW' : '']"
         @mousedown="clicked($event, piece.type, color, piece.count)"
+        @dragstart="(e) => e.preventDefault()"
       />
       <div
         class="piece-count noselect"
@@ -65,8 +66,6 @@ export default {
       if (pieceCount === 0) {
         return
       }
-      console.log(`pieceType: ${pieceType}`)
-      console.log(`color: ${color}`)
       this.$emit('selection', event, pieceType, color)
     }
   }
