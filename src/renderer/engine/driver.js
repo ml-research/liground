@@ -26,7 +26,6 @@ export default class EngineDriver {
    */
   constructor (input, output) {
     this.events = new EventEmitter()
-    this.ignore = false
     this.ready = false
     this.pendingReady = false
     this.info = {
@@ -67,12 +66,6 @@ export default class EngineDriver {
   _parseLine (line) {
     this.events.emit('line', line)
     line = line.trim()
-    if (this.ignore) {
-      if (line.startsWith('bestmove')) {
-        this.ignore = false
-      }
-      return
-    }
     switch (line.split(/\s/)[0].trim()) {
       case 'uciok':
         this.events.emit('initialized')
@@ -121,9 +114,12 @@ export default class EngineDriver {
         this.events.emit('info', info)
         break
       }
-      case 'bestmove':
-        this.events.emit('bestmove')
+      case 'bestmove': {
+        const words = line.split(' ')
+        const ucimove = words[1]
+        this.events.emit('bestmove', ucimove)
         break
+      }
     }
   }
 
@@ -158,7 +154,6 @@ export default class EngineDriver {
       case 'quit':
         return await this.quit()
       case 'stop':
-        this.ignore = true
         this._write(cmd)
         break
       case 'setoption':

@@ -60,7 +60,7 @@ export class Engine extends EventEmitter {
 
       // run main engine
       this.mainWorker.postMessage({
-        payload: { binary, cwd, listeners: ['io', 'info'] },
+        payload: { binary, cwd, listeners: ['io', 'info', 'bestmove'] },
         type: 'run'
       })
 

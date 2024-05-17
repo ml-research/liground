@@ -252,12 +252,14 @@ export default {
         case 'nodes':
           this.$store.dispatch(
             'setPvEParam',
-            'go nodes ' + this.PvEInput * 1000000
+            'go nodes ' + this.PvEInput * 1000000 + ' movetime 60000'
           )
           this.$store.dispatch('setPvEInput', this.PvEInput * 1000000)
           break
         case 'depth':
-          this.$store.dispatch('setPvEParam', 'go depth ' + this.PvEInput)
+          this.$store.dispatch(
+            'setPvEParam',
+            'go depth ' + this.PvEInput + ' movetime 60000')
           this.$store.dispatch('setPvEInput', this.PvEInput)
           break
         default:

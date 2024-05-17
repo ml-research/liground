@@ -690,6 +690,12 @@ export const store = new Vuex.Store({
       engine.send(context.getters.PvEParam)
       context.commit('setEngineClock')
     },
+    PvEMakeMove (context, payload) {
+      const state = context.state
+      if (state.active && state.PvE && !state.turn) {
+        context.dispatch('push', { move: payload, prev: context.getters.currentMove[0] })
+      }
+    },
     setActiveTrue (context) {
       context.commit('active', true)
     },
@@ -1471,4 +1477,5 @@ ffish.onRuntimeInitialized = () => {
 
   // capture engine info
   engine.on('info', info => store.dispatch('updateMultiPV', info))
+  engine.on('bestmove', move => store.dispatch('PvEMakeMove', move))
 })()

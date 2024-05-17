@@ -151,28 +151,6 @@ export default {
       this.originalMultiPV = this.engineSettings.MultiPV
       this.updateLines()
     },
-    enginetime () {
-      if (this.active && this.PvE && !this.turn) {
-        if (this.PvEValue === 'time') {
-          if (this.enginetime >= this.PvEInput) {
-            if (this.lines[0] != null) {
-              this.onClick(this.lines[0])
-            }
-          }
-        } else if (this.PvEValue === 'nodes') {
-          if (this.enginetime === 60000) {
-            this.onClick(this.lines[0])
-          }
-        } else if (this.PvEValue === 'depth') {
-          if (this.enginetime === 60000) {
-            this.onClick(this.lines[0])
-          }
-          if (this.enginetime >= 5000 && this.depth === this.seldepth) {
-            this.onClick(this.lines[0])
-          }
-        }
-      }
-    },
     nodes () {
       if (this.active && this.PvE && !this.turn) {
         if (this.PvEValue === 'nodes') {
