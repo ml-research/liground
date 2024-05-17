@@ -258,7 +258,7 @@ export default {
           break
         case 'depth':
           this.$store.dispatch(
-            'setPvEParam', 
+            'setPvEParam',
             'go depth ' + this.PvEInput + ' movetime 60000')
           this.$store.dispatch('setPvEInput', this.PvEInput)
           break

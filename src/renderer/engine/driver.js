@@ -114,12 +114,12 @@ export default class EngineDriver {
         this.events.emit('info', info)
         break
       }
-      case 'bestmove':
-        console.log('emit bestmove')
+      case 'bestmove': {
         const words = line.split(' ')
         const ucimove = words[1]
         this.events.emit('bestmove', ucimove)
         break
+      }
     }
   }
 
