@@ -1046,7 +1046,13 @@ export const store = new Vuex.Store({
               board.setFen(context.state.fen)
               console.warn('Invalid engine pv move.\nFEN:', board.fen(), '\nPV:', payload.pv)
             }
-            multipv[payload.multipv - 1] = pvline
+
+            // if there is only one pv
+            if (payload.multipv === undefined) {
+              multipv[0] = pvline
+            } else {
+              multipv[payload.multipv - 1] = pvline
+            }
           }
         }
         context.commit('multipv', multipv)
