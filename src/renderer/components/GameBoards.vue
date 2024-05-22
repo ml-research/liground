@@ -197,7 +197,7 @@ export default {
   mounted () { // EventListener für Keyboardinput, ruft direkt die jeweilige Methode auf
     window.addEventListener('keydown', (event) => {
       const keyName = event.key
-      if (event.target.nodeName.toLowerCase() !== 'input') {
+      if (event.target.nodeName.toLowerCase() !== 'input' || event.target.type.toLowerCase() === 'checkbox') {
         if (keyName === 'ArrowUp') {
           event.preventDefault()
           this.moveToStart()

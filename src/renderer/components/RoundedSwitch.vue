@@ -32,18 +32,6 @@ export default {
   methods: {
     changeActiveState (payload) {
       this.engineActive = payload
-    },
-    onClick () {
-      if (!this.active) {
-        this.$store.dispatch('position')
-        if (this.PvE) {
-          this.$store.dispatch('setActiveTrue')
-        } else {
-          this.$store.dispatch('goEngine')
-        }
-      } else {
-        this.$store.dispatch('stopEngine')
-      }
     }
   }
 }
