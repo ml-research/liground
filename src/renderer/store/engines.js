@@ -2,6 +2,7 @@ import path from 'path'
 import logoStockfish from '../assets/images/engines/stockfish.png'
 import logoStockfishBlue from '../assets/images/engines/stockfish_blue.png'
 import logoStockfishPurple from '../assets/images/engines/stockfish_purple.png'
+import logoLeela from "../assets/images/engines/leela.png"
 
 const enginePath = path.resolve(
   process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
@@ -18,6 +19,47 @@ function resolveBinary (name) {
 
 // first engine in the list has highest priority for default engine selection
 export default {
+  'Stockfish 16': {
+    binary: resolveBinary('stockfish-16'),
+    cwd: enginePath,
+    logo: logoStockfish,
+    variants: [
+      'standard',
+      'antichess',
+      'atomic',
+      'crazyhouse',
+      'chess960',
+      'giveaway',
+      'kingofthehill',
+      'racingkings',
+      '3check',
+      'horde',
+      'losers',
+      'chess'
+      ]
+  },
+  'Leela Chess Zero': {
+    binary: resolveBinary('lc0'),
+    cwd: enginePath,
+    logo: logoStockfish,
+    variants: [
+      'standard',
+      'antichess',
+      'atomic',
+      'crazyhouse',
+      'chess960',
+      'giveaway',
+      'kingofthehill',
+      'racingkings',
+      '3check',
+      'horde',
+      'losers',
+      'chess',
+      'selfplay',
+      'bughouse',
+      'correspondence'
+      ]
+  },
   'Stockfish 12': {
     binary: resolveBinary('stockfish'),
     cwd: enginePath,
