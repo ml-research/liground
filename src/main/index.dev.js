@@ -1,22 +1,25 @@
 /**
- * This file is used specifically and only for development. It installs
- * `electron-debug` & `vue-devtools`. There shouldn't be any need to
- *  modify this file, but it can be used to extend your development
- *  environment.
+ * Dev environment setup for Electron + Vue 2
+ * Modernized for Electron ≥22 (no CRX extensions).
  */
 
-import electron from 'electron'
+import { app } from 'electron'
 import debug from 'electron-debug'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
-// Install `electron-debug` with `devtron`
+// Enable electron-debug with devtools open
 debug({ showDevTools: true })
 
-// Install `vue-devtools`
-electron.app.on('ready', () => {
-  installExtension(VUEJS_DEVTOOLS)
-    .catch(err => console.log('Unable to install `vue-devtools`: \n', err))
-})
+// Optional: Try installing Vue Devtools (modern version)
+import { installVueDevtools } from '@vue/devtools'
 
-// Require `main` process to boot app
-require('./index')
+app.whenReady().then(async () => {
+  try {
+    await installVueDevtools()
+    console.log('✅ Vue Devtools installed')
+  } catch (err) {
+    console.log('⚠️  Unable to install Vue Devtools:', err.message)
+  }
+
+  // Boot the main app
+  require('./index')
+})

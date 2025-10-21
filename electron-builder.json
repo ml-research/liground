@@ -34,11 +34,12 @@
         "x": 130,
         "y": 150,
         "type": "file"
-      }
-    ]
+      },
+    ],
   },
   "mac": {
-    "icon": "build/icons/icon.icns"
+    "icon": "build/icons/icon.icns",
+    "target": ["zip"]
   },
   "win": {
     "icon": "build/icons/icon.ico"
