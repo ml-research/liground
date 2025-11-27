@@ -139,7 +139,27 @@ export default {
       }
     },
     async selectPath () {
-      const { filePaths: [file] } = await remote.dialog.showOpenDialog({ properties: ['openFile'] })
+      let file
+      if (remote && remote.dialog) {
+        const { filePaths: [f] } = await remote.dialog.showOpenDialog({ properties: ['openFile'] })
+        file = f
+      } else {
+        // Try IPC fallback: ask main process to show dialog
+        let ipcRenderer
+        try {
+          // prefer require('electron').ipcRenderer when available
+          // eslint-disable-next-line
+          ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+        } catch (e) {
+          ipcRenderer = null
+        }
+        if (!ipcRenderer || !ipcRenderer.invoke) {
+          this.error = 'File dialog not available'
+          return
+        }
+        const res = await ipcRenderer.invoke('show-open-dialog', { properties: ['openFile'] })
+        file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
+      }
       if (file) {
         if (this.cwd.length === 0 || this.cwd === path.dirname(this.binary)) {
           this.cwd = path.dirname(file)
@@ -148,13 +168,37 @@ export default {
       }
     },
     async selectImage () {
-      const { filePaths: [file] } = await remote.dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [
-          { name: 'Images', extensions: ['bmp', 'gif', 'jpg', 'jpeg', 'png', 'svg', 'tif', 'tiff', 'webp'] },
-          { name: 'All Files', extensions: ['*'] }
-        ]
-      })
+      let file
+      if (remote && remote.dialog) {
+        const { filePaths: [f] } = await remote.dialog.showOpenDialog({
+          properties: ['openFile'],
+          filters: [
+            { name: 'Images', extensions: ['bmp', 'gif', 'jpg', 'jpeg', 'png', 'svg', 'tif', 'tiff', 'webp'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        })
+        file = f
+      } else {
+        let ipcRenderer
+        try {
+          // eslint-disable-next-line
+          ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+        } catch (e) {
+          ipcRenderer = null
+        }
+        if (!ipcRenderer || !ipcRenderer.invoke) {
+          this.error = 'File dialog not available'
+          return
+        }
+        const res = await ipcRenderer.invoke('show-open-dialog', {
+          properties: ['openFile'],
+          filters: [
+            { name: 'Images', extensions: ['bmp', 'gif', 'jpg', 'jpeg', 'png', 'svg', 'tif', 'tiff', 'webp'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        })
+        file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
+      }
       if (file) {
         const base64 = await fs.readFile(file, { encoding: 'base64' })
         this.logo = `data:image/${this.imageExtToMime(path.extname(file))};base64,${base64}`

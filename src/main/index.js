@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -52,6 +52,17 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
+  }
+})
+
+// IPC handler so renderer can request native dialogs when `remote` is not available
+ipcMain.handle('show-open-dialog', async (event, options) => {
+  const browserWindow = mainWindow || null
+  try {
+    const res = await dialog.showOpenDialog(browserWindow, options || {})
+    return res
+  } catch (err) {
+    return { canceled: true, filePaths: [] }
   }
 })
 /**
