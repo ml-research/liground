@@ -14,6 +14,12 @@
       >
         Save as standard
       </a>
+      <a
+        class="btn red"
+        @click="resetDefaults"
+      >
+        Reset to defaults
+      </a>
     </div>
     <div class="panel">
       <span class="title">Engine Settings</span>
@@ -223,6 +229,14 @@ export default {
     saveStandardSettings () {
       this.$store.dispatch('saveSettings')
       this.$store.commit('viewAnalysis', true)
+    },
+    resetDefaults () {
+      if (confirm('Do you really wish to reset all settings to their defaults?')) {
+        this.$store.dispatch('resetAllSettings')
+        // refresh local settings shown in UI
+        this.resetSettings()
+        this.$store.commit('viewAnalysis', true)
+      }
     },
     save () {
       this.updateSettings()
