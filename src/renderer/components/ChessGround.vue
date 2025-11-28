@@ -335,7 +335,7 @@ export default {
       this.resetPockets(this.piecesB)
       if (this.board.state.geometry !== this.dimensionNumber) {
         this.board = Chessground(this.$refs.board, {
-          coordinates: false,
+          coordinates: true,
           fen: this.fen,
           turnColor: 'white',
           resizable: true,
@@ -388,7 +388,7 @@ export default {
     window.addEventListener('mouseup', this.reRender)
 
     this.board = Chessground(this.$refs.board, {
-      coordinates: false,
+      coordinates: true,
       fen: this.fen,
       turnColor: 'white',
       resizable: true,
