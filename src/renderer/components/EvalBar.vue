@@ -24,10 +24,10 @@ export default {
 <style scoped>
 .progress {
   position: relative;
-  width: 17px;
+  width: 22px;
   height: 600px;
-  background: var(--light-text-color);;
-  border: 1px solid #888;
+  background: var(--second-bg-color);
+  border: 1px solid var(--main-border-color);
   border-radius: 5px;
   overflow: hidden;
 }
@@ -49,7 +49,7 @@ export default {
 .progress-value {
   width: 100%;
   height: 50%;
-  background: #111;
+  background: var(--main-text-color);
   transition: height .25s ease;
 }
 </style>
