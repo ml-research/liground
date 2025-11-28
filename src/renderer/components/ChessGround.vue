@@ -984,34 +984,6 @@ export default {
   grid-template-columns: 1fr 1fr ;
 
 }
-coords.ranks {
-  height: 100%;
-  width: .8em;
-  margin-bottom: 10px;
-}
-coords.files {
-  height: 100%;
-  width: .8em;
-  width: 10px;
-  padding-left: 30px;
-  margin-right: 10px;
-}
-coords {
-  text-shadow: var(--cg-coord-shadow);
-  font-size: calc(8px + 4 * ((100vw - 320px) / 880));
-  display: flex;
-  color: var(--light-text-color);
-  text-shadow: 0 1px 2px #000;
-  font-weight: bold;
-}
-.coords {
-  margin-right: 1.5px;
-  text-align: center;
-  font-size: 8px;
-  width: 10px;
-  padding: 0px 0px 0px 0px;
-  color: black;
-}
 .cg-board-wrap {
   position: relative;
 }
