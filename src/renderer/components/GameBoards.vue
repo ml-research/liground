@@ -448,10 +448,12 @@ input {
 #fen-field {
   grid-area: fenfield;
   /*margin-left: 48px;*/
+  margin-top: 12px;
 }
 #fen-field-qt {
   grid-area: fenfield;
   border: 5px solid var(--quicktour-highlight);
+  margin-top: 12px;
 }
 #lname {
   background-color: var(--second-bg-color);
@@ -505,12 +507,13 @@ input {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  width: max-content
+  width: max-content;
 }
 
 .board {
   grid-area: board;
   display: grid;
+  column-gap: 12px;
   grid-template-areas:
   "gameinfo ."
   "scrollable evalbar";
@@ -531,12 +534,12 @@ input {
 }
 .evalbar {
   grid-area: evalbar;
-  margin-left: 8px;
+  margin-left: 0px;
   height: auto;
 }
 .evalbar-qt {
   grid-area: evalbar;
-  margin-left: 8px;
+  margin-left: 0px;
   height: auto;
   border: 3px solid var(--quicktour-highlight);
 }
