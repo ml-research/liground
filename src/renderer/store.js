@@ -597,7 +597,10 @@ export const store = new Vuex.Store({
         selectedEngines: {},
         loadedGames: [],
         rounds: null,
-        selectedGame: null
+        selectedGame: null,
+        allEngines: allEngines,
+        activeEngine: null,
+        active: false
       }
 
       // assign defaults onto state
@@ -613,6 +616,7 @@ export const store = new Vuex.Store({
         } catch (e) {
         }
       }
+      /* made redundant by calling resetEngineStats mutation in wrapper action
       // reset engine stats
       state.enginetime = 0
       state.engineStats = {
@@ -624,6 +628,7 @@ export const store = new Vuex.Store({
         tbhits: 0,
         time: 0
       }
+        */
     }
   },
   actions: { // async
@@ -1259,11 +1264,27 @@ export const store = new Vuex.Store({
             localStorage.removeItem(key)
           }
         }
-      } catch (e) {
-      }
+      } catch (e) {}
+
+      // clear piece/board style choices saved per-variant
+      try {
+        const styleKeys = [
+          'internationalPieceStyle', 'internationalBoardStyle',
+          'shogiPieceStyle', 'shogiBoardStyle',
+          'seaPieceStyle', 'seaBoardStyle',
+          'xiangqiPieceStyle', 'xiangqiBoardStyle',
+          'janggiPieceStyle', 'janggiBoardStyle'
+        ]
+        for (const k of styleKeys) {
+          localStorage.removeItem(k)
+        }
+      } catch (e) {}
 
       // commit the state-level defaults
       commit('resetAllSettings')
+
+      // ensure engine runtime counters are zeroed
+      commit('resetEngineStats')
 
       // replace the board with a fresh one (safer than board.load)
       try {
