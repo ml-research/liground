@@ -608,27 +608,8 @@ export const store = new Vuex.Store({
         // preserve reactive properties by setting individual keys
         state[key] = defaults[key]
       })
-      // optionally trigger any derived resets
-      if (state.board && typeof state.board.load === 'function') {
-        // try to reset board if available
-        try {
-          state.board.load(state.fen)
-        } catch (e) {
-        }
-      }
-      /* made redundant by calling resetEngineStats mutation in wrapper action
-      // reset engine stats
-      state.enginetime = 0
-      state.engineStats = {
-        depth: 0,
-        seldepth: 0,
-        nodes: 0,
-        nps: 0,
-        hashfull: 0,
-        tbhits: 0,
-        time: 0
-      }
-        */
+
+      // board instance is replaced by the action (commit('newBoard')), avoid mutating external objects here
     }
   },
   actions: { // async
