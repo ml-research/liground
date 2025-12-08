@@ -541,6 +541,75 @@ export const store = new Vuex.Store({
       localStorage.resized9x10width = state.resized9x10width
       localStorage.resized9x10height = state.resized9x10height
       localStorage.dimNumber = state.dimNumber
+    },
+
+    // mutation to reset settings back to defaults
+    resetAllSettings (state) {
+      const defaults = {
+        engineIndex: 1,
+        enginesActive: [false],
+        PvE: false,
+        PvEParam: 'go movetime 1000',
+        PvEValue: 'time',
+        PvEInput: 1000,
+        resized: 0,
+        resized9x9height: 0,
+        resized9x9width: 0,
+        resized9x10height: 0,
+        resized9x10width: 0,
+        dimNumber: 0,
+        turn: true,
+        fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        moves: [],
+        firstMoves: [],
+        mainFirstMove: null,
+        legalMoves: '',
+        destinations: {},
+        variant: 'chess',
+        viewAnalysis: true,
+        analysisMode: true,
+        darkMode: false,
+        muteButton: false,
+        pieceStyle: 'cburnett',
+        boardStyle: 'blue',
+        curVar960Fen: '',
+        openedPGN: false,
+        QuickTourIndex: 0,
+        evalPlotDepth: 20,
+        fenply: 1,
+        engineInfo: {
+          name: '',
+          author: '',
+          options: []
+        },
+        engineSettings: {},
+        multipv: [
+          {
+            cp: 0,
+            pv: '',
+            ucimove: ''
+          }
+        ],
+        numberOfEngines: [{ number: 1 }],
+        engineCounter: 1,
+        selectedEngines: {},
+        loadedGames: [],
+        rounds: null,
+        selectedGame: null,
+        allEngines: allEngines,
+        activeEngine: null,
+        active: false
+      }
+
+      // assign defaults onto state
+      Object.keys(defaults).forEach(key => {
+        // preserve reactive properties by setting individual keys
+        state[key] = defaults[key]
+      })
+
+      // board instance is replaced by the action (commit('newBoard')), avoid mutating external objects here
     }
   },
   actions: { // async
@@ -1152,6 +1221,66 @@ export const store = new Vuex.Store({
     },
     saveSettings (context) {
       context.commit('saveSettings')
+    },
+
+    // action wrapper to reset
+    async resetAllSettings ({ commit, dispatch }) {
+      // stop any running engine and timers
+      try {
+        await dispatch('stopEngine') // clears engine timer and active flag
+      } catch (e) {}
+
+      // reset engine runtime data (multipv + engineStats)
+      try {
+        await dispatch('resetEngineData')
+        commit('resetEngineTime') // clears interval
+      } catch (e) {}
+
+      // clear persisted engine lists / per-engine settings for full reset
+      try {
+        localStorage.removeItem('engines')
+        // remove any keys that start with 'engine'
+        for (const key in localStorage) {
+          if (typeof key === 'string' && key.startsWith('engine')) {
+            localStorage.removeItem(key)
+          }
+        }
+      } catch (e) {}
+
+      // clear piece/board style choices saved per-variant
+      try {
+        const styleKeys = [
+          'internationalPieceStyle', 'internationalBoardStyle',
+          'shogiPieceStyle', 'shogiBoardStyle',
+          'seaPieceStyle', 'seaBoardStyle',
+          'xiangqiPieceStyle', 'xiangqiBoardStyle',
+          'janggiPieceStyle', 'janggiBoardStyle'
+        ]
+        for (const k of styleKeys) {
+          localStorage.removeItem(k)
+        }
+      } catch (e) {}
+
+      // commit the state-level defaults
+      commit('resetAllSettings')
+
+      // ensure engine runtime counters are zeroed
+      commit('resetEngineStats')
+
+      // replace the board with a fresh one (safer than board.load)
+      try {
+        commit('newBoard')
+      } catch (e) {}
+
+      // persist basic UI settings
+      try {
+        dispatch('saveSettings')
+      } catch (e) {}
+
+      // re-run initialize to pick default engine / options like at app start
+      try {
+        await dispatch('initialize')
+      } catch (e) {}
     }
   },
   getters: {
