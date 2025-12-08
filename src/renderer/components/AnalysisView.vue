@@ -56,7 +56,7 @@ export default {
       if (mutation.type === 'resetAllSettings') {
         this.removeAllEngines()
         // ensure child containers reset after DOM update
-        //It might make sense to move the code below to the removeAllEngines method
+        // It might make sense to move the code below to the removeAllEngines method
         this.$nextTick(() => {
           try { this.resetEngines() } catch (e) { /* ignore */ }
         })
