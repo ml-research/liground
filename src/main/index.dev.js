@@ -11,6 +11,7 @@ import { installVueDevtools } from '@vue/devtools'
 // Enable electron-debug with devtools open
 debug({ showDevTools: true })
 
+// Install Vue Devtools
 app.whenReady().then(async () => {
   try {
     await installVueDevtools()

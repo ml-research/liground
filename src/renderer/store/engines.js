@@ -1,7 +1,7 @@
 import path from 'path'
 import logoStockfish from '../assets/images/engines/stockfish.png'
 import logoStockfishBlue from '../assets/images/engines/stockfish_blue.png'
-import logoStockfishPurple from '../assets/images/engines/stockfish_purple.png'
+import logoStockfishPurple from '../assets/images/engines/fairy_stockfish.jpg'
 
 const enginePath = path.resolve(
   process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
