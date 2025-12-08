@@ -44,11 +44,29 @@ export default {
   data () {
     return {
       Engines: [
-        {
-          number: 1
-        }
+        { number: 1 }
       ],
-      counter: 1
+      counter: 1,
+      storeUnsubscribe: null
+    }
+  },
+  mounted () {
+    // listen for the global reset and update component-local engine list
+    this.storeUnsubscribe = this.$store.subscribe((mutation) => {
+      if (mutation.type === 'resetAllSettings') {
+        this.removeAllEngines()
+        // ensure child containers reset after DOM update
+        // It might make sense to move the code below to the removeAllEngines method
+        this.$nextTick(() => {
+          try { this.resetEngines() } catch (e) { /* ignore */ }
+        })
+      }
+    })
+  },
+  beforeDestroy () {
+    if (this.storeUnsubscribe) {
+      this.storeUnsubscribe()
+      this.storeUnsubscribe = null
     }
   },
   methods: {

@@ -5,6 +5,7 @@
 
 import { app } from 'electron'
 import debug from 'electron-debug'
+// Optional: Try installing Vue Devtools (modern version)
 import { installVueDevtools } from '@vue/devtools'
 
 // Enable electron-debug with devtools open
