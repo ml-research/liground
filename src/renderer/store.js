@@ -1223,7 +1223,7 @@ export const store = new Vuex.Store({
       context.commit('saveSettings')
     },
 
-    // action wrapper to reset 
+    // action wrapper to reset
     async resetAllSettings ({ commit, dispatch }) {
       // stop any running engine and timers
       try {
