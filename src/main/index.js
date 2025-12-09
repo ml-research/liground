@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -63,6 +63,37 @@ ipcMain.handle('show-open-dialog', async (event, options) => {
     return res
   } catch (err) {
     return { canceled: true, filePaths: [] }
+  }
+})
+
+// Build and show a context menu requested from renderer. The renderer
+// sends a simplified template (no functions) and we build native menu
+// items whose click handlers forward a message back to the renderer.
+ipcMain.handle('show-context-menu', async (event, template) => {
+  try {
+    if (!Array.isArray(template)) return false
+    const menu = Menu.buildFromTemplate(template.map(item => {
+      return {
+        label: item.label,
+        type: item.type,
+        checked: item.checked,
+        id: item.id,
+        click: (menuItem, browserWindow, ev) => {
+          try {
+            const payload = { id: item.id, checked: menuItem.checked }
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('context-menu-command', payload)
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+    }))
+    menu.popup({ window: mainWindow })
+    return true
+  } catch (err) {
+    return false
   }
 })
 /**
