@@ -94,7 +94,15 @@
 </template>
 
 <script>
-import { remote } from 'electron'
+// Use ipcRenderer to ask main process for native menus
+let ipcRenderer
+try {
+  // prefer require('electron').ipcRenderer when available
+  // eslint-disable-next-line
+  ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+} catch (e) {
+  ipcRenderer = null
+}
 import { mapGetters } from 'vuex'
 import { bus } from '../main'
 import AddPgnModal from './AddPgnModal'
@@ -200,8 +208,48 @@ export default {
         }
       }
     ]
+menuTemplate
+    // store a simplified template (no functions) and request main to show it
+    // items carry an `id` so the main process can forward click events back
+    this.menuTemplate = [
+      {
+        id: 'toggleGroup',
+        label: 'Group by rounds',
+        type: 'checkbox',
+        checked: this.groupByRound
+      },
+      {
+        id: 'toggleUnsupported',
+        label: 'Display unsupported',
+        type: 'checkbox',
+        checked: this.displayUnsupported
+      },
+      { id: 'openAllRounds', label: 'Open all rounds', type: 'normal' },
+      { id: 'collapseAllRounds', label: 'Collapse all rounds', type: 'normal' }
+    ]
 
-    this.menu = remote.Menu.buildFromTemplate(menuTemplate)
+    // Listen for commands forwarded from main process
+    if (ipcRenderer && ipcRenderer.on) {
+      ipcRenderer.on('context-menu-command', (ev, payload) => {
+        if (!payload || !payload.id) return
+        switch (payload.id) {
+          case 'toggleGroup':
+            bus.$emit('toggleGroup', !!payload.checked)
+            break
+          case 'toggleUnsupported':
+            bus.$emit('toggleUnsupported', !!payload.checked)
+            break
+          case 'openAllRounds':
+            bus.$emit('openAllRounds')
+            break
+          case 'collapseAllRounds':
+            bus.$emit('collapseAllRounds')
+            break
+          default:
+            break
+        }
+      })
+    }
   },
   methods: {
     isGameVisible (game) {
@@ -213,8 +261,17 @@ export default {
         return false
       }
     },
-    openContextMenu () {
-      this.menu.popup(remote.getCurrentWindow())
+    async openContextMenu () {
+      if (!ipcRenderer || !ipcRenderer.invoke) {
+        console.log('Context menu not available')
+        return
+      }
+      try {
+        // send the simplified template to main; main will popup and forward clicks
+        await ipcRenderer.invoke('show-context-menu', this.menuTemplate)
+      } catch (err) {
+        console.log(err)
+      }
     },
     setVisibilityOfAllRounds (value) {
       this.rounds.forEach(round => {
