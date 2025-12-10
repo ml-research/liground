@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import ffish from 'ffish'
 import { engine } from './engine'
 import allEngines from './store/engines'
+import fs from 'fs'
+import path from 'path'
 
 import moveAudio from './assets/audio/Move.mp3'
 import captureAudio from './assets/audio/Capture.mp3'
@@ -1229,13 +1231,21 @@ export const store = new Vuex.Store({
       try {
         await dispatch('stopEngine') // clears engine timer and active flag
       } catch (e) {}
-
+ 
       // reset engine runtime data (multipv + engineStats)
       try {
         await dispatch('resetEngineData')
         commit('resetEngineTime') // clears interval
       } catch (e) {}
-
+ 
+      // prompt & optionally remove added engine binaries (single action handles dialog + deletion)
+      try {
+        await dispatch('removeAddedEngineBinaries')
+        console.log('[resetAllSettings] removeAddedEngineBinaries completed')
+      } catch (e) {
+        console.warn('[resetAllSettings] removeAddedEngineBinaries failed', e)
+      }
+ 
       // clear persisted engine lists / per-engine settings for full reset
       try {
         localStorage.removeItem('engines')
@@ -1246,7 +1256,7 @@ export const store = new Vuex.Store({
           }
         }
       } catch (e) {}
-
+ 
       // clear piece/board style choices saved per-variant
       try {
         const styleKeys = [
@@ -1260,28 +1270,86 @@ export const store = new Vuex.Store({
           localStorage.removeItem(k)
         }
       } catch (e) {}
-
+ 
       // commit the state-level defaults
       commit('resetAllSettings')
-
+ 
       // ensure engine runtime counters are zeroed
       commit('resetEngineStats')
-
+ 
       // replace the board with a fresh one (safer than board.load)
       try {
         commit('newBoard')
       } catch (e) {}
-
+ 
       // persist basic UI settings
       try {
         dispatch('saveSettings')
       } catch (e) {}
-
+ 
       // re-run initialize to pick default engine / options like at app start
       try {
         await dispatch('initialize')
       } catch (e) {}
-    }
+    },
+
+   /**
+     * Prompt the user with a list of user-added engine binaries and delete them
+     * if the user confirms. No parameters. Returns { deleted: [], failed: [] }.
+     *
+     * Reasoning / safety:
+     * - only considers engines that are present in state.allEngines but not in the bundled allEngines
+     * - only deletes files that are located inside the app's engines directory
+    * - uses fs.promises.unlink for non-blocking I/O and returns a summary     */
+    async removeAddedEngineBinaries ({ state }) {
+      const currentEngines = Object.keys(state.allEngines || {})
+      const defaultEngines = Object.keys(allEngines || {})
+      const addedEngines = currentEngines.filter(n => !defaultEngines.includes(n))
+      if (addedEngines.length === 0) return { deleted: [], failed: [] }
+
+      // compute engines directory for dev vs packaged app
+      const enginesDir = path.resolve(
+        process.env.NODE_ENV === 'development' ? path.resolve(__dirname, '../../../') : process.resourcesPath,
+        'engines'
+      )
+
+      // prepare list for user display (name + path)
+      const candidates = []
+      for (const name of addedEngines) {
+        const binPath = state.allEngines[name] && state.allEngines[name].binary
+        if (!binPath) continue
+        const resolvedBin = path.resolve(binPath)
+        // only surface candidates under the engines folder
+        if (resolvedBin.startsWith(path.resolve(enginesDir))) {
+          candidates.push({ name, binPath, resolvedBin })
+        }
+      }
+
+      if (candidates.length === 0) return { deleted: [], failed: [] }
+
+      // build dialog message with list of files
+      const listText = candidates.map(c => `${c.name}: ${c.resolvedBin}`).join('\n')
+      const msg = `The following user-added engine binaries were found:\n\n${listText}\n\nPress OK to delete these files from disk, Cancel to keep them.`
+
+      // ask the user (UI responsibility done here to keep resetAllSettings flow simple)
+      const doRemove = typeof window !== 'undefined' ? window.confirm(msg) : false
+      if (!doRemove) return { deleted: [], failed: [] }
+
+      const deleted = []
+      const failed = []
+      for (const c of candidates) {
+        try {
+          await fs.promises.unlink(c.resolvedBin)
+          deleted.push(c.name)
+        } catch (err) {
+          // record failure but continue with other files
+          failed.push({ name: c.name, error: err && err.message ? err.message : String(err) })
+        }
+      }
+      return { deleted, failed }
+    },
+
+
   },
   getters: {
     engineNumber (state) {
