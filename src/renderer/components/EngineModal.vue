@@ -138,7 +138,6 @@ export default {
       }
     },
     async selectPath () {
-      let file
       // Try IPC fallback: ask main process to show dialog
       let ipcRenderer
       try {
@@ -153,7 +152,7 @@ export default {
         return
       }
       const res = await ipcRenderer.invoke('show-open-dialog', { properties: ['openFile'] })
-      file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
+      const file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
       
       if (file) {
         if (this.cwd.length === 0 || this.cwd === path.dirname(this.binary)) {
