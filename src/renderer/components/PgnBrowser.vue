@@ -94,6 +94,9 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
+  import { bus } from '../main'
+  import AddPgnModal from './AddPgnModal'
 // Use ipcRenderer to ask main process for native menus
 let ipcRenderer
 try {
@@ -103,9 +106,6 @@ try {
 } catch (e) {
   ipcRenderer = null
 }
-import { mapGetters } from 'vuex'
-import { bus } from '../main'
-import AddPgnModal from './AddPgnModal'
 
 export default {
   name: 'PgnBrowser',
