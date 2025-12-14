@@ -201,7 +201,7 @@ export default {
     onMouseLeave (id) {
       this.$store.commit('hoveredpv', -1)
     },
-    onClick (line) {
+    onClick (line) { //calles store action 'push' to play the selected pv line
       this.$store.commit('hoveredpv', -1)
       const prevMov = this.currentMove
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })

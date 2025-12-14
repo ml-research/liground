@@ -119,6 +119,8 @@
         @close="modal.visible = false"
         @save="modal.save"
       />
+    </div>
+    <div class="panel">
       <div>
         <span class="title">PvE Settings</span>
         <Multiselect
