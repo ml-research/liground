@@ -64,6 +64,12 @@
               :size="setFenSize()"
               @change="checkValidFEN"
             >
+            <div
+              v-if="opening"
+              class="opening-label"
+            >
+              {{ opening.eco }} – {{ opening.name }}
+            </div>
           </div>
           <div
             v-else
@@ -78,6 +84,12 @@
               :size="setFenSize()"
               @change="checkValidFEN"
             >
+              <div
+                v-if="opening"
+                class="opening-label"
+              >
+                {{ opening.eco }} – {{ opening.name }}
+              </div>
           </div>
           <div
             v-if="QuickTourIndex !== 5"
