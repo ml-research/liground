@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+
+// get all.tsv here: https://github.com/lichess-org/chess-openings/actions (check artifacts of latest run)
 const inputFile = path.resolve('tools/chess-openings/all.tsv');
 
 const text = fs.readFileSync(inputFile, 'utf8');
