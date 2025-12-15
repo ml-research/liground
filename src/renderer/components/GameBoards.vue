@@ -151,6 +151,7 @@ import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
 import EvalPlotButton from './EvalPlotButton'
 import GameInfo from './GameInfo.vue'
+import { findBestOpeningForFen } from '../../shared/openingLookup'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -358,6 +359,23 @@ export default {
     },
     deselectPocketPieces () {
       this.$store.commit('selectPocketPiece', ['boardA', ''])
+    },
+    findOpeningProgressive () {
+
+      let mov = this.currentMove;
+      // check current position
+      let opening = findBestOpeningForFen(this.fen);
+      if (opening) return opening;
+
+      // if no exact match, backtrack
+      while (mov && mov.prev){
+        console.log('find progressive loop');
+        mov = mov.prev;
+        let opening = findBestOpeningForFen(mov.fen);
+        if (opening) return opening;
+      }
+
+      return null;
     },
     getBoardPos (event) {
       if (event.explicitOriginalTarget.className === 'cg-board' && this.selectedPockedPiece.boardA !== '') {
