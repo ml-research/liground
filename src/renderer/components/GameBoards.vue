@@ -41,14 +41,15 @@
                   @onMove="showInfo"
                 />
               </div>
-              <EvalBar
-                v-if="QuickTourIndex !== 3"
-                class="evalbar"
-              />
-              <EvalBar
-                v-else
-                class="evalbar-qt"
-              />
+              <div v-if="QuickTourIndex !== 3" class="engine-bars">
+                <EvalBar class="evalbar" />
+                <WdlBar class="wdlbar" />
+              </div>
+
+              <div v-else class="engine-bars-qt">
+                <EvalBar class="evalbar-qt" />
+                <WdlBar class="wdlbar-qt" />
+              </div>
             </div>
           </div>
           <div
@@ -130,6 +131,7 @@
 <script>
 import AnalysisView from './AnalysisView'
 import EvalBar from './EvalBar'
+import WdlBar from './WdlBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
 import PieceStyleSelector from './PieceStyleSelector'
@@ -146,6 +148,7 @@ export default {
   components: {
     AnalysisView,
     EvalBar,
+    WdlBar,
     ChessGround,
     PieceStyleSelector,
     BoardStyleSelector,
@@ -543,6 +546,21 @@ input {
   height: auto;
   border: 3px solid var(--quicktour-highlight);
 }
+.engine-bars {
+  grid-area: evalbar;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.wdlbar {
+  margin-left: 4px;
+}
+
+.engine-bars-qt {
+  border: 3px solid var(--quicktour-highlight);
+}
+
 #analysisview {
   margin-left: 15px;
 }

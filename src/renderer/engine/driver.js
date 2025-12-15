@@ -171,6 +171,10 @@ export default class EngineDriver {
     // send "uci" to engine
     this._write('uci')
 
+    //send WDL
+    this._write('setoption name UCI_ShowWDL value true') 
+
+  
     // wait until done
     await waitFor(this.events, 'initialized')
 

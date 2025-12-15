@@ -1440,6 +1440,25 @@ export const store = new Vuex.Store({
     cpForWhite (state) {
       return calcForSide(state.multipv[0].cp, state.turn)
     },
+    wdlForWhite(state) {
+      const pv = state.multipv?.[0]
+      if (!pv || !pv.wdl) return null
+
+      const { win, draw, loss } = pv.wdl
+      const sum = win + draw + loss
+      if (!sum) return null
+
+      const wdl = {
+        win: win / sum,
+        draw: draw / sum,
+        loss: loss / sum
+      }
+
+      // Perspektive drehen, wenn Schwarz am Zug ist
+      return state.turn
+        ? { win: wdl.loss, draw: wdl.draw, loss: wdl.win }
+        : wdl
+    },
     cpForWhiteStr (state, getters) {
       const currentMove = getters.currentMove[0]
       const { mate } = state.multipv[0]
