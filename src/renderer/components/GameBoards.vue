@@ -648,4 +648,21 @@ input {
   border-radius: 8px;
 }
 
+.opening-label {
+  margin-top: 4px;
+  font-size: 11pt;
+  color: var(--main-text-color);
+  opacity: 0.9;
+}
+
+.opening-label-qt {
+  margin-top: 4px;
+  font-size: 11pt;
+  color: var(--main-text-color);
+  opacity: 0.9;
+  border: 5px solid var(--quicktour-highlight);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
 </style>
