@@ -191,6 +191,12 @@ export default {
     fen () {
       return this.$store.getters.fen
     },
+    opening () {
+      if (!this.fen) return null
+      // only makes sense for standard chess
+      if (this.variant && this.variant !== 'chess') return null
+      return this.findOpeningProgressive()
+    },
     mainFirstMove () {
       return this.$store.getters.mainFirstMove
     },
@@ -369,7 +375,6 @@ export default {
 
       // if no exact match, backtrack
       while (mov && mov.prev){
-        console.log('find progressive loop');
         mov = mov.prev;
         let opening = findBestOpeningForFen(mov.fen);
         if (opening) return opening;
