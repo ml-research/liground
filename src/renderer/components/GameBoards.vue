@@ -84,12 +84,12 @@
               :size="setFenSize()"
               @change="checkValidFEN"
             >
-              <div
-                v-if="opening"
-                class="opening-label"
-              >
-                {{ opening.eco }} – {{ opening.name }}
-              </div>
+            <div
+              v-if="opening"
+              class="opening-label"
+            >
+              {{ opening.eco }} – {{ opening.name }}
+            </div>
           </div>
           <div
             v-if="QuickTourIndex !== 5"
@@ -367,20 +367,19 @@ export default {
       this.$store.commit('selectPocketPiece', ['boardA', ''])
     },
     findOpeningProgressive () {
-
-      let mov = this.currentMove;
+      let mov = this.currentMove
       // check current position
-      let opening = findBestOpeningForFen(this.fen);
-      if (opening) return opening;
+      const opening = findBestOpeningForFen(this.fen)
+      if (opening) return opening
 
       // if no exact match, backtrack
-      while (mov && mov.prev){
-        mov = mov.prev;
-        let opening = findBestOpeningForFen(mov.fen);
-        if (opening) return opening;
+      while (mov && mov.prev) {
+        mov = mov.prev
+        const opening = findBestOpeningForFen(mov.fen)
+        if (opening) return opening
       }
 
-      return null;
+      return null
     },
     getBoardPos (event) {
       if (event.explicitOriginalTarget.className === 'cg-board' && this.selectedPockedPiece.boardA !== '') {
