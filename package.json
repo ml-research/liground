@@ -6,7 +6,8 @@
   "license": "AGPL-3.0",
   "main": "./dist/electron/main.js",
   "scripts": {
-    "build": "node scripts/build.js && electron-builder",
+    "build:openings": "node tools/build-openings-json.mjs",
+    "build": "npm run build:openings && node scripts/build.js && electron-builder",
     "build:dir": "node scripts/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node scripts/build.js",
     "build:web": "cross-env BUILD_TARGET=web node scripts/build.js",
