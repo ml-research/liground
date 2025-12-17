@@ -81,22 +81,37 @@ export default {
     close () {
       this.$emit('close')
     },
-    openPgn () {
-      this.$electron.remote.dialog.showOpenDialog({
-        title: 'Open PGN file',
-        properties: ['openFile'],
-        filters: [
-          { name: 'PGN Files', extensions: ['pgn'] },
-          { name: 'All Files', extensions: ['*'] }
-        ]
-      }).then(result => {
-        if (!result.canceled) {
-          localStorage.PGNPath = JSON.stringify(result.filePaths[0])
-          this.openPGNFromPath(result.filePaths[0])
+    async openPgn () {
+      // Try IPC fallback: ask main process to show dialog (matches EngineModal pattern)
+      let ipcRenderer
+      try {
+        // eslint-disable-next-line
+        ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+      } catch (e) {
+        ipcRenderer = null
+      }
+      if (!ipcRenderer || !ipcRenderer.invoke) {
+        console.log('File dialog not available')
+        return
+      }
+
+      try {
+        const res = await ipcRenderer.invoke('show-open-dialog', {
+          title: 'Open PGN file',
+          properties: ['openFile'],
+          filters: [
+            { name: 'PGN Files', extensions: ['pgn'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        })
+        const file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
+        if (file) {
+          localStorage.PGNPath = JSON.stringify(file)
+          this.openPGNFromPath(file)
         }
-      }).catch(err => {
+      } catch (err) {
         console.log(err)
-      })
+      }
     },
     openPGNFromPath (path) {
       fs.readFile(path, 'utf8', (err, data) => {
