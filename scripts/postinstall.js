@@ -3,6 +3,7 @@ const fs = require('fs')
 const https = require('https')
 const os = require('os')
 const chalk = require('chalk')
+const { spawn } = require('child_process')
 
 /**
  * Downloads a file to the given path.
@@ -36,6 +37,76 @@ function downloadFile (url, filePath) {
   })
 }
 
+function inferKindFromExt (filePath) {
+  const lower = path.extname(filePath).toLowerCase()
+  if (lower === '.zip') return 'zip'
+  if (lower === '.tar' || lower === '.tgz' || lower === '.tar.gz') return 'tar'
+  return 'file'
+}
+
+function extractArchive (archivePath, kind) {
+  const extractDir = fs.mkdtempSync(path.join(os.tmpdir(), 'liground-engine-'))
+  let cmd
+  let args
+
+  if (kind === 'zip') {
+    if (process.platform === 'win32') {
+      cmd = 'powershell'
+      args = [
+        '-NoLogo',
+        '-NonInteractive',
+        '-Command',
+        `Expand-Archive -Path "${archivePath}" -DestinationPath "${extractDir}" -Force`
+      ]
+    } else {
+      cmd = 'unzip'
+      args = ['-q', archivePath, '-d', extractDir]
+    }
+  } else {
+    cmd = 'tar'
+    args = ['-xf', archivePath, '-C', extractDir]
+  }
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, args, { stdio: 'inherit' })
+    child.on('error', reject)
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve(extractDir)
+      } else {
+        reject(new Error(`${cmd} exited with code ${code}`))
+      }
+    })
+  })
+}
+
+/**
+ * Copy the downloaded payload into place, extracting if needed.
+ * @param {string} sourcePath downloaded file path
+ * @param {string} destPath destination path
+ * @param {string} kind archive kind hint (zip|tar|file)
+ * @param {string} engineName engine name for fallback matching
+ * @param {string} entry optional expected archive entry path
+ */
+async function placeBinary (sourcePath, destPath, kind, engineName, entry) {
+  const inferredKind = kind || inferKindFromExt(sourcePath)
+  if (inferredKind === 'file') {
+    await fs.promises.copyFile(sourcePath, destPath)
+    return
+  }
+
+  const extractDir = await extractArchive(sourcePath, inferredKind)
+  if (!entry) {
+    throw new Error(`Archive entry path must be provided for ${engineName}`)
+  }
+  const locatedBinary = path.join(extractDir, entry)
+  if (!fs.existsSync(locatedBinary)) {
+    throw new Error(`Could not locate ${engineName} binary (${entry}) after extracting ${sourcePath}`)
+  }
+  await fs.promises.copyFile(locatedBinary, destPath)
+  fs.rmSync(extractDir, { recursive: true, force: true })
+}
+
 /**
  * Downloads an engine binary.
  * @param {string} fileName Name of binary to save
@@ -46,50 +117,60 @@ function downloadFile (url, filePath) {
  */
 async function downloadBinary (fileName, urlMap) {
   // find out which file to download
-  let url
+  let target
   const platform = os.platform()
   switch (platform) {
     case 'darwin':
-      url = urlMap.mac
+      target = urlMap.mac
       break
     case 'win32':
-      url = urlMap.win
-      fileName += '.exe'
+      target = urlMap.win
       break
     default:
-      url = urlMap.linux
+      target = urlMap.linux
   }
 
   // check if no url available
-  if (!url) {
+  if (!target) {
     console.error(chalk.red('IMPORTANT:'), `No prebuilt binary of ${fileName} available for your current OS. Please build one yourself.`)
     return
   }
+  const url = typeof target === 'string' ? target : target.url
+  const kind = typeof target === 'object' ? target.kind : undefined
+  const entry = typeof target === 'object' ? target.entry : undefined
   console.log(`Downloading ${fileName} binary from ${url}...`)
 
   // download file
-  const filePath = path.resolve(__dirname, '../engines', fileName)
+  const downloadPath = path.join(os.tmpdir(), `${fileName}-${Date.now()}${path.extname(url).split('?')[0]}`)
   try {
-    await downloadFile(url, filePath)
+    await downloadFile(url, downloadPath)
   } catch (err) {
     console.error(chalk.red(`Failed to download ${fileName}:`), err)
     return
   }
 
-  // make the file executable
-  if (platform !== 'win32') {
-    await new Promise((resolve) => fs.chmod(filePath, '755', (err) => {
-      if (err) throw err
-      resolve()
-    }))
+  try {
+    const destName = platform === 'win32' ? `${fileName}.exe` : fileName
+    const destPath = path.resolve(__dirname, '../engines', destName)
+    await fs.promises.mkdir(path.dirname(destPath), { recursive: true })
+    await placeBinary(downloadPath, destPath, kind, fileName, entry)
+
+    // make the file executable
+    if (platform !== 'win32') {
+      await fs.promises.chmod(destPath, '755')
+    }
+    console.log(`Download of ${fileName} completed!`)
+  } catch (err) {
+    console.error(chalk.red(`Failed to prepare ${fileName}:`), err)
+  } finally {
+    fs.rm(downloadPath, { force: true }, () => {})
   }
-  console.log(`Download of ${fileName} completed!`)
 }
 
 downloadBinary('stockfish', {
-  linux: 'https://github.com/niklasf/Stockfish/releases/download/fishnet-20200613/stockfish-x86_64',
-  win: 'https://github.com/niklasf/Stockfish/releases/download/fishnet-20200613/stockfish-windows-amd64.exe',
-  mac: 'https://github.com/niklasf/Stockfish/releases/download/fishnet-20200613/stockfish-osx-x86_64'
+  linux: { url: 'https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-ubuntu-x86-64-avx2.tar', kind: 'tar', entry: 'stockfish/stockfish-ubuntu-x86-64-avx2' },
+  win: { url: 'https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-windows-x86-64-avx2.zip', kind: 'zip', entry: 'stockfish/stockfish-windows-x86-64-avx2.exe' },
+  mac: { url: 'https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-macos-universal.zip', kind: 'zip', entry: 'stockfish/stockfish-macos-universal' }
 })
 
 downloadBinary('multi-variant-stockfish', {
@@ -99,6 +180,6 @@ downloadBinary('multi-variant-stockfish', {
 })
 
 downloadBinary('fairy-stockfish', {
-  linux: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_13/fairy-stockfish-largeboard_x86-64',
-  win: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_13/fairy-stockfish-largeboard_x86-64.exe'
+  linux: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_14/fairy-stockfish-largeboard_x86-64',
+  win: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_14/fairy-stockfish-largeboard_x86-64.exe'
 })
