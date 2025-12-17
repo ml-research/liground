@@ -94,9 +94,9 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import { bus } from '../main'
-  import AddPgnModal from './AddPgnModal'
+import { mapGetters } from 'vuex'
+import { bus } from '../main'
+import AddPgnModal from './AddPgnModal'
 // Use ipcRenderer to ask main process for native menus
 let ipcRenderer
 try {
@@ -208,7 +208,6 @@ export default {
         }
       }
     ]
-menuTemplate
     // store a simplified template (no functions) and request main to show it
     // items carry an `id` so the main process can forward click events back
     this.menuTemplate = [
