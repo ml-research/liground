@@ -1,0 +1,3 @@
+# Normalize line endings for shared data files
+tools/chess-openings/*.tsv text eol=lf
+src/shared/openings.json text eol=lf
