@@ -5,13 +5,13 @@
 
 import { app } from 'electron'
 import debug from 'electron-debug'
+// Optional: Try installing Vue Devtools (modern version)
+import { installVueDevtools } from '@vue/devtools'
 
 // Enable electron-debug with devtools open
 debug({ showDevTools: true })
 
-// Optional: Try installing Vue Devtools (modern version)
-import { installVueDevtools } from '@vue/devtools'
-
+// Install Vue Devtools
 app.whenReady().then(async () => {
   try {
     await installVueDevtools()

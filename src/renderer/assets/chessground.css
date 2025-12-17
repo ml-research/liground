@@ -128,25 +128,28 @@ cg-board piece.fading {
   position: absolute;
   display: flex;
   pointer-events: none;
-  opacity: 0.8;
-  font-size: 9px;
+  opacity: 0.9;
+  font-size: 10px;
+  color: var(--coord-color, var(--main-text-color));
 }
 .cg-wrap coords.ranks {
   right: -15px;
   top: 0;
   flex-flow: column-reverse;
+  justify-content: space-between;
   height: 100%;
-  width: 12px;
+  width: 18px;
 }
 .cg-wrap coords.ranks.black {
   flex-flow: column;
 }
 .cg-wrap coords.files {
-  bottom: -16px;
+  bottom: -15px;
   left: 0;
   flex-flow: row;
+  justify-content: space-between;
   width: 100%;
-  height: 16px;
+  height: 18px;
   text-transform: uppercase;
   text-align: center;
 }
@@ -154,8 +157,11 @@ cg-board piece.fading {
   flex-flow: row-reverse;
 }
 .cg-wrap coords coord {
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .cg-wrap coords.ranks coord {
-  transform: translateY(39%);
+  transform: none;
 }
