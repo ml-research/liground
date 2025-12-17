@@ -176,38 +176,6 @@ export default {
 
     bus.$on('collapseAllRounds', () => this.setVisibilityOfAllRounds(false))
 
-    const menuTemplate = [
-      {
-        label: 'Group by rounds',
-        type: 'checkbox',
-        checked: this.groupByRound,
-        click: function (item, browserWindow, event) {
-          bus.$emit('toggleGroup', item.checked)
-        }
-      },
-      {
-        label: 'Display unsupported',
-        type: 'checkbox',
-        checked: this.displayUnsupported,
-        click: function (item, browserWindow, event) {
-          bus.$emit('toggleUnsupported', item.checked)
-        }
-      },
-      {
-        label: 'Open all rounds',
-        type: 'normal',
-        click: function () {
-          bus.$emit('openAllRounds')
-        }
-      },
-      {
-        label: 'Collapse all rounds',
-        type: 'normal',
-        click: function () {
-          bus.$emit('collapseAllRounds')
-        }
-      }
-    ]
     // store a simplified template (no functions) and request main to show it
     // items carry an `id` so the main process can forward click events back
     this.menuTemplate = [
