@@ -1,6 +1,6 @@
 <template>
   <div class="settings">
-    <div class="panel">
+    <div class="panel"> //LiGround Settings
       <span class="title">LiGround Settings</span>
       <div class="switch-container">
         <span>Dark Mode</span>
@@ -21,7 +21,7 @@
         Reset to defaults
       </a>
     </div>
-    <div class="panel">
+    <div class="panel"> //Engine Settings
       <span class="title">Engine Settings</span>
       <div class="bar">
         <EngineSelect
@@ -120,7 +120,7 @@
         @save="modal.save"
       />
     </div>
-    <div class="panel">
+    <div class="panel"> //PvE Settings
       <div>
         <span class="title">PvE Settings</span>
         <Multiselect
@@ -144,6 +144,7 @@
           </tr>
         </table>
       </div>
+      //TODO the buttons below should maybe not be in the PvE panel
       <a
         class="btn green"
         @click="save"
