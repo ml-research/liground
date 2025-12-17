@@ -94,9 +94,9 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import { bus } from '../main'
-  import AddPgnModal from './AddPgnModal'
+import { mapGetters } from 'vuex'
+import { bus } from '../main'
+import AddPgnModal from './AddPgnModal'
 // Use ipcRenderer to ask main process for native menus
 let ipcRenderer
 try {
@@ -176,39 +176,6 @@ export default {
 
     bus.$on('collapseAllRounds', () => this.setVisibilityOfAllRounds(false))
 
-    const menuTemplate = [
-      {
-        label: 'Group by rounds',
-        type: 'checkbox',
-        checked: this.groupByRound,
-        click: function (item, browserWindow, event) {
-          bus.$emit('toggleGroup', item.checked)
-        }
-      },
-      {
-        label: 'Display unsupported',
-        type: 'checkbox',
-        checked: this.displayUnsupported,
-        click: function (item, browserWindow, event) {
-          bus.$emit('toggleUnsupported', item.checked)
-        }
-      },
-      {
-        label: 'Open all rounds',
-        type: 'normal',
-        click: function () {
-          bus.$emit('openAllRounds')
-        }
-      },
-      {
-        label: 'Collapse all rounds',
-        type: 'normal',
-        click: function () {
-          bus.$emit('collapseAllRounds')
-        }
-      }
-    ]
-menuTemplate
     // store a simplified template (no functions) and request main to show it
     // items carry an `id` so the main process can forward click events back
     this.menuTemplate = [
