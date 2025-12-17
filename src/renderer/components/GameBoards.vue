@@ -64,6 +64,12 @@
               :size="setFenSize()"
               @change="checkValidFEN"
             >
+            <div
+              v-if="opening"
+              class="opening-label"
+            >
+              {{ opening.eco }} – {{ opening.name }}
+            </div>
           </div>
           <div
             v-else
@@ -78,6 +84,12 @@
               :size="setFenSize()"
               @change="checkValidFEN"
             >
+            <div
+              v-if="opening"
+              class="opening-label"
+            >
+              {{ opening.eco }} – {{ opening.name }}
+            </div>
           </div>
           <div
             v-if="QuickTourIndex !== 5"
@@ -139,6 +151,7 @@ import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
 import EvalPlotButton from './EvalPlotButton'
 import GameInfo from './GameInfo.vue'
+import { findBestOpeningForFen } from '../../shared/openingLookup'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -177,6 +190,12 @@ export default {
     },
     fen () {
       return this.$store.getters.fen
+    },
+    opening () {
+      if (!this.fen) return null
+      // only makes sense for standard chess
+      if (this.variant && this.variant !== 'chess') return null
+      return this.findOpeningProgressive()
     },
     mainFirstMove () {
       return this.$store.getters.mainFirstMove
@@ -346,6 +365,21 @@ export default {
     },
     deselectPocketPieces () {
       this.$store.commit('selectPocketPiece', ['boardA', ''])
+    },
+    findOpeningProgressive () {
+      let mov = this.currentMove
+      // check current position
+      const opening = findBestOpeningForFen(this.fen)
+      if (opening) return opening
+
+      // if no exact match, backtrack
+      while (mov && mov.prev) {
+        mov = mov.prev
+        const opening = findBestOpeningForFen(mov.fen)
+        if (opening) return opening
+      }
+
+      return null
     },
     getBoardPos (event) {
       if (event.explicitOriginalTarget.className === 'cg-board' && this.selectedPockedPiece.boardA !== '') {
@@ -616,6 +650,23 @@ input {
 ::-webkit-scrollbar-corner {
   background: var(--main-bg-color);
   border-radius: 8px;
+}
+
+.opening-label {
+  margin-top: 4px;
+  font-size: 11pt;
+  color: var(--main-text-color);
+  opacity: 0.9;
+}
+
+.opening-label-qt {
+  margin-top: 4px;
+  font-size: 11pt;
+  color: var(--main-text-color);
+  opacity: 0.9;
+  border: 5px solid var(--quicktour-highlight);
+  padding: 2px 4px;
+  border-radius: 4px;
 }
 
 </style>
