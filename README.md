@@ -59,9 +59,9 @@ npm run lint
 ### Post-Installation Actions
 LiGround ships with preincluded engine binaries. By default all engines are downloaded automatically into the `./engines/` folder as postinstall action. However, if no prebuilt binaries are available for you system or something goes wrong, please go ahead and build/download them manually:
 
-* Download [Stockfish 2020-06-13](https://github.com/niklasf/Stockfish/releases/fishnet-20200613) and rename it to `stockfish`
+* Stockfish 17: download the archive for your platform ([Linux AVX2](https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-ubuntu-x86-64-avx2.tar), [Windows AVX2](https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-windows-x86-64-avx2.zip), [macOS universal](https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-macos-universal.zip)), extract it, and copy/rename the binary to `stockfish` (or `stockfish.exe`).
 * Download [Multi-Variant-Stockfish 10](https://github.com/ddugovic/Stockfish/releases/variant_sf_10) and rename it to `multi-variant-stockfish`
-* Download [Fairy-Stockfish 13 **Largeboard**](https://github.com/ianfab/Fairy-Stockfish/releases/fairy_sf_13) and rename it to `fairy-stockfish`
+* Download [Fairy-Stockfish 14 **Largeboard**](https://github.com/fairy-stockfish/Fairy-Stockfish/releases/fairy_sf_14) and rename it to `fairy-stockfish`
 
 ### Libraries
 The following libraries or assets are used in **LiGround**:

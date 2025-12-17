@@ -18,7 +18,7 @@ function resolveBinary (name) {
 
 // first engine in the list has highest priority for default engine selection
 export default {
-  'Stockfish 12': {
+  'Stockfish 17': {
     binary: resolveBinary('stockfish'),
     cwd: enginePath,
     logo: logoStockfish,
