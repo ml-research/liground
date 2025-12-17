@@ -499,16 +499,34 @@ export default {
         }, 1500)
       }
     },
-    addCustom (counter) {
+    async addCustom (counter) {
       if (counter > 5) {
         alert("You can't add more than 5 Custom Designs")
         return
       }
-      return this.$electron.remote.dialog.showOpenDialog({
-        title: 'Choose Custom Board Style',
-        properties: ['openFile'],
-        filters: [{ name: 'SVG Files', extensions: ['svg'] }]
-      })
+      // Try IPC fallback: ask main process to show dialog
+      let ipcRenderer
+      try {
+        // eslint-disable-next-line
+        ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+      } catch (e) {
+        ipcRenderer = null
+      }
+      if (!ipcRenderer || !ipcRenderer.invoke) {
+        console.log('File dialog not available')
+        return { canceled: true }
+      }
+      try {
+        const res = await ipcRenderer.invoke('show-open-dialog', {
+          title: 'Choose Custom Board Style',
+          properties: ['openFile'],
+          filters: [{ name: 'SVG Files', extensions: ['svg'] }]
+        })
+        return res
+      } catch (err) {
+        console.log(err)
+        return { canceled: true }
+      }
     },
     updateBoardStyle (payload) {
       if (payload === 'Add Custom') {
