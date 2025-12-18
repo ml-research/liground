@@ -24,14 +24,7 @@ export default {
     logo: logoStockfish,
     variants: [
       'chess',
-      'antichess',
-      'atomic',
-      'crazyhouse',
-      'horde',
-      'kingofthehill',
-      'racingkings',
-      '3check',
-      'giveaway'
+      'fischerandom'
     ]
   },
   'Multi-Variant-Stockfish 10': {
