@@ -20,26 +20,16 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'EvalBar',
   computed: {
-    ...mapGetters(['orientation', 'cpForWhitePerc', 'cpForWhite']),
-    // compute W/D/L probabilities from centipawn evaluation
-    wdlDrawPct () {
-      const cp = this.cpForWhite || 0
-      const minDraw = 0.05
-      const drawAtZero = 0.65
-      const draw = minDraw + (drawAtZero - minDraw) * Math.exp(-Math.abs(cp) / 500)
-      return Math.max(0, Math.min(100, draw * 100))
-    },
+    ...mapGetters(['orientation', 'cpForWhitePerc', 'cpForWhite', 'wdlForWhiteWinPct', 'wdlForWhiteDrawPct', 'wdlForWhiteLossPct']),
+    
     wdlWinPct () {
-      const s = this.cpForWhitePerc
-      const draw = this.wdlDrawPct / 100
-      let win = s - 0.5 * draw
-      if (win < 0) win = 0
-      if (win > 1 - draw) win = 1 - draw
-      return win * 100
+      return this.wdlForWhiteWinPct ?? 0
+    }, 
+    wdlDrawPct () {
+      return this.wdlForWhiteDrawPct ?? 0
     },
     wdlLossPct () {
-      const loss = 1 - (this.wdlWinPct / 100) - (this.wdlDrawPct / 100)
-      return Math.max(0, Math.min(100, loss * 100))
+      return this.wdlForWhiteLossPct ?? 0
     }
   }
 }
