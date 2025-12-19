@@ -18,20 +18,13 @@ function resolveBinary (name) {
 
 // first engine in the list has highest priority for default engine selection
 export default {
-  'Stockfish 12': {
+  'Stockfish 17': {
     binary: resolveBinary('stockfish'),
     cwd: enginePath,
     logo: logoStockfish,
     variants: [
       'chess',
-      'antichess',
-      'atomic',
-      'crazyhouse',
-      'horde',
-      'kingofthehill',
-      'racingkings',
-      '3check',
-      'giveaway'
+      'fischerandom'
     ]
   },
   'Multi-Variant-Stockfish 10': {
@@ -60,7 +53,7 @@ export default {
       'twokingssymmetric'
     ]
   },
-  'Fairy Stockfish 13': {
+  'Fairy Stockfish 14': {
     binary: resolveBinary('fairy-stockfish'),
     cwd: enginePath,
     logo: logoStockfishPurple,

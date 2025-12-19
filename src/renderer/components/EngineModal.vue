@@ -138,7 +138,6 @@ export default {
       }
     },
     async selectPath () {
-      let file
       // Try IPC fallback: ask main process to show dialog
       let ipcRenderer
       try {
@@ -153,8 +152,7 @@ export default {
         return
       }
       const res = await ipcRenderer.invoke('show-open-dialog', { properties: ['openFile'] })
-      file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
-      
+      const file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
       if (file) {
         if (this.cwd.length === 0 || this.cwd === path.dirname(this.binary)) {
           this.cwd = path.dirname(file)
@@ -163,7 +161,6 @@ export default {
       }
     },
     async selectImage () {
-      let file
       let ipcRenderer
       try {
         // eslint-disable-next-line
@@ -182,8 +179,7 @@ export default {
           { name: 'All Files', extensions: ['*'] }
         ]
       })
-      file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
-    
+      const file = Array.isArray(res && res.filePaths) ? res.filePaths[0] : undefined
       if (file) {
         const base64 = await fs.readFile(file, { encoding: 'base64' })
         this.logo = `data:image/${this.imageExtToMime(path.extname(file))};base64,${base64}`
