@@ -131,7 +131,10 @@ export default {
       }
       return null
     },
-    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
+    limiter () {
+      return this.$store.getters.limiterForEngine(this.currentEngine)
+    },
+    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
     pvcount () {
@@ -153,8 +156,8 @@ export default {
     },
     nodes () {
       if (this.active && this.PvE && !this.turn) {
-        if (this.PvEValue === 'nodes') {
-          if (this.nodes >= (this.PvEInput)) {
+        if (this.limiter.value === 'nodes') {
+          if (this.nodes >= (this.limiter.input)) {
             this.onClick(this.lines[0])
           }
         }
@@ -162,8 +165,17 @@ export default {
     },
     depth () {
       if (this.active && this.PvE && !this.turn) {
-        if (this.PvEValue === 'depth') {
-          if (this.depth >= (this.PvEInput)) {
+        if (this.limiter.value === 'depth') {
+          if (this.depth >= (this.limiter.input)) {
+            this.onClick(this.lines[0])
+          }
+        }
+      }
+    },
+    enginetime () {
+      if (this.active && this.PvE && !this.turn) {
+        if (this.limiter.value === 'time') {
+          if (this.enginetime >= (this.limiter.input)) {
             this.onClick(this.lines[0])
           }
         }

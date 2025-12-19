@@ -1,6 +1,6 @@
 <template>
   <div class="settings">
-    <div class="panel"> //LiGround Settings
+    <div class="panel"> <!-- LiGround Settings -->
       <span class="title">LiGround Settings</span>
       <div class="switch-container">
         <span>Dark Mode</span>
@@ -21,7 +21,7 @@
         Reset to defaults
       </a>
     </div>
-    <div class="panel"> //Engine Settings
+    <div class="panel"> <!-- Engine Settings -->
       <span class="title">Engine Settings</span>
       <div class="bar">
         <EngineSelect
@@ -120,7 +120,7 @@
         @save="modal.save"
       />
     </div>
-    <div class="panel"> //PvE Settings
+    <div class="panel"> <!-- PvE Settings -->
       <div>
         <span class="title">PvE Settings</span>
         <Multiselect
@@ -144,7 +144,7 @@
           </tr>
         </table>
       </div>
-      //TODO the buttons below should maybe not be in the PvE panel
+      <!-- TODO the buttons below should maybe not be in the PvE panel -->
       <a
         class="btn green"
         @click="save"
@@ -206,6 +206,9 @@ export default {
   watch: {
     engineOptions () {
       this.resetSettings()
+    },
+    engineIndex () {
+      this.resetSettings()
     }
   },
   methods: {
@@ -250,6 +253,7 @@ export default {
       this.$store.commit('viewAnalysis', true)
     },
     updateSettings () {
+      console.log('updating settings')
       const changed = {}
       for (const [name, value] of Object.entries(this.settings)) {
         if (value !== this.engineSettings[name]) {
@@ -257,27 +261,19 @@ export default {
         }
       }
       this.$store.dispatch('setEngineOptions', changed)
-      this.$store.dispatch('setPvEValue', this.value)
+      this.$store.dispatch('setLimiterValue', { engineIndex: this.engineIndex, value: this.value })
       switch (this.value) {
         case 'time':
-          this.$store.dispatch(
-            'setPvEParam',
-            'go movetime ' + this.PvEInput * 1000
-          )
-          this.$store.dispatch('setPvEInput', this.PvEInput * 1000)
+          this.$store.dispatch('setLimiterParam', { engineIndex: this.engineIndex, param: 'go movetime ' + this.PvEInput * 1000 })
+          this.$store.dispatch('setLimiterInput', { engineIndex: this.engineIndex, input: this.PvEInput * 1000 })
           break
         case 'nodes':
-          this.$store.dispatch(
-            'setPvEParam',
-            'go nodes ' + this.PvEInput * 1000000 + ' movetime 60000'
-          )
-          this.$store.dispatch('setPvEInput', this.PvEInput * 1000000)
+          this.$store.dispatch('setLimiterParam', { engineIndex: this.engineIndex, param: 'go nodes ' + this.PvEInput * 1000000 + ' movetime 60000' })
+          this.$store.dispatch('setLimiterInput', { engineIndex: this.engineIndex, input: this.PvEInput * 1000000 })
           break
         case 'depth':
-          this.$store.dispatch(
-            'setPvEParam',
-            'go depth ' + this.PvEInput + ' movetime 60000')
-          this.$store.dispatch('setPvEInput', this.PvEInput)
+          this.$store.dispatch('setLimiterParam', { engineIndex: this.engineIndex, param: 'go depth ' + this.PvEInput + ' movetime 60000' })
+          this.$store.dispatch('setLimiterInput', { engineIndex: this.engineIndex, input: this.PvEInput })
           break
         default:
           break
@@ -292,6 +288,19 @@ export default {
         if (type !== 'button') {
           this.settings[name] = this.engineSettings[name]
         }
+      }
+      // load per-engine limiter settings
+      const limiter = this.$store.getters.limiterForEngine(this.engineIndex)
+      this.value = limiter.value || 'time'
+      if (this.value === 'time') {
+        this.settingsName = 'Time in seconds'
+        this.PvEInput = limiter.input ? limiter.input / 1000 : 1
+      } else if (this.value === 'nodes') {
+        this.settingsName = 'Number of nodes in Million'
+        this.PvEInput = limiter.input ? limiter.input / 1000000 : 5
+      } else if (this.value === 'depth') {
+        this.settingsName = 'depth of'
+        this.PvEInput = limiter.input || 20
       }
     },
     editEngine () {

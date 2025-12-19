@@ -110,9 +110,13 @@ export const store = new Vuex.Store({
     initialized: false,
     active: false,
     PvE: false,
-    PvEParam: 'go movetime 1000',
-    PvEValue: 'time',
-    PvEInput: 1000,
+    limiterSettings: {
+      1: {
+        value: 'time',
+        input: 1000,
+        param: 'go movetime 1000'
+      }
+    },
     resized: 0,
     resized9x9height: 0,
     resized9x9width: 0,
@@ -273,14 +277,23 @@ export const store = new Vuex.Store({
     PvE (state, payload) {
       state.PvE = payload
     },
-    PvEParam (state, payload) {
-      state.PvEParam = payload
+    setLimiterParam (state, { engineIndex, param }) {
+      if (!state.limiterSettings[engineIndex]) {
+        Vue.set(state.limiterSettings, engineIndex, { value: 'time', input: 1000, param: '' })
+      }
+      state.limiterSettings[engineIndex].param = param
     },
-    PvEValue (state, payload) {
-      state.PvEValue = payload
+    setLimiterValue (state, { engineIndex, value }) {
+      if (!state.limiterSettings[engineIndex]) {
+        Vue.set(state.limiterSettings, engineIndex, { value: 'time', input: 1000, param: '' })
+      }
+      state.limiterSettings[engineIndex].value = value
     },
-    PvEInput (state, payload) {
-      state.PvEInput = payload
+    setLimiterInput (state, { engineIndex, input }) {
+      if (!state.limiterSettings[engineIndex]) {
+        Vue.set(state.limiterSettings, engineIndex, { value: 'time', input: 1000, param: '' })
+      }
+      state.limiterSettings[engineIndex].input = input
     },
     quicktourIndexIncr (state) {
       state.QuickTourIndex++
@@ -549,9 +562,13 @@ export const store = new Vuex.Store({
         engineIndex: 1,
         enginesActive: [false],
         PvE: false,
-        PvEParam: 'go movetime 1000',
-        PvEValue: 'time',
-        PvEInput: 1000,
+        limiterSettings: {
+          1: {
+            value: 'time',
+            input: 1000,
+            param: 'go movetime 1000'
+          }
+        },
         resized: 0,
         resized9x9height: 0,
         resized9x9width: 0,
@@ -723,15 +740,9 @@ export const store = new Vuex.Store({
       context.commit('resetMultiPV')
       context.commit('resetEngineStats')
     },
-    setPvEParam (context, payload) {
-      context.commit('PvEParam', payload)
-    },
-    setPvEValue (context, payload) {
-      context.commit('PvEValue', payload)
-    },
-    setPvEInput (context, payload) {
-      context.commit('PvEInput', payload)
-    },
+    setLimiterParam (context, payload) { context.commit('setLimiterParam', payload) },
+    setLimiterValue (context, payload) { context.commit('setLimiterValue', payload) },
+    setLimiterInput (context, payload) { context.commit('setLimiterInput', payload) },
     setDimNumber (context, payload) {
       context.commit('dimNumber', payload)
     },
@@ -756,7 +767,7 @@ export const store = new Vuex.Store({
       context.commit('active', true)
     },
     goEnginePvE (context) {
-      engine.send(context.getters.PvEParam)
+      engine.send(context.getters.limiterParam)
       context.commit('setEngineClock')
     },
     PvEMakeMove (context, payload) {
@@ -861,14 +872,14 @@ export const store = new Vuex.Store({
     engineIndex (context, payload) {
       context.commit('engineIndex', payload)
     },
-    PvEParam (context, payload) {
-      context.commit('PvEParam', payload)
+    setLimiterParam (context, payload) {
+      context.commit('setLimiterParam', payload)
     },
-    PvEValue (context, payload) {
-      context.commit('PvEValue', payload)
+    setLimiterValue (context, payload) {
+      context.commit('setLimiterValue', payload)
     },
-    PvEInput (context, payload) {
-      context.commit('PvEInput', payload)
+    setLimiterInput (context, payload) {
+      context.commit('setLimiterInput', payload)
     },
     dimNumber (context, payload) {
       context.commit('dimNumber', payload)
@@ -1321,15 +1332,22 @@ export const store = new Vuex.Store({
     PvE (state) {
       return state.PvE
     },
-    PvEParam (state) {
-      return state.PvEParam
+    limiterForEngine (state) {
+      return (engineIndex) => state.limiterSettings[engineIndex] || { value: 'time', input: 1000, param: 'go movetime 1000' }
     },
-    PvEValue (state) {
-      return state.PvEValue
+    limiterParam (state, getters) {
+      return getters.limiterForEngine(state.engineIndex).param
     },
-    PvEInput (state) {
-      return state.PvEInput
+    limiterValue (state, getters) {
+      return getters.limiterForEngine(state.engineIndex).value
     },
+    limiterInput (state, getters) {
+      return getters.limiterForEngine(state.engineIndex).input
+    },
+    PvEParam (state, getters) { return getters.limiterParam },
+    PvEValue (state, getters) { return getters.limiterValue },
+    PvEInput (state, getters) { return getters.limiterInput },
+
     dimNumber (state) {
       return state.dimNumber
     },
