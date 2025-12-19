@@ -110,6 +110,7 @@ export const store = new Vuex.Store({
     initialized: false,
     active: false,
     PvE: false,
+    PvEPlayerIsWhite: true, // true when the human player controls White in PvE mode
     PvEParam: 'go movetime 1000',
     PvEValue: 'time',
     PvEInput: 1000,
@@ -272,6 +273,9 @@ export const store = new Vuex.Store({
     },
     PvE (state, payload) {
       state.PvE = payload
+    },
+    PvEPlayerIsWhite (state, payload) {
+      state.PvEPlayerIsWhite = payload
     },
     PvEParam (state, payload) {
       state.PvEParam = payload
@@ -774,8 +778,22 @@ export const store = new Vuex.Store({
     enginesActive (context, payload) {
       context.commit('enginesActive', payload)
     },
-    PvEtrue (context) {
+    PvEtrue (context, payload = { playerIsWhite: true }) {
+      // Enable PvE mode and remember which side the human player controls.
+      // payload.playerIsWhite = true means the human is White (legacy behavior).
+      const playerIsWhite = payload && typeof payload.playerIsWhite !== 'undefined' ? payload.playerIsWhite : true
       context.commit('PvE', true)
+      context.commit('PvEPlayerIsWhite', playerIsWhite)
+
+      // If the human is Black (playerIsWhite === false) and the position's turn is White,
+      // the engine (playing White) must move immediately. Trigger engine to compute on the
+      // current position by sending the 'position' followed by the engine 'go' command.
+      // This mirrors logic used in restart and turn watchers elsewhere that kick off the engine
+      // when it's the engine's turn in PvE mode.
+      if (!playerIsWhite && context.getters.turn === true) {
+        context.dispatch('position')
+        context.dispatch('goEnginePvE')
+      }
     },
     stopEnginePvE (context) {
       engine.send('stop')
@@ -1320,6 +1338,9 @@ export const store = new Vuex.Store({
     },
     PvE (state) {
       return state.PvE
+    },
+    PvEPlayerIsWhite (state) {
+      return state.PvEPlayerIsWhite
     },
     PvEParam (state) {
       return state.PvEParam

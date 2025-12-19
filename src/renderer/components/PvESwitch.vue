@@ -38,37 +38,55 @@ export default {
   },
   watch: {
     depth () {
+      // If we're in PvE and the analysis depth changes while it's the player's turn,
+      // reset engine-related data/time so timings stay sensible.
       if (this.active && this.PvE && this.turn && this.depth > 0) {
         this.$store.dispatch('resetEngineData')
         this.$store.commit('resetEngineTime')
       }
     },
     turn () {
+      // When the turn flips to the player while in PvE, reset engine timers/data.
       if (this.turn && this.PvE) {
         this.$store.dispatch('resetEngineData')
         this.$store.commit('resetEngineTime')
       }
     },
     PvE () {
+      // This watcher reacts to entering/exiting PvE mode.
+      // Several scenarios are handled:
+      // - If we switch out of engine activity back to a normal player position, refresh position.
       if (!this.active && !this.PvE && this.turn) {
         this.$store.dispatch('position')
       }
+
+      // - If the engine is active and PvE is enabled while it is the player's turn,
+      //   reset engine state and stop any running PvE engine task.
       if (this.active && this.PvE && this.turn) {
         this.$store.dispatch('resetEngineData')
         this.$store.commit('resetEngineTime')
         this.$store.dispatch('stopEnginePvE')
       }
+
+      // - If the engine is active and PvE is enabled while it is NOT the player's turn,
+      //   ensure the engine starts calculating for PvE.
       if (this.active && this.PvE && !this.turn) {
-        // may lead to an inconsistent engine
+        // may lead to an inconsistent engine if it was previously running; stop it first
         engine.send('stop')
         this.$store.dispatch('goEnginePvE')
       }
+
+      // Note: starting PvE via the switch intentionally sets playerIsWhite: true (human = White).
+      // The actual behavior for "player is Black" is handled in the store 'PvEtrue' action which
+      // will kick off the engine immediately if the engine must move on enable.
     }
   },
   methods: {
     onClick () {
       if (!this.PvE) {
-        this.$store.dispatch('PvEtrue')
+        // PvESwitch historically starts PvE with the human as White.
+        // Pass playerIsWhite: true to preserve legacy behavior.
+        this.$store.dispatch('PvEtrue', { playerIsWhite: true })
         if (confirm('Do you want to start with opening suit?')) {
           this.openingSuit()
         }

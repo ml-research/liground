@@ -46,6 +46,17 @@
       PvE
       <PvESwitch />
     </div>
+
+    <!-- Start New Game button shown next to PvE switch -->
+    <div v-if="QuickTourIndex !== 10" id="StartGameButton">
+      <button class="startGame" @click="openStartModal">Start New Game</button>
+    </div>
+    <div v-else id="StartGameButton-qt">
+      <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+    </div>
+
+    <!-- Modal component for selecting roles for white/black (UI only) -->
+    <StartGameModal :visible="showStartModal" @close="closeStartModal" @start="handleStart" />
   </div>
 </template>
 
@@ -53,16 +64,18 @@
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
 import PvESwitch from './PvESwitch.vue'
-import { mapGetters, mapState } from 'vuex'
+import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engine for White & Black
+import { mapGetters, mapState } from 'vuex' 
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, PvESwitch
+    Multiselect, Mode960, PvESwitch, StartGameModal
   },
   data () {
     return {
-      selected: '♟️ Standard'
+      selected: '♟️ Standard',
+      showStartModal: false // controls visibility of the start game modal
     }
   },
   computed: {
@@ -93,6 +106,25 @@ export default {
         this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
         this.$emit('resetMultiEngine')
       }
+    },
+
+    // Open the Start Game modal
+    openStartModal () {
+      this.showStartModal = true
+    },
+
+    // Close the Start Game modal
+    closeStartModal () {
+      this.showStartModal = false
+    },
+
+    // Handle start request from modal; this is a UI-only stub for now
+    // Payload example: { white: 'player'|'engine', black: 'player'|'engine' }
+    handleStart (payload) {
+      // TODO: wire-up actual game start logic in future
+      console.log('[StartGame] Requested start with', payload)
+      this.$emit('startNewGame', payload) // notify parent (if needed)
+      this.closeStartModal()
     }
   }
 }
@@ -135,6 +167,36 @@ export default {
 #PvESwitch{
   margin-top: 8px;
   display: flex;
+}
+
+/* Start game button styles */
+#StartGameButton-qt{
+  margin-left: 8px;
+  display: flex;
+  border: 5px solid var(--quicktour-highlight);
+}
+#StartGameButton{
+  margin-top: 8px;
+  display: flex;
+}
+.startGame {
+  background-color: #2ecc71; /* green */
+  color: white;
+  border-radius: 5px;
+  padding: 6px 10px;
+  border: none;
+}
+.startGame:hover {
+  background-color: #23c663;
+  cursor: pointer;
+}
+.startGame-qt{
+  background-color: #2ecc71;
+  color: white;
+  border-radius: 5px;
+  padding: 6px 10px;
+  border: none;
+  box-shadow: 0 0 0 3px var(--quicktour-highlight) inset;
 }
 .grid-parent {
   display: grid;
