@@ -13,9 +13,9 @@ We provide binary releases for the following plattforms:
 
 Operating System | Version
 ---              | ---
-Linux            | [**liground-0.5.0-linux.AppImage**](https://github.com/ml-research/liground/releases/download/0.5.0/liground-0.5.0-linux.AppImage)
-Windows          | [**liground-Setup-0.5.0-win.exe**](https://github.com/ml-research/liground/releases/download/0.5.0/liground-Setup-0.5.0-win.exe)                              
-Mac              | [**liground-0.5.0-mac.zip**](https://github.com/ml-research/liground/releases/download/0.5.0/liground-0.5.0-mac.zip)
+Linux            | [**liground-0.5.1-linux.AppImage**](https://github.com/ml-research/liground/releases/download/0.5.1/liground-0.5.1.AppImage)
+Windows          | [**liground-Setup-0.5.1-win.exe**](https://github.com/ml-research/liground/releases/download/0.5.1/liground.Setup.0.5.1.win.exe)                              
+Mac              | [**liground-0.5.1-mac.zip**](https://github.com/ml-research/liground/releases/download/0.5.1/liground-0.5.1-mac.zip)
 
 The current _LiGround_ release and all its previous versions can also be found at [releases](https://github.com/ml-research/liground/releases).
 
@@ -91,3 +91,4 @@ Project | Description
 ---
 
 This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[45a3e22](https://github.com/SimulatedGREG/electron-vue/tree/45a3e224e7bb8fc71909021ccfdcfec0f461f634) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+
