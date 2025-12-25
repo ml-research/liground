@@ -34,10 +34,10 @@
       >
         <div
           v-if="line"
-          :key="id"
+          :key="`line-${id}`"
           class="item clickable"
           @mouseenter="onMouseEnter(id)"
-          @mouseleave="onMouseLeave(id)"
+          @mouseleave="onMouseLeave"
           @click="onClick(line)"
         >
           <span class="left">{{ line.cpDisplay }}</span>
@@ -45,12 +45,21 @@
             class="right"
             @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
           >
-            {{ line.pv }}
+            <span
+              v-for="(entry, idx) in line.pv.split(' ')"
+              :key="idx"
+              class="pv-entry"
+              @mouseenter="setPreview(id, idx, line.pv.split(' '))"
+              @mouseleave="clearPreview"
+            >
+              {{ entry }}
+              <span v-show="previewLineId === id && displayIdx === idx">{{previewFen}}</span>
+            </span>
           </span>
         </div>
         <div
           v-else
-          :key="id"
+          :key="`placeholder-${id}`"
           class="item placeholder"
         >
           ...
@@ -84,6 +93,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import VueContext from 'vue-context/src/js/index'
+import ffish from 'ffish'
 
 export default {
   components: {
@@ -104,6 +114,10 @@ export default {
           ucimove: ''
         }
       ],
+      previewLineId: null, // Shows which PV line is being previewed
+      previewUciIdx: null,
+      displayIdx: null,
+      previewFen: null,
       currentEngine: 1,
       pvcount: 0,
       originalMultiPV: 1,
@@ -131,7 +145,7 @@ export default {
       }
       return null
     },
-    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
+    ...mapGetters(['moves', 'fen','is960','variant', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
     pvcount () {
@@ -195,10 +209,83 @@ export default {
       const prevMov = this.currentMove
       this.$store.dispatch('pushAltLine', { line: mainLine, prev: prevMov })
     },
+    computePreviewFen(baseFen, pvUciMoves, plyCount) {
+      const b = this.is960
+      ? new ffish.Board(this.variant, baseFen, true)
+      : new ffish.Board(this.variant, baseFen)
+
+      for (let i = 0; i < plyCount; i++){
+        b.push(pvUciMoves[i])
+      }
+      return b.fen()
+    },
+    countMovesUpTo (entries, displayIdx) {
+      console.log(entries)
+      let moveNum = 0
+      for (let i = 0; i <= displayIdx; i++){
+        if (this.isMoveToken(entries[i])){
+          moveNum++
+        }
+      }
+      console.log(moveNum)
+      return moveNum
+    },
+    setPreview (lineId, displayIdx, entries) {
+      const previewIdx = this.previewIndex(displayIdx, entries)
+      if (previewIdx === null) {
+        this.clearPreview()
+        return
+      }
+
+      const uciIndex = this.countMovesUpTo(entries, previewIdx)
+      this.previewLineId = lineId
+      this.previewUciIdx = uciIndex 
+      this.displayIdx = previewIdx
+
+      const uciMoves = this.lines[lineId].pvUCI.trim().split(/\s+/)
+      const plyCount = uciIndex
+      try {
+        this.previewFen = this.computePreviewFen(this.fen, uciMoves, plyCount)
+      } catch(e) {
+        this.clearPreview()
+        return
+      }
+    },
+    clearPreview () {
+      this.previewLineId = null
+      this.displayIdx = null
+      this.previewUciIdx = null
+      this.previewFen = null
+    },
+    previewIndex (displayIdx, entries) {
+      const entry = entries[displayIdx]
+      if (this.isMoveNumber(entry)) {
+        return this.nextMoveIndex(displayIdx + 1, entries)
+      }
+      if (!this.isMoveToken(entry)) {
+        return null
+      }
+      return displayIdx
+    },
+    nextMoveIndex (startIdx, entries) {
+      for (let idx = startIdx; idx < entries.length; idx++) {
+        if (this.isMoveToken(entries[idx])) {
+          return idx
+        }
+      }
+      return null
+    },
+    isMoveNumber (entry) {
+      return /^\d+\.+$/.test(entry) // Match move numbers like "1." or "12..."
+    },
+    isMoveToken (entry) {
+      return entry.length > 0 && !this.isMoveNumber(entry)
+    },
     onMouseEnter (id) {
       this.$store.commit('hoveredpv', id)
     },
-    onMouseLeave (id) {
+    onMouseLeave () {
+      this.clearPreview()
       this.$store.commit('hoveredpv', -1)
     },
     onClick (line) {
