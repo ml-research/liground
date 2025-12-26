@@ -184,12 +184,8 @@ export default class EngineDriver {
   async initialize () {
     // send "uci" to engine
     this._write('uci')
-
-    
-
     // wait until done
     await waitFor(this.events, 'initialized')
-
     // perform ready check
     await this.waitForReady()
   }
