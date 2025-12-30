@@ -6,14 +6,61 @@
         <h3>Start New Game</h3>
       </div>
 
-      <!-- Modal body: choose Player or Engine for both sides -->
+      <!-- Modal body: choose Game Mode and Player/Engine for both sides -->
       <div class="modal-body">
+        <div class="game-mode">
+          <label for="game-mode-select"><b>Game mode</b></label>
+          <select id="game-mode-select" v-model="selectedGameMode">
+            <option v-for="opt in gameModeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+
         <div class="side-select">
           <label for="white-select"><b>White</b></label>
           <select id="white-select" v-model="whiteChoice">
             <option value="player">Player</option>
             <option value="engine">Engine</option>
           </select>
+
+          <!-- Engine-specific controls for White -->
+          <div v-if="whiteChoice === 'engine'" class="engine-config">
+            <label><small><b>Engine</b></small></label>
+
+            <div class="engine-select-row">
+              <div class="engine-logo" :style="{ backgroundImage: whiteEngineLogo }" />
+              <Multiselect
+                v-model="whiteEngineObj"
+                class="engine-select"
+                label="name"
+                track-by="name"
+                :options="filteredEngines"
+                :allow-empty="false"
+                :show-labels="false"
+                placeholder="Select engine"
+                @change="onWhiteEngineChanged"
+              />
+            </div>
+
+            <label class="engine-limiter">
+              <input type="checkbox" v-model="whiteLimiterEnabled" /> Engine limiter
+            </label>
+
+            <div v-if="whiteLimiterEnabled" class="limiter-controls">
+              <Multiselect
+                v-model="whiteLimiterType"
+                :options="options"
+                :allow-empty="false"
+                :show-labels="false"
+              />
+              <input
+                type="number"
+                class="limiter-input"
+                v-model.number="whiteLimiterValue"
+                :min="minForType(whiteLimiterType)"
+              />
+              <div class="limiter-unit">{{ unitForType(whiteLimiterType) }}</div>
+            </div>
+          </div>
         </div>
 
         <div class="side-select">
@@ -22,9 +69,49 @@
             <option value="player">Player</option>
             <option value="engine">Engine</option>
           </select>
+
+          <!-- Engine-specific controls for Black -->
+          <div v-if="blackChoice === 'engine'" class="engine-config">
+            <label><small><b>Engine</b></small></label>
+
+            <div class="engine-select-row">
+              <div class="engine-logo" :style="{ backgroundImage: blackEngineLogo }" />
+              <Multiselect
+                v-model="blackEngineObj"
+                class="engine-select"
+                label="name"
+                track-by="name"
+                :options="filteredEngines"
+                :allow-empty="false"
+                :show-labels="false"
+                placeholder="Select engine"
+                @change="onBlackEngineChanged"
+              />
+            </div>
+
+            <label class="engine-limiter">
+              <input type="checkbox" v-model="blackLimiterEnabled" /> Engine limiter
+            </label>
+
+            <div v-if="blackLimiterEnabled" class="limiter-controls">
+              <Multiselect
+                v-model="blackLimiterType"
+                :options="options"
+                :allow-empty="false"
+                :show-labels="false"
+              />
+              <input
+                type="number"
+                class="limiter-input"
+                v-model.number="blackLimiterValue"
+                :min="minForType(blackLimiterType)"
+              />
+              <div class="limiter-unit">{{ unitForType(blackLimiterType) }}</div>
+            </div>
+          </div>
         </div>
 
-        <p class="hint">Choose whether each side should be controlled by a human player or an engine (PvP, PvE, EvE supported).</p>
+        <p class="hint">Choose whether each side should be controlled by a human player or an engine (PvP, PvE, EvE supported). Only engines that support the selected Game Mode are listed.</p>
       </div>
 
       <!-- Modal footer: Start (left) and Close (right) -->
@@ -37,6 +124,8 @@
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect'
+
 export default {
   name: 'StartGameModal',
   props: {
@@ -46,11 +135,70 @@ export default {
       default: false
     }
   },
+  components: { Multiselect },
   data () {
     return {
       // Default selections
       whiteChoice: 'player',
-      blackChoice: 'engine'
+      blackChoice: 'engine',
+
+      // Game mode (local to modal) — default to current app variant
+      selectedGameMode: this.$store.getters.variant,
+
+      // Engine selections (UI-only, store objects)
+      whiteEngineObj: null,
+      blackEngineObj: null,
+
+      // Limiter options per engine (UI-only)
+      options: ['time', 'nodes', 'depth'],
+
+      whiteLimiterEnabled: true,
+      whiteLimiterType: 'time',
+      whiteLimiterValue: 1000, // ms default
+
+      blackLimiterEnabled: true,
+      blackLimiterType: 'time',
+      blackLimiterValue: 1000 // ms default
+    }
+  },
+  computed: {
+    // Friendly list for game mode selector
+    gameModeOptions () {
+      const varop = Object.keys(this.$store.getters.variantOptions.getAll())
+      return varop.map(k => ({ value: this.$store.getters.variantOptions.get(k), label: k }))
+    },
+
+    // Engines that support the selected game mode
+    filteredEngines () {
+      return Object.entries(this.$store.state.allEngines)
+        .map(([name, info]) => ({ name, ...info }))
+        .filter(e => e.variants && e.variants.includes(this.selectedGameMode))
+    },
+
+    whiteEngineLogo () {
+      return this.whiteEngineObj ? `url(${this.whiteEngineObj.logo || ''})` : ''
+    },
+
+    blackEngineLogo () {
+      return this.blackEngineObj ? `url(${this.blackEngineObj.logo || ''})` : ''
+    }
+  },
+  watch: {
+    // If game mode changes, ensure selected engines still compatible
+    selectedGameMode (newMode) {
+      if (this.whiteEngineObj && !this.whiteEngineObj.variants.includes(newMode)) {
+        this.whiteEngineObj = null
+      }
+      if (this.blackEngineObj && !this.blackEngineObj.variants.includes(newMode)) {
+        this.blackEngineObj = null
+      }
+    },
+    // When limiter type changes, apply sensible default values
+    whiteLimiterType (type) {
+      this.whiteLimiterValue = this.defaultValueForType(type)
+    },
+    blackLimiterType (type) {
+      this.blackLimiterValue = this.defaultValueForType(type)
     }
   },
   methods: {
@@ -59,14 +207,60 @@ export default {
       this.$emit('close')
     },
 
+    onWhiteEngineChanged (selected) {
+      this.whiteEngineObj = selected
+    },
+
+    onBlackEngineChanged (selected) {
+      this.blackEngineObj = selected
+    },
+
+    minForType (type) {
+      return 1
+    },
+
+    defaultValueForType (type) {
+      switch (type) {
+        case 'time': return 1000 // ms
+        case 'nodes': return 5 // million
+        case 'depth': return 20
+        default: return 1
+      }
+    },
+
+    unitForType (type) {
+      switch (type) {
+        case 'time': return 'ms'
+        case 'nodes': return 'million'
+        case 'depth': return 'ply'
+        default: return ''
+      }
+    },
+
     // Emit a start event with the selected roles and close the modal.
-    // We differentiate between PvP, PvE and EvE here:
-    // - PvP and EvE are TODO for now (no automatic logic implemented yet)
-    // - PvE dispatches 'PvEtrue' with payload { playerIsWhite } so the app knows which side the human controls
+    // UI-only: We include engine and limiter selections in the emitted payload
+    // so the caller may wire functionality later.
     startGame () {
       const payload = {
+        gameMode: this.selectedGameMode,
         white: this.whiteChoice,
-        black: this.blackChoice
+        black: this.blackChoice,
+
+        // Engines are only relevant when a side is set to 'engine'. We emit names for simplicity
+        whiteEngine: this.whiteChoice === 'engine' && this.whiteEngineObj ? this.whiteEngineObj.name : null,
+        blackEngine: this.blackChoice === 'engine' && this.blackEngineObj ? this.blackEngineObj.name : null,
+
+        // Limiter configuration (UI-only)
+        whiteLimiter: this.whiteChoice === 'engine' ? {
+          enabled: this.whiteLimiterEnabled,
+          type: this.whiteLimiterType,
+          value: this.whiteLimiterValue
+        } : null,
+        blackLimiter: this.blackChoice === 'engine' ? {
+          enabled: this.blackLimiterEnabled,
+          type: this.blackLimiterType,
+          value: this.blackLimiterValue
+        } : null
       }
 
       // PvP: both are players
@@ -89,7 +283,7 @@ export default {
       const playerIsWhite = (this.whiteChoice === 'player')
 
       // Dispatch PvEtrue with information about which side is the player
-      // This mirrors PvESwitch but allows the player to be black as well.
+      // (existing behavior; actual logic remains in the store)
       this.$store.dispatch('PvEtrue', { playerIsWhite })
 
       // Emit a start event as well (UI layer hook), then close
@@ -117,11 +311,15 @@ export default {
 .modal-content {
   background: var(--card-background, #fff);
   color: var(--text-color, #111);
-  width: 420px;
+  width: 820px;
   max-width: calc(100% - 40px);
+  height: 80vh;
+  max-height: 900px;
   border-radius: 8px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -130,15 +328,24 @@ export default {
 }
 
 .modal-body {
-  padding: 16px 18px;
+  padding: 12px 16px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 12px;
+  overflow: auto; /* keep body scrollable while footer stays put */
+  flex: 1 1 auto; /* ensure body grows and footer remains fixed */
+}
+
+.game-mode {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
 }
 
 .side-select {
   display: flex;
   flex-direction: column;
+  min-height: 180px; /* reserve vertical space so footer doesn't jump */
 }
 
 .side-select select {
@@ -147,9 +354,64 @@ export default {
   border-radius: 4px;
 }
 
+.engine-config {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid rgba(0,0,0,0.04);
+  border-radius: 6px;
+  background: var(--second-bg-color, #fafafa);
+}
+
+.engine-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.engine-logo {
+  width: 120px;
+  height: 60px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+  background-color: var(--light-text-color);
+  flex-shrink: 0;
+}
+
+.engine-select {
+  margin-top: 6px;
+  flex: 1;
+}
+
+.engine-limiter {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.limiter-controls {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.limiter-input {
+  width: 120px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.limiter-unit {
+  font-size: 12px;
+  color: var(--muted-text, #666);
+}
+
 .hint {
   grid-column: 1 / -1;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 12px;
   color: var(--muted-text, #666);
 }
@@ -160,6 +422,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid rgba(0,0,0,0.06);
+  /* keep footer fixed at bottom */
+  flex: 0 0 auto;
 }
 
 .start-button {
