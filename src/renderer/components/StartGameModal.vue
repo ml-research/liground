@@ -72,7 +72,6 @@ export default {
       // PvP: both are players
       if (this.whiteChoice === 'player' && this.blackChoice === 'player') {
         // TODO: implement player vs player setup
-        console.log('[StartGame] PvP selected (TODO)')
         this.$emit('start', payload)
         this.close()
         return
@@ -81,7 +80,6 @@ export default {
       // EvE: both are engines
       if (this.whiteChoice === 'engine' && this.blackChoice === 'engine') {
         // TODO: implement engine vs engine setup
-        console.log('[StartGame] EvE selected (TODO)')
         this.$emit('start', payload)
         this.close()
         return
@@ -89,6 +87,7 @@ export default {
 
       // PvE: one side player, other engine
       const playerIsWhite = (this.whiteChoice === 'player')
+
       // Dispatch PvEtrue with information about which side is the player
       // This mirrors PvESwitch but allows the player to be black as well.
       this.$store.dispatch('PvEtrue', { playerIsWhite })

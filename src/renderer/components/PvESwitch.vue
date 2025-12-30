@@ -34,46 +34,49 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth'])
+        ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth', 'PvEPlayerIsWhite'])
   },
   watch: {
     depth () {
-      // If we're in PvE and the analysis depth changes while it's the player's turn,
-      // reset engine-related data/time so timings stay sensible.
-      if (this.active && this.PvE && this.turn && this.depth > 0) {
-        this.$store.dispatch('resetEngineData')
-        this.$store.commit('resetEngineTime')
+      // If the analysis depth changes while in PvE during the player's turn, reset engine data.
+      if (this.active && this.PvE && this.depth > 0) {
+        const engineToMoveNow = (this.turn && !this.PvEPlayerIsWhite) || (!this.turn && this.PvEPlayerIsWhite)
+        if (!engineToMoveNow) {
+          this.$store.dispatch('resetEngineData')
+          this.$store.commit('resetEngineTime')
+        }
       }
     },
     turn () {
-      // When the turn flips to the player while in PvE, reset engine timers/data.
-      if (this.turn && this.PvE) {
-        this.$store.dispatch('resetEngineData')
-        this.$store.commit('resetEngineTime')
+         if (this.PvE) {
+        const engineToMoveNow = (this.turn && !this.PvEPlayerIsWhite) || (!this.turn && this.PvEPlayerIsWhite)
+        if (!engineToMoveNow) { // player turn: reset engine timers/data.
+          this.$store.dispatch('resetEngineData')
+          this.$store.commit('resetEngineTime')
+        } else { // engine turn: start engine for PvE.
+          engine.send('stop')
+          this.$store.dispatch('goEnginePvE')
+        }
       }
     },
     PvE () {
       // This watcher reacts to entering/exiting PvE mode.
-      // Several scenarios are handled:
-      // - If we switch out of engine activity back to a normal player position, refresh position.
       if (!this.active && !this.PvE && this.turn) {
         this.$store.dispatch('position')
       }
 
-      // - If the engine is active and PvE is enabled while it is the player's turn,
-      //   reset engine state and stop any running PvE engine task.
-      if (this.active && this.PvE && this.turn) {
-        this.$store.dispatch('resetEngineData')
-        this.$store.commit('resetEngineTime')
-        this.$store.dispatch('stopEnginePvE')
-      }
-
-      // - If the engine is active and PvE is enabled while it is NOT the player's turn,
-      //   ensure the engine starts calculating for PvE.
-      if (this.active && this.PvE && !this.turn) {
-        // may lead to an inconsistent engine if it was previously running; stop it first
-        engine.send('stop')
-        this.$store.dispatch('goEnginePvE')
+      if (this.active && this.PvE) {
+        const engineToMoveNow = (this.turn && !this.PvEPlayerIsWhite) || (!this.turn && this.PvEPlayerIsWhite)
+        if (!engineToMoveNow) {
+          // player turn: reset engine state and stop any running PvE engine task.
+          this.$store.dispatch('resetEngineData')
+          this.$store.commit('resetEngineTime')
+          this.$store.dispatch('stopEnginePvE')
+        } else {
+          // engine turn: start engine for PvE.
+          engine.send('stop')
+          this.$store.dispatch('goEnginePvE')
+        }
       }
 
       // Note: starting PvE via the switch intentionally sets playerIsWhite: true (human = White).

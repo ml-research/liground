@@ -760,15 +760,33 @@ export const store = new Vuex.Store({
       context.commit('active', true)
     },
     goEnginePvE (context) {
+      // Send PvE engine command, start the clock, mark engine as active
       engine.send(context.getters.PvEParam)
       context.commit('setEngineClock')
+      context.commit('active', true)
     },
     PvEMakeMove (context, payload) {
+      // Triggered when the engine emits 'bestmove'. Apply the move only if:
+      //  1. PvE mode is active 2. engine is to move now
       const state = context.state
-      if (state.active && state.PvE && !state.turn) {
-        context.dispatch('push', { move: payload, prev: context.getters.currentMove[0] })
+      const playerIsWhite = context.state.PvEPlayerIsWhite
+      const engineIsWhite = !playerIsWhite
+      const turnIsWhite = state.turn
+      const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
+
+      if (state.active && state.PvE && engineToMoveNow) {
+         // Dispatch push and handle failure (invalid uci for current position)
+        context.dispatch('push', { move: payload, prev: context.getters.currentMove[0] }).then(() => {
+        }).catch((err) => {
+          // If engine returned a move invalid for the current position, log and restart engine on the
+          // current position so it recalculates for the correct state.
+          console.error('[PvEMakeMove] Engine provided invalid move for current position:', payload, err)
+          context.dispatch('position')
+          context.dispatch('goEnginePvE')
+        })
       }
     },
+
     setActiveTrue (context) {
       context.commit('active', true)
     },
@@ -784,13 +802,13 @@ export const store = new Vuex.Store({
       const playerIsWhite = payload && typeof payload.playerIsWhite !== 'undefined' ? payload.playerIsWhite : true
       context.commit('PvE', true)
       context.commit('PvEPlayerIsWhite', playerIsWhite)
+      context.commit('active', true)
 
-      // If the human is Black (playerIsWhite === false) and the position's turn is White,
-      // the engine (playing White) must move immediately. Trigger engine to compute on the
-      // current position by sending the 'position' followed by the engine 'go' command.
-      // This mirrors logic used in restart and turn watchers elsewhere that kick off the engine
-      // when it's the engine's turn in PvE mode.
-      if (!playerIsWhite && context.getters.turn === true) {
+       const engineIsWhite = !playerIsWhite
+      const turnIsWhite = context.getters.turn
+      const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
+      if (engineToMoveNow) {
+        engine.send('stop')
         context.dispatch('position')
         context.dispatch('goEnginePvE')
       }
@@ -819,11 +837,18 @@ export const store = new Vuex.Store({
         context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEngine')
-      } else if (context.getters.active && context.getters.PvE && !context.getters.turn) {
-        context.dispatch('position')
-        context.dispatch('goEnginePvE')
+      } else if (context.getters.active && context.getters.PvE) {
+         const playerIsWhite = context.getters.PvEPlayerIsWhite
+        const engineIsWhite = !playerIsWhite
+        const turnIsWhite = context.getters.turn
+        const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
+        if (engineToMoveNow) {
+          context.dispatch('position')
+          context.dispatch('goEnginePvE')
+        }
       }
     },
+
     position (context) {
       engine.send(`position fen ${context.getters.fen}`)
       const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
