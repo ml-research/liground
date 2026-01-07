@@ -273,7 +273,15 @@ export default {
 
       // EvE: both are engines
       if (this.whiteChoice === 'engine' && this.blackChoice === 'engine') {
-        // TODO: implement engine vs engine setup
+        // Dispatch EvEtrue with engine names and limiter configs 
+        this.$store.dispatch('EvEtrue', {
+          whiteEngine: payload.whiteEngine,
+          blackEngine: payload.blackEngine,
+          whiteLimiter: payload.whiteLimiter,
+          blackLimiter: payload.blackLimiter
+        })
+
+        // Emit a start event as well (UI layer hook), then close
         this.$emit('start', payload)
         this.close()
         return
@@ -281,10 +289,16 @@ export default {
 
       // PvE: one side player, other engine
       const playerIsWhite = (this.whiteChoice === 'player')
+      if (playerIsWhite) {
+        const limiter = payload.blackLimiter
+      }
+      else {
+        const limiter = payload.whiteLimiter
+      }
 
       // Dispatch PvEtrue with information about which side is the player
       // (existing behavior; actual logic remains in the store)
-      this.$store.dispatch('PvEtrue', { playerIsWhite })
+      this.$store.dispatch('PvEtrue', { playerIsWhite, limiter })
 
       // Emit a start event as well (UI layer hook), then close
       this.$emit('start', payload)

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
-import { engine } from './engine'
+import { engine, Engine } from './engine'
 import allEngines from './store/engines'
 
 import moveAudio from './assets/audio/Move.mp3'
@@ -130,6 +130,12 @@ export const store = new Vuex.Store({
     legalMoves: '',
     destinations: {},
     variant: 'chess',
+
+    // Engine-vs-Engine state
+    EvE: false,
+    EvEConfig: null,
+    engineWhiteInstance: null,
+    engineBlackInstance: null,
     variantOptions: new TwoWayMap({ // all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
       Standard: 'chess',
       Crazyhouse: 'crazyhouse',
@@ -285,6 +291,19 @@ export const store = new Vuex.Store({
     },
     PvEInput (state, payload) {
       state.PvEInput = payload
+    },
+    // EvE mutations
+    EvE (state, payload) {
+      state.EvE = payload
+    },
+    EvEConfig (state, payload) {
+      state.EvEConfig = payload
+    },
+    engineWhiteInstance (state, payload) {
+      state.engineWhiteInstance = payload
+    },
+    engineBlackInstance (state, payload) {
+      state.engineBlackInstance = payload
     },
     quicktourIndexIncr (state) {
       state.QuickTourIndex++
@@ -813,6 +832,130 @@ export const store = new Vuex.Store({
         context.dispatch('goEnginePvE')
       }
     },
+    // Start an Engine vs Engine match. Payload must include engine names and limiter configs:
+    // { whiteEngine, blackEngine, whiteLimiter: { enabled, type, value }, blackLimiter: {...} }
+    async EvEtrue (context, payload = {}) {
+      try {
+        const whiteName = payload.whiteEngine
+        const blackName = payload.blackEngine
+        if (!whiteName || !blackName) {
+          throw new Error('Both whiteEngine and blackEngine must be provided')
+        }
+
+        const whiteInfo = context.state.allEngines[whiteName]
+        const blackInfo = context.state.allEngines[blackName]
+        if (!whiteInfo || !blackInfo) {
+          throw new Error('Could not find engine binaries for provided names')
+        }
+
+        // create engine instances
+        const white = new Engine()
+        const black = new Engine()
+
+        // run both engines
+        await Promise.all([
+          white.run(whiteInfo.binary, whiteInfo.cwd),
+          black.run(blackInfo.binary, blackInfo.cwd)
+        ])
+
+        context.commit('engineWhiteInstance', white)
+        context.commit('engineBlackInstance', black)
+        context.commit('EvEConfig', payload)
+        context.commit('EvE', true)
+        context.commit('enginesActive', [true, true])
+        context.commit('active', true)
+
+        // helper to produce a `go` command from limiter
+        function limiterToGo (limiter) {
+          if (!limiter || !limiter.enabled) return 'go movetime 1000'
+          switch (limiter.type) {
+            case 'time': return `go movetime ${parseInt(limiter.value, 10)}`
+            case 'nodes': return `go nodes ${parseInt(limiter.value, 10) * 1000000}`
+            case 'depth': return `go depth ${parseInt(limiter.value, 10)}`
+            default: return `go movetime ${parseInt(limiter.value, 10) || 1000}`
+          }
+        }
+
+        // send position and go to a specific engine instance
+        const sendPositionAndGo = (inst, lim) => {
+          try {
+            inst.send(`position fen ${context.getters.fen}`)
+            inst.send(limiterToGo(lim))
+          } catch (err) {
+            console.error('[EvE] Failed to send position/go:', err)
+          }
+        }
+
+        // bestmove handlers
+        const whiteHandler = async ucimove => {
+          // only apply if it's White to move
+          const turnIsWhite = context.getters.turn
+          if (!context.state.EvE || !turnIsWhite) return
+          try {
+            await context.dispatch('push', { move: ucimove, prev: context.getters.currentMove[0] })
+            // after white move, trigger black
+            const cfg = context.state.EvEConfig || {}
+            sendPositionAndGo(context.state.engineBlackInstance, cfg.blackLimiter)
+          } catch (err) {
+            console.error('[EvEMakeMove] White provided invalid move:', ucimove, err)
+            // try to restart the black engine calculation on current position
+            context.dispatch('position')
+            sendPositionAndGo(context.state.engineBlackInstance, context.state.EvEConfig && context.state.EvEConfig.blackLimiter)
+          }
+        }
+
+        const blackHandler = async ucimove => {
+          const turnIsWhite = context.getters.turn
+          if (!context.state.EvE || turnIsWhite) return
+          try {
+            await context.dispatch('push', { move: ucimove, prev: context.getters.currentMove[0] })
+            // after black move, trigger white
+            const cfg = context.state.EvEConfig || {}
+            sendPositionAndGo(context.state.engineWhiteInstance, cfg.whiteLimiter)
+          } catch (err) {
+            console.error('[EvEMakeMove] Black provided invalid move:', ucimove, err)
+            context.dispatch('position')
+            sendPositionAndGo(context.state.engineWhiteInstance, context.state.EvEConfig && context.state.EvEConfig.whiteLimiter)
+          }
+        }
+
+        // attach listeners
+        white.on('bestmove', whiteHandler)
+        black.on('bestmove', blackHandler)
+
+        // kick off the side to move now
+        const turnIsWhiteNow = context.getters.turn
+        if (turnIsWhiteNow) {
+          sendPositionAndGo(white, payload.whiteLimiter)
+        } else {
+          sendPositionAndGo(black, payload.blackLimiter)
+        }
+      } catch (err) {
+        console.error('[EvEtrue] Could not start EvE match:', err)
+      }
+    },
+
+    async EvEfalse (context) {
+      // stop EvE match and quit engines
+      context.commit('EvE', false)
+      context.commit('enginesActive', [false, false])
+      try {
+        if (context.state.engineWhiteInstance) {
+          try { context.state.engineWhiteInstance.send('quit') } catch (e) {}
+          context.state.engineWhiteInstance.removeAllListeners && context.state.engineWhiteInstance.removeAllListeners()
+          context.commit('engineWhiteInstance', null)
+        }
+        if (context.state.engineBlackInstance) {
+          try { context.state.engineBlackInstance.send('quit') } catch (e) {}
+          context.state.engineBlackInstance.removeAllListeners && context.state.engineBlackInstance.removeAllListeners()
+          context.commit('engineBlackInstance', null)
+        }
+      } catch (err) {
+        console.error('[EvEfalse] Error stopping EvE engines:', err)
+      }
+      context.commit('active', false)
+      context.dispatch('resetEngineData')
+    }, 
     stopEnginePvE (context) {
       engine.send('stop')
     },
