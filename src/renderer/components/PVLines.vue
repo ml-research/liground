@@ -45,20 +45,32 @@
             class="right"
             @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
           >
+           <!--Right now, lines are split here and in setPreview.
+           Improve to only once for better performance-->
             <span
               v-for="(entry, idx) in line.pv.split(' ')"
               :key="idx"
               class="pv-entry"
-              @mouseenter="setPreview(id, idx, line.pv.split(' '))"
-              @mouseleave="clearPreview"
+              :class="{ 'is-move-token': isMoveToken(entry) }"
+              @mouseenter="isMoveToken(entry) && setPreview(id, idx, line.pv.split(' '))"
             >
               {{ entry }}
-              <span v-show="previewLineId === id && displayIdx === idx">{{previewFen}}</span>
             </span>
           </span>
+          </div>
+          <div
+            v-if="line && previewLineId === id && previewFen"
+            :key="`preview-${id}`"
+            class="pv-preview"
+            :class="[boardStyle, pieceStyle, 'is2d', { koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber===3, dim9x9: dimensionNumber===1 }]"
+          >
+          <div class="cg-board-wrap">
+            <div ref="previewBoard"></div>
+          </div>
         </div>
+
         <div
-          v-else
+          v-if="!line"
           :key="`placeholder-${id}`"
           class="item placeholder"
         >
@@ -94,6 +106,7 @@
 import { mapGetters } from 'vuex'
 import VueContext from 'vue-context/src/js/index'
 import ffish from 'ffish'
+import { Chessground } from 'chessgroundx'
 
 export default {
   components: {
@@ -118,12 +131,60 @@ export default {
       previewUciIdx: null,
       displayIdx: null,
       previewFen: null,
+      previewBoard: null,
       currentEngine: 1,
       pvcount: 0,
       originalMultiPV: 1,
       showOnlyOnePvLine: false, // Flag to show only one PvLine
       showExpandIcon: false, // Flag to show expand-down icon
-      showMinimizeIcon: true // Flag to show expand-up icon
+      showMinimizeIcon: true, // Flag to show expand-up icon
+      piecesW: [
+        { count: 0, type: 'q-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'p-piece' }
+      ],
+      piecesB: [
+        { count: 0, type: 'p-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'q-piece' }
+      ],
+      chessPiecesW: [
+        { count: 0, type: 'q-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'p-piece' }
+      ],
+      chessPiecesB: [
+        { count: 0, type: 'p-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'q-piece' }
+      ],
+      shogiPiecesB: [
+        { count: 0, type: 'p-piece' },
+        { count: 0, type: 'l-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 's-piece' },
+        { count: 0, type: 'g-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'r-piece' }
+      ],
+      shogiPiecesW: [
+        { count: 0, type: 'r-piece' },
+        { count: 0, type: 'b-piece' },
+        { count: 0, type: 'g-piece' },
+        { count: 0, type: 's-piece' },
+        { count: 0, type: 'n-piece' },
+        { count: 0, type: 'l-piece' },
+        { count: 0, type: 'p-piece' }
+      ],
+      board: null
     }
   },
   computed: {
@@ -145,7 +206,7 @@ export default {
       }
       return null
     },
-    ...mapGetters(['moves', 'fen','is960','variant', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
+    ...mapGetters(['boardStyle', 'pieceStyle', 'dimensionNumber', 'moves', 'fen', 'is960', 'variant', 'orientation', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
     pvcount () {
@@ -185,6 +246,74 @@ export default {
     }
   },
   methods: {
+    ensurePreviewBoard () {
+      const el = Array.isArray(this.$refs.previewBoard)
+        ? this.$refs.previewBoard[0]
+        : this.$refs.previewBoard
+      if (!el) return
+
+      if (!this.previewBoard || this.previewBoard.state.geometry !== this.dimensionNumber) {
+        this.previewBoard = Chessground(el, {
+          coordinates: false,
+          fen: this.previewFen || this.fen,
+          orientation: this.orientation,
+          highlight: { lastMove: false, check: false },
+          drawable: { enabled: false, visible: false },
+          movable: { enabled: false },
+          geometry: this.dimensionNumber
+        })
+      }
+    },
+    updatePreviewFen () {
+      if (!this.previewFen) return
+      this.ensurePreviewBoard()
+      if (this.previewBoard) {
+        this.previewBoard.set({ fen: this.previewFen, variant: this.variant, lastMove: false })
+      }
+    },
+    // initBoard () {
+    //   if (this.variant === 'shogi') {
+    //     this.piecesW = this.shogiPiecesW
+    //     this.piecesB = this.shogiPiecesB
+    //   }
+    //   if (this.variant === 'crazyhouse') {
+    //     this.piecesW = this.chessPiecesW
+    //     this.piecesB = this.chessPiecesB
+    //   }
+    //   const el = Array.isArray(this.$refs.previewBoard)
+    //   ? this.$refs.previewBoard[0]
+    //   : this.$refs.previewBoard
+    //   if (!el) return
+    //   if (!this.board || this.board.state.geometry !== this.dimensionNumber) {
+    //     this.board = Chessground(el, {
+    //       coordinates: true,
+    //       fen: this.fen,
+    //       turnColor: 'white',
+    //       resizable: true,
+    //       highlight: {
+    //         lastMove: true, // add last-move class to squares
+    //         check: false // add check class to squares
+    //       },
+    //       drawable: {
+    //         enabled: false, // cannot draw
+    //       },
+    //       movable: {
+    //         enabled:false,
+    //       },
+    //       orientation: this.orientation,
+    //       geometry: this.$store.getters.dimensionNumber
+    //     })
+
+    //     document.body.dispatchEvent(new Event('chessground.resize'))
+    //   }
+    //   if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
+    //     document.body.dispatchEvent(new Event('chessground.resize'))
+    //   }
+    //   this.board.set({
+    //     variant: this.variant,
+    //     lastMove: false
+    //   })
+    // },
     fillpvCount (payload) {
       this.pvcount = payload
       this.originalMultiPV = payload
@@ -209,12 +338,12 @@ export default {
       const prevMov = this.currentMove
       this.$store.dispatch('pushAltLine', { line: mainLine, prev: prevMov })
     },
-    computePreviewFen(baseFen, pvUciMoves, plyCount) {
+    computePreviewFen (baseFen, pvUciMoves, plyCount) {
       const b = this.is960
-      ? new ffish.Board(this.variant, baseFen, true)
-      : new ffish.Board(this.variant, baseFen)
+        ? new ffish.Board(this.variant, baseFen, true)
+        : new ffish.Board(this.variant, baseFen)
 
-      for (let i = 0; i < plyCount; i++){
+      for (let i = 0; i < plyCount; i++) {
         b.push(pvUciMoves[i])
       }
       return b.fen()
@@ -222,8 +351,8 @@ export default {
     countMovesUpTo (entries, displayIdx) {
       console.log(entries)
       let moveNum = 0
-      for (let i = 0; i <= displayIdx; i++){
-        if (this.isMoveToken(entries[i])){
+      for (let i = 0; i <= displayIdx; i++) {
+        if (this.isMoveToken(entries[i])) {
           moveNum++
         }
       }
@@ -239,16 +368,16 @@ export default {
 
       const uciIndex = this.countMovesUpTo(entries, previewIdx)
       this.previewLineId = lineId
-      this.previewUciIdx = uciIndex 
+      this.previewUciIdx = uciIndex
       this.displayIdx = previewIdx
 
       const uciMoves = this.lines[lineId].pvUCI.trim().split(/\s+/)
       const plyCount = uciIndex
       try {
         this.previewFen = this.computePreviewFen(this.fen, uciMoves, plyCount)
-      } catch(e) {
+        this.$nextTick(() => this.updatePreviewFen())
+      } catch (e) {
         this.clearPreview()
-        return
       }
     },
     clearPreview () {
@@ -256,6 +385,7 @@ export default {
       this.displayIdx = null
       this.previewUciIdx = null
       this.previewFen = null
+      this.previewBoard = null
     },
     previewIndex (displayIdx, entries) {
       const entry = entries[displayIdx]
@@ -283,6 +413,7 @@ export default {
     },
     onMouseEnter (id) {
       this.$store.commit('hoveredpv', id)
+      this.ensurePreviewBoard()
     },
     onMouseLeave () {
       this.clearPreview()
@@ -334,6 +465,18 @@ export default {
   font-weight: 100;
   white-space: nowrap;
 }
+.pv-entry.is-move-token:hover {
+  font-weight: bold;
+}
+.pv-preview {
+  display: inline-block;
+}
+
+.pv-preview .cg-wrap {
+  width: 160px;
+  height: 160px;
+}
+
 .scroller {
   max-height: 12em;
   overflow-x: scroll;
