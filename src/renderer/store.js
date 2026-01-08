@@ -815,7 +815,7 @@ export const store = new Vuex.Store({
     enginesActive (context, payload) {
       context.commit('enginesActive', payload)
     },
-    PvEtrue (context, payload = { playerIsWhite: true }) {
+    PvEtrue (context, payload = {}) {
       // Enable PvE mode and remember which side the human player controls.
       // payload.playerIsWhite = true means the human is White (legacy behavior).
       const playerIsWhite = payload && typeof payload.playerIsWhite !== 'undefined' ? payload.playerIsWhite : true
