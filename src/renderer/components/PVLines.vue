@@ -1,5 +1,8 @@
 <template>
-  <div class="pv-lines">
+  <div
+    class="pv-lines"
+    ref="pvLines"
+  >
     <div class="scroller">
       <VueContext
         ref="menu1"
@@ -52,22 +55,12 @@
               :key="idx"
               class="pv-entry"
               :class="{ 'is-move-token': isMoveToken(entry) }"
-              @mouseenter="isMoveToken(entry) && setPreview(id, idx, line.pv.split(' '))"
+              @mouseenter="isMoveToken(entry) && setPreview(id, idx, line.pv.split(' '), $event)"
             >
               {{ entry }}
             </span>
           </span>
           </div>
-          <div
-            v-if="line && previewLineId === id && previewFen"
-            :key="`preview-${id}`"
-            class="pv-preview"
-            :class="[boardStyle, pieceStyle, 'is2d', { koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber===3, dim9x9: dimensionNumber===1 }]"
-          >
-          <div class="cg-board-wrap">
-            <div ref="previewBoard"></div>
-          </div>
-        </div>
 
         <div
           v-if="!line"
@@ -77,6 +70,16 @@
           ...
         </div>
       </template>
+    </div>
+    <div
+      v-if="previewLineId !== null && previewFen"
+      class="pv-preview"
+      :class="[boardStyle, pieceStyle, 'is2d', { koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber===3, dim9x9: dimensionNumber===1 }]"
+      :style="{ top: `${previewTop}px`, left: `${previewLeft}px` }"
+    >
+      <div class="cg-board-wrap">
+        <div ref="previewBoard"></div>
+      </div>
     </div>
     <footer class="footer">
       <div
@@ -128,6 +131,8 @@ export default {
         }
       ],
       previewLineId: null, // Shows which PV line is being previewed
+      previewTop: 0,
+      previewLeft: 0,
       previewUciIdx: null,
       displayIdx: null,
       previewFen: null,
@@ -359,13 +364,14 @@ export default {
       console.log(moveNum)
       return moveNum
     },
-    setPreview (lineId, displayIdx, entries) {
+    setPreview (lineId, displayIdx, entries, event) {
       const previewIdx = this.previewIndex(displayIdx, entries)
       if (previewIdx === null) {
         this.clearPreview()
         return
       }
 
+      this.updatePreviewPosition(event)
       const uciIndex = this.countMovesUpTo(entries, previewIdx)
       this.previewLineId = lineId
       this.previewUciIdx = uciIndex
@@ -380,12 +386,26 @@ export default {
         this.clearPreview()
       }
     },
+    updatePreviewPosition (event) {
+      const pvLinesEl = this.$refs.pvLines
+      if (!pvLinesEl || !event || !event.currentTarget) return
+
+      const lineEl = event.currentTarget.closest('.item')
+      if (!lineEl) return
+
+      const pvRect = pvLinesEl.getBoundingClientRect()
+      const lineRect = lineEl.getBoundingClientRect()
+      this.previewTop = lineRect.bottom - pvRect.top
+      this.previewLeft = lineRect.left - pvRect.left
+    },
     clearPreview () {
       this.previewLineId = null
       this.displayIdx = null
       this.previewUciIdx = null
       this.previewFen = null
       this.previewBoard = null
+      this.previewTop = 0
+      this.previewLeft = 0
     },
     previewIndex (displayIdx, entries) {
       const entry = entries[displayIdx]
@@ -463,6 +483,8 @@ export default {
   background-color: var(--second-bg-color);
   border: 1px solid var(--main-border-color);
   font-weight: 100;
+  overflow: visible;
+  position: relative;
   white-space: nowrap;
 }
 .pv-entry.is-move-token:hover {
@@ -470,6 +492,10 @@ export default {
 }
 .pv-preview {
   display: inline-block;
+  position: absolute;
+  z-index: 20;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .pv-preview .cg-wrap {
