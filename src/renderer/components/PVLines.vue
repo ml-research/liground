@@ -142,52 +142,6 @@ export default {
       showOnlyOnePvLine: false, // Flag to show only one PvLine
       showExpandIcon: false, // Flag to show expand-down icon
       showMinimizeIcon: true, // Flag to show expand-up icon
-      piecesW: [
-        { count: 0, type: 'q-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'p-piece' }
-      ],
-      piecesB: [
-        { count: 0, type: 'p-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'q-piece' }
-      ],
-      chessPiecesW: [
-        { count: 0, type: 'q-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'p-piece' }
-      ],
-      chessPiecesB: [
-        { count: 0, type: 'p-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'q-piece' }
-      ],
-      shogiPiecesB: [
-        { count: 0, type: 'p-piece' },
-        { count: 0, type: 'l-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 's-piece' },
-        { count: 0, type: 'g-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'r-piece' }
-      ],
-      shogiPiecesW: [
-        { count: 0, type: 'r-piece' },
-        { count: 0, type: 'b-piece' },
-        { count: 0, type: 'g-piece' },
-        { count: 0, type: 's-piece' },
-        { count: 0, type: 'n-piece' },
-        { count: 0, type: 'l-piece' },
-        { count: 0, type: 'p-piece' }
-      ],
       board: null
     }
   },
@@ -275,49 +229,6 @@ export default {
         this.previewBoard.set({ fen: this.previewFen, variant: this.variant, lastMove: false })
       }
     },
-    // initBoard () {
-    //   if (this.variant === 'shogi') {
-    //     this.piecesW = this.shogiPiecesW
-    //     this.piecesB = this.shogiPiecesB
-    //   }
-    //   if (this.variant === 'crazyhouse') {
-    //     this.piecesW = this.chessPiecesW
-    //     this.piecesB = this.chessPiecesB
-    //   }
-    //   const el = Array.isArray(this.$refs.previewBoard)
-    //   ? this.$refs.previewBoard[0]
-    //   : this.$refs.previewBoard
-    //   if (!el) return
-    //   if (!this.board || this.board.state.geometry !== this.dimensionNumber) {
-    //     this.board = Chessground(el, {
-    //       coordinates: true,
-    //       fen: this.fen,
-    //       turnColor: 'white',
-    //       resizable: true,
-    //       highlight: {
-    //         lastMove: true, // add last-move class to squares
-    //         check: false // add check class to squares
-    //       },
-    //       drawable: {
-    //         enabled: false, // cannot draw
-    //       },
-    //       movable: {
-    //         enabled:false,
-    //       },
-    //       orientation: this.orientation,
-    //       geometry: this.$store.getters.dimensionNumber
-    //     })
-
-    //     document.body.dispatchEvent(new Event('chessground.resize'))
-    //   }
-    //   if (this.variant === 'crazyhouse' || this.variant === 'shogi') {
-    //     document.body.dispatchEvent(new Event('chessground.resize'))
-    //   }
-    //   this.board.set({
-    //     variant: this.variant,
-    //     lastMove: false
-    //   })
-    // },
     fillpvCount (payload) {
       this.pvcount = payload
       this.originalMultiPV = payload
