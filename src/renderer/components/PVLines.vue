@@ -1,7 +1,7 @@
 <template>
   <div
-    class="pv-lines"
     ref="pvLines"
+    class="pv-lines"
   >
     <div class="scroller">
       <VueContext
@@ -59,7 +59,7 @@
               {{ entry }}
             </span>
           </span>
-          </div>
+        </div>
 
         <div
           v-if="!line"
@@ -77,7 +77,7 @@
       :style="{ top: `${previewTop}px`, left: `${previewLeft}px` }"
     >
       <div class="cg-board-wrap">
-        <div ref="previewBoard"></div>
+        <div ref="previewBoard" />
       </div>
     </div>
     <footer class="footer">
@@ -299,7 +299,6 @@ export default {
     setBoard (lineId, displayIdx, entries) {
       const previewIdx = this.previewIndex(displayIdx, entries)
       const uciIndex = this.countMovesUpTo(entries, previewIdx)
-      
       this.previewLineId = lineId
       this.previewUciIdx = uciIndex
       this.displayIdx = previewIdx
