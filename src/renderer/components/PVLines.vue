@@ -41,15 +41,13 @@
           class="item clickable"
           @mouseenter="onMouseEnter(id)"
           @mouseleave="onMouseLeave"
-          @click="onClick(line)"
+          @click="onClick(line, id)"
         >
           <span class="left">{{ line.cpDisplay }}</span>
           <span
             class="right"
             @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
           >
-           <!--Right now, lines are split here and in setPreview.
-           Improve to only once for better performance-->
             <span
               v-for="(entry, idx) in line.pv.split(' ')"
               :key="idx"
@@ -439,9 +437,10 @@ export default {
       this.clearPreview()
       this.$store.commit('hoveredpv', -1)
     },
-    onClick (line) {
+    onClick (line, id) {
       this.$store.commit('hoveredpv', -1)
       const prevMov = this.currentMove
+      // Implement loop over moves here
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     },
     updateLines () {
@@ -496,6 +495,7 @@ export default {
   z-index: 20;
   border-radius: 6px;
   overflow: hidden;
+  filter: drop-shadow(4px 4px 3px black)
 }
 
 .pv-preview .cg-wrap {
