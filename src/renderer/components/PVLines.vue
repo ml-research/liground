@@ -41,7 +41,7 @@
           class="item clickable"
           @mouseenter="onMouseEnter(id)"
           @mouseleave="onMouseLeave"
-          @click="onClick(line, id)"
+          @click="onClick(line)"
         >
           <span class="left">{{ line.cpDisplay }}</span>
           <span
@@ -54,6 +54,7 @@
               class="pv-entry"
               :class="{ 'is-move-token': isMoveToken(entry) }"
               @mouseenter="isMoveToken(entry) && setPreview(id, idx, line.pv.split(' '), $event)"
+              @click="isMoveToken(entry) && setBoard(id, idx, line.pv.split(' '))"
             >
               {{ entry }}
             </span>
@@ -384,6 +385,28 @@ export default {
         this.clearPreview()
       }
     },
+    setBoard (lineId, displayIdx, entries) {
+      const previewIdx = this.previewIndex(displayIdx, entries)
+      const uciIndex = this.countMovesUpTo(entries, previewIdx)
+      
+      this.previewLineId = lineId
+      this.previewUciIdx = uciIndex
+      this.displayIdx = previewIdx
+
+      const uciMoves = this.lines[lineId].pvUCI.trim().split(/\s+/)
+      const plyCount = uciIndex
+      try {
+        const fallbackFEN = this.fen
+        for (let i = 0; i < plyCount; i++) {
+          const prevMov = this.currentMove
+          this.$store.dispatch('push', { move: uciMoves[i], prev: prevMov })
+        }
+      } catch (e) {
+        this.$store.commit('hoveredpv', -1)
+        this.$store.dispatch('fen', fallbackFEN)
+      }
+      this.clearPreview()
+    },
     updatePreviewPosition (event) {
       const pvLinesEl = this.$refs.pvLines
       if (!pvLinesEl || !event || !event.currentTarget) return
@@ -437,10 +460,9 @@ export default {
       this.clearPreview()
       this.$store.commit('hoveredpv', -1)
     },
-    onClick (line, id) {
+    onClick (line) {
       this.$store.commit('hoveredpv', -1)
       const prevMov = this.currentMove
-      // Implement loop over moves here
       this.$store.dispatch('push', { move: line.ucimove, prev: prevMov })
     },
     updateLines () {
@@ -490,7 +512,7 @@ export default {
   font-weight: bold;
 }
 .pv-preview {
-  display: inline-block;
+  display: inline-block;  
   position: absolute;
   z-index: 20;
   border-radius: 6px;
