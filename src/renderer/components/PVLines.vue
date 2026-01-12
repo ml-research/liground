@@ -306,8 +306,8 @@ export default {
 
       const uciMoves = this.lines[lineId].pvUCI.trim().split(/\s+/)
       const plyCount = uciIndex
+      const fallbackFEN = this.fen
       try {
-        const fallbackFEN = this.fen
         for (let i = 0; i < plyCount; i++) {
           const prevMov = this.currentMove
           this.$store.dispatch('push', { move: uciMoves[i], prev: prevMov })
@@ -423,7 +423,7 @@ export default {
   font-weight: bold;
 }
 .pv-preview {
-  display: inline-block;  
+  display: inline-block;
   position: absolute;
   z-index: 20;
   border-radius: 6px;
