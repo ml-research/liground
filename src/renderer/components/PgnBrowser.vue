@@ -24,12 +24,23 @@
           class="icon mdi mdi-plus-box-outline"
           @click="openAddPgnModal()"
         />
+        <i
+          id="icon"
+          class="icon mdi mdi-content-save-outline"
+          @click="openSaveGameModal()"
+          title="Save current game"
+        />
       </div>
       <div>
         <AddPgnModal
           v-if="AddPgnModal.visible"
           :title="AddPgnModal.title"
           @close="AddPgnModal.visible = false"
+        />
+        <SaveGameModal
+          v-if="SaveGameModal.visible"
+          :title="SaveGameModal.title"
+          @close="SaveGameModal.visible = false"
         />
       </div>
       <template v-if="groupByRound">
@@ -97,6 +108,7 @@
 import { mapGetters } from 'vuex'
 import { bus } from '../main'
 import AddPgnModal from './AddPgnModal'
+import SaveGameModal from './SaveGameModal'
 // Use ipcRenderer to ask main process for native menus
 let ipcRenderer
 try {
@@ -109,10 +121,14 @@ try {
 
 export default {
   name: 'PgnBrowser',
-  components: { AddPgnModal },
+  components: { AddPgnModal, SaveGameModal },
   data: function () {
     return {
       AddPgnModal: {
+        visible: false,
+        title: ''
+      },
+      SaveGameModal: {
         visible: false,
         title: ''
       },
@@ -249,6 +265,12 @@ export default {
       this.AddPgnModal = {
         visible: true,
         title: 'Add new PGN'
+      }
+    },
+    openSaveGameModal () {
+      this.SaveGameModal = {
+        visible: true,
+        title: 'Save current game'
       }
     },
     removeSafedPGN () {
