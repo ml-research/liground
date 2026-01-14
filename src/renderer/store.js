@@ -836,6 +836,8 @@ export const store = new Vuex.Store({
     // { whiteEngine, blackEngine, whiteLimiter: { enabled, type, value }, blackLimiter: {...} }
     async EvEtrue (context, payload = {}) {
       try {
+        const gameMode = payload.gameMode
+
         const whiteName = payload.whiteEngine
         const blackName = payload.blackEngine
         if (!whiteName || !blackName) {
@@ -857,6 +859,19 @@ export const store = new Vuex.Store({
           white.run(whiteInfo.binary, whiteInfo.cwd),
           black.run(blackInfo.binary, blackInfo.cwd)
         ])
+
+        // configure Eve engines with the desired game mode (variant) and 960 flag
+        const variantCmd = `setoption name UCI_Variant value ${gameMode}`
+        const chess960Cmd = `setoption name UCI_Chess960 value ${context.getters.is960}`
+
+        try {
+          white.send(variantCmd)
+          white.send(chess960Cmd)
+          black.send(variantCmd)
+          black.send(chess960Cmd)
+        } catch (err) {
+          console.warn('[EvEtrue] Failed to send variant/960 to Eve engines:', err)
+        }
 
         context.commit('engineWhiteInstance', white)
         context.commit('engineBlackInstance', black)

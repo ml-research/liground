@@ -125,6 +125,7 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
+import ChessGround from './ChessGround.vue';
 
 export default {
   name: 'StartGameModal',
@@ -240,7 +241,10 @@ export default {
     // Emit a start event with the selected roles and close the modal.
     // UI-only: We include engine and limiter selections in the emitted payload
     // so the caller may wire functionality later.
-    startGame () {
+    async startGame () {
+      if (this.selectedGameMode !== this.$store.getters.variant){
+        await this.$store.dispatch('variant', this.selectedGameMode)
+      }
       const payload = {
         gameMode: this.selectedGameMode,
         white: this.whiteChoice,
@@ -278,7 +282,8 @@ export default {
           whiteEngine: payload.whiteEngine,
           blackEngine: payload.blackEngine,
           whiteLimiter: payload.whiteLimiter,
-          blackLimiter: payload.blackLimiter
+          blackLimiter: payload.blackLimiter,
+          gameMode: payload.gameMode
         })
 
         // Emit a start event as well (UI layer hook), then close
@@ -298,7 +303,7 @@ export default {
 
       // Dispatch PvEtrue with information about which side is the player
       // (existing behavior; actual logic remains in the store)
-      this.$store.dispatch('PvEtrue', { playerIsWhite, limiter })
+      this.$store.dispatch('PvEtrue', { playerIsWhite })
 
       // Emit a start event as well (UI layer hook), then close
       this.$emit('start', payload)
