@@ -130,7 +130,9 @@ export const store = new Vuex.Store({
     legalMoves: '',
     destinations: {},
     variant: 'chess',
-
+    gameConfig: null,
+    showGameEndModal: false,
+    gameResult: null,
     // Engine-vs-Engine state
     EvE: false,
     EvEConfig: null,
@@ -304,6 +306,15 @@ export const store = new Vuex.Store({
     },
     engineBlackInstance (state, payload) {
       state.engineBlackInstance = payload
+    },
+    gameConfig (state, payload) {
+      state.gameConfig = payload
+    },
+    showGameEndModal (state, payload) {
+      state.showGameEndModal = payload
+    },
+    gameResult (state, payload) {
+      state.gameResult = payload
     },
     quicktourIndexIncr (state) {
       state.QuickTourIndex++
@@ -694,7 +705,19 @@ export const store = new Vuex.Store({
     },
     push (context, payload) {
       context.commit('appendMoves', payload)
-      context.dispatch('fen', context.state.board.fen())
+      return context.dispatch('fen', context.state.board.fen()).then(() => {
+        // Only check for game end if a game was started via the new game modal
+        if (context.state.gameConfig) {
+          if (context.state.board.isGameOver()) {
+            const resultStr = context.state.board.result()
+            let result = null
+            if (resultStr === '1-0') result = 'white-win'
+            else if (resultStr === '0-1') result = 'black-win'
+            else if (resultStr === '1/2-1/2') result = 'draw'
+            context.dispatch('endGame', { result })
+          } 
+        }
+      })
     },
     pushMainLine (context, payload) {
       let prev = payload.prev
@@ -815,9 +838,22 @@ export const store = new Vuex.Store({
     enginesActive (context, payload) {
       context.commit('enginesActive', payload)
     },
+
+    setGameConfig (context, payload) {
+      context.commit('gameConfig', payload)
+    },
+
+    endGame (context, payload) {
+      context.commit('gameResult', payload.result)
+      context.commit('showGameEndModal', true)
+    },
+
+    closeGameEndModal (context) {
+      context.commit('showGameEndModal', false)
+    },
     PvEtrue (context, payload = {}) {
       // Enable PvE mode and remember which side the human player controls.
-      // payload.playerIsWhite = true means the human is White (legacy behavior).
+      // payload.playerIsWhite = true means the human is White.
       const playerIsWhite = payload && typeof payload.playerIsWhite !== 'undefined' ? payload.playerIsWhite : true
       context.commit('PvE', true)
       context.commit('PvEPlayerIsWhite', playerIsWhite)
@@ -1727,6 +1763,15 @@ export const store = new Vuex.Store({
     },
     selectedGame (state) {
       return state.selectedGame
+    },
+    gameConfig (state) {
+      return state.gameConfig
+    },
+    showGameEndModal (state) {
+      return state.showGameEndModal
+    },
+    gameResult (state) {
+      return state.gameResult
     },
     isInternational (state) {
       return state.internationalVariants.includes(state.variant)

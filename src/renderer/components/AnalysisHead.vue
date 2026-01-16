@@ -47,16 +47,20 @@
       <PvESwitch />
     </div>
 
-    <!-- Start New Game button shown next to PvE switch -->
+    <!-- Start New Game button  -->
     <div v-if="QuickTourIndex !== 10" id="StartGameButton">
       <button class="startGame" @click="openStartModal">Start New Game</button>
     </div>
     <div v-else id="StartGameButton-qt">
       <button class="startGame-qt" @click="openStartModal">Start New Game</button>
     </div>
-
-    <!-- Modal component for selecting roles for white/black (UI only) -->
     <StartGameModal :visible="showStartModal" @close="closeStartModal" @start="handleStart" />
+    <GameEndModal
+      :visible="showGameEndModal"
+      :gameConfig="gameConfig"
+      :stats="gameStats"
+      @close="closeGameEndModal"
+    />
   </div>
 </template>
 
@@ -64,18 +68,19 @@
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
 import PvESwitch from './PvESwitch.vue'
-import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engine for White & Black
-import { mapGetters, mapState } from 'vuex' 
+import StartGameModal from './StartGameModal.vue'
+import GameEndModal from './GameEndModal.vue'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, PvESwitch, StartGameModal
+    Multiselect, Mode960, PvESwitch, StartGameModal, GameEndModal
   },
   data () {
     return {
       selected: '♟️ Standard',
-      showStartModal: false // controls visibility of the start game modal
+      showStartModal: false
     }
   },
   computed: {
@@ -93,7 +98,22 @@ export default {
     displayVariant () { // retuns the "nice" name of the current variant
       return this.variantOptions.revGet(this.variant)
     },
-    ...mapGetters(['QuickTourIndex'])
+    ...mapGetters(['QuickTourIndex', 'gameConfig', 'showGameEndModal']),
+    showGameEndModal () {
+      return this.$store.getters.showGameEndModal
+    },
+    gameConfig () {
+      return this.$store.getters.gameConfig
+    },
+    gameStats () {
+      // TODO: compute stats from board state (accuracy, move count, etc.)
+      return {
+        whiteAccuracy: null,
+        blackAccuracy: null,
+        moveCount: this.$store.getters.moves.length,
+        gameLength: null
+      }
+    }
   },
   methods: {
     updateVariant (payload) {
@@ -108,23 +128,24 @@ export default {
       }
     },
 
-    // Open the Start Game modal
     openStartModal () {
       this.showStartModal = true
     },
 
-    // Close the Start Game modal
     closeStartModal () {
       this.showStartModal = false
     },
 
-    // Handle start request from modal; this is a UI-only stub for now
     // Payload example: { white: 'player'|'engine', black: 'player'|'engine' }
     handleStart (payload) {
-      // TODO: wire-up actual game start logic in future
-      console.log('[StartGame] Requested start with', payload)
-      this.$emit('startNewGame', payload) // notify parent (if needed)
+      // Store game configuration for the game end modal
+      this.$store.dispatch('setGameConfig', payload)
+      this.$emit('startNewGame', payload) 
       this.closeStartModal()
+    },
+
+    closeGameEndModal () {
+      this.$store.dispatch('closeGameEndModal')
     }
   }
 }
