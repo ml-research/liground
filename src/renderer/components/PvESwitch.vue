@@ -1,4 +1,6 @@
+
 <template>
+  <!-- PvE Switch is a Legacy Component replaced by NewGameButton -->
   <div class="panel">
     <label class="switch">
       <input

@@ -32,20 +32,6 @@
       v-else
       id="Mode960-qt"
     />
-    <div
-      v-if="QuickTourIndex !== 9"
-      id="PvESwitch"
-    >
-      PvE
-      <PvESwitch />
-    </div>
-    <div
-      v-else
-      id="PvESwitch-qt"
-    >
-      PvE
-      <PvESwitch />
-    </div>
 
     <!-- Start New Game button  -->
     <div v-if="QuickTourIndex !== 10" id="StartGameButton">
@@ -67,7 +53,6 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
-import PvESwitch from './PvESwitch.vue'
 import StartGameModal from './StartGameModal.vue'
 import GameEndModal from './GameEndModal.vue'
 import { mapGetters, mapState } from 'vuex'
@@ -75,7 +60,7 @@ import { mapGetters, mapState } from 'vuex'
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, PvESwitch, StartGameModal, GameEndModal
+    Multiselect, Mode960, StartGameModal, GameEndModal
   },
   data () {
     return {
@@ -138,9 +123,24 @@ export default {
 
     // Payload example: { white: 'player'|'engine', black: 'player'|'engine' }
     handleStart (payload) {
-      // Store game configuration for the game end modal
+      this.$store.dispatch('resetBoard', { is960: false })
       this.$store.dispatch('setGameConfig', payload)
-      this.$emit('startNewGame', payload) 
+      
+      // Determine game mode and manage PvE state
+      const isPvP = payload.white === 'player' && payload.black === 'player'
+      const isEvE = payload.white === 'engine' && payload.black === 'engine'
+      const isPvE = !isPvP && !isEvE
+      
+      if (isPvE) {
+        // For PvE games: enable PvE with the player's side
+        const playerIsWhite = payload.white === 'player'
+        this.$store.dispatch('PvEtrue', { playerIsWhite })
+      } else {
+        // For PvP and EvE games: disable PvE
+        this.$store.dispatch('PvEfalse')
+      }
+      
+      this.$emit('startNewGame', payload)
       this.closeStartModal()
     },
 
@@ -179,15 +179,6 @@ export default {
 }
 .multiselect-qt{
   border: 5px solid var(--quicktour-highlight);
-}
-#PvESwitch-qt{
-  margin-left: 8px;
-  display: flex;
-  border: 5px solid var(--quicktour-highlight);
-}
-#PvESwitch{
-  margin-top: 8px;
-  display: flex;
 }
 
 /* Start game button styles */
