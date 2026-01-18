@@ -1,5 +1,8 @@
 <template>
-  <div class="eval-bars" :class="{ flip: orientation === 'black' }">
+  <div
+    class="eval-bars"
+    :class="{ flip: orientation === 'black' }"
+  >
     <div class="progress">
       <div
         class="progress-value"
@@ -7,9 +10,18 @@
       />
     </div>
     <div class="wdl">
-      <div class="wdl-seg wdl-win" :style="{ height: `${wdlWinPct}%` }" />
-      <div class="wdl-seg wdl-draw" :style="{ height: `${wdlDrawPct}%` }" />
-      <div class="wdl-seg wdl-loss" :style="{ height: `${wdlLossPct}%` }" />
+      <div
+        class="wdl-seg wdl-win"
+        :style="{ height: `${wdlWinPct}%` }"
+      />
+      <div
+        class="wdl-seg wdl-draw"
+        :style="{ height: `${wdlDrawPct}%` }"
+      />
+      <div
+        class="wdl-seg wdl-loss"
+        :style="{ height: `${wdlLossPct}%` }"
+      />
     </div>
   </div>
 </template>
@@ -21,10 +33,9 @@ export default {
   name: 'EvalBar',
   computed: {
     ...mapGetters(['orientation', 'cpForWhitePerc', 'cpForWhite', 'wdlForWhiteWinPct', 'wdlForWhiteDrawPct', 'wdlForWhiteLossPct']),
-    
     wdlWinPct () {
       return this.wdlForWhiteWinPct ?? 0
-    }, 
+    },
     wdlDrawPct () {
       return this.wdlForWhiteDrawPct ?? 0
     },
