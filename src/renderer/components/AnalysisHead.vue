@@ -53,6 +53,9 @@
     <EvalPlotButton v-if="QuickTourIndex !== 6" id="evalplot-button" />
     <EvalPlotButton v-else id="evalplot-button-qt" />
 
+    <!-- Flip Board Button -->
+    <button class="flipBoardBtn" @click="flipBoard" title="Flip Board">🔄 Flip</button>
+
     <!-- PGN Browser button -->
     <button class="pgnBrowserBtn" @click="openPgnBrowser" title="Open PGN Browser">📋 PGN Browser</button>
 
@@ -139,6 +142,16 @@ export default {
     // Open PGN Browser modal
     openPgnBrowser () {
       this.showPgnModal = true
+    },
+
+    // Flip the board
+    flipBoard () {
+      if (this.variant === 'racingkings') {
+        return
+      }
+      const currentOrientation = this.$store.getters.orientation
+      const newOrientation = currentOrientation === 'white' ? 'black' : 'white'
+      this.$store.dispatch('orientation', newOrientation)
     },
 
     // Handle start request from modal; this is a UI-only stub for now
@@ -274,6 +287,20 @@ export default {
 }
 
 .pgnBrowserBtn:hover {
+  background-color: #5a6268;
+}
+
+.flipBoardBtn {
+  background-color: #6c757d;
+  color: white;
+  border-radius: 5px;
+  padding: 6px 10px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.flipBoardBtn:hover {
   background-color: #5a6268;
 }
 
