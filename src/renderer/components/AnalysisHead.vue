@@ -151,7 +151,12 @@ export default {
 .ceval {
   /* display: table */
   font-size: 15pt;
-  height: 40px;
+  height: auto;
+  padding: 15px 10px;
+  background-color: var(--bg-color, #f5f5f5);
+  border-bottom: 2px solid #ddd;
+  position: relative;
+  z-index: 10;
 }
 #Mode960-qt{
   border: 5px solid var(--quicktour-highlight);
@@ -199,12 +204,11 @@ export default {
   box-shadow: 0 0 0 3px var(--quicktour-highlight) inset;
 }
 .grid-parent {
-  display: grid;
-  grid-template-columns: auto auto auto auto auto auto;
-  align: center;
-  text-align: bottom;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
   align-items: center;
-  /* vertical-align: middle; */
+  justify-content: flex-start;
 }
 .logo {
   font-size: 15pt;
