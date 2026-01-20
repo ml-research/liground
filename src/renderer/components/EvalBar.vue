@@ -9,7 +9,7 @@
         :style="{ height: `${100 - cpForWhitePerc * 100}%` }"
       />
     </div>
-    <div class="wdl">
+    <div v-if="hasWdlData" class="wdl">
       <div
         class="wdl-seg wdl-win"
         :style="{ height: `${wdlWinPct}%` }"
@@ -32,7 +32,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'EvalBar',
   computed: {
-    ...mapGetters(['orientation', 'cpForWhitePerc', 'cpForWhite', 'wdlForWhiteWinPct', 'wdlForWhiteDrawPct', 'wdlForWhiteLossPct']),
+    ...mapGetters(['orientation', 'cpForWhitePerc', 'cpForWhite', 'wdlForWhiteWinPct', 'wdlForWhiteDrawPct', 'wdlForWhiteLossPct', 'currentMove']),
     wdlWinPct () {
       return this.wdlForWhiteWinPct ?? 0
     },
@@ -41,6 +41,11 @@ export default {
     },
     wdlLossPct () {
       return this.wdlForWhiteLossPct ?? 0
+    },
+    hasWdlData () {
+      const mv = this.$store.state.multipv[0]
+      const uciShowWdl = this.$store.state.engineSettings.UCI_ShowWDL
+      return mv && typeof mv.wdlWin === 'number' && typeof mv.wdlDraw === 'number' && typeof mv.wdlLoss === 'number' && uciShowWdl === true
     }
   }
 }

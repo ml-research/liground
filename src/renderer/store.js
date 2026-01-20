@@ -366,6 +366,11 @@ export const store = new Vuex.Store({
         time: 0
       }
     },
+    resetWdlCache (state) {
+      state.lastWdlWin = null
+      state.lastWdlDraw = null
+      state.lastWdlLoss = null
+    },
     multipv (state, payload) {
       for (const pvline of payload) {
         if (pvline) {
@@ -725,6 +730,7 @@ export const store = new Vuex.Store({
     resetEngineData (context) {
       context.commit('resetMultiPV')
       context.commit('resetEngineStats')
+      context.commit('resetWdlCache')
     },
     setPvEParam (context, payload) {
       context.commit('PvEParam', payload)
@@ -1018,6 +1024,7 @@ export const store = new Vuex.Store({
       // only change engine when its a different one
       if (context.state.activeEngine !== id) {
         context.state.activeEngine = id
+        context.dispatch('resetEngineData')
         context.dispatch('runBinary', {
           binary: context.getters.engineBinary,
           cwd: context.getters.selectedEngine.cwd
