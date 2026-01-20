@@ -32,20 +32,6 @@
       v-else
       id="Mode960-qt"
     />
-    <div
-      v-if="QuickTourIndex !== 9"
-      id="PvESwitch"
-    >
-      PvE
-      <PvESwitch />
-    </div>
-    <div
-      v-else
-      id="PvESwitch-qt"
-    >
-      PvE
-      <PvESwitch />
-    </div>
 
     <!-- Start New Game button shown next to PvE switch -->
     <div v-if="QuickTourIndex !== 10" id="StartGameButton">
@@ -53,6 +39,14 @@
     </div>
     <div v-else id="StartGameButton-qt">
       <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+    </div>
+
+    <!-- Style Selectors -->
+    <div class="style-selectors">
+      <PieceStyleSelector v-if="QuickTourIndex !== 5" id="piece-style-top" />
+      <PieceStyleSelector v-else id="piece-style-top-qt" />
+      <BoardStyleSelector v-if="QuickTourIndex !== 5" id="board-style-top" />
+      <BoardStyleSelector v-else id="board-style-top-qt" />
     </div>
 
     <!-- PGN Browser button -->
@@ -79,15 +73,16 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
-import PvESwitch from './PvESwitch.vue'
 import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engine for White & Black
 import PgnBrowser from './PgnBrowser.vue'
+import PieceStyleSelector from './PieceStyleSelector.vue'
+import BoardStyleSelector from './BoardStyleSelector.vue'
 import { mapGetters, mapState } from 'vuex' 
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, PvESwitch, StartGameModal, PgnBrowser
+    Multiselect, Mode960, StartGameModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector
   },
   data () {
     return {
@@ -180,21 +175,13 @@ export default {
   border-bottom: 2px solid #ddd;
   position: relative;
   z-index: 10;
+  overflow: visible;
 }
 #Mode960-qt{
   border: 5px solid var(--quicktour-highlight);
 }
 .multiselect-qt{
   border: 5px solid var(--quicktour-highlight);
-}
-#PvESwitch-qt{
-  margin-left: 8px;
-  display: flex;
-  border: 5px solid var(--quicktour-highlight);
-}
-#PvESwitch{
-  margin-top: 8px;
-  display: flex;
 }
 
 /* Start game button styles */
@@ -233,7 +220,7 @@ export default {
   align-items: center;
   justify-content: flex-start;
   max-width: 100%;
-  overflow-x: auto;
+  overflow: visible;
   padding: 0 10px;
 }
 
@@ -344,6 +331,49 @@ export default {
   padding: 12px 16px;
   overflow: auto;
   flex: 1 1 auto;
+}
+
+#piece-style-top {
+  width: 200px;
+  min-width: 200px;
+}
+
+#piece-style-top-qt {
+  width: 200px;
+  min-width: 200px;
+  border: 5px solid var(--quicktour-highlight);
+}
+
+#board-style-top {
+  width: 200px;
+  min-width: 200px;
+}
+
+#board-style-top-qt {
+  width: 200px;
+  min-width: 200px;
+  border: 5px solid var(--quicktour-highlight);
+}
+
+.style-selectors {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#piece-style-top :deep(.multiselect__content-wrapper),
+#piece-style-top-qt :deep(.multiselect__content-wrapper),
+#board-style-top :deep(.multiselect__content-wrapper),
+#board-style-top-qt :deep(.multiselect__content-wrapper) {
+  z-index: 2000 !important;
+}
+
+#piece-style-top :deep(.multiselect),
+#piece-style-top-qt :deep(.multiselect),
+#board-style-top :deep(.multiselect),
+#board-style-top-qt :deep(.multiselect) {
+  position: relative;
+  z-index: 100;
 }
 
 </style>

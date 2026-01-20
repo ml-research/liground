@@ -83,22 +83,6 @@
               {{ opening.eco }} – {{ opening.name }}
             </div>
           </div>
-          <div
-            v-if="QuickTourIndex !== 5"
-            id="selector-container"
-          >
-            <PieceStyleSelector id="piece-style" />
-            <BoardStyleSelector id="board-style" />
-            <EvalPlotButton id="evalbutton-style" />
-          </div>
-          <div
-            v-else
-            id="selector-container-qt"
-          >
-            <PieceStyleSelector id="piece-style" />
-            <BoardStyleSelector id="board-style" />
-            <EvalPlotButton id="evalbutton-style" />
-          </div>
         </div>
         <EvalPlot
           v-if="QuickTourIndex !== 6"
@@ -136,8 +120,6 @@ import AnalysisView from './AnalysisView'
 import EvalBar from './EvalBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
-import PieceStyleSelector from './PieceStyleSelector'
-import BoardStyleSelector from './BoardStyleSelector'
 import Vue from 'vue'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
@@ -152,8 +134,6 @@ export default {
     AnalysisView,
     EvalBar,
     ChessGround,
-    PieceStyleSelector,
-    BoardStyleSelector,
     EvalPlot,
     GameInfo,
     PgnBrowser,
@@ -425,10 +405,9 @@ export default {
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto 150px auto;
+  grid-template-rows: auto auto;
   grid-template-areas:
     "board-grid"
-    "selector"
     "fenfield";
 }
 
@@ -484,35 +463,6 @@ input {
 #lname {
   background-color: var(--second-bg-color);
   color: var(--main-text-color)
-}
-#selector-container {
-  grid-area: selector;
-  display: grid;
-  grid-template-areas:
-  "piecestyle"
-  "boardstyle"
-  "evalButton";
-  margin-left: 5px;
-}
-#selector-container-qt {
-  grid-area: selector;
-  display: grid;
-  grid-template-areas:
-  "piecestyle"
-  "boardstyle"
-  "evalButton";
-  margin-left: 5px;
-  border: 5px solid var(--quicktour-highlight);
-}
-#piece-style {
-  grid-area: piecestyle;
-  margin-top: 10px;
-  width: 100%;
-}
-#board-style {
-  grid-area: boardstyle;
-  margin-top: 10px;
-  width: 100%;
 }
 #pgnbrowser {
   grid-area: pgnbrowser;
