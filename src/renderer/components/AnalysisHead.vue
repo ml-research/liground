@@ -168,7 +168,7 @@ export default {
 
 <style scoped>
 .reset {
-  background-color:var(--button-color);
+  background-color: red;
   color: white;
   outline: none;
   border-radius: 5px;
@@ -181,7 +181,7 @@ export default {
   padding-left: 4px;
 }
 .reset:hover {
-  background-color: var(--hover-color);
+  background-color: darkred;
   cursor:pointer;
 }
 .ceval {
