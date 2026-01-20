@@ -118,7 +118,7 @@ export default {
     }
   },
   mounted () {
-    //gotta look into this again later dosen't seem to work
+    // gotta look into this again later dosen't seem to work
     // Ensure the input field is focused when modal opens
     this.$nextTick(() => {
       const input = document.getElementById('gameName')

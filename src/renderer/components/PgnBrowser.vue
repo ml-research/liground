@@ -27,8 +27,8 @@
         <i
           id="icon"
           class="icon mdi mdi-content-save-outline"
-          @click="openSaveGameModal()"
           title="Save current game"
+          @click="openSaveGameModal()"
         />
       </div>
       <div>
