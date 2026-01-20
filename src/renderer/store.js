@@ -55,6 +55,21 @@ function cpToString (cp) {
 }
 
 /**
+ * Strip halfmove/fullmove counters from a FEN string for caching.
+ * @param {string} fen Full FEN string
+ */
+function normalizeFen (fen) {
+  if (typeof fen !== 'string') {
+    return ''
+  }
+  const parts = fen.trim().split(/\s+/)
+  if (parts.length >= 6) {
+    return parts.slice(0, parts.length - 2).join(' ')
+  }
+  return parts.join(' ')
+}
+
+/**
  * Check if an option value is valid and emit warnings if necessary.
  * @param {any[]} options Array of engine options
  * @param {string} name Name of option
@@ -121,6 +136,7 @@ export const store = new Vuex.Store({
     dimNumber: 0,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    normalizedFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
@@ -230,6 +246,7 @@ export const store = new Vuex.Store({
     },
     fen (state, payload) {
       state.fen = payload
+      state.normalizedFen = normalizeFen(payload)
     },
     engineIndex (state, payload) {
       state.engineIndex = payload
@@ -420,6 +437,7 @@ export const store = new Vuex.Store({
       state.selectedGame = null
       state.fenply = 1
       this.commit('resetEngineStats')
+      state.normalizedFen = normalizeFen(state.fen)
     },
     resetBoard (state, payload) {
       if (!payload.is960) {
@@ -560,6 +578,7 @@ export const store = new Vuex.Store({
         dimNumber: 0,
         turn: true,
         fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        normalizedFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -',
         lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         moves: [],
@@ -1356,6 +1375,9 @@ export const store = new Vuex.Store({
     },
     fen (state) {
       return state.fen
+    },
+    normalizedFen (state) {
+      return state.normalizedFen
     },
     lastFen (state) {
       return state.lastFen

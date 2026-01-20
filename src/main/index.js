@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
+import { createSchema } from './evalCache'
 
 /**
  * Set `__static` path to static files in production
@@ -41,7 +42,10 @@ function createWindow () {
     mainWindow = null
   })
 }
-app.on('ready', createWindow)
+app.whenReady().then(() => {
+  createSchema()
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
