@@ -392,30 +392,13 @@ export default {
 <style scoped>
 .main-grid {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr;
   grid-template-rows: auto auto;
-  gap: 10px;
   grid-template-areas:
     "chessboard analysisview"
     "evalplot analysisview";
-  overflow-x: auto;
-}
-
-@media (max-width: 1400px) {
-  .main-grid {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "chessboard"
-      "evalplot"
-      "analysisview";
-  }
-  #right-column {
-    width: 100% !important;
-  }
 }
 .chessboard-grid {
-  max-width: 100%;
-  width: 100%;
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 1fr;
@@ -423,7 +406,6 @@ export default {
   grid-template-areas:
     "board-grid"
     "fenfield";
-  overflow-x: auto;
 }
 
 .board-grid {
@@ -456,16 +438,9 @@ export default {
 }
 #right-column {
   grid-area: analysisview;
-  width: 40vw;
+  width: 100%;
   max-height: calc(100vh - 25px);
-  min-width: 300px;
-}
-
-@media (max-width: 1400px) {
-  #right-column {
-    width: 100%;
-    min-width: 100%;
-  }
+  min-width: 0;
 }
 .tab:not(.visible) {
   display: none;
