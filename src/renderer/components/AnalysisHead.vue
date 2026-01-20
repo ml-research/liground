@@ -55,6 +55,22 @@
       <button class="startGame-qt" @click="openStartModal">Start New Game</button>
     </div>
 
+    <!-- PGN Browser button -->
+    <button class="pgnBrowserBtn" @click="openPgnBrowser" title="Open PGN Browser">📋 PGN Browser</button>
+
+    <!-- PGN Browser Modal -->
+    <div v-if="showPgnModal" class="pgn-modal-overlay" @click.self="showPgnModal = false">
+      <div class="pgn-modal-content">
+        <div class="pgn-modal-header">
+          <h3>PGN Browser</h3>
+          <button class="pgn-modal-close" @click="showPgnModal = false">×</button>
+        </div>
+        <div class="pgn-modal-body">
+          <PgnBrowser />
+        </div>
+      </div>
+    </div>
+
     <!-- Modal component for selecting roles for white/black (UI only) -->
     <StartGameModal :visible="showStartModal" @close="closeStartModal" @start="handleStart" />
   </div>
@@ -65,17 +81,19 @@ import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
 import PvESwitch from './PvESwitch.vue'
 import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engine for White & Black
+import PgnBrowser from './PgnBrowser.vue'
 import { mapGetters, mapState } from 'vuex' 
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, PvESwitch, StartGameModal
+    Multiselect, Mode960, PvESwitch, StartGameModal, PgnBrowser
   },
   data () {
     return {
       selected: '♟️ Standard',
-      showStartModal: false // controls visibility of the start game modal
+      showStartModal: false, // controls visibility of the start game modal
+      showPgnModal: false // controls visibility of the PGN browser modal
     }
   },
   computed: {
@@ -116,6 +134,11 @@ export default {
     // Close the Start Game modal
     closeStartModal () {
       this.showStartModal = false
+    },
+
+    // Open PGN Browser modal
+    openPgnBrowser () {
+      this.showPgnModal = true
     },
 
     // Handle start request from modal; this is a UI-only stub for now
@@ -209,10 +232,118 @@ export default {
   gap: 15px;
   align-items: center;
   justify-content: flex-start;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0 10px;
+}
+
+@media (max-width: 1024px) {
+  .grid-parent {
+    gap: 10px;
+    font-size: 13pt;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-parent {
+    gap: 8px;
+    font-size: 12pt;
+    padding: 0 5px;
+  }
+  
+  .startGame,
+  .startGame-qt {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .reset {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 12px;
+  }
 }
 .logo {
   font-size: 15pt;
   font-family: sans-serif;
+}
+
+.pgnBrowserBtn {
+  background-color: #6c757d;
+  color: white;
+  border-radius: 5px;
+  padding: 6px 10px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pgnBrowserBtn:hover {
+  background-color: #5a6268;
+}
+
+.pgn-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pgn-modal-content {
+  background: var(--card-background, #fff);
+  color: var(--text-color, #111);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pgn-modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pgn-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.pgn-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-color, #111);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pgn-modal-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.pgn-modal-body {
+  padding: 12px 16px;
+  overflow: auto;
+  flex: 1 1 auto;
 }
 
 </style>

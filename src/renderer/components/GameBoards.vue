@@ -4,14 +4,6 @@
     <div>
       <div class="main-grid">
         <div class="chessboard-grid">
-          <PgnBrowser
-            v-if="QuickTourIndex !== 1"
-            id="pgnbrowser"
-          />
-          <PgnBrowser
-            v-else
-            id="pgnbrowser-qt"
-          />
           <div class="board-grid">
             <div class="board">
               <span>
@@ -429,15 +421,15 @@ export default {
     "evalplot analysisview";
 }
 .chessboard-grid {
-  min-width: 1050px;
+  min-width: 800px;
   grid-area: chessboard;
   display: grid;
-  grid-template-columns: 20% auto;
+  grid-template-columns: 1fr;
   grid-template-rows: auto 150px auto;
   grid-template-areas:
-    "pgnbrowser board-grid"
-    "selector board-grid "
-    ". fenfield";
+    "board-grid"
+    "selector"
+    "fenfield";
 }
 
 .board-grid {
