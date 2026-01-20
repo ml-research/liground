@@ -1,14 +1,11 @@
 <template>
   <div v-if="visible" class="modal-overlay" @click.self="close">
     <div class="modal-content" role="dialog" aria-modal="true">
-      <!-- Modal header -->
       <div class="modal-header">
         <h3>Game Over</h3>
       </div>
 
-      <!-- Modal body -->
       <div class="modal-body">
-        <!-- Result messages -->
         <div class="result-messages">
           <div v-if="result === 'draw'" class="draw-result">
             <p class="draw-text">The game ended in a draw between <strong>{{ whiteLabel }}</strong> and <strong>{{ blackLabel }}</strong>.</p>
@@ -22,7 +19,6 @@
           </div>
         </div>
 
-        <!-- Game statistics -->
         <div v-if="hasStats" class="game-stats">
           <h4>Game Statistics</h4>
           <table class="stats-table">
@@ -46,7 +42,6 @@
         </div>
       </div>
 
-      <!-- Modal footer -->
       <div class="modal-footer">
         <button class="close-button" @click="close"><b>Close</b></button>
       </div>
@@ -80,8 +75,6 @@ export default {
   },
   computed: {
     result () {
-      // DEBUG: Get result from store
-      console.log('[GameEndModal] Getting result from store:', this.$store.state.gameResult)
       return this.$store.state.gameResult
     },
     whiteLabel () {
@@ -130,8 +123,8 @@ export default {
 }
 
 .modal-content {
-  background: var(--card-background, #fff);
-  color: var(--text-color, #111);
+  background: var(--main-bg-color);
+  color: var(--main-text-color);
   width: 500px;
   max-width: calc(100% - 40px);
   border-radius: 8px;
@@ -143,7 +136,7 @@ export default {
 
 .modal-header {
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid var(--main-border-color);
 }
 
 .modal-header h3 {
@@ -165,7 +158,7 @@ export default {
   font-size: 1.1em;
   line-height: 1.5;
   margin: 0;
-  color: var(--text-color, #111);
+  color: var(--main-text-color);
 }
 
 .win-loss-result {
@@ -191,16 +184,17 @@ export default {
 }
 
 .game-stats {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--main-border-color);
   border-radius: 6px;
   padding: 12px;
-  background: var(--second-bg-color, #fafafa);
+  background: var(--second-bg-color);
 }
 
 .game-stats h4 {
   margin: 0 0 10px 0;
   font-size: 0.95em;
-  color: var(--muted-text, #666);
+  color: var(--main-text-color);
+  opacity: 0.8;
 }
 
 .stats-table {
@@ -210,7 +204,8 @@ export default {
 }
 
 .stats-table tr {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid var(--main-border-color);
+  opacity: 0.8;
 }
 
 .stats-table tr:last-child {
@@ -234,11 +229,11 @@ export default {
   padding: 10px 12px;
   display: flex;
   justify-content: center;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--main-border-color);
 }
 
 .close-button {
-  background-color: #6c757d;
+  background-color: var(--cancel-btn-color);
   color: white;
   border: none;
   padding: 8px 24px;
@@ -247,6 +242,6 @@ export default {
 }
 
 .close-button:hover {
-  background-color: #5a6268;
+  background-color: var(--cancel-btn-hover);
 }
 </style>

@@ -1,7 +1,6 @@
 <template>
   <div v-if="visible" class="modal-overlay" @click.self="close">
     <div class="modal-content" role="dialog" aria-modal="true">
-      <!-- Modal header -->
       <div class="modal-header">
         <h3>Start New Game</h3>
       </div>
@@ -114,9 +113,11 @@
         <p class="hint">Choose whether each side should be controlled by a human player or an engine (PvP, PvE, EvE supported). Only engines that support the selected Game Mode are listed.</p>
       </div>
 
-      <!-- Modal footer: Start (left) and Close (right) -->
       <div class="modal-footer">
-        <button class="start-button" @click="startGame"><b>Start Game</b></button>
+        <div class="footer-left">
+          <button class="start-button" :disabled="startDisabled" :title="disabledReason" @click="startGame"><b>Start Game</b></button>
+          <span v-if="disabledReason" class="disabled-hint">{{ disabledReason }}</span>
+        </div>
         <button class="close-button" @click="close"><b>Close</b></button>
       </div>
     </div>
@@ -125,7 +126,6 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
-import ChessGround from './ChessGround.vue';
 
 export default {
   name: 'StartGameModal',
@@ -182,7 +182,7 @@ export default {
 
     blackEngineLogo () {
       return this.blackEngineObj ? `url(${this.blackEngineObj.logo || ''})` : ''
-    }
+    },
   },
   watch: {
     // If game mode changes, ensure selected engines still compatible
@@ -203,7 +203,6 @@ export default {
     }
   },
   methods: {
-    // Close the modal and emit a close event so parent can update visibility.
     close () {
       this.$emit('close')
     },
@@ -238,13 +237,7 @@ export default {
       }
     },
 
-    // Emit a start event with the selected roles and close the modal.
-    // UI-only: We include engine and limiter selections in the emitted payload
-    // so the caller may wire functionality later.
-    async startGame () {
-      if (this.selectedGameMode !== this.$store.getters.variant){
-        await this.$store.dispatch('variant', this.selectedGameMode)
-      }
+    startGame () {
       const payload = {
         gameMode: this.selectedGameMode,
         white: this.whiteChoice,
@@ -269,7 +262,6 @@ export default {
 
       // PvP: both are players
       if (this.whiteChoice === 'player' && this.blackChoice === 'player') {
-        // TODO: implement player vs player setup
         this.$emit('start', payload)
         this.close()
         return
@@ -277,16 +269,6 @@ export default {
 
       // EvE: both are engines
       if (this.whiteChoice === 'engine' && this.blackChoice === 'engine') {
-        // Dispatch EvEtrue with engine names and limiter configs 
-        this.$store.dispatch('EvEtrue', {
-          whiteEngine: payload.whiteEngine,
-          blackEngine: payload.blackEngine,
-          whiteLimiter: payload.whiteLimiter,
-          blackLimiter: payload.blackLimiter,
-          gameMode: payload.gameMode
-        })
-
-        // Emit a start event as well (UI layer hook), then close
         this.$emit('start', payload)
         this.close()
         return
@@ -294,12 +276,6 @@ export default {
 
       // PvE: one side player, other engine
       const playerIsWhite = (this.whiteChoice === 'player')
-      if (playerIsWhite) {
-        const limiter = payload.blackLimiter
-      }
-      else {
-        const limiter = payload.whiteLimiter
-      }
 
       // Dispatch PvEtrue with information about which side is the player
       // (existing behavior; actual logic remains in the store)
@@ -328,8 +304,8 @@ export default {
 }
 
 .modal-content {
-  background: var(--card-background, #fff);
-  color: var(--text-color, #111);
+  background: var(--main-bg-color);
+  color: var(--main-text-color);
   width: 820px;
   max-width: calc(100% - 40px);
   height: 80vh;
@@ -343,7 +319,7 @@ export default {
 
 .modal-header {
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid var(--main-border-color);
 }
 
 .modal-body {
@@ -351,34 +327,40 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 12px;
-  overflow: auto; /* keep body scrollable while footer stays put */
-  flex: 1 1 auto; /* ensure body grows and footer remains fixed */
+  overflow: auto;
+  flex: 1 1 auto;
 }
 
 .game-mode {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
+  
 }
+
 
 .side-select {
   display: flex;
   flex-direction: column;
-  min-height: 180px; /* reserve vertical space so footer doesn't jump */
+  min-height: 180px;
 }
 
-.side-select select {
+.side-select select,
+.game-mode select {
   margin-top: 6px;
   padding: 6px 8px;
   border-radius: 4px;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
+  border: 1px solid var(--main-border-color);
 }
 
 .engine-config {
   margin-top: 8px;
   padding: 8px;
-  border: 1px solid rgba(0,0,0,0.04);
+  border: 1px solid var(--main-border-color);
   border-radius: 6px;
-  background: var(--second-bg-color, #fafafa);
+  background: var(--second-bg-color);
 }
 
 .engine-select-row {
@@ -394,7 +376,7 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
-  background-color: var(--light-text-color);
+  background-color: var(--button-color);
   flex-shrink: 0;
 }
 
@@ -421,18 +403,23 @@ export default {
   width: 120px;
   padding: 6px 8px;
   border-radius: 4px;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
+  border: 1px solid var(--main-border-color);
 }
 
 .limiter-unit {
   font-size: 12px;
-  color: var(--muted-text, #666);
+  color: var(--main-text-color);
+  opacity: 0.7;
 }
 
 .hint {
   grid-column: 1 / -1;
   margin-top: 6px;
   font-size: 12px;
-  color: var(--muted-text, #666);
+  color: var(--main-text-color);
+  opacity: 0.7;
 }
 
 .modal-footer {
@@ -440,28 +427,47 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(0,0,0,0.06);
-  /* keep footer fixed at bottom */
+  border-top: 1px solid var(--main-border-color);
   flex: 0 0 auto;
+  gap: 12px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.disabled-hint {
+  font-size: 12px;
+  color: var(--main-text-color);
+  opacity: 0.6;
+  font-style: italic;
 }
 
 .start-button {
-  background-color: #28a745; /* green */
+  background-color: var(--save-btn-color);
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
 }
 
-.start-button:hover { background-color: #1f8f3b; cursor: pointer; }
+.start-button:hover { background-color: var(--save-btn-hover); cursor: pointer; }
+
+.start-button:disabled {
+  background-color: var(--save-btn-color);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 
 .close-button {
-  background-color: #c72634; /* red */
+  background-color: var(--cancel-btn-color);
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
 }
 
-.close-button:hover { background-color: #8b1919; cursor: pointer; }
+.close-button:hover { background-color: var(--cancel-btn-hover); cursor: pointer; }
 </style>
