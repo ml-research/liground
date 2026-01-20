@@ -306,7 +306,7 @@ export default {
   border: 1px solid var(--main-border-color);
   border-radius: 4px;
   background-color: var(--button-color);
-  color: var(--main-text-color);
+  color: white;
   font-size: 14px;
   box-sizing: border-box;
 }
@@ -319,6 +319,7 @@ export default {
 
 .inputGroup input::placeholder {
   color: var(--light-text-color);
+  opacity: 0.5;
 }
 
 .infoText {
