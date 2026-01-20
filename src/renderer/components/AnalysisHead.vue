@@ -49,6 +49,10 @@
       <BoardStyleSelector v-else id="board-style-top-qt" />
     </div>
 
+    <!-- Eval Plot Button -->
+    <EvalPlotButton v-if="QuickTourIndex !== 6" id="evalplot-button" />
+    <EvalPlotButton v-else id="evalplot-button-qt" />
+
     <!-- PGN Browser button -->
     <button class="pgnBrowserBtn" @click="openPgnBrowser" title="Open PGN Browser">📋 PGN Browser</button>
 
@@ -77,12 +81,13 @@ import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engi
 import PgnBrowser from './PgnBrowser.vue'
 import PieceStyleSelector from './PieceStyleSelector.vue'
 import BoardStyleSelector from './BoardStyleSelector.vue'
+import EvalPlotButton from './EvalPlotButton.vue'
 import { mapGetters, mapState } from 'vuex' 
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, StartGameModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector
+    Multiselect, Mode960, StartGameModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector, EvalPlotButton
   },
   data () {
     return {
@@ -170,12 +175,15 @@ export default {
   /* display: table */
   font-size: 15pt;
   height: auto;
-  padding: 15px 10px;
+  padding: 15px 0 15px 0;
+  margin: 0;
+  width: 100%;
   background-color: var(--bg-color, #f5f5f5);
   border-bottom: 2px solid #ddd;
   position: relative;
   z-index: 10;
   overflow: visible;
+  box-sizing: border-box;
 }
 #Mode960-qt{
   border: 5px solid var(--quicktour-highlight);
@@ -359,6 +367,26 @@ export default {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+#evalplot-button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  background-color: var(--second-bg-color, #f5f5f5);
+  border: 1px solid var(--main-border-color, #ddd);
+  border-radius: 5px;
+}
+
+#evalplot-button-qt {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  background-color: var(--second-bg-color, #f5f5f5);
+  border: 5px solid var(--quicktour-highlight);
+  border-radius: 5px;
 }
 
 #piece-style-top :deep(.multiselect__content-wrapper),

@@ -123,7 +123,6 @@ import EvalPlot from './EvalPlot'
 import Vue from 'vue'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
-import EvalPlotButton from './EvalPlotButton'
 import GameInfo from './GameInfo.vue'
 import { findBestOpeningForFen } from '../../shared/openingLookup'
 import { mapGetters } from 'vuex'
@@ -137,8 +136,7 @@ export default {
     EvalPlot,
     GameInfo,
     PgnBrowser,
-    SettingsTab,
-    EvalPlotButton
+    SettingsTab
   },
   data () {
     return {
@@ -507,27 +505,34 @@ input {
 #inner {
   display: table;
   margin: 0 auto;
+  padding-right: 10px;
 }
 .evalbar {
   grid-area: evalbar;
   margin-left: 0px;
+  padding-right: 0;
   height: auto;
 }
 .evalbar-qt {
   grid-area: evalbar;
   margin-left: 0px;
+  padding-right: 0;
   height: auto;
   border: 3px solid var(--quicktour-highlight);
 }
 #analysisview {
-  margin-left: 15px;
+  margin-left: 0x;
 }
 #evalplot {
   grid-area: evalplot;
+  width: 560px;
+  margin-left: 120px;
 }
 #evalplot-qt {
   grid-area: evalplot;
   border: 5px solid var(--quicktour-highlight);
+  width: 560px;
+  margin-left: 120px;
 }
 #evalbutton-style {
   margin-top: 10px;

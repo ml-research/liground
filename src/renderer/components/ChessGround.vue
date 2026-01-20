@@ -943,8 +943,8 @@ export default {
 @import '../assets/dim9x10.css';
 
 .resizer{
-  padding-left: 15px;
-  padding-top: 15px;
+  padding-left: 5px;
+  padding-top: 5px;
   position: absolute;
   width: 10px;
   height: 10px;
