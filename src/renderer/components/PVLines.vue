@@ -3,7 +3,10 @@
     ref="pvLines"
     class="pv-lines"
   >
-    <div class="scroller">
+    <div
+      ref="scroller"
+      class="scroller"
+    >
       <VueContext
         ref="menu1"
         v-slot="{ data }"
@@ -326,8 +329,10 @@ export default {
 
       const pvRect = pvLinesEl.getBoundingClientRect()
       const lineRect = lineEl.getBoundingClientRect()
+      const scrollerEl = this.$refs.scroller
+      const scrollLeft = scrollerEl ? scrollerEl.scrollLeft : 0
       this.previewTop = lineRect.bottom - pvRect.top
-      this.previewLeft = lineRect.left - pvRect.left
+      this.previewLeft = lineRect.left - pvRect.left + scrollLeft
     },
     clearPreview () {
       this.previewLineId = null
