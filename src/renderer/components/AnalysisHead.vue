@@ -126,18 +126,26 @@ export default {
       this.$store.dispatch('resetBoard', { is960: false })
       this.$store.dispatch('setGameConfig', payload)
       
-      // Determine game mode and manage PvE state
       const isPvP = payload.white === 'player' && payload.black === 'player'
       const isEvE = payload.white === 'engine' && payload.black === 'engine'
       const isPvE = !isPvP && !isEvE
       
       if (isPvE) {
-        // For PvE games: enable PvE with the player's side
         const playerIsWhite = payload.white === 'player'
         this.$store.dispatch('PvEtrue', { playerIsWhite })
+      } else if (isEvE) {
+        // start Engine vs Engine with provided engine names and limiter settings
+        this.$store.dispatch('EvEtrue', {
+          gameMode: payload.gameMode,
+          whiteEngine: payload.whiteEngine,
+          blackEngine: payload.blackEngine,
+          whiteLimiter: payload.whiteLimiter,
+          blackLimiter: payload.blackLimiter
+        })
       } else {
-        // For PvP and EvE games: disable PvE
+        // make sure PvE/EvE are disabled for pure PvP
         this.$store.dispatch('PvEfalse')
+        this.$store.dispatch('EvEfalse')
       }
       
       this.$emit('startNewGame', payload)

@@ -1570,6 +1570,9 @@ export const store = new Vuex.Store({
     PvEInput (state) {
       return state.PvEInput
     },
+    EvE (state) {
+      return state.EvE
+    },
     dimNumber (state) {
       return state.dimNumber
     },
