@@ -75,7 +75,7 @@ export default class EngineSender {
       case 'info':
         if ('multipv' in payload) {
           const line = {}
-          for (const key of ['multipv', 'pv', 'cp', 'mate']) {
+          for (const key of ['multipv', 'pv', 'cp', 'mate', 'wdlWin', 'wdlDraw', 'wdlLoss']) {
             line[key] = payload[key]
             delete payload[key]
           }
