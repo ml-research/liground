@@ -194,6 +194,9 @@ export const store = new Vuex.Store({
       time: 0
     },
     enginetime: 0,
+    lastWdlWin: null,
+    lastWdlDraw: null,
+    lastWdlLoss: null,
     multipv: [
       {
         cp: 0,
@@ -417,6 +420,11 @@ export const store = new Vuex.Store({
         tbhits: 0,
         time: 0
       }
+    },
+    resetWdlCache (state) {
+      state.lastWdlWin = null
+      state.lastWdlDraw = null
+      state.lastWdlLoss = null
     },
     multipv (state, payload) {
       for (const pvline of payload) {
@@ -789,6 +797,7 @@ export const store = new Vuex.Store({
     resetEngineData (context) {
       context.commit('resetMultiPV')
       context.commit('resetEngineStats')
+      context.commit('resetWdlCache')
     },
     setPvEParam (context, payload) {
       context.commit('PvEParam', payload)
@@ -1339,6 +1348,7 @@ export const store = new Vuex.Store({
       // only change engine when its a different one
       if (context.state.activeEngine !== id) {
         context.state.activeEngine = id
+        context.dispatch('resetEngineData')
         context.dispatch('runBinary', {
           binary: context.getters.engineBinary,
           cwd: context.getters.selectedEngine.cwd
@@ -1430,6 +1440,12 @@ export const store = new Vuex.Store({
               mate: payload.mate,
               pvUCI: payload.pv,
               ucimove
+            }
+            // attach engine-provided WDL info when available (fractions 0..1)
+            if ('wdlWin' in payload || 'wdlDraw' in payload || 'wdlLoss' in payload) {
+              pvline.wdlWin = typeof payload.wdlWin === 'number' ? payload.wdlWin : parseFloat(payload.wdlWin)
+              pvline.wdlDraw = typeof payload.wdlDraw === 'number' ? payload.wdlDraw : parseFloat(payload.wdlDraw)
+              pvline.wdlLoss = typeof payload.wdlLoss === 'number' ? payload.wdlLoss : parseFloat(payload.wdlLoss)
             }
             try {
               pvline.pv = board.variationSan(payload.pv)
@@ -1814,6 +1830,56 @@ export const store = new Vuex.Store({
       } else {
         return 1 / (1 + Math.exp(-0.003 * getters.cpForWhite))
       }
+    },
+    wdlForWhiteWin (state) {
+      const mv = state.multipv[0]
+      if (mv && typeof mv.wdlWin === 'number') {
+        let win = mv.wdlWin
+        if (!state.turn) { // black to move -> swap perspective
+          win = mv.wdlLoss
+        }
+        // cache the new value
+        state.lastWdlWin = win
+        return win
+      }
+      // fallback to last known value
+      return state.lastWdlWin
+    },
+    wdlForWhiteDraw (state) {
+      const mv = state.multipv[0]
+      if (mv && typeof mv.wdlDraw === 'number') {
+        // cache the new value
+        state.lastWdlDraw = mv.wdlDraw
+        return mv.wdlDraw
+      }
+      // fallback to last known value
+      return state.lastWdlDraw
+    },
+    wdlForWhiteLoss (state) {
+      const mv = state.multipv[0]
+      if (mv && typeof mv.wdlLoss === 'number') {
+        let loss = mv.wdlLoss
+        if (!state.turn) {
+          loss = mv.wdlWin
+        }
+        // cache the new value
+        state.lastWdlLoss = loss
+        return loss
+      }
+      // fallback to last known value
+      return state.lastWdlLoss
+    },
+    wdlForWhiteWinPct (state, getters) {
+      const v = getters.wdlForWhiteWin
+      return v === null ? null : v * 100
+    },
+    wdlForWhiteDrawPct (state, getters) {
+      const v = getters.wdlForWhiteDraw
+      return v === null ? null : v * 100
+    },
+    wdlForWhiteLossPct (state, getters) {
+      const v = getters.wdlForWhiteLoss
+      return v === null ? null : v * 100
     },
     message (state) {
       return state.message.toUpperCase()
