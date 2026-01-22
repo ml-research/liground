@@ -1,6 +1,12 @@
 <template>
-  <div class="pv-lines">
-    <div class="scroller">
+  <div
+    ref="pvLines"
+    class="pv-lines"
+  >
+    <div
+      ref="scroller"
+      class="scroller"
+    >
       <VueContext
         ref="menu1"
         v-slot="{ data }"
@@ -34,10 +40,10 @@
       >
         <div
           v-if="line"
-          :key="id"
+          :key="`line-${id}`"
           class="item clickable"
           @mouseenter="onMouseEnter(id)"
-          @mouseleave="onMouseLeave(id)"
+          @mouseleave="onMouseLeave"
           @click="onClick(line)"
         >
           <span class="left">{{ line.cpDisplay }}</span>
@@ -45,17 +51,37 @@
             class="right"
             @contextmenu.prevent="(currentMove && currentMove.main) || (!currentMove && mainFirstMove) ? $refs.menu1.open($event, { line: line }) : $refs.menu2.open($event, { line: line })"
           >
-            {{ line.pv }}
+            <span
+              v-for="(entry, idx) in line.pv.split(' ')"
+              :key="idx"
+              class="pv-entry"
+              :class="{ 'is-move-token': isMoveToken(entry) }"
+              @mouseenter="isMoveToken(entry) && setPreview(id, idx, line.pv.split(' '), $event)"
+              @click="isMoveToken(entry) && setBoard(id, idx, line.pv.split(' '))"
+            >
+              {{ entry }}
+            </span>
           </span>
         </div>
+
         <div
-          v-else
-          :key="id"
+          v-if="!line"
+          :key="`placeholder-${id}`"
           class="item placeholder"
         >
           ...
         </div>
       </template>
+    </div>
+    <div
+      v-if="hasPreviewLine && previewFen"
+      class="pv-preview"
+      :class="[boardStyle, pieceStyle, 'is2d', { koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber===3, dim9x9: dimensionNumber===1 }]"
+      :style="{ top: `${previewTop}px`, left: `${previewLeft}px` }"
+    >
+      <div class="cg-board-wrap">
+        <div ref="previewBoard" />
+      </div>
     </div>
     <footer class="footer">
       <div
@@ -84,6 +110,8 @@
 <script>
 import { mapGetters } from 'vuex'
 import VueContext from 'vue-context/src/js/index'
+import ffish from 'ffish'
+import { Chessground } from 'chessgroundx'
 
 export default {
   components: {
@@ -104,12 +132,20 @@ export default {
           ucimove: ''
         }
       ],
+      previewLineId: null, // Shows which PV line is being previewed
+      previewTop: 0,
+      previewLeft: 0,
+      previewUciIdx: null,
+      displayIdx: null,
+      previewFen: null,
+      previewBoard: null,
       currentEngine: 1,
       pvcount: 0,
       originalMultiPV: 1,
       showOnlyOnePvLine: false, // Flag to show only one PvLine
       showExpandIcon: false, // Flag to show expand-down icon
-      showMinimizeIcon: true // Flag to show expand-up icon
+      showMinimizeIcon: true, // Flag to show expand-up icon
+      board: null
     }
   },
   computed: {
@@ -131,7 +167,10 @@ export default {
       }
       return null
     },
-    ...mapGetters(['moves', 'fen', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
+    hasPreviewLine () {
+      return this.previewLineId !== null && !!this.lines[this.previewLineId]
+    },
+    ...mapGetters(['boardStyle', 'pieceStyle', 'dimensionNumber', 'moves', 'fen', 'is960', 'variant', 'orientation', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
     pvcount () {
@@ -146,6 +185,12 @@ export default {
     },
     multipv () {
       this.updateLines()
+    },
+    lines () {
+      if (this.previewLineId === null) return
+      if (!this.lines[this.previewLineId]) {
+        this.clearPreview()
+      }
     },
     engineSettings () {
       this.originalMultiPV = this.engineSettings.MultiPV
@@ -171,6 +216,31 @@ export default {
     }
   },
   methods: {
+    ensurePreviewBoard () {
+      const el = Array.isArray(this.$refs.previewBoard)
+        ? this.$refs.previewBoard[0]
+        : this.$refs.previewBoard
+      if (!el) return
+
+      if (!this.previewBoard || this.previewBoard.state.geometry !== this.dimensionNumber) {
+        this.previewBoard = Chessground(el, {
+          coordinates: false,
+          fen: this.previewFen || this.fen,
+          orientation: this.orientation,
+          highlight: { lastMove: false, check: false },
+          drawable: { enabled: false, visible: false },
+          movable: { enabled: false },
+          geometry: this.dimensionNumber
+        })
+      }
+    },
+    updatePreviewFen () {
+      if (!this.previewFen) return
+      this.ensurePreviewBoard()
+      if (this.previewBoard) {
+        this.previewBoard.set({ fen: this.previewFen, variant: this.variant, lastMove: false })
+      }
+    },
     fillpvCount (payload) {
       this.pvcount = payload
       this.originalMultiPV = payload
@@ -195,10 +265,123 @@ export default {
       const prevMov = this.currentMove
       this.$store.dispatch('pushAltLine', { line: mainLine, prev: prevMov })
     },
+    computePreviewFen (baseFen, pvUciMoves, plyCount) {
+      const b = this.is960
+        ? new ffish.Board(this.variant, baseFen, true)
+        : new ffish.Board(this.variant, baseFen)
+
+      for (let i = 0; i < plyCount; i++) {
+        b.push(pvUciMoves[i])
+      }
+      return b.fen()
+    },
+    countMovesUpTo (entries, displayIdx) {
+      console.log(entries)
+      let moveNum = 0
+      for (let i = 0; i <= displayIdx; i++) {
+        if (this.isMoveToken(entries[i])) {
+          moveNum++
+        }
+      }
+      console.log(moveNum)
+      return moveNum
+    },
+    setPreview (lineId, displayIdx, entries, event) {
+      const previewIdx = this.previewIndex(displayIdx, entries)
+      if (previewIdx === null) {
+        this.clearPreview()
+        return
+      }
+
+      this.updatePreviewPosition(event)
+      const uciIndex = this.countMovesUpTo(entries, previewIdx)
+      this.previewLineId = lineId
+      this.previewUciIdx = uciIndex
+      this.displayIdx = previewIdx
+
+      const uciMoves = this.lines[lineId].pvUCI.trim().split(/\s+/)
+      const plyCount = uciIndex
+      try {
+        this.previewFen = this.computePreviewFen(this.fen, uciMoves, plyCount)
+        this.$nextTick(() => this.updatePreviewFen())
+      } catch (e) {
+        this.clearPreview()
+      }
+    },
+    setBoard (lineId, displayIdx, entries) {
+      const previewIdx = this.previewIndex(displayIdx, entries)
+      const uciIndex = this.countMovesUpTo(entries, previewIdx)
+      this.previewLineId = lineId
+      this.previewUciIdx = uciIndex
+      this.displayIdx = previewIdx
+
+      const uciMoves = this.lines[lineId].pvUCI.trim().split(/\s+/)
+      const plyCount = uciIndex
+      const fallbackFEN = this.fen
+      try {
+        for (let i = 0; i < plyCount; i++) {
+          const prevMov = this.currentMove
+          this.$store.dispatch('push', { move: uciMoves[i], prev: prevMov })
+        }
+      } catch (e) {
+        this.$store.commit('hoveredpv', -1)
+        this.$store.dispatch('fen', fallbackFEN)
+      }
+      this.clearPreview()
+    },
+    updatePreviewPosition (event) {
+      const pvLinesEl = this.$refs.pvLines
+      if (!pvLinesEl || !event || !event.currentTarget) return
+
+      const lineEl = event.currentTarget.closest('.item')
+      if (!lineEl) return
+
+      const pvRect = pvLinesEl.getBoundingClientRect()
+      const lineRect = lineEl.getBoundingClientRect()
+      const scrollerEl = this.$refs.scroller
+      const scrollLeft = scrollerEl ? scrollerEl.scrollLeft : 0
+      this.previewTop = lineRect.bottom - pvRect.top
+      this.previewLeft = lineRect.left - pvRect.left + scrollLeft
+    },
+    clearPreview () {
+      this.previewLineId = null
+      this.displayIdx = null
+      this.previewUciIdx = null
+      this.previewFen = null
+      this.previewBoard = null
+      this.previewTop = 0
+      this.previewLeft = 0
+    },
+    previewIndex (displayIdx, entries) {
+      const entry = entries[displayIdx]
+      if (this.isMoveNumber(entry)) {
+        return this.nextMoveIndex(displayIdx + 1, entries)
+      }
+      if (!this.isMoveToken(entry)) {
+        return null
+      }
+      return displayIdx
+    },
+    nextMoveIndex (startIdx, entries) {
+      for (let idx = startIdx; idx < entries.length; idx++) {
+        if (this.isMoveToken(entries[idx])) {
+          return idx
+        }
+      }
+      return null
+    },
+    isMoveNumber (entry) {
+      return /^\d+\.+$/.test(entry) // Match move numbers like "1." or "12..."
+    },
+    isMoveToken (entry) {
+      return entry.length > 0 && !this.isMoveNumber(entry)
+    },
     onMouseEnter (id) {
       this.$store.commit('hoveredpv', id)
+      this.ensurePreviewBoard()
     },
-    onMouseLeave (id) {
+    onMouseLeave () {
+      this.clearPreview()
       this.$store.commit('hoveredpv', -1)
     },
     onClick (line) {
@@ -245,8 +428,27 @@ export default {
   background-color: var(--second-bg-color);
   border: 1px solid var(--main-border-color);
   font-weight: 100;
+  overflow: visible;
+  position: relative;
   white-space: nowrap;
 }
+.pv-entry.is-move-token:hover {
+  font-weight: bold;
+}
+.pv-preview {
+  display: inline-block;
+  position: absolute;
+  z-index: 20;
+  border-radius: 6px;
+  overflow: hidden;
+  filter: drop-shadow(4px 4px 3px black)
+}
+
+.pv-preview .cg-wrap {
+  width: 160px;
+  height: 160px;
+}
+
 .scroller {
   max-height: 12em;
   overflow-x: scroll;
