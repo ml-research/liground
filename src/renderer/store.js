@@ -103,6 +103,19 @@ function checkOption (options, name, value) {
 
 const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
 
+/* Helper to produce a `go` command from limiter configuration
+** @param {Object} limiter Limiter configuration
+*/
+function limiterToGo (limiter) {
+  if (!limiter || !limiter.enabled) return 'go movetime 1000'
+  switch (limiter.type) {
+    case 'time': return `go movetime ${parseInt(limiter.value, 10)}`
+    case 'nodes': return `go nodes ${parseInt(limiter.value, 10) * 1000000}`
+    case 'depth': return `go depth ${parseInt(limiter.value, 10)}`
+    default: return `go movetime ${parseInt(limiter.value, 10) || 1000}`
+  }
+}
+
 export const store = new Vuex.Store({
   state: {
     engineIndex: 1,
@@ -111,9 +124,11 @@ export const store = new Vuex.Store({
     active: false,
     PvE: false,
     PvEPlayerIsWhite: true, // true when the human player controls White in PvE mode
-    PvEParam: 'go movetime 1000',
+    PvEParam: 'go movetime 1000', 
     PvEValue: 'time',
     PvEInput: 1000,
+    PvELimiter: null, // stores the limiter config for the PvE engine
+    PvEEngineInstance: null,
     resized: 0,
     resized9x9height: 0,
     resized9x9width: 0,
@@ -285,6 +300,9 @@ export const store = new Vuex.Store({
     PvEPlayerIsWhite (state, payload) {
       state.PvEPlayerIsWhite = payload
     },
+    PvEEngineInstance (state, payload) {
+      state.PvEEngineInstance = payload
+    },
     PvEParam (state, payload) {
       state.PvEParam = payload
     },
@@ -293,6 +311,9 @@ export const store = new Vuex.Store({
     },
     PvEInput (state, payload) {
       state.PvEInput = payload
+    },
+    PvELimiter (state, payload) {
+      state.PvELimiter = payload
     },
     // EvE mutations
     EvE (state, payload) {
@@ -802,8 +823,22 @@ export const store = new Vuex.Store({
       context.commit('active', true)
     },
     goEnginePvE (context) {
-      // Send PvE engine command, start the clock, mark engine as active
-      engine.send(context.getters.PvEParam)
+      // Send PvE engine command using the stored PvE engine instance and limiter
+      const pveEngine = context.state.PvEEngineInstance
+      const pveLimiter = context.state.PvELimiter
+      
+      if (!pveEngine) {
+        console.error('[goEnginePvE] No PvE engine instance available')
+        return
+      }
+
+      try {
+        pveEngine.send(`position fen ${context.getters.fen}`)
+        pveEngine.send(limiterToGo(pveLimiter))
+      } catch (err) {
+        console.error('[goEnginePvE] Failed to send position/go to PvE engine:', err)
+      }
+      
       context.commit('setEngineClock')
       context.commit('active', true)
     },
@@ -851,21 +886,84 @@ export const store = new Vuex.Store({
     closeGameEndModal (context) {
       context.commit('showGameEndModal', false)
     },
-    PvEtrue (context, payload = {}) {
+    
+    async PvEtrue (context, payload = {}) {
       // Enable PvE mode and remember which side the human player controls.
-      // payload.playerIsWhite = true means the human is White.
-      const playerIsWhite = payload && typeof payload.playerIsWhite !== 'undefined' ? payload.playerIsWhite : true
-      context.commit('PvE', true)
-      context.commit('PvEPlayerIsWhite', playerIsWhite)
-      context.commit('active', true)
+      // payload.playerIsWhite = true means the human is White (legacy behavior).
+      try {
+        const gameMode = payload.gameMode
+        const playerIsWhite = payload && typeof payload.playerIsWhite !== 'undefined' ? payload.playerIsWhite : true
+        const engineName = payload.engine
+        const pveLimiter = payload.pveLimiter
 
-       const engineIsWhite = !playerIsWhite
-      const turnIsWhite = context.getters.turn
-      const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
-      if (engineToMoveNow) {
-        engine.send('stop')
-        context.dispatch('position')
-        context.dispatch('goEnginePvE')
+        const engineInfo = context.state.allEngines[engineName]
+        if (!engineInfo) {
+          throw new Error('Could not find engine binary for provided name')
+        }
+
+        // create engine instance
+        const pveEngine = new Engine()
+
+        // run the PvE engine
+        await pveEngine.run(engineInfo.binary, engineInfo.cwd)
+
+        // configure PvE engine with the desired game mode (variant) and 960 flag
+        const variantCmd = `setoption name UCI_Variant value ${gameMode}`
+        const chess960Cmd = `setoption name UCI_Chess960 value ${context.getters.is960}`
+
+        try {
+          pveEngine.send(variantCmd)
+          pveEngine.send(chess960Cmd)
+        } catch (err) {
+          console.warn('[PvEtrue] Failed to send variant/960 to PvE engine:', err)
+        }
+
+        // commit engine instance and PvE mode state
+        context.commit('PvE', true)
+        context.commit('PvEPlayerIsWhite', playerIsWhite)
+        context.commit('PvEEngineInstance', pveEngine)
+        context.commit('PvELimiter', pveLimiter)
+        context.commit('active', true)
+
+        const engineIsWhite = !playerIsWhite
+
+        // send position and go to the engine instance
+        const sendPositionAndGo = (inst, lim) => {
+          try {
+            inst.send(`position fen ${context.getters.fen}`)
+            inst.send(limiterToGo(lim))
+          } catch (err) {
+            console.error('[PvE] Failed to send position/go:', err)
+          }
+        }
+
+        // bestmove handler
+        const pveEngineHandler = async ucimove => {
+          const turnIsWhite = context.getters.turn
+          const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
+
+          if (!context.state.PvE || !engineToMoveNow) return
+          try {
+            await context.dispatch('push', { move: ucimove, prev: context.getters.currentMove[0] })
+          } catch (err) {
+            console.error('[PvEMakeMove] Engine provided invalid move:', ucimove, err)
+            // try to restart the engine calculation on current position
+            context.dispatch('position')
+            sendPositionAndGo(pveEngine, pveLimiter)
+          }
+        }
+
+        // attach listener
+        pveEngine.on('bestmove', pveEngineHandler)
+
+        // kick off the engine if it's the engine's turn now
+        const turnIsWhiteNow = context.getters.turn
+        const engineToMoveNow = (turnIsWhiteNow && engineIsWhite) || (!turnIsWhiteNow && !engineIsWhite)
+        if (engineToMoveNow) {
+          sendPositionAndGo(pveEngine, pveLimiter)
+        }
+      } catch (err) {
+        console.error('[PvEtrue] Could not start PvE match:', err)
       }
     },
     // Start an Engine vs Engine match. Payload must include engine names and limiter configs:
@@ -915,17 +1013,6 @@ export const store = new Vuex.Store({
         context.commit('EvE', true)
         context.commit('enginesActive', [true, true])
         context.commit('active', true)
-
-        // helper to produce a `go` command from limiter
-        function limiterToGo (limiter) {
-          if (!limiter || !limiter.enabled) return 'go movetime 1000'
-          switch (limiter.type) {
-            case 'time': return `go movetime ${parseInt(limiter.value, 10)}`
-            case 'nodes': return `go nodes ${parseInt(limiter.value, 10) * 1000000}`
-            case 'depth': return `go depth ${parseInt(limiter.value, 10)}`
-            default: return `go movetime ${parseInt(limiter.value, 10) || 1000}`
-          }
-        }
 
         // send position and go to a specific engine instance
         const sendPositionAndGo = (inst, lim) => {
@@ -1557,6 +1644,9 @@ export const store = new Vuex.Store({
     },
     PvE (state) {
       return state.PvE
+    },
+    EvE (state) {
+      return state.EvE
     },
     PvEPlayerIsWhite (state) {
       return state.PvEPlayerIsWhite

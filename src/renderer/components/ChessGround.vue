@@ -283,6 +283,14 @@ export default {
       this.updateBoardCSS(boardStyle)
     },
     multipv () {
+      // Don't draw engine arrows during PvE or EvE modes
+      if (this.PvE || this.EvE) {
+        this.shapes = []
+        this.pieceShapes = []
+        this.drawShapes()
+        return
+      }
+
       const multipv = this.multipv
       const shapes = []
       const pieceShapes = []
