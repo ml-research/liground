@@ -237,7 +237,10 @@ export default {
       }
     },
 
-    startGame () {
+    async startGame () {
+      if (this.selectedGameMode !== this.$store.getters.variant){
+        await this.$store.dispatch('variant', this.selectedGameMode) 
+      }
       const payload = {
         gameMode: this.selectedGameMode,
         white: this.whiteChoice,
