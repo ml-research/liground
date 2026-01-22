@@ -74,7 +74,7 @@
       </template>
     </div>
     <div
-      v-if="previewLineId !== null && previewFen"
+      v-if="hasPreviewLine && previewFen"
       class="pv-preview"
       :class="[boardStyle, pieceStyle, 'is2d', { koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber===3, dim9x9: dimensionNumber===1 }]"
       :style="{ top: `${previewTop}px`, left: `${previewLeft}px` }"
@@ -167,6 +167,9 @@ export default {
       }
       return null
     },
+    hasPreviewLine () {
+      return this.previewLineId !== null && !!this.lines[this.previewLineId]
+    },
     ...mapGetters(['boardStyle', 'pieceStyle', 'dimensionNumber', 'moves', 'fen', 'is960', 'variant', 'orientation', 'multipv', 'engineSettings', 'mainFirstMove', 'PvE', 'active', 'turn', 'enginetime', 'PvEValue', 'PvEParam', 'PvEInput', 'nodes', 'depth', 'seldepth'])
   },
   watch: {
@@ -182,6 +185,12 @@ export default {
     },
     multipv () {
       this.updateLines()
+    },
+    lines () {
+      if (this.previewLineId === null) return
+      if (!this.lines[this.previewLineId]) {
+        this.clearPreview()
+      }
     },
     engineSettings () {
       this.originalMultiPV = this.engineSettings.MultiPV
