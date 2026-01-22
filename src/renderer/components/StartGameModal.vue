@@ -254,7 +254,7 @@ export default {
         whiteEngine: this.whiteChoice === 'engine' && this.whiteEngineObj ? this.whiteEngineObj.name : null,
         blackEngine: this.blackChoice === 'engine' && this.blackEngineObj ? this.blackEngineObj.name : null,
 
-        // Limiter configuration (UI-only)
+        // Limiter configuration for PvE and EvE modes 
         whiteLimiter: this.whiteChoice === 'engine' ? {
           enabled: this.whiteLimiterEnabled,
           type: this.whiteLimiterType,
@@ -269,7 +269,6 @@ export default {
 
       // PvP: both are players
       if (this.whiteChoice === 'player' && this.blackChoice === 'player') {
-        // TODO: implement player vs player setup
         this.$emit('start', payload)
         this.close()
         return
@@ -294,16 +293,14 @@ export default {
 
       // PvE: one side player, other engine
       const playerIsWhite = (this.whiteChoice === 'player')
-      if (playerIsWhite) {
-        const limiter = payload.blackLimiter
-      }
-      else {
-        const limiter = payload.whiteLimiter
-      }
-
       // Dispatch PvEtrue with information about which side is the player
       // (existing behavior; actual logic remains in the store)
-      this.$store.dispatch('PvEtrue', { playerIsWhite })
+      this.$store.dispatch('PvEtrue', { 
+        playerIsWhite,
+        pveLimiter: playerIsWhite ? payload.blackLimiter : payload.whiteLimiter,
+        engine: playerIsWhite ? payload.blackEngine : payload.whiteEngine,
+        gameMode: payload.gameMode
+       })
 
       // Emit a start event as well (UI layer hook), then close
       this.$emit('start', payload)

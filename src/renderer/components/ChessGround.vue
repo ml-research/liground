@@ -213,7 +213,7 @@ export default {
         return undefined
       }
     },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime', 'resized', 'resized9x9width', 'resized9x9height', 'resized9x10width', 'resized9x10height', 'dimNumber'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'EvE', 'enginetime', 'resized', 'resized9x9width', 'resized9x9height', 'resized9x10width', 'resized9x10height', 'dimNumber'])
   },
   watch: {
     dimensionNumber () {
@@ -265,6 +265,14 @@ export default {
       this.updateBoardCSS(boardStyle)
     },
     multipv () {
+      // Don't draw engine arrows during PvE or EvE modes
+      if (this.PvE || this.EvE) {
+        this.shapes = []
+        this.pieceShapes = []
+        this.drawShapes()
+        return
+      }
+
       const multipv = this.multipv
       const shapes = []
       const pieceShapes = []
