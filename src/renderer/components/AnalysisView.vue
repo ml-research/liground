@@ -101,6 +101,11 @@ export default {
 </script>
 
 <style scoped>
+.analysis {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
 .analysis-container {
   margin-top: 30px;
   margin-bottom: 30px;
