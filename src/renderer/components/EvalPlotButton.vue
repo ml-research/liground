@@ -94,7 +94,7 @@ input::-webkit-inner-spin-button {
   border-radius: 3px;
   background-color:var(--button-color);
   color: white;
-  box-shadow: 1px 1px 1px 1px black;
+  border: 2px solid rgba(0, 0, 0, 0.3);
   outline: none;
 }
 .button:hover {

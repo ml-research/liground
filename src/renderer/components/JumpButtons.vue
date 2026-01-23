@@ -3,15 +3,6 @@
     <a
       href="#"
       class="jump previous"
-      :class="{ grey : variant === 'racingkings' }"
-      @click="$emit('flip-board', 0)"
-    ><i
-      slot="extra"
-      class="icon mdi mdi-rotate-3d-variant"
-    /></a>
-    <a
-      href="#"
-      class="jump previous"
       :class="{ grey : !currentMove }"
       @click="$emit('move-to-start', 0)"
     ><i

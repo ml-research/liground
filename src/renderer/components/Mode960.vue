@@ -32,7 +32,7 @@ export default {
     return {
       curVar: '',
       fen: '',
-      variants: ['chess', 'crazyhouse', 'kingofthehill', '3check', 'antichess', 'atomic', 'horde']
+      variants: ['chess', 'crazyhouse', 'kingofthehill', '3check', 'antichess', 'atomic', 'horde', 'fischerandom', 'chess960']
     }
   },
   computed: {
@@ -185,8 +185,8 @@ input[type=number] {
 .button {
   color: white;
   background-color:var(--button-color);
-  box-shadow: 1px 1px 1px 1px black;
   border-radius: 5px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
   outline: none;
   font-size: 25px;
 }
