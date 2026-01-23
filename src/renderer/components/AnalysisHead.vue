@@ -12,11 +12,16 @@
     </div>
 
     <!-- Start New Game button -->
-    <div v-if="QuickTourIndex !== 10" id="StartGameButton">
-      <button class="startGame" @click="openStartModal">Start New Game</button>
-    </div>
-    <div v-else id="StartGameButton-qt">
-      <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+    <div class="button-group">
+      <div v-if="QuickTourIndex !== 10" id="StartGameButton">
+        <button class="startGame" @click="openStartModal">Start New Game</button>
+      </div>
+      <div v-else id="StartGameButton-qt">
+        <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+      </div>
+
+      <!-- PGN Browser button -->
+      <button class="pgnBrowserBtn" @click="openPgnBrowser" title="Open PGN Browser">📋 PGN Browser</button>
     </div>
 
     <!-- Mode Selection -->
@@ -49,9 +54,6 @@
 
     <!-- Flip Board Button -->
     <button class="flipBoardBtn" @click="flipBoard" title="Flip Board">🔄 Flip</button>
-
-    <!-- PGN Browser button -->
-    <button class="pgnBrowserBtn" @click="openPgnBrowser" title="Open PGN Browser">📋 PGN Browser</button>
 
     <!-- Eval Plot Button -->
     <EvalPlotButton v-if="QuickTourIndex !== 6" id="evalplot-button" />
@@ -211,12 +213,16 @@ export default {
 
 /* Start game button styles */
 #StartGameButton-qt{
-  margin-left: 8px;
   display: flex;
   border: 5px solid var(--quicktour-highlight);
 }
 #StartGameButton{
   display: flex;
+}
+.button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 .startGame {
   background-color: #2ecc71; /* green */
@@ -284,9 +290,9 @@ export default {
   background-color: #6c757d;
   color: white;
   border-radius: 5px;
-  padding: 6px 10px;
+  padding: 10px 16px;
   border: 2px solid #5a6268;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
 }
 

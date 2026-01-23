@@ -672,13 +672,13 @@ export default {
 .modal {
   position: fixed;
   top: 0;
-  bottom: 50%;
-  left: -30%;
+  bottom: 0;
+  left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 10000;
 }
 .contents {
   display: flex;
@@ -687,6 +687,9 @@ export default {
   background: var(--second-bg-color);
   box-shadow: 2px 2px 20px 1px var(--second-bg-color);
   overflow-x: 10px;
+  width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 .item {
   margin: 5px 0;

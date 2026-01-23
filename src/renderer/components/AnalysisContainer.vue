@@ -93,23 +93,6 @@
           />
         </div>
       </div>
-      <JumpButtons
-        v-if="QuickTourIndex !== 14"
-        @flip-board="$emit('flip-board', 0)"
-        @move-to-start="$emit('move-to-start', 0)"
-        @move-back-one="$emit('move-back-one', 0)"
-        @move-forward-one="$emit('move-forward-one', 0)"
-        @move-to-end="$emit('move-to-end', 0)"
-      />
-      <JumpButtons
-        v-else
-        id="JumpButtons-qt"
-        @flip-board="$emit('flip-board', 0)"
-        @move-to-start="$emit('move-to-start', 0)"
-        @move-back-one="$emit('move-back-one', 0)"
-        @move-forward-one="$emit('move-forward-one', 0)"
-        @move-to-end="$emit('move-to-end', 0)"
-      />
       <EngineConsole
         v-if="QuickTourIndex !== 16"
         ref="console"
@@ -137,7 +120,6 @@
 import { mapGetters } from 'vuex'
 
 // import AnalysisEvalRow from './AnalysisEvalRow'
-import JumpButtons from './JumpButtons'
 import EngineStats from './EngineStats'
 import PVLines from './PVLines'
 import EngineConsole from './EngineConsole'
@@ -150,7 +132,6 @@ export default {
   name: 'AnalysisContainer',
   components: {
     // AnalysisEvalRow,
-    JumpButtons,
     EngineStats,
     PVLines,
     EngineConsole,

@@ -83,6 +83,24 @@
               {{ opening.eco }} – {{ opening.name }}
             </div>
           </div>
+          <JumpButtons
+            v-if="QuickTourIndex !== 14"
+            id="jump-buttons"
+            @flip-board="flipBoard"
+            @move-to-start="moveToStart"
+            @move-back-one="moveBackOne"
+            @move-forward-one="moveForwardOne"
+            @move-to-end="moveToEnd"
+          />
+          <JumpButtons
+            v-else
+            id="jump-buttons-qt"
+            @flip-board="flipBoard"
+            @move-to-start="moveToStart"
+            @move-back-one="moveBackOne"
+            @move-forward-one="moveForwardOne"
+            @move-to-end="moveToEnd"
+          />
         </div>
         <EvalPlot
           v-if="QuickTourIndex !== 6"
@@ -120,6 +138,7 @@ import AnalysisView from './AnalysisView'
 import EvalBar from './EvalBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
+import JumpButtons from './JumpButtons'
 import Vue from 'vue'
 import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
@@ -134,6 +153,7 @@ export default {
     EvalBar,
     ChessGround,
     EvalPlot,
+    JumpButtons,
     GameInfo,
     PgnBrowser,
     SettingsTab
@@ -393,19 +413,23 @@ export default {
 .main-grid {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
+  column-gap: 12px;
+  padding-right: 12px;
   grid-template-areas:
     "chessboard analysisview"
+    "evalplot analysisview"
     "evalplot analysisview";
 }
 .chessboard-grid {
   grid-area: chessboard;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   grid-template-areas:
     "board-grid"
-    "fenfield";
+    "fenfield"
+    "jumpbuttons";
 }
 
 .board-grid {
@@ -458,6 +482,15 @@ input {
   border: 5px solid var(--quicktour-highlight);
   margin-top: 12px;
 }
+#jump-buttons {
+  grid-area: jumpbuttons;
+  margin-top: 8px;
+}
+#jump-buttons-qt {
+  grid-area: jumpbuttons;
+  margin-top: 8px;
+  border: 5px solid var(--quicktour-highlight);
+}
 #lname {
   background-color: var(--second-bg-color);
   color: var(--main-text-color)
@@ -488,6 +521,7 @@ input {
   grid-area: board;
   display: grid;
   column-gap: 12px;
+  padding-left: 12px;
   grid-template-areas:
   "gameinfo ."
   "scrollable evalbar";
@@ -505,7 +539,7 @@ input {
 #inner {
   display: table;
   margin: 0 auto;
-  padding-right: 10px;
+  padding-left: 12px;
 }
 .evalbar {
   grid-area: evalbar;
@@ -525,14 +559,18 @@ input {
 }
 #evalplot {
   grid-area: evalplot;
-  width: 560px;
-  margin-left: 120px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 12px;
+  margin-left: 12px;
 }
 #evalplot-qt {
   grid-area: evalplot;
   border: 5px solid var(--quicktour-highlight);
-  width: 560px;
-  margin-left: 120px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 12px;
+  margin-left: 12px;
 }
 #evalbutton-style {
   margin-top: 10px;
