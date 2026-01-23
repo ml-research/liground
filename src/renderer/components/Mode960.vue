@@ -8,11 +8,11 @@
     </div>
     <div class="input960">
       <input
-        id="in"
+        ref="input960"
+        v-model="inputValue"
         class="inputField"
-        type="number"
-        :value="curVar"
-        @change="updateBoard"
+        type="text"
+        @keydown.enter="handleEnter"
       >
     </div>
     <button
@@ -31,6 +31,7 @@ export default {
   data () {
     return {
       curVar: '',
+      inputValue: '',
       fen: '',
       variants: ['chess', 'crazyhouse', 'kingofthehill', '3check', 'antichess', 'atomic', 'horde', 'fischerandom', 'chess960']
     }
@@ -46,12 +47,14 @@ export default {
   },
   watch: {
     variant () {
-      document.getElementById('in').value = ''
+      this.inputValue = ''
+      this.curVar = ''
       this.$store.commit('newBoard')
     },
     curVar960Fen () {
       if (this.$store.getters.curVar960Fen === '') {
         this.curVar = ''
+        this.inputValue = ''
       }
     }
   },
@@ -60,6 +63,7 @@ export default {
       if (this.variants.includes(this.variant)) {
         const rand = Math.floor(960 * Math.random())
         this.curVar = rand
+        this.inputValue = rand.toString()
         if (this.variant === 'horde') {
           this.fen = this.c960_arrangement(rand).toLowerCase() + '/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1'
         } else {
@@ -71,9 +75,74 @@ export default {
         alert('This variant does not support 960 mode')
       }
     },
-    updateBoard (event) {
+    handleEnter () {
+      let value = this.inputValue.trim()
+      
+      // Allow empty input
+      if (value === '' || value === null) {
+        this.curVar = ''
+        return
+      }
+      
+      let num = parseInt(value, 10)
+      
+      // Check if input is a valid number
+      if (isNaN(num)) {
+        alert('Please enter a valid number')
+        // Refocus input after alert closes
+        setTimeout(() => {
+          this.$refs.input960.focus()
+        }, 0)
+        return
+      }
+      
+      // Validate range (0-960)
+      if (num < 0 || num > 960) {
+        alert('Please enter a number between 0 and 960')
+        // Refocus input after alert closes
+        setTimeout(() => {
+          this.$refs.input960.focus()
+        }, 0)
+        return
+      }
+      
+      // Update on success
+      this.updateBoard(num)
+    },
+    validateInput () {
+      let value = this.inputValue.trim()
+      
+      // Allow empty input
+      if (value === '' || value === null) {
+        this.curVar = ''
+        return false
+      }
+      
+      let num = parseInt(value, 10)
+      
+      // Check if input is a valid number
+      if (isNaN(num)) {
+        alert('Please enter a valid number')
+        return false
+      }
+      
+      // Validate range (0-960)
+      if (num < 0 || num > 960) {
+        alert('Please enter a number between 0 and 960')
+        return false
+      }
+      
+      return true
+    },
+    updateBoard (num = null) {
       if (this.variants.includes(this.variant)) {
-        this.curVar = event.target.value
+        // Use passed number or parse from input
+        if (num === null) {
+          num = parseInt(this.inputValue.trim(), 10)
+        }
+        
+        this.curVar = num
+        this.inputValue = num.toString()
         if (this.variant === 'horde') {
           this.fen = this.c960_arrangement(this.curVar).toLowerCase() + '/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1'
         } else {
