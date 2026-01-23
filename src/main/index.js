@@ -1,7 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
-import { createSchema } from './evalCache'
+import { createSchema, insertEval, getEval } from './evalCache'
 
 /**
  * Set `__static` path to static files in production
@@ -58,6 +58,24 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+ipcMain.handle('eval-cache-get', async (normalizedFen) => {
+  try {
+    const evaluation  = getEval(normalizedFen)
+    return evaluation
+  } catch (err) {
+    console.error("[eval-cache-get] failed", err);
+  }
+})
+
+ipcMain.on('eval-cache-put', (_event, payload) => {
+  try {
+    insertEval(payload)
+  } catch (err) {
+    console.error('[eval-cache-put] failed', err)
+  }
+})
+
 
 // IPC handler so renderer can request native dialogs when `remote` is not available
 ipcMain.handle('show-open-dialog', async (event, options) => {

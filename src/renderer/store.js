@@ -9,6 +9,16 @@ import captureAudio from './assets/audio/Capture.mp3'
 
 Vue.use(Vuex)
 
+let ipcRenderer
+try {
+  ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+} catch (err) {
+  ipcRenderer = null
+}
+
+const MIN_CACHE_DEPTH = 16
+let lastCacheKey = null
+
 class TwoWayMap {
   constructor (map) {
     this.map = map
@@ -825,8 +835,15 @@ export const store = new Vuex.Store({
         context.dispatch('goEnginePvE')
       }
     },
-    position (context) {
-      engine.send(`position fen ${context.getters.fen}`)
+    async position (context) {
+      const evaluation = await ipcRenderer.invoke('eval-cache-get', {
+        positionKey: context.getters.normalizedFen
+      })
+      if (evaluation) {
+        // update store from cached eval
+      } else {
+        engine.send(`position fen ${context.getters.fen}`)
+      }
       const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
       document.dispatchEvent(eve)
     },
@@ -1138,6 +1155,30 @@ export const store = new Vuex.Store({
           }
         }
         context.commit('multipv', multipv)
+      }
+      if (!('pv' in payload)) return
+
+      const depth = payload.depth
+      const mate = payload.mate
+      if (typeof depth !== 'number') return
+      if (depth < MIN_CACHE_DEPTH && typeof mate !== 'number') return
+
+      const positionKey = context.getters.normalizedFen
+      const engineName = context.getters.engineName
+      const cacheKey = `${positionKey}|${engineName}|${depth}`
+      if (cacheKey === lastCacheKey) return
+      lastCacheKey = cacheKey
+
+      if (ipcRenderer && ipcRenderer.send) {
+        ipcRenderer.send('eval-cache-put', {
+          positionKey,
+          engineName,
+          depth,
+          cp: payload.cp,
+          mate,
+          pv: payload.pv,
+          updatedAt: Date.now()
+        })
       }
     },
     loadedGames (context, payload) {
