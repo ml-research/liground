@@ -88,8 +88,7 @@ export default {
       this.$emit('save', this.commentText)
     },
     deleteComment () {
-        this.$emit('delete')
-      
+      this.$emit('delete')
     }
   }
 }

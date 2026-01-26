@@ -19,7 +19,6 @@ export function loadSavedGamePaths () {
   }
   return { games: [] }
 }
-
 /**
  * Save a game file path to the registry
  */
@@ -37,7 +36,6 @@ export function addGamePath (filePath) {
     return false
   }
 }
-
 /**
  * Remove a game file path from the registry
  */
@@ -52,7 +50,6 @@ export function removeGamePath (filePath) {
     return false
   }
 }
-
 /**
  * Get all saved game file paths 
  */

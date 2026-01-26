@@ -111,29 +111,22 @@ const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
  */
 function extractCommentsFromPGN (pgnText) {
   const commentMap = {}
-  
   // Skip header section and get moves section
   const headerEndIndex = pgnText.indexOf('\n\n')
   if (headerEndIndex === -1) {
     return commentMap
   }
-  
   const movesSection = pgnText.substring(headerEndIndex + 2)
-  
   // Split moves section into tokens
   const tokens = movesSection.split(/(\{[^}]*\}|\S+)/g).filter(t => t && t.trim())
-  
   let moveIndex = 0
   let lastWasMove = false
-  
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i]
-    
     // Skip move numbers and empty tokens
     if (token.match(/^\d+\.\.?$/) || !token.trim() || token === '*') {
       continue
     }
-    
     // Check if this is a comment
     if (token.match(/^\{[^}]*\}$/)) {
       // Extract comment text without braces
@@ -149,7 +142,6 @@ function extractCommentsFromPGN (pgnText) {
       lastWasMove = true
     }
   }
-  
   return commentMap
 }
 
@@ -1217,17 +1209,14 @@ export const store = new Vuex.Store({
         context.commit('newBoard', { fen: fen, is960: is960 })
       }
       await context.dispatch('fen', fen)
-
       context.commit('selectedGame', payload.game)
       context.commit('gameInfo', gameInfo)
       const moves = payload.game.mainlineMoves().split(' ')
-      
       // Parse comments from the original PGN if available
       let commentMap = {}
       if (payload.game.originalPGN) {
         commentMap = extractCommentsFromPGN(payload.game.originalPGN)
       }
-      
       for (const num in moves) {
         if (num === 0) {
           context.commit('appendMoves', { move: moves[num], prev: undefined, comment: commentMap[0] })
