@@ -136,32 +136,25 @@ export default {
         alert('Please enter a game name')
         return
       }
-
       // Create PGN string from current game state
       const pgn = this.generatePGN()
-
       // Parse the PGN using ffish
       try {
         const game = ffish.readGamePGN(pgn)
-
         // Get existing games
         let games = []
         if (this.$store.getters.loadedGames) {
           games = this.$store.getters.loadedGames
         }
-
         // Assign new id to the game
         game.id = games.length
         game.supported = true
         // Store the original PGN for comment extraction
         game.originalPGN = pgn
-
         // Add the game to the list
         games.push(game)
-
         // Update store
         this.$store.dispatch('loadedGames', games)
-
         // Ask user if they want to save to file
         const saveToFile = confirm('Do you want to save this game to a file on your computer?')
         if (saveToFile) {
@@ -177,7 +170,6 @@ export default {
     },
     async saveToFile (pgn) {
       const { ipcRenderer } = require('electron')
-      
       try {
         // Show save dialog
         const result = await ipcRenderer.invoke('show-save-dialog', {
@@ -188,21 +180,17 @@ export default {
             { name: 'All Files', extensions: ['*'] }
           ]
         })
-
         if (result.canceled) {
           // User canceled, just close the modal
           this.$emit('close')
           alert(`Game "${this.gameName}" saved to library!`)
           return
         }
-
         // Write the file
         const writeResult = await ipcRenderer.invoke('write-file', result.filePath, pgn)
-        
         if (writeResult.success) {
           // Add the file path to the saved games list
           await ipcRenderer.invoke('add-game-path', result.filePath)
-          
           this.$emit('close')
           alert(`Game "${this.gameName}" saved successfully to:\n${result.filePath}`)
         } else {
@@ -216,7 +204,6 @@ export default {
     generatePGN () {
       // Build the header section
       let pgn = ''
-
       // Add headers - use user input if provided, otherwise fall back to gameInfo or default
       pgn += `[Event "${this.eventName || this.gameInfo.Event || 'My Game'}"]\n`
       pgn += `[Site "${this.siteName || this.gameInfo.Site || '?'}"]\n`
@@ -225,26 +212,20 @@ export default {
       pgn += `[White "${this.whiteName || this.gameInfo.White || 'Player1'}"]\n`
       pgn += `[Black "${this.blackName || this.gameInfo.Black || 'Player2'}"]\n`
       pgn += `[Result "${this.gameInfo.Result || '*'}"]\n`
-
       // Add custom title
       pgn += `[WhiteTitle "${this.gameName}"]\n`
-
       // Add variant if not standard chess
       if (this.variant && this.variant !== 'chess') {
         pgn += `[Variant "${this.variant}"]\n`
       }
-
       // Add FEN if it's not the starting position
       if (this.startFen && this.startFen !== 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
         pgn += `[FEN "${this.startFen}"]\n`
       }
-
       pgn += '\n'
-
       // Add moves in SAN notation
       const movesText = this.generateMovesSAN()
       pgn += movesText
-
       return pgn
     },
     generateMovesSAN () {
@@ -252,37 +233,30 @@ export default {
       if (!this.moves || this.moves.length === 0) {
         return '*'
       }
-
       let san = ''
       let moveNumber = 1
-
       // Start from the beginning
       for (let i = 0; i < this.moves.length; i++) {
         const move = this.moves[i]
-
         // Add move number for white moves
         if (i % 2 === 0) {
           san += moveNumber + '. '
         }
-
         // Add the move in SAN notation (name field contains SAN)
         if (move.name) {
           san += move.name + ' '
         } else if (move.uci) {
           san += move.uci + ' '
         }
-
         // Add comment if it exists (in PGN format)
         if (move.comment) {
           san += `{${move.comment}} `
         }
-
         // Increment move number after black's move
         if (i % 2 === 1) {
           moveNumber++
         }
       }
-
       return san.trim() + ' *'
     }
   }

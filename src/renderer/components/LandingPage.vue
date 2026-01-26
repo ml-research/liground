@@ -22,13 +22,11 @@ export default {
   methods: {
     async loadSavedGames () {
       const { ipcRenderer } = require('electron')
-      
       try {
         const result = await ipcRenderer.invoke('load-saved-games')
         if (result.success && result.paths && result.paths.length > 0) {
           const games = []
           let gameId = 0
-          
           for (const filePath of result.paths) {
             try {
               const fileResult = await ipcRenderer.invoke('read-pgn-file', filePath)
@@ -46,7 +44,6 @@ export default {
               console.error(`Error loading game from ${filePath}:`, error)
             }
           }
-          
           if (games.length > 0) {
             this.$store.dispatch('loadedGames', games)
             console.log(`Loaded ${games.length} saved games`)

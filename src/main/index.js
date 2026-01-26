@@ -1,7 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
-import { loadSavedGamePaths, addGamePath, removeGamePath, getAllSavedGamePaths } from './gameStorage'
+import { addGamePath, removeGamePath, getAllSavedGamePaths } from './gameStorage'
 
 /**
  * Set `__static` path to static files in production

@@ -26,7 +26,6 @@ export function loadSavedGamePaths () {
 export function addGamePath (filePath) {
   try {
     const data = loadSavedGamePaths()
-    
     // Check if path already exists
     if (!data.games.includes(filePath)) {
       data.games.push(filePath)
@@ -60,7 +59,6 @@ export function removeGamePath (filePath) {
 export function getAllSavedGamePaths () {
   const data = loadSavedGamePaths()
   const existingPaths = []
-
   for (const filePath of data.games) {
     try {
       if (fs.existsSync(filePath)) {
@@ -73,7 +71,5 @@ export function getAllSavedGamePaths () {
       console.error(`Error checking game file ${filePath}:`, error)
     }
   }
-
   return existingPaths
 }
-
