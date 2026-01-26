@@ -51,7 +51,7 @@ export function removeGamePath (filePath) {
   }
 }
 /**
- * Get all saved game file paths 
+ * Get all saved game file paths
  */
 export function getAllSavedGamePaths () {
   const data = loadSavedGamePaths()
