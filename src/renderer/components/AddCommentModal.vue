@@ -1,5 +1,7 @@
 <template>
-  <div class="addCommentModal" @keydown.stop @keyup.stop>
+  <div class="addCommentModal" 
+  @keydown.stop
+  @keyup.stop>
     <div
       class="backdrop"
       @click="close"
