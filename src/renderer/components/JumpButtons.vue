@@ -1,41 +1,46 @@
 <template>
-  <div class="jump-buttons">
-    <a
-      href="#"
-      class="jump previous"
-      :class="{ grey : !currentMove }"
-      @click="$emit('move-to-start', 0)"
-    ><i
-      slot="extra"
-      class="icon mdi mdi-skip-backward"
-    /></a>
-    <a
-      href="#"
-      class="jump previous"
-      :class="{ grey : !currentMove }"
-      @click="$emit('move-back-one', 0)"
-    ><i
-      slot="extra"
-      class="icon mdi mdi-skip-previous"
-    /></a>
-    <a
-      href="#"
-      class="jump next"
-      :class="{ grey : moves.length === 0 || ( currentMove && !currentMove.main ) }"
-      @click="$emit('move-forward-one', 0)"
-    ><i
-      slot="extra"
-      class="icon mdi mdi-skip-next"
-    /></a>
-    <a
-      href="#"
-      class="jump next"
-      :class="{ grey : moves.length === 0 || ( currentMove && !currentMove.main ) }"
-      @click="$emit('move-to-end', 0)"
-    ><i
-      slot="extra"
-      class="icon mdi mdi-skip-forward"
-    /></a>
+  <div class="buttons-wrapper">
+    <div class="jump-buttons">
+      <a
+        href="#"
+        class="jump previous"
+        :class="{ grey : !currentMove }"
+        @click="$emit('move-to-start', 0)"
+      ><i
+        slot="extra"
+        class="icon mdi mdi-skip-backward"
+      /></a>
+      <a
+        href="#"
+        class="jump previous"
+        :class="{ grey : !currentMove }"
+        @click="$emit('move-back-one', 0)"
+      ><i
+        slot="extra"
+        class="icon mdi mdi-skip-previous"
+      /></a>
+      <a
+        href="#"
+        class="jump next"
+        :class="{ grey : moves.length === 0 || ( currentMove && !currentMove.main ) }"
+        @click="$emit('move-forward-one', 0)"
+      ><i
+        slot="extra"
+        class="icon mdi mdi-skip-next"
+      /></a>
+      <a
+        href="#"
+        class="jump next"
+        :class="{ grey : moves.length === 0 || ( currentMove && !currentMove.main ) }"
+        @click="$emit('move-to-end', 0)"
+      ><i
+        slot="extra"
+        class="icon mdi mdi-skip-forward"
+      /></a>
+    </div>
+    <div class="eval-plot-button-container">
+      <EvalPlotButton />
+    </div>
   </div>
 </template>
 
@@ -43,11 +48,13 @@
 // raw vue component
 // TODO: use HookIcon component?
 // import HookIcon from 'mdi-vue/Hook.vue'
+import EvalPlotButton from './EvalPlotButton.vue'
 
 export default {
   name: 'JumpButtons',
   components: {
     // HookIcon
+    EvalPlotButton
   },
   computed: {
     currentMove () { // returns undefined when the current fen doesnt match a move from the history, otherwise it returns move from the moves array that matches the current fen
@@ -76,21 +83,48 @@ i {
   font-size: 22pt;
   text-align: center;
 }
+.buttons-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  align-items: center;
+}
 .jump-buttons {
   align-items: center;
   text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0px;
+  background-color: var(--second-bg-color);
+  border: 1px solid var(--main-border-color);
+  border-radius: 5px;
+  padding: 3px 5px;
+}
+.eval-plot-button-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  background-color: var(--second-bg-color);
+  border: 1px solid var(--main-border-color);
+  border-radius: 5px;
+  padding: 3px 5px;
 }
 .jump {
   align-items: center;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
-  align: center;
+  display: inline-flex;
+  justify-content: center;
   font-size: 24pt;
   width: 70px;
-  height: 40px;
+  height: 32px;
   color: var(--main-text-color);
   border-radius: 5px 5px 5px 5px;
+  margin: 0 -8px;
 }
 .jump:hover {
   background-color: var(--hover-highlight-color);

@@ -412,9 +412,9 @@ export default {
 <style scoped>
 .main-grid {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(45%, 1fr) minmax(30%, 1fr);
   grid-template-rows: auto auto auto;
-  column-gap: 12px;
+  column-gap: 28px;
   padding-right: 12px;
   grid-template-areas:
     "chessboard analysisview"
@@ -430,6 +430,7 @@ export default {
     "board-grid"
     "fenfield"
     "jumpbuttons";
+  min-width: 0;
 }
 
 .board-grid {
@@ -465,6 +466,8 @@ export default {
   width: 100%;
   max-height: calc(100vh - 25px);
   min-width: 0;
+  padding-left: 16px;
+  box-sizing: border-box;
 }
 .tab:not(.visible) {
   display: none;
@@ -514,7 +517,7 @@ input {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  width: max-content;
+  width: 100%;
 }
 
 .board {
@@ -560,7 +563,7 @@ input {
 #evalplot {
   grid-area: evalplot;
   width: 100%;
-  max-width: 600px;
+  max-width: none;
   margin-top: 12px;
   margin-left: 12px;
 }
@@ -568,13 +571,26 @@ input {
   grid-area: evalplot;
   border: 5px solid var(--quicktour-highlight);
   width: 100%;
-  max-width: 600px;
+  max-width: none;
   margin-top: 12px;
   margin-left: 12px;
 }
 #evalbutton-style {
   margin-top: 10px;
   grid-area: evalButton;
+}
+
+@media (max-width: 1100px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "chessboard"
+      "evalplot"
+      "analysisview";
+  }
+  #right-column {
+    max-height: none;
+  }
 }
 
 </style>

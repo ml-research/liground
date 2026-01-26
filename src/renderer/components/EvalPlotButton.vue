@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="eval-depth-wrapper">
     <div
       class="EvalPlotButton"
       data-text="Input a number to set the engine depth for the Eval Plot."
@@ -76,13 +76,23 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
+.eval-depth-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  width: fit-content;
+}
+
 .inputDepth {
   position: relative;
   display: inline-block;
   width: 40px;
+  height: 100%;
 }
 .inputField {
   width: 25px;
+  height: 100%;
   background-color: var(--second-bg-color);
   color: var(--main-text-color);
 }
@@ -90,12 +100,15 @@ input::-webkit-inner-spin-button {
   color: var(--main-text-color);
 }
 .button {
-  padding: 3px;
+  padding: 3px 8px;
   border-radius: 3px;
   background-color:var(--button-color);
   color: white;
   border: 2px solid rgba(0, 0, 0, 0.3);
   outline: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 .button:hover {
   background-color: var(--hover-color);
@@ -104,6 +117,8 @@ input::-webkit-inner-spin-button {
 .EvalPlotButton {
   display: inline-block;
   position: relative;
+  white-space: nowrap;
+  font-size: 12pt;
 }
 .EvalPlotButton::before{
   content: attr(data-text);

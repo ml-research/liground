@@ -55,10 +55,6 @@
     <!-- Flip Board Button -->
     <button class="flipBoardBtn" @click="flipBoard" title="Flip Board">🔄 Flip</button>
 
-    <!-- Eval Plot Button -->
-    <EvalPlotButton v-if="QuickTourIndex !== 6" id="evalplot-button" />
-    <EvalPlotButton v-else id="evalplot-button-qt" />
-
     <!-- 960 Board -->
     <Mode960 v-if="QuickTourIndex !== 8 && (variant === 'fischerandom' || variant === 'chess960')" />
     <Mode960
@@ -91,13 +87,12 @@ import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engi
 import PgnBrowser from './PgnBrowser.vue'
 import PieceStyleSelector from './PieceStyleSelector.vue'
 import BoardStyleSelector from './BoardStyleSelector.vue'
-import EvalPlotButton from './EvalPlotButton.vue'
 import { mapGetters, mapState } from 'vuex' 
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, StartGameModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector, EvalPlotButton
+    Multiselect, Mode960, StartGameModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector
   },
   data () {
     return {
