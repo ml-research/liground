@@ -153,6 +153,8 @@ export default {
         // Assign new id to the game
         game.id = games.length
         game.supported = true
+        // Store the original PGN for comment extraction
+        game.originalPGN = pgn
 
         // Add the game to the list
         games.push(game)
@@ -270,13 +272,18 @@ export default {
           san += move.uci + ' '
         }
 
+        // Add comment if it exists (in PGN format)
+        if (move.comment) {
+          san += `{${move.comment}} `
+        }
+
         // Increment move number after black's move
         if (i % 2 === 1) {
           moveNumber++
         }
       }
 
-      return san + '*'
+      return san.trim() + ' *'
     }
   }
 }

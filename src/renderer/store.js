@@ -103,6 +103,56 @@ function checkOption (options, name, value) {
 
 const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
 
+/**
+ * Extract comments from PGN text
+ * Parses PGN format comments like {this is a comment} and maps them to move indices
+ * @param {string} pgnText The full PGN text
+ * @returns {Object} Map of move index to comment text
+ */
+function extractCommentsFromPGN (pgnText) {
+  const commentMap = {}
+  
+  // Skip header section and get moves section
+  const headerEndIndex = pgnText.indexOf('\n\n')
+  if (headerEndIndex === -1) {
+    return commentMap
+  }
+  
+  const movesSection = pgnText.substring(headerEndIndex + 2)
+  
+  // Split moves section into tokens
+  const tokens = movesSection.split(/(\{[^}]*\}|\S+)/g).filter(t => t && t.trim())
+  
+  let moveIndex = 0
+  let lastWasMove = false
+  
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    
+    // Skip move numbers and empty tokens
+    if (token.match(/^\d+\.\.?$/) || !token.trim() || token === '*') {
+      continue
+    }
+    
+    // Check if this is a comment
+    if (token.match(/^\{[^}]*\}$/)) {
+      // Extract comment text without braces
+      const commentText = token.replace(/^\{/, '').replace(/\}$/, '')
+      // Associate comment with the current move (just played)
+      if (lastWasMove) {
+        commentMap[moveIndex - 1] = commentText
+        lastWasMove = false
+      }
+    } else if (token.trim()) {
+      // This is a move
+      moveIndex++
+      lastWasMove = true
+    }
+  }
+  
+  return commentMap
+}
+
 export const store = new Vuex.Store({
   state: {
     engineIndex: 1,
@@ -453,7 +503,12 @@ export const store = new Vuex.Store({
           const sanMove = state.board.sanMove(curVal)
           state.board.push(curVal)
           this.commit('playAudio', sanMove)
-          return { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev }
+          const moveObj = { ply: ply, name: sanMove, fen: state.board.fen(), uci: curVal, whitePocket: state.board.pocket(true), blackPocket: state.board.pocket(false), main: undefined, next: [], prev: prev }
+          // Add comment if provided (only for the first move in the sequence)
+          if (idx === 0 && payload.comment) {
+            moveObj.comment = payload.comment
+          }
+          return moveObj
         }))
         if (payload.prev) { // if the move is not a starting move
           prev.next.push(state.moves[state.moves.length - 1]) // the last entry in moves is the move object of the current move
@@ -1166,11 +1221,18 @@ export const store = new Vuex.Store({
       context.commit('selectedGame', payload.game)
       context.commit('gameInfo', gameInfo)
       const moves = payload.game.mainlineMoves().split(' ')
+      
+      // Parse comments from the original PGN if available
+      let commentMap = {}
+      if (payload.game.originalPGN) {
+        commentMap = extractCommentsFromPGN(payload.game.originalPGN)
+      }
+      
       for (const num in moves) {
         if (num === 0) {
-          context.commit('appendMoves', { move: moves[num], prev: undefined })
+          context.commit('appendMoves', { move: moves[num], prev: undefined, comment: commentMap[0] })
         } else {
-          context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1] }) // TODO differentiate between alternative lines
+          context.commit('appendMoves', { move: moves[num], prev: context.state.moves[num - 1], comment: commentMap[num] }) // TODO differentiate between alternative lines
         }
       }
       context.dispatch('updateBoard')

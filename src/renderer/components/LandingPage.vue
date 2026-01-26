@@ -38,6 +38,8 @@ export default {
                 game.id = gameId++
                 game.supported = true
                 game.filePath = filePath
+                // Store the original PGN for comment extraction
+                game.originalPGN = fileResult.content
                 games.push(game)
               }
             } catch (error) {

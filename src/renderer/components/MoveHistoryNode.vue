@@ -20,17 +20,29 @@
     <span
       v-if="printRoot"
       class="move-name"
-      :class="{ current : move.fen === fen }"
+      :class="{ current : move.fen === fen, hasComment: move.comment }"
       @click="updateBoard(move)"
       @contextmenu.prevent="(menuAtMove === move.name || displayMenu) ? $refs.menu.open($event, { name: move.name }) : dummy"
     >
       {{ checkCheckmate }}
+    </span>
+    <span
+      v-if="move.comment && printRoot"
+      class="move-comment"
+    >
+      {{ '{' + move.comment + '}' }}
     </span>
     <VueContext
       ref="menu"
       @open="onOpen($event, { move: move })"
       @close="onClose"
     >
+      <li>
+        <a
+          href="#"
+          @click.prevent="openAddCommentModal"
+        >{{ move.comment ? 'Edit Comment' : 'Add Comment' }}</a>
+      </li>
       <li>
         <a
           v-if="!mainLine.includes(move)"
@@ -45,6 +57,14 @@
         >Delete Variation</a>
       </li>
     </VueContext>
+    <AddCommentModal
+      v-if="showCommentModal"
+      :move-name="move.name"
+      :existing-comment="move.comment"
+      @close="showCommentModal = false"
+      @save="saveComment"
+      @delete="deleteCommentFromMove"
+    />
     <span v-if="move.fen === mainFirstMove.fen">
       <MoveHistoryNode
         v-for="variation in firstMovesFiltered"
@@ -89,11 +109,13 @@
 
 import ffish from 'ffish'
 import VueContext from 'vue-context/src/js/index'
+import AddCommentModal from './AddCommentModal'
 
 export default {
   name: 'MoveHistoryNode',
   components: {
-    VueContext
+    VueContext,
+    AddCommentModal
   },
   props: {
     move: {
@@ -111,6 +133,11 @@ export default {
     beginVariation: {
       default: false,
       type: Boolean
+    }
+  },
+  data () {
+    return {
+      showCommentModal: false
     }
   },
   computed: {
@@ -297,6 +324,21 @@ export default {
     },
     updateBoard (move) {
       this.$store.dispatch('fen', move.fen)
+    },
+    openAddCommentModal () {
+      this.showCommentModal = true
+    },
+    saveComment (commentText) {
+      this.move.comment = commentText
+      this.showCommentModal = false
+      this.$store.dispatch('displayMenu', true)
+      this.$store.dispatch('menuAtMove', null)
+    },
+    deleteCommentFromMove () {
+      this.move.comment = undefined
+      this.showCommentModal = false
+      this.$store.dispatch('displayMenu', true)
+      this.$store.dispatch('menuAtMove', null)
     }
   }
 }
@@ -321,6 +363,19 @@ export default {
   margin-right: 4px;
   pointer-events: auto;
   font-family: 'Noto Chess', sans-serif;
+}
+.move-name.hasComment {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.move-comment {
+  margin-left: 4px;
+  font-size: 0.85em;
+  color: var(--light-text-color);
+  font-style: italic;
+  background-color: var(--variation-color);
+  padding: 2px 4px;
+  border-radius: 2px;
 }
 .variation {
   background-color:var(--variation-color);
