@@ -66,6 +66,28 @@ ipcMain.handle('show-open-dialog', async (event, options) => {
   }
 })
 
+// IPC handler for save-as dialog
+ipcMain.handle('show-save-dialog', async (event, options) => {
+  const browserWindow = mainWindow || null
+  try {
+    const res = await dialog.showSaveDialog(browserWindow, options || {})
+    return res
+  } catch (err) {
+    return { canceled: true, filePath: '' }
+  }
+})
+
+// IPC handler for writing files
+ipcMain.handle('write-file', async (event, filePath, content) => {
+  const fs = require('fs')
+  try {
+    fs.writeFileSync(filePath, content, 'utf8')
+    return { success: true }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
 // Build and show a context menu requested from renderer. The renderer
 // sends a simplified template (no functions) and we build native menu
 // items whose click handlers forward a message back to the renderer.

@@ -131,7 +131,7 @@ export default {
     cancel () {
       this.$emit('close')
     },
-    save () {
+    async save () {
       if (this.gameName.trim() === '') {
         alert('Please enter a game name')
         return
@@ -160,12 +160,52 @@ export default {
         // Update store
         this.$store.dispatch('loadedGames', games)
 
-        // Close modal
-        this.$emit('close')
-        alert(`Game "${this.gameName}" saved successfully!`)
+        // Ask user if they want to save to file
+        const saveToFile = confirm('Do you want to save this game to a file on your computer?')
+        if (saveToFile) {
+          await this.saveToFile(pgn)
+        } else {
+          this.$emit('close')
+          alert(`Game "${this.gameName}" saved successfully!`)
+        }
       } catch (error) {
         console.error('Error saving game:', error)
         alert('Error saving game: ' + error.message)
+      }
+    },
+    async saveToFile (pgn) {
+      const { ipcRenderer } = require('electron')
+      
+      try {
+        // Show save dialog
+        const result = await ipcRenderer.invoke('show-save-dialog', {
+          title: 'Save Game',
+          defaultPath: `${this.gameName}.pgn`,
+          filters: [
+            { name: 'PGN Files', extensions: ['pgn'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        })
+
+        if (result.canceled) {
+          // User canceled, just close the modal
+          this.$emit('close')
+          alert(`Game "${this.gameName}" saved to library!`)
+          return
+        }
+
+        // Write the file
+        const writeResult = await ipcRenderer.invoke('write-file', result.filePath, pgn)
+        
+        if (writeResult.success) {
+          this.$emit('close')
+          alert(`Game "${this.gameName}" saved successfully to:\n${result.filePath}`)
+        } else {
+          alert(`Error writing file: ${writeResult.error}`)
+        }
+      } catch (error) {
+        console.error('Error in saveToFile:', error)
+        alert('Error saving file: ' + error.message)
       }
     },
     generatePGN () {
