@@ -88,9 +88,8 @@ export default {
       this.$emit('save', this.commentText)
     },
     deleteComment () {
-      if (confirm('Are you sure you want to delete this comment?')) {
         this.$emit('delete')
-      }
+      
     }
   }
 }
