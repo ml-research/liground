@@ -1,5 +1,5 @@
 <template>
-  <div class="addCommentModal">
+  <div class="addCommentModal" @keydown.stop @keyup.stop>
     <div
       class="backdrop"
       @click="close"
@@ -106,7 +106,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 9999;
 }
 
 .backdrop {
