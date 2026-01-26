@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
+import { loadSavedGamePaths, addGamePath, removeGamePath, getAllSavedGamePaths } from './gameStorage'
 
 /**
  * Set `__static` path to static files in production
@@ -118,6 +119,48 @@ ipcMain.handle('show-context-menu', async (event, template) => {
     return false
   }
 })
+
+// IPC handler to load all saved game paths
+ipcMain.handle('load-saved-games', async (event) => {
+  try {
+    const paths = getAllSavedGamePaths()
+    return { success: true, paths }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+// IPC handler to add a game path to the saved games list
+ipcMain.handle('add-game-path', async (event, filePath) => {
+  try {
+    const success = addGamePath(filePath)
+    return { success }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+// IPC handler to remove a game path from the saved games list
+ipcMain.handle('remove-game-path', async (event, filePath) => {
+  try {
+    const success = removeGamePath(filePath)
+    return { success }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+// IPC handler to read a PGN file content
+ipcMain.handle('read-pgn-file', async (event, filePath) => {
+  const fs = require('fs')
+  try {
+    const content = fs.readFileSync(filePath, 'utf8')
+    return { success: true, content }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
 /**
  * Auto Updater
  *

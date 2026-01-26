@@ -198,6 +198,9 @@ export default {
         const writeResult = await ipcRenderer.invoke('write-file', result.filePath, pgn)
         
         if (writeResult.success) {
+          // Add the file path to the saved games list
+          await ipcRenderer.invoke('add-game-path', result.filePath)
+          
           this.$emit('close')
           alert(`Game "${this.gameName}" saved successfully to:\n${result.filePath}`)
         } else {
