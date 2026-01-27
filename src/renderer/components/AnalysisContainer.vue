@@ -330,9 +330,6 @@ input {
   background-color: var(--second-bg-color);
   border: 5px solid var(--quicktour-highlight);
 }
-#JumpButtons-qt {
-  border: 5px solid var(--quicktour-highlight);
-}
 .panel {
   border-radius: 3px 3px 3px 3px;
   border: 1px solid var(--main-border-color);
