@@ -1,6 +1,6 @@
 <template>
   <div class="settings">
-    <div class="panel">
+    <div class="panel"> <!-- LiGround Settings -->
       <span class="title">LiGround Settings</span>
       <div class="switch-container">
         <span>Dark Mode</span>
@@ -21,7 +21,7 @@
         Reset to defaults
       </a>
     </div>
-    <div class="panel">
+    <div class="panel"> <!-- Engine Settings -->
       <span class="title">Engine Settings</span>
       <div class="bar">
         <EngineSelect
@@ -119,42 +119,14 @@
         @close="modal.visible = false"
         @save="modal.save"
       />
-      <div>
-        <span class="title">PvE Settings</span>
-        <Multiselect
-          v-model="value"
-          class="multiselect"
-          :options="options"
-          @input="showSettings"
-        />
-        <table class="table">
-          <tr>
-            <td>{{ settingsName }}</td>
-            <td>
-              <input
-                v-model.number="PvEInput"
-                type="number"
-                :step="1"
-                :min="1"
-                class="input"
-              >
-            </td>
-          </tr>
-        </table>
-      </div>
-      <a
-        class="btn green"
-        @click="save"
-      >
-        Save
-      </a>
-      <a
-        class="btn red"
-        @click="cancel"
-      >
-        Cancel
-      </a>
     </div>
+
+    <a
+      class="btn green"
+      @click="close"
+    >
+      Close
+    </a>
   </div>
 </template>
 
@@ -165,7 +137,6 @@ import EngineModal from './EngineModal'
 import DarkModeSwitch from './DarkModeSwitch'
 import MuteButton from './MuteButton'
 import defaultLogo from '../assets/images/engines/chess_engine.svg'
-import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'SettingsTab',
@@ -173,8 +144,7 @@ export default {
     EngineSelect,
     EngineModal,
     DarkModeSwitch,
-    MuteButton,
-    Multiselect
+    MuteButton
   },
   data () {
     return {
@@ -184,10 +154,6 @@ export default {
         title: '',
         save: () => {}
       },
-      value: 'time',
-      options: ['time', 'nodes', 'depth'],
-      settingsName: 'Time in seconds',
-      PvEInput: 1
     }
   },
   computed: {
@@ -203,27 +169,15 @@ export default {
   watch: {
     engineOptions () {
       this.resetSettings()
+    },
+    engineIndex () {
+      this.resetSettings()
     }
   },
   methods: {
     changeEngine (event) {
       if (this.engineIndex < 2) {
         this.$store.dispatch('changeEngine', event)
-      }
-    },
-    showSettings (payload) {
-      if (payload === 'nodes') {
-        this.settingsName = 'Number of nodes in Million'
-        this.value = 'nodes'
-        this.PvEInput = 5
-      } else if (payload === 'time') {
-        this.settingsName = 'Time in seconds'
-        this.value = 'time'
-        this.PvEInput = 1
-      } else if (payload === 'depth') {
-        this.PvEInput = 20
-        this.settingsName = 'depth of'
-        this.value = 'depth'
       }
     },
     saveStandardSettings () {
@@ -238,14 +192,7 @@ export default {
         this.$store.commit('viewAnalysis', true)
       }
     },
-    save () {
-      this.updateSettings()
-      this.$store.commit('viewAnalysis', true)
-    },
-    cancel () {
-      this.resetSettings()
-      this.$store.commit('viewAnalysis', true)
-    },
+
     updateSettings () {
       const changed = {}
       for (const [name, value] of Object.entries(this.settings)) {
@@ -254,31 +201,6 @@ export default {
         }
       }
       this.$store.dispatch('setEngineOptions', changed)
-      this.$store.dispatch('setPvEValue', this.value)
-      switch (this.value) {
-        case 'time':
-          this.$store.dispatch(
-            'setPvEParam',
-            'go movetime ' + this.PvEInput * 1000
-          )
-          this.$store.dispatch('setPvEInput', this.PvEInput * 1000)
-          break
-        case 'nodes':
-          this.$store.dispatch(
-            'setPvEParam',
-            'go nodes ' + this.PvEInput * 1000000 + ' movetime 60000'
-          )
-          this.$store.dispatch('setPvEInput', this.PvEInput * 1000000)
-          break
-        case 'depth':
-          this.$store.dispatch(
-            'setPvEParam',
-            'go depth ' + this.PvEInput + ' movetime 60000')
-          this.$store.dispatch('setPvEInput', this.PvEInput)
-          break
-        default:
-          break
-      }
     },
     triggerButtonSetting (optionName) {
       this.$store.dispatch('setEngineOptions', { [optionName]: null })
@@ -320,6 +242,9 @@ export default {
         logo: defaultLogo,
         save: data => this.$store.dispatch('addEngine', data)
       }
+    },
+    close () {
+      this.$store.commit('viewAnalysis', true)
     }
   }
 }

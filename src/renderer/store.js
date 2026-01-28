@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ffish from 'ffish'
-import { engine } from './engine'
+import { engine, Engine } from './engine'
 import allEngines from './store/engines'
 
 import moveAudio from './assets/audio/Move.mp3'
@@ -103,6 +103,19 @@ function checkOption (options, name, value) {
 
 const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
 
+/* Helper to produce a `go` command from limiter configuration
+** @param {Object} limiter Limiter configuration
+*/
+function limiterToGo (limiter) {
+  if (!limiter || !limiter.enabled) return 'go movetime 1000'
+  switch (limiter.type) {
+    case 'time': return `go movetime ${parseInt(limiter.value, 10)}`
+    case 'nodes': return `go nodes ${parseInt(limiter.value, 10) * 1000000}`
+    case 'depth': return `go depth ${parseInt(limiter.value, 10)}`
+    default: return `go movetime ${parseInt(limiter.value, 10) || 1000}`
+  }
+}
+
 export const store = new Vuex.Store({
   state: {
     engineIndex: 1,
@@ -110,9 +123,12 @@ export const store = new Vuex.Store({
     initialized: false,
     active: false,
     PvE: false,
-    PvEParam: 'go movetime 1000',
+    PvEPlayerIsWhite: true, // true when the human player controls White in PvE mode
+    PvEParam: 'go movetime 1000', 
     PvEValue: 'time',
     PvEInput: 1000,
+    PvELimiter: null, // stores the limiter config for the PvE engine
+    PvEEngineInstance: null,
     resized: 0,
     resized9x9height: 0,
     resized9x9width: 0,
@@ -129,6 +145,27 @@ export const store = new Vuex.Store({
     legalMoves: '',
     destinations: {},
     variant: 'chess',
+    gameConfig: null,
+    startGameModal: {
+      whiteChoice: 'player',
+      blackChoice: 'engine',
+      selectedGameMode: 'chess',
+      whiteEngineName: null,
+      blackEngineName: null,
+      whiteLimiterEnabled: true,
+      whiteLimiterType: 'time',
+      whiteLimiterValue: 1000,
+      blackLimiterEnabled: true,
+      blackLimiterType: 'time',
+      blackLimiterValue: 1000
+    },
+    showGameEndModal: false,
+    gameResult: null,
+    // Engine-vs-Engine state
+    EvE: false,
+    EvEConfig: null,
+    engineWhiteInstance: null,
+    engineBlackInstance: null,
     variantOptions: new TwoWayMap({ // all the currently supported options are listed here, variantOptions.get returns the right side, variantOptions.revGet returns the left side of the dict
       Standard: 'chess',
       Crazyhouse: 'crazyhouse',
@@ -276,6 +313,12 @@ export const store = new Vuex.Store({
     PvE (state, payload) {
       state.PvE = payload
     },
+    PvEPlayerIsWhite (state, payload) {
+      state.PvEPlayerIsWhite = payload
+    },
+    PvEEngineInstance (state, payload) {
+      state.PvEEngineInstance = payload
+    },
     PvEParam (state, payload) {
       state.PvEParam = payload
     },
@@ -284,6 +327,34 @@ export const store = new Vuex.Store({
     },
     PvEInput (state, payload) {
       state.PvEInput = payload
+    },
+    PvELimiter (state, payload) {
+      state.PvELimiter = payload
+    },
+    // EvE mutations
+    EvE (state, payload) {
+      state.EvE = payload
+    },
+    EvEConfig (state, payload) {
+      state.EvEConfig = payload
+    },
+    engineWhiteInstance (state, payload) {
+      state.engineWhiteInstance = payload
+    },
+    engineBlackInstance (state, payload) {
+      state.engineBlackInstance = payload
+    },
+    gameConfig (state, payload) {
+      state.gameConfig = payload
+    },
+    startGameModal (state, payload) {
+      state.startGameModal = Object.assign({}, state.startGameModal || {}, payload)
+    },
+    showGameEndModal (state, payload) {
+      state.showGameEndModal = payload
+    },
+    gameResult (state, payload) {
+      state.gameResult = payload
     },
     quicktourIndexIncr (state) {
       state.QuickTourIndex++
@@ -583,6 +654,19 @@ export const store = new Vuex.Store({
         pieceStyle: 'cburnett',
         boardStyle: 'blue',
         curVar960Fen: '',
+        startGameModal: {
+          whiteChoice: 'player',
+          blackChoice: 'engine',
+          selectedGameMode: 'chess',
+          whiteEngineName: null,
+          blackEngineName: null,
+          whiteLimiterEnabled: true,
+          whiteLimiterType: 'time',
+          whiteLimiterValue: 1000,
+          blackLimiterEnabled: true,
+          blackLimiterType: 'time',
+          blackLimiterValue: 1000
+        },
         openedPGN: false,
         QuickTourIndex: 0,
         evalPlotDepth: 20,
@@ -679,7 +763,19 @@ export const store = new Vuex.Store({
     },
     push (context, payload) {
       context.commit('appendMoves', payload)
-      context.dispatch('fen', context.state.board.fen())
+      return context.dispatch('fen', context.state.board.fen()).then(() => {
+        // Only check for game end if a game was started via the new game modal
+        if (context.state.gameConfig) {
+          if (context.state.board.isGameOver()) {
+            const resultStr = context.state.board.result()
+            let result = null
+            if (resultStr === '1-0') result = 'white-win'
+            else if (resultStr === '0-1') result = 'black-win'
+            else if (resultStr === '1/2-1/2') result = 'draw'
+            context.dispatch('endGame', { result })
+          } 
+        }
+      })
     },
     pushMainLine (context, payload) {
       let prev = payload.prev
@@ -765,15 +861,47 @@ export const store = new Vuex.Store({
       context.commit('active', true)
     },
     goEnginePvE (context) {
-      engine.send(context.getters.PvEParam)
+      // Send PvE engine command using the stored PvE engine instance and limiter
+      const pveEngine = context.state.PvEEngineInstance
+      const pveLimiter = context.state.PvELimiter
+      
+      if (!pveEngine) {
+        console.error('[goEnginePvE] No PvE engine instance available')
+        return
+      }
+
+      try {
+        pveEngine.send(`position fen ${context.getters.fen}`)
+        pveEngine.send(limiterToGo(pveLimiter))
+      } catch (err) {
+        console.error('[goEnginePvE] Failed to send position/go to PvE engine:', err)
+      }
+      
       context.commit('setEngineClock')
+      context.commit('active', true)
     },
     PvEMakeMove (context, payload) {
+      // Triggered when the engine emits 'bestmove'. Apply the move only if:
+      //  1. PvE mode is active 2. engine is to move now
       const state = context.state
-      if (state.active && state.PvE && !state.turn) {
-        context.dispatch('push', { move: payload, prev: context.getters.currentMove[0] })
+      const playerIsWhite = context.state.PvEPlayerIsWhite
+      const engineIsWhite = !playerIsWhite
+      const turnIsWhite = state.turn
+      const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
+
+      if (state.active && state.PvE && engineToMoveNow) {
+         // Dispatch push and handle failure (invalid uci for current position)
+        context.dispatch('push', { move: payload, prev: context.getters.currentMove[0] }).then(() => {
+        }).catch((err) => {
+          // If engine returned a move invalid for the current position, log and restart engine on the
+          // current position so it recalculates for the correct state.
+          console.error('[PvEMakeMove] Engine provided invalid move for current position:', payload, err)
+          context.dispatch('position')
+          context.dispatch('goEnginePvE')
+        })
       }
     },
+
     setActiveTrue (context) {
       context.commit('active', true)
     },
@@ -783,14 +911,252 @@ export const store = new Vuex.Store({
     enginesActive (context, payload) {
       context.commit('enginesActive', payload)
     },
-    PvEtrue (context) {
-      context.commit('PvE', true)
+
+    setGameConfig (context, payload) {
+      context.commit('gameConfig', payload)
     },
+
+    endGame (context, payload) {
+      context.commit('gameResult', payload.result)
+      context.commit('showGameEndModal', true)
+    },
+
+    closeGameEndModal (context) {
+      context.commit('showGameEndModal', false)
+    },
+    
+    async PvEtrue (context, payload = {}) {
+      // Enable PvE mode and remember which side the human player controls.
+      // payload.playerIsWhite = true means the human is White (legacy behavior).
+      try {
+        const gameMode = payload.gameMode
+        const playerIsWhite = payload && typeof payload.playerIsWhite !== 'undefined' ? payload.playerIsWhite : true
+        const engineName = payload.engine
+        const pveLimiter = payload.pveLimiter
+
+        // Stop old PvE engine if it exists to avoid listener conflicts
+        if (context.state.PvEEngineInstance) {
+          try {
+            context.state.PvEEngineInstance.send('stop')
+            context.state.PvEEngineInstance.removeAllListeners()
+          } catch (err) {
+            console.warn('[PvEtrue] Error stopping old engine:', err)
+          }
+        }
+
+        const engineInfo = context.state.allEngines[engineName]
+        if (!engineInfo) {
+          throw new Error('Could not find engine binary for provided name')
+        }
+
+        // create engine instance
+        const pveEngine = new Engine()
+
+        // run the PvE engine
+        await pveEngine.run(engineInfo.binary, engineInfo.cwd)
+
+        // configure PvE engine with the desired game mode (variant) and 960 flag
+        const variantCmd = `setoption name UCI_Variant value ${gameMode}`
+        const chess960Cmd = `setoption name UCI_Chess960 value ${context.getters.is960}`
+
+        try {
+          pveEngine.send(variantCmd)
+          pveEngine.send(chess960Cmd)
+        } catch (err) {
+          console.warn('[PvEtrue] Failed to send variant/960 to PvE engine:', err)
+        }
+
+        // commit engine instance and PvE mode state
+        context.commit('PvE', true)
+        context.commit('PvEPlayerIsWhite', playerIsWhite)
+        context.commit('PvEEngineInstance', pveEngine)
+        context.commit('PvELimiter', pveLimiter)
+        context.commit('active', true)
+
+        const engineIsWhite = !playerIsWhite
+
+        // send position and go to the engine instance
+        const sendPositionAndGo = (inst, lim) => {
+          try {
+            inst.send(`position fen ${context.getters.fen}`)
+            inst.send(limiterToGo(lim))
+          } catch (err) {
+            console.error('[PvE] Failed to send position/go:', err)
+          }
+        }
+
+        // bestmove handler
+        const pveEngineHandler = async ucimove => {
+          const turnIsWhite = context.getters.turn
+          const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
+
+          if (!context.state.PvE || !engineToMoveNow) return
+          try {
+            await context.dispatch('push', { move: ucimove, prev: context.getters.currentMove[0] })
+          } catch (err) {
+            console.error('[PvEMakeMove] Engine provided invalid move:', ucimove, err)
+            // try to restart the engine calculation on current position
+            context.dispatch('position')
+            sendPositionAndGo(pveEngine, pveLimiter)
+          }
+        }
+
+        // attach listener
+        pveEngine.on('bestmove', pveEngineHandler)
+
+        // kick off the engine if it's the engine's turn now
+        const turnIsWhiteNow = context.getters.turn
+        const engineToMoveNow = (turnIsWhiteNow && engineIsWhite) || (!turnIsWhiteNow && !engineIsWhite)
+        if (engineToMoveNow) {
+          sendPositionAndGo(pveEngine, pveLimiter)
+        }
+      } catch (err) {
+        console.error('[PvEtrue] Could not start PvE match:', err)
+      }
+    },
+    // Start an Engine vs Engine match. Payload must include engine names and limiter configs:
+    // { whiteEngine, blackEngine, whiteLimiter: { enabled, type, value }, blackLimiter: {...} }
+    async EvEtrue (context, payload = {}) {
+      try {
+        const gameMode = payload.gameMode
+
+        const whiteName = payload.whiteEngine
+        const blackName = payload.blackEngine
+        if (!whiteName || !blackName) {
+          throw new Error('Both whiteEngine and blackEngine must be provided')
+        }
+
+        const whiteInfo = context.state.allEngines[whiteName]
+        const blackInfo = context.state.allEngines[blackName]
+        if (!whiteInfo || !blackInfo) {
+          throw new Error('Could not find engine binaries for provided names')
+        }
+
+        // create engine instances
+        const white = new Engine()
+        const black = new Engine()
+
+        // run both engines
+        await Promise.all([
+          white.run(whiteInfo.binary, whiteInfo.cwd),
+          black.run(blackInfo.binary, blackInfo.cwd)
+        ])
+
+        // configure Eve engines with the desired game mode (variant) and 960 flag
+        const variantCmd = `setoption name UCI_Variant value ${gameMode}`
+        const chess960Cmd = `setoption name UCI_Chess960 value ${context.getters.is960}`
+
+        try {
+          white.send(variantCmd)
+          white.send(chess960Cmd)
+          black.send(variantCmd)
+          black.send(chess960Cmd)
+        } catch (err) {
+          console.warn('[EvEtrue] Failed to send variant/960 to Eve engines:', err)
+        }
+
+        context.commit('engineWhiteInstance', white)
+        context.commit('engineBlackInstance', black)
+        context.commit('EvEConfig', payload)
+        context.commit('EvE', true)
+        context.commit('enginesActive', [true, true])
+        context.commit('active', true)
+
+        // send position and go to a specific engine instance
+        const sendPositionAndGo = (inst, lim) => {
+          try {
+            inst.send(`position fen ${context.getters.fen}`)
+            inst.send(limiterToGo(lim))
+          } catch (err) {
+            console.error('[EvE] Failed to send position/go:', err)
+          }
+        }
+
+        // bestmove handlers
+        const whiteHandler = async ucimove => {
+          // only apply if it's White to move
+          const turnIsWhite = context.getters.turn
+          if (!context.state.EvE || !turnIsWhite) return
+          try {
+            await context.dispatch('push', { move: ucimove, prev: context.getters.currentMove[0] })
+            // after white move, trigger black
+            const cfg = context.state.EvEConfig || {}
+            sendPositionAndGo(context.state.engineBlackInstance, cfg.blackLimiter)
+          } catch (err) {
+            console.error('[EvEMakeMove] White provided invalid move:', ucimove, err)
+            // try to restart the black engine calculation on current position
+            context.dispatch('position')
+            sendPositionAndGo(context.state.engineBlackInstance, context.state.EvEConfig && context.state.EvEConfig.blackLimiter)
+          }
+        }
+
+        const blackHandler = async ucimove => {
+          const turnIsWhite = context.getters.turn
+          if (!context.state.EvE || turnIsWhite) return
+          try {
+            await context.dispatch('push', { move: ucimove, prev: context.getters.currentMove[0] })
+            // after black move, trigger white
+            const cfg = context.state.EvEConfig || {}
+            sendPositionAndGo(context.state.engineWhiteInstance, cfg.whiteLimiter)
+          } catch (err) {
+            console.error('[EvEMakeMove] Black provided invalid move:', ucimove, err)
+            context.dispatch('position')
+            sendPositionAndGo(context.state.engineWhiteInstance, context.state.EvEConfig && context.state.EvEConfig.whiteLimiter)
+          }
+        }
+
+        // attach listeners
+        white.on('bestmove', whiteHandler)
+        black.on('bestmove', blackHandler)
+
+        // kick off the side to move now
+        const turnIsWhiteNow = context.getters.turn
+        if (turnIsWhiteNow) {
+          sendPositionAndGo(white, payload.whiteLimiter)
+        } else {
+          sendPositionAndGo(black, payload.blackLimiter)
+        }
+      } catch (err) {
+        console.error('[EvEtrue] Could not start EvE match:', err)
+      }
+    },
+
+    async EvEfalse (context) {
+      // stop EvE match and quit engines
+      context.commit('EvE', false)
+      context.commit('enginesActive', [false, false])
+      try {
+        if (context.state.engineWhiteInstance) {
+          try { context.state.engineWhiteInstance.send('quit') } catch (e) {}
+          context.state.engineWhiteInstance.removeAllListeners && context.state.engineWhiteInstance.removeAllListeners()
+          context.commit('engineWhiteInstance', null)
+        }
+        if (context.state.engineBlackInstance) {
+          try { context.state.engineBlackInstance.send('quit') } catch (e) {}
+          context.state.engineBlackInstance.removeAllListeners && context.state.engineBlackInstance.removeAllListeners()
+          context.commit('engineBlackInstance', null)
+        }
+      } catch (err) {
+        console.error('[EvEfalse] Error stopping EvE engines:', err)
+      }
+      context.commit('active', false)
+      context.dispatch('resetEngineData')
+    }, 
     stopEnginePvE (context) {
       engine.send('stop')
     },
     PvEfalse (context) {
+      // Stop and clean up old PvE engine
+      if (context.state.PvEEngineInstance) {
+        try {
+          context.state.PvEEngineInstance.send('stop')
+          context.state.PvEEngineInstance.removeAllListeners()
+        } catch (err) {
+          console.warn('[PvEfalse] Error stopping PvE engine:', err)
+        }
+      }
       context.commit('PvE', false)
+      context.commit('PvEEngineInstance', null)
       if (!context.getters.turn) {
         context.dispatch('stopEngine')
       } else {
@@ -810,11 +1176,18 @@ export const store = new Vuex.Store({
         context.dispatch('stopEngine')
         context.dispatch('position')
         context.dispatch('goEngine')
-      } else if (context.getters.active && context.getters.PvE && !context.getters.turn) {
-        context.dispatch('position')
-        context.dispatch('goEnginePvE')
+      } else if (context.getters.active && context.getters.PvE) {
+         const playerIsWhite = context.getters.PvEPlayerIsWhite
+        const engineIsWhite = !playerIsWhite
+        const turnIsWhite = context.getters.turn
+        const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
+        if (engineToMoveNow) {
+          context.dispatch('position')
+          context.dispatch('goEnginePvE')
+        }
       }
     },
+
     position (context) {
       engine.send(`position fen ${context.getters.fen}`)
       const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
@@ -1337,6 +1710,12 @@ export const store = new Vuex.Store({
     PvE (state) {
       return state.PvE
     },
+    EvE (state) {
+      return state.EvE
+    },
+    PvEPlayerIsWhite (state) {
+      return state.PvEPlayerIsWhite
+    },
     PvEParam (state) {
       return state.PvEParam
     },
@@ -1345,6 +1724,9 @@ export const store = new Vuex.Store({
     },
     PvEInput (state) {
       return state.PvEInput
+    },
+    EvE (state) {
+      return state.EvE
     },
     dimNumber (state) {
       return state.dimNumber
@@ -1589,6 +1971,15 @@ export const store = new Vuex.Store({
     },
     selectedGame (state) {
       return state.selectedGame
+    },
+    gameConfig (state) {
+      return state.gameConfig
+    },
+    showGameEndModal (state) {
+      return state.showGameEndModal
+    },
+    gameResult (state) {
+      return state.gameResult
     },
     isInternational (state) {
       return state.internationalVariants.includes(state.variant)
