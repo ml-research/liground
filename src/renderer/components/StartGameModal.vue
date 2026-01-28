@@ -240,6 +240,32 @@ export default {
 
     blackEngineLogo () {
       return this.blackEngineObj ? `url(${this.blackEngineObj.logo || ''})` : ''
+    },
+
+    startDisabled () {
+      // Disable if white is engine but no engine selected
+      if (this.whiteChoice === 'engine' && !this.whiteEngineObj) {
+        return true
+      }
+      // Disable if black is engine but no engine selected
+      if (this.blackChoice === 'engine' && !this.blackEngineObj) {
+        return true
+      }
+      return false
+    },
+
+    disabledReason () {
+      if (this.whiteChoice === 'engine' && !this.whiteEngineObj &&
+        this.blackChoice === 'engine' && !this.blackEngineObj) {
+        return 'White and Black engines not selected'
+      }
+      if (this.whiteChoice === 'engine' && !this.whiteEngineObj) {
+        return 'White engine not selected'
+      }
+      if (this.blackChoice === 'engine' && !this.blackEngineObj) {
+        return 'Black engine not selected'
+      }
+      return ''
     }
   },
   watch: {
