@@ -934,6 +934,16 @@ export const store = new Vuex.Store({
         const engineName = payload.engine
         const pveLimiter = payload.pveLimiter
 
+        // Stop old PvE engine if it exists to avoid listener conflicts
+        if (context.state.PvEEngineInstance) {
+          try {
+            context.state.PvEEngineInstance.send('stop')
+            context.state.PvEEngineInstance.removeAllListeners()
+          } catch (err) {
+            console.warn('[PvEtrue] Error stopping old engine:', err)
+          }
+        }
+
         const engineInfo = context.state.allEngines[engineName]
         if (!engineInfo) {
           throw new Error('Could not find engine binary for provided name')
@@ -1136,7 +1146,17 @@ export const store = new Vuex.Store({
       engine.send('stop')
     },
     PvEfalse (context) {
+      // Stop and clean up old PvE engine
+      if (context.state.PvEEngineInstance) {
+        try {
+          context.state.PvEEngineInstance.send('stop')
+          context.state.PvEEngineInstance.removeAllListeners()
+        } catch (err) {
+          console.warn('[PvEfalse] Error stopping PvE engine:', err)
+        }
+      }
       context.commit('PvE', false)
+      context.commit('PvEEngineInstance', null)
       if (!context.getters.turn) {
         context.dispatch('stopEngine')
       } else {

@@ -178,6 +178,10 @@ export default {
     // Handle start request from modal; this is a UI-only stub for now
     // Payload example: { white: 'player'|'engine', black: 'player'|'engine' }
     handleStart (payload) {
+      // Stop any running PvE/EvE before starting new game to clean up old engine listeners
+      this.$store.dispatch('PvEfalse')
+      this.$store.dispatch('EvEfalse')
+      
       this.$store.dispatch('resetBoard', { is960: false })
       this.$store.dispatch('setGameConfig', payload)
       
@@ -198,9 +202,7 @@ export default {
           blackLimiter: payload.blackLimiter
         })
       } else {
-        // make sure PvE/EvE are disabled for pure PvP
-        this.$store.dispatch('PvEfalse')
-        this.$store.dispatch('EvEfalse')
+        // PvP mode - no special setup needed
       }
       
       this.$emit('startNewGame', payload)
