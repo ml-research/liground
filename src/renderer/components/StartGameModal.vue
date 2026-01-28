@@ -139,27 +139,8 @@ export default {
   components: { Multiselect },
   data () {
     return {
-      // Default selections
-      whiteChoice: 'player',
-      blackChoice: 'engine',
-
-      // Game mode (local to modal) — default to current app variant
-      selectedGameMode: this.$store.getters.variant,
-
-      // Engine selections (UI-only, store objects)
-      whiteEngineObj: null,
-      blackEngineObj: null,
-
       // Limiter options per engine (UI-only)
-      options: ['time', 'nodes', 'depth'],
-
-      whiteLimiterEnabled: true,
-      whiteLimiterType: 'time',
-      whiteLimiterValue: 1000, // ms default
-
-      blackLimiterEnabled: true,
-      blackLimiterType: 'time',
-      blackLimiterValue: 1000 // ms default
+      options: ['time', 'nodes', 'depth']
     }
   },
   computed: {
@@ -176,30 +157,107 @@ export default {
         .filter(e => e.variants && e.variants.includes(this.selectedGameMode))
     },
 
+    // Store-backed UI state (getters/setters sync with Vuex)
+    selectedGameMode: {
+      get () {
+        const s = this.$store.state.startGameModal && this.$store.state.startGameModal.selectedGameMode
+        return s || this.$store.getters.variant
+      },
+      set (v) {
+        this.$store.commit('startGameModal', { selectedGameMode: v })
+      }
+    },
+
+    whiteChoice: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.whiteChoice) || 'player' },
+      set (v) { this.$store.commit('startGameModal', { whiteChoice: v }) }
+    },
+
+    blackChoice: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.blackChoice) || 'engine' },
+      set (v) { this.$store.commit('startGameModal', { blackChoice: v }) }
+    },
+
+    whiteEngineObj: {
+      get () {
+        const name = this.$store.state.startGameModal && this.$store.state.startGameModal.whiteEngineName
+        if (!name) return null
+        const info = this.$store.state.allEngines && this.$store.state.allEngines[name]
+        return Object.assign({ name }, info || {})
+      },
+      set (v) {
+        const name = v && v.name ? v.name : v
+        this.$store.commit('startGameModal', { whiteEngineName: name })
+      }
+    },
+
+    blackEngineObj: {
+      get () {
+        const name = this.$store.state.startGameModal && this.$store.state.startGameModal.blackEngineName
+        if (!name) return null
+        const info = this.$store.state.allEngines && this.$store.state.allEngines[name]
+        return Object.assign({ name }, info || {})
+      },
+      set (v) {
+        const name = v && v.name ? v.name : v
+        this.$store.commit('startGameModal', { blackEngineName: name })
+      }
+    },
+
+    whiteLimiterEnabled: {
+      get () { return !!(this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterEnabled) },
+      set (v) { this.$store.commit('startGameModal', { whiteLimiterEnabled: !!v }) }
+    },
+
+    whiteLimiterType: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterType) || 'time' },
+      set (v) { this.$store.commit('startGameModal', { whiteLimiterType: v }) }
+    },
+
+    whiteLimiterValue: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterValue) || 1000 },
+      set (v) { this.$store.commit('startGameModal', { whiteLimiterValue: v }) }
+    },
+
+    blackLimiterEnabled: {
+      get () { return !!(this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterEnabled) },
+      set (v) { this.$store.commit('startGameModal', { blackLimiterEnabled: !!v }) }
+    },
+
+    blackLimiterType: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterType) || 'time' },
+      set (v) { this.$store.commit('startGameModal', { blackLimiterType: v }) }
+    },
+
+    blackLimiterValue: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterValue) || 1000 },
+      set (v) { this.$store.commit('startGameModal', { blackLimiterValue: v }) }
+    },
+
     whiteEngineLogo () {
       return this.whiteEngineObj ? `url(${this.whiteEngineObj.logo || ''})` : ''
     },
 
     blackEngineLogo () {
       return this.blackEngineObj ? `url(${this.blackEngineObj.logo || ''})` : ''
-    },
+    }
   },
   watch: {
     // If game mode changes, ensure selected engines still compatible
     selectedGameMode (newMode) {
-      if (this.whiteEngineObj && !this.whiteEngineObj.variants.includes(newMode)) {
-        this.whiteEngineObj = null
+      if (this.whiteEngineObj && !(this.whiteEngineObj.variants && this.whiteEngineObj.variants.includes(newMode))) {
+        this.$store.commit('startGameModal', { whiteEngineName: null })
       }
-      if (this.blackEngineObj && !this.blackEngineObj.variants.includes(newMode)) {
-        this.blackEngineObj = null
+      if (this.blackEngineObj && !(this.blackEngineObj.variants && this.blackEngineObj.variants.includes(newMode))) {
+        this.$store.commit('startGameModal', { blackEngineName: null })
       }
     },
     // When limiter type changes, apply sensible default values
     whiteLimiterType (type) {
-      this.whiteLimiterValue = this.defaultValueForType(type)
+      this.$store.commit('startGameModal', { whiteLimiterValue: this.defaultValueForType(type) })
     },
     blackLimiterType (type) {
-      this.blackLimiterValue = this.defaultValueForType(type)
+      this.$store.commit('startGameModal', { blackLimiterValue: this.defaultValueForType(type) })
     }
   },
   methods: {

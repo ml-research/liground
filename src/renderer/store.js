@@ -146,6 +146,19 @@ export const store = new Vuex.Store({
     destinations: {},
     variant: 'chess',
     gameConfig: null,
+    startGameModal: {
+      whiteChoice: 'player',
+      blackChoice: 'engine',
+      selectedGameMode: 'chess',
+      whiteEngineName: null,
+      blackEngineName: null,
+      whiteLimiterEnabled: true,
+      whiteLimiterType: 'time',
+      whiteLimiterValue: 1000,
+      blackLimiterEnabled: true,
+      blackLimiterType: 'time',
+      blackLimiterValue: 1000
+    },
     showGameEndModal: false,
     gameResult: null,
     // Engine-vs-Engine state
@@ -333,6 +346,9 @@ export const store = new Vuex.Store({
     },
     gameConfig (state, payload) {
       state.gameConfig = payload
+    },
+    startGameModal (state, payload) {
+      state.startGameModal = Object.assign({}, state.startGameModal || {}, payload)
     },
     showGameEndModal (state, payload) {
       state.showGameEndModal = payload
@@ -638,6 +654,19 @@ export const store = new Vuex.Store({
         pieceStyle: 'cburnett',
         boardStyle: 'blue',
         curVar960Fen: '',
+        startGameModal: {
+          whiteChoice: 'player',
+          blackChoice: 'engine',
+          selectedGameMode: 'chess',
+          whiteEngineName: null,
+          blackEngineName: null,
+          whiteLimiterEnabled: true,
+          whiteLimiterType: 'time',
+          whiteLimiterValue: 1000,
+          blackLimiterEnabled: true,
+          blackLimiterType: 'time',
+          blackLimiterValue: 1000
+        },
         openedPGN: false,
         QuickTourIndex: 0,
         evalPlotDepth: 20,
