@@ -66,6 +66,8 @@ export default {
     stats: {
       type: Object,
       default: () => ({
+        // These stats can be filled in as available,
+        // curremntly only moveCount is implemented
         whiteAccuracy: null,
         blackAccuracy: null,
         moveCount: null,

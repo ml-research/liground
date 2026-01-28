@@ -74,6 +74,7 @@
 
     <!-- Modal component for selecting roles for white/black (UI only) -->
     <StartGameModal :visible="showStartModal" @close="closeStartModal" @start="handleStart" />
+    <!-- Game End Modal popup after a game ends that was started via new game modal -->
     <GameEndModal
       :visible="showGameEndModal"
       :gameConfig="gameConfig"
@@ -87,6 +88,7 @@
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
 import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engine for White & Black
+import GameEndModal from './GameEndModal.vue' // Modal displayed when a game ends
 import PgnBrowser from './PgnBrowser.vue'
 import PieceStyleSelector from './PieceStyleSelector.vue'
 import BoardStyleSelector from './BoardStyleSelector.vue'
@@ -96,7 +98,7 @@ import { mapGetters, mapState } from 'vuex'
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, StartGameModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector, EvalPlotButton
+    Multiselect, Mode960, StartGameModal, GameEndModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector, EvalPlotButton
   },
   data () {
     return {
