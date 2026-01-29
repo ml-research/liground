@@ -17,7 +17,7 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --config webpack/main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --config webpack/renderer.config.js",
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node scripts/postinstall.js && npx electron-rebuild -f -w better-sqlite3"
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
@@ -58,6 +58,7 @@
     "electron-builder": "^26.0.12",
     "electron-debug": "^3.1.0",
     "electron-devtools-installer": "^3.1.1",
+    "electron-rebuild": "^3.2.9",
     "eslint": "^7.18.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-friendly-formatter": "^4.0.1",
