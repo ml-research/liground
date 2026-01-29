@@ -836,16 +836,24 @@ export const store = new Vuex.Store({
       }
     },
     async position (context) {
+      const fen = context.getters.fen
+      const normalizedFen = context.getters.normalizedFen
+      const engineName = context.getters.engineName
+      const cacheKey = `${normalizedFen}|${engineName}`
+
+      engine.send(`position fen ${context.getters.fen}`)
+      const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
+      document.dispatchEvent(eve)
+
       const evaluation = await ipcRenderer.invoke('eval-cache-get', {
         positionKey: context.getters.normalizedFen
       })
-      if (evaluation) {
-        // update store from cached eval
-      } else {
-        engine.send(`position fen ${context.getters.fen}`)
-      }
-      const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
-      document.dispatchEvent(eve)
+      // make sure result is not stale
+      if(!evaluation) return
+      if (context.getters.normalizedFen !== normalizedFen) return
+      if (context.getters.engineName !== engineName) return
+
+      // display cached result here
     },
     sendEngineCommand (_, payload) {
       engine.send(payload)
@@ -1157,12 +1165,13 @@ export const store = new Vuex.Store({
         context.commit('multipv', multipv)
       }
       if (!('pv' in payload)) return
-
       const depth = payload.depth
       const mate = payload.mate
-      if (typeof depth !== 'number') return
-      if (depth < MIN_CACHE_DEPTH && typeof mate !== 'number') return
 
+
+      if (typeof depth !== 'number') return
+    
+      if (depth < MIN_CACHE_DEPTH && typeof mate !== 'number') return
       const positionKey = context.getters.normalizedFen
       const engineName = context.getters.engineName
       const cacheKey = `${positionKey}|${engineName}|${depth}`
@@ -1175,6 +1184,7 @@ export const store = new Vuex.Store({
           engineName,
           depth,
           cp: payload.cp,
+          wdl: payload.wdl,
           mate,
           pv: payload.pv,
           updatedAt: Date.now()
@@ -1472,6 +1482,9 @@ export const store = new Vuex.Store({
     },
     cp (state) {
       return state.multipv[0].cp
+    },
+    wdl (state) {
+      return state.multipv[0].wdl
     },
     depth (state) {
       return state.engineStats.depth

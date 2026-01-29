@@ -59,12 +59,12 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.handle('eval-cache-get', async (normalizedFen) => {
+ipcMain.handle('eval-cache-get', async (_event, normalizedFen) => {
   try {
-    const evaluation  = getEval(normalizedFen)
+    const evaluation = getEval(normalizedFen)
     return evaluation
   } catch (err) {
-    console.error("[eval-cache-get] failed", err);
+    console.error('[eval-cache-get] failed', err)
   }
 })
 
@@ -76,8 +76,6 @@ ipcMain.on('eval-cache-put', (_event, payload) => {
   }
 })
 
-
-// IPC handler so renderer can request native dialogs when `remote` is not available
 ipcMain.handle('show-open-dialog', async (event, options) => {
   const browserWindow = mainWindow || null
   try {
