@@ -113,8 +113,8 @@ export default {
         console.log(err)
       }
     },
-    openPGNFromPath (path) {
-      fs.readFile(path, 'utf8', (err, data) => {
+    async openPGNFromPath (path) {
+      fs.readFile(path, 'utf8', async (err, data) => {
         if (err) {
           return console.log(err)
         }
@@ -123,6 +123,21 @@ export default {
         data = data.replace(/\r\n/g, '\n')
         this.convertAndStorePgn(data)
         this.close()
+
+        // Add the file path to saved games
+        let ipcRenderer
+        try {
+          ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+        } catch (e) {
+          ipcRenderer = null
+        }
+        if (ipcRenderer) {
+          try {
+            await ipcRenderer.invoke('add-game-path', path)
+          } catch (error) {
+            console.error('Error adding game path:', error)
+          }
+        }
       })
     },
     openPGNFromString () {

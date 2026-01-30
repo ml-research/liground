@@ -7,6 +7,7 @@
 
 <script>
 import ffish from 'ffish'
+import { mapGetters } from 'vuex'
 import GameBoards from './GameBoards'
 import MenuBar from './MenuBar.vue'
 
@@ -16,8 +17,18 @@ export default {
     MenuBar,
     GameBoards
   },
+  computed: {
+    ...mapGetters(['variantOptions', 'initialized'])
+  },
+  watch: {
+    initialized () {
+      if (this.initialized === true) {
+        this.loadSavedGames()
+      }
+    }
+  },
   mounted () {
-    this.loadSavedGames()
+    // loadSavedGames is now called in watch when initialized
   },
   methods: {
     async loadSavedGames () {
@@ -32,13 +43,17 @@ export default {
               const fileResult = await ipcRenderer.invoke('read-pgn-file', filePath)
               if (fileResult.success) {
                 console.log(`Parsing game from ${filePath}`)
-                const game = ffish.readGamePGN(fileResult.content)
-                game.id = gameId++
-                game.supported = true
-                game.filePath = filePath
-                // Store the original PGN for comment extraction
-                game.originalPGN = fileResult.content
-                games.push(game)
+                try {
+                  const game = ffish.readGamePGN(fileResult.content)
+                  game.id = gameId++
+                  game.supported = this.variantOptions.revGet(game.headers('Variant').toLowerCase()) !== undefined || !game.headers('Variant')
+                  game.filePath = filePath
+                  // Store the original PGN for comment extraction
+                  game.originalPGN = fileResult.content
+                  games.push(game)
+                } catch (parseError) {
+                  console.error(`Error parsing PGN from ${filePath}:`, parseError)
+                }
               }
             } catch (error) {
               console.error(`Error loading game from ${filePath}:`, error)
