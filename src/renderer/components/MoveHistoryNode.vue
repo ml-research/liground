@@ -371,8 +371,9 @@ export default {
 .move-comment {
   margin-left: 4px;
   font-size: 0.85em;
-  color: var(--light-text-color);
+  color: black;
   font-style: italic;
+  font-weight: bold;
   background-color: var(--variation-color);
   padding: 2px 4px;
   border-radius: 2px;

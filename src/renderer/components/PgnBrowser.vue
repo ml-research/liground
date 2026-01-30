@@ -279,6 +279,12 @@ export default {
         this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
       }
       if (this.$store.getters.loadedGames) {
+        // Remove all saved game paths from storage
+        for (const game of this.$store.getters.loadedGames) {
+          if (game.filePath && ipcRenderer) {
+            ipcRenderer.invoke('remove-game-path', game.filePath)
+          }
+        }
         const games = []
         this.$store.dispatch('loadedGames', games)
       }
