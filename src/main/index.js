@@ -59,9 +59,13 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.handle('eval-cache-get', async (_event, normalizedFen) => {
+ipcMain.handle('eval-cache-get', async (event, payload) => {
   try {
-    const evaluation = getEval(normalizedFen)
+    const { positionKey, engineName } = payload || {}
+    if (!positionKey || !engineName) return null
+    const [name, version] = engineName.split(' ')
+    const evaluation = getEval(positionKey, name, version)
+    console.log(JSON.stringify(evaluation))
     return evaluation
   } catch (err) {
     console.error('[eval-cache-get] failed', err)

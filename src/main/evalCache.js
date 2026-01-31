@@ -54,12 +54,13 @@ export function insertEval (evaluation) {
   )
 }
 
-export function getEval (positionKey) {
+export function getEval (positionKey, engineName, engineVersion) {
   const select = db.prepare(`
-  SELECT * FROM eval_cache WHERE
-  position_key = '${positionKey}'
-  LIMIT 1
-  ;
+  SELECT * FROM eval_cache
+  WHERE position_key = ?
+    AND engine_name = ?
+    AND engine_version = ?
+  LIMIT 1;
   `)
-  return select.get()
+  return select.get(positionKey, engineName, engineVersion)
 }

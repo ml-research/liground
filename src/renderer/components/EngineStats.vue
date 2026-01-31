@@ -1,11 +1,20 @@
 <template>
   <div class="base-demo">
-    <VueTableDynamic :params="params" />
+    <VueTableDynamic :params="params">
+      <template v-slot:column-0="{ props }">
+        <span v-if="props.row === 0">{{ props.cellData }}</span>
+        <span v-else class="engine-stats__depth-cell">
+          <img v-if="isEvalCached" :src="cacheHitIcon" alt="Cache hit" class="engine-stats__icon">
+          <span>{{ props.cellData }}</span>
+        </span>
+      </template>
+    </VueTableDynamic>
   </div>
 </template>
 
 <script>
 import VueTableDynamic from 'vue-table-dynamic'
+import cacheHitIcon from '../assets/images/analysis/cache-hit-icon.svg'
 
 export default {
   name: 'EngineStats',
@@ -14,9 +23,11 @@ export default {
   },
   data () {
     return {
+      cacheHitIcon,
       parentEngineStats: {
         depth: 0,
         seldepth: 0,
+        isevalCached: false,
         nodes: 0,
         nps: 0,
         hashfull: 0,
@@ -28,6 +39,12 @@ export default {
   },
 
   computed: {
+    isEvalCached () {
+      if (this.engineIndex === 1) {
+        return Boolean(this.$store.getters.isEvalCached)
+      }
+      return Boolean(this.parentEngineStats.isevalCached)
+    },
     params () {
       if (this.engineIndex === 1) {
         const { depth, seldepth, nps, nodes, enginetime, hashfull, tbhits } = this.$store.getters
@@ -94,5 +111,17 @@ tbody {
   font-style: normal;
   font-weight: bold;
   font-weight: normal
+}
+
+.engine-stats__depth-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.engine-stats__icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
 }
 </style>

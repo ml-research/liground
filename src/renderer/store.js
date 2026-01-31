@@ -16,7 +16,7 @@ try {
   ipcRenderer = null
 }
 
-const MIN_CACHE_DEPTH = 16
+const MIN_CACHE_DEPTH = 20
 let lastCacheKey = null
 
 class TwoWayMap {
@@ -188,6 +188,7 @@ export const store = new Vuex.Store({
     listOfEngineStats: [],
     engineStats: {
       depth: 0,
+      isEvalCached: false,
       seldepth: 0,
       nodes: 0,
       nps: 0,
@@ -387,7 +388,8 @@ export const store = new Vuex.Store({
         nps: 0,
         hashfull: 0,
         tbhits: 0,
-        time: 0
+        time: 0,
+        isEvalCached: false
       }
     },
     multipv (state, payload) {
@@ -839,21 +841,83 @@ export const store = new Vuex.Store({
       const fen = context.getters.fen
       const normalizedFen = context.getters.normalizedFen
       const engineName = context.getters.engineName
-      const cacheKey = `${normalizedFen}|${engineName}`
 
       engine.send(`position fen ${context.getters.fen}`)
       const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
       document.dispatchEvent(eve)
-
+      if (!ipcRenderer){
+        console.log('ipcrenderer not available')
+        return
+      } 
       const evaluation = await ipcRenderer.invoke('eval-cache-get', {
-        positionKey: context.getters.normalizedFen
+        positionKey: normalizedFen,
+        engineName
       })
-      // make sure result is not stale
-      if(!evaluation) return
-      if (context.getters.normalizedFen !== normalizedFen) return
-      if (context.getters.engineName !== engineName) return
 
-      // display cached result here
+      // make sure result is not stale
+      if (!evaluation) {
+        console.log("no evaluation")
+        return
+      }
+      if (context.getters.normalizedFen !== normalizedFen) {
+        console.log("stale fen")
+        return
+      }
+      if (context.getters.engineName !== engineName) {
+        console.log("stale engine")
+        return
+      }
+      console.log('after checks')
+      // TO DO: display cached result here
+
+      // ignore pv updates when engine is expected to be inactive
+      if (!context.state.active) {
+        return
+      }
+      // update engine stats
+      const stats = { ...context.state.engineStats }
+      for (const key of Object.keys(stats)) {
+        if (key in evaluation) {
+          stats[key] = evaluation[key]
+        }
+      }
+      
+      stats['isEvalCached'] = true
+      context.commit('engineStats', stats)
+
+      // update pvline
+      if ('pv' in evaluation) {
+        const multipv = context.getters.multipv.slice(0)
+
+        // handle checkmate
+        if (payload.mate === 0) {
+          multipv[0] = { mate: payload.mate }
+        } else {
+          const ucimove = payload.pv.split(/\s/)[0]
+          const { board } = context.state
+
+          // assert first move is valid
+          if (board.legalMoves().includes(ucimove)) {
+            const pvline = {
+              cp: payload.cp,
+              mate: payload.mate,
+              pvUCI: payload.pv,
+              ucimove
+            }
+            try {
+              pvline.pv = board.variationSan(evaluation.pv)
+            } catch (err) {
+              // currently invalid moves cause ffish to error mid calculation and fail to reset the fen
+              // so to avoid getting stuck with a future fen, we reset the board fen on error
+              board.setFen(context.state.fen)
+              console.warn('Invalid engine pv move.\nFEN:', board.fen(), '\nPV:', evaluation.pv)
+            }
+            multipv[evaluation.multipv - 1] = pvline
+          }
+        }
+        context.commit('multipv', multipv)
+      }
+
     },
     sendEngineCommand (_, payload) {
       engine.send(payload)
@@ -1503,6 +1567,9 @@ export const store = new Vuex.Store({
     },
     tbhits (state) {
       return state.engineStats.tbhits
+    },
+    isEvalCached (state) {
+      return state.engineStats.isEvalCached
     },
     time (state) {
       return state.engineStats.time
