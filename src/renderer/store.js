@@ -1196,6 +1196,9 @@ export const store = new Vuex.Store({
       }
       context.commit('engineStats', stats)
 
+      // only update multipv if depth is higher than cached depth
+      if (stats.isEvalCached && stats.depth <= stats.cachedDepth) return
+
       // update pvline
       if ('pv' in payload) {
         const multipv = context.getters.multipv.slice(0)
