@@ -5,6 +5,7 @@
         <span v-if="props.row === 0">{{ props.cellData }}</span>
         <span v-else class="engine-stats__depth-cell">
           <img v-if="isEvalCached" :src="cacheHitIcon" alt="Cache hit" class="engine-stats__icon">
+          <span v-if="isEvalCached" class = "engine-stats__eval-depth">d = {{ evalCacheDepth }}</span>
           <span>{{ props.cellData }}</span>
         </span>
       </template>
@@ -28,6 +29,7 @@ export default {
         depth: 0,
         seldepth: 0,
         isevalCached: false,
+        cachedDepth: -1,
         nodes: 0,
         nps: 0,
         hashfull: 0,
@@ -44,6 +46,12 @@ export default {
         return Boolean(this.$store.getters.isEvalCached)
       }
       return Boolean(this.parentEngineStats.isevalCached)
+    },
+    evalCacheDepth () {
+      if (this.engineIndex === 1) {
+        return this.$store.getters.cachedDepth
+      }
+      return this.parentEngineStats.cachedDepth
     },
     params () {
       if (this.engineIndex === 1) {

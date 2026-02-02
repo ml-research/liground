@@ -11,12 +11,13 @@ export function createSchema () {
     position_key TEXT NOT NULL,
     engine_name TEXT NOT NULL,
     engine_version TEXT NOT NULL,
+    multipv INTEGER NOT NULL,
     depth INTEGER NOT NULL,
     cp_eval REAL,
     wdl_eval TEXT,
     pv_line TEXT,
     updated_at INTEGER NOT NULL,
-    PRIMARY KEY (position_key, engine_name, engine_version)
+    PRIMARY KEY (position_key, engine_name, engine_version, multipv)
   );
   `
   const ddl = db.prepare(CREATE_EVAL_CACHE_TABLE)
@@ -32,9 +33,9 @@ export function insertEval (evaluation) {
     : null
   const insert = db.prepare(`
     INSERT INTO eval_cache (
-    position_key, engine_name, engine_version, depth, cp_eval, wdl_eval, pv_line, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(position_key, engine_name, engine_version) DO UPDATE SET
+    position_key, engine_name, engine_version, multipv, depth, cp_eval, wdl_eval, pv_line, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(position_key, engine_name, engine_version, multipv) DO UPDATE SET
     depth      = excluded.depth,
     cp_eval    = excluded.cp_eval,
     wdl_eval   = excluded.wdl_eval,
@@ -46,6 +47,7 @@ export function insertEval (evaluation) {
     evaluation.positionKey,
     engineName,
     engineVersion,
+    evaluation.multipv,
     evaluation.depth,
     evaluation.cp,
     wdlValue,
@@ -54,13 +56,13 @@ export function insertEval (evaluation) {
   )
 }
 
-export function getEval (positionKey, engineName, engineVersion) {
+export function getEvals (positionKey, engineName, engineVersion) {
   const select = db.prepare(`
   SELECT * FROM eval_cache
   WHERE position_key = ?
     AND engine_name = ?
     AND engine_version = ?
-  LIMIT 1;
+  ORDER BY multipv ASC;
   `)
-  return select.get(positionKey, engineName, engineVersion)
+  return select.all(positionKey, engineName, engineVersion)
 }

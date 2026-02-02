@@ -189,6 +189,7 @@ export const store = new Vuex.Store({
     engineStats: {
       depth: 0,
       isEvalCached: false,
+      cachedDepth: -1,
       seldepth: 0,
       nodes: 0,
       nps: 0,
@@ -389,7 +390,8 @@ export const store = new Vuex.Store({
         hashfull: 0,
         tbhits: 0,
         time: 0,
-        isEvalCached: false
+        isEvalCached: false,
+        cachedDepth: -1
       }
     },
     multipv (state, payload) {
@@ -853,70 +855,69 @@ export const store = new Vuex.Store({
         positionKey: normalizedFen,
         engineName
       })
+      // expect array
+      if (!Array.isArray(evaluation) || evaluation.length === 0) return
 
       // make sure result is not stale
-      if (!evaluation) {
-        console.log("no evaluation")
-        return
-      }
-      if (context.getters.normalizedFen !== normalizedFen) {
-        console.log("stale fen")
-        return
-      }
-      if (context.getters.engineName !== engineName) {
-        console.log("stale engine")
-        return
-      }
-      console.log('after checks')
-      // TO DO: display cached result here
+      if (!evaluation) return
+      if (context.getters.normalizedFen !== normalizedFen) return
+      if (context.getters.engineName !== engineName) return
 
       // ignore pv updates when engine is expected to be inactive
       if (!context.state.active) {
         return
       }
+      const primary = evaluation[0]
       // update engine stats
       const stats = { ...context.state.engineStats }
       for (const key of Object.keys(stats)) {
-        if (key in evaluation) {
-          stats[key] = evaluation[key]
-        }
+        if (key in primary) stats[key] = primary[key]
       }
       
-      stats['isEvalCached'] = true
+      stats.isEvalCached = true
+      stats.cachedDepth = stats.depth
       context.commit('engineStats', stats)
 
-      // update pvline
-      if ('pv' in evaluation) {
-        const multipv = context.getters.multipv.slice(0)
+      // update multipv array
+      const multipv = context.getters.multipv.slice(0)
+      for (const row of evaluation) {
+        const idx = (row.multipv || 1) - 1
+        if (idx < 0) continue
 
-        // handle checkmate
-        if (payload.mate === 0) {
-          multipv[0] = { mate: payload.mate }
-        } else {
-          const ucimove = payload.pv.split(/\s/)[0]
-          const { board } = context.state
-
-          // assert first move is valid
-          if (board.legalMoves().includes(ucimove)) {
-            const pvline = {
-              cp: payload.cp,
-              mate: payload.mate,
-              pvUCI: payload.pv,
-              ucimove
-            }
-            try {
-              pvline.pv = board.variationSan(evaluation.pv)
-            } catch (err) {
-              // currently invalid moves cause ffish to error mid calculation and fail to reset the fen
-              // so to avoid getting stuck with a future fen, we reset the board fen on error
-              board.setFen(context.state.fen)
-              console.warn('Invalid engine pv move.\nFEN:', board.fen(), '\nPV:', evaluation.pv)
-            }
-            multipv[evaluation.multipv - 1] = pvline
-          }
+        // handle mate-only rows (if you store mate)
+        if (row.mate === 0) {
+          multipv[idx] = { mate: row.mate }
+          continue
         }
-        context.commit('multipv', multipv)
+
+        if (!row.pv_line) continue
+
+        const { board } = context.state
+        const ucimove = row.pv_line.split(/\s/)[0]
+
+        // verify first move is legal
+        if (!board.legalMoves().includes(ucimove)) continue
+
+        const pvline = {
+          cp: row.cp_eval,
+          mate: row.mate,
+          pvUCI: row.pv_line,
+          ucimove
+        }
+
+        try {
+          pvline.pv = board.variationSan(row.pv_line)
+        } catch (err) {
+          // reset board to avoid being stuck
+          board.setFen(context.state.fen)
+          console.warn('Invalid cached pv move.\nFEN:', board.fen(), '\nPV:', row.pv_line)
+          continue
+        }
+
+        multipv[idx] = pvline
       }
+
+      context.commit('multipv', multipv)
 
     },
     sendEngineCommand (_, payload) {
@@ -1230,6 +1231,7 @@ export const store = new Vuex.Store({
           }
         }
         context.commit('multipv', multipv)
+        stats.isEvalCached = false
       }
       if (!('pv' in payload)) return
       const depth = payload.depth
@@ -1241,10 +1243,10 @@ export const store = new Vuex.Store({
       if (depth < MIN_CACHE_DEPTH && typeof mate !== 'number') return
       const positionKey = context.getters.normalizedFen
       const engineName = context.getters.engineName
-      const cacheKey = `${positionKey}|${engineName}|${depth}`
+      const cacheKey = `${positionKey}|${engineName}|${depth}|${payload.multipv}`
       if (cacheKey === lastCacheKey) return
       lastCacheKey = cacheKey
-
+      console.log(JSON.stringify(payload.multipv))
       if (ipcRenderer && ipcRenderer.send) {
         ipcRenderer.send('eval-cache-put', {
           positionKey,
@@ -1254,6 +1256,7 @@ export const store = new Vuex.Store({
           wdl: payload.wdl,
           mate,
           pv: payload.pv,
+          multipv: payload.multipv,
           updatedAt: Date.now()
         })
       }
@@ -1573,6 +1576,9 @@ export const store = new Vuex.Store({
     },
     isEvalCached (state) {
       return state.engineStats.isEvalCached
+    },
+    cachedDepth (state) {
+      return state.engineStats.cachedDepth
     },
     time (state) {
       return state.engineStats.time

@@ -1,7 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
-import { createSchema, insertEval, getEval } from './evalCache'
+import { createSchema, insertEval, getEvals } from './evalCache'
 
 /**
  * Set `__static` path to static files in production
@@ -64,7 +64,7 @@ ipcMain.handle('eval-cache-get', async (event, payload) => {
     const { positionKey, engineName } = payload || {}
     if (!positionKey || !engineName) return null
     const [name, version] = engineName.split(' ')
-    const evaluation = getEval(positionKey, name, version)
+    const evaluation = getEvals(positionKey, name, version)
     console.log(JSON.stringify(evaluation))
     return evaluation
   } catch (err) {
