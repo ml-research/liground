@@ -153,7 +153,7 @@ export default {
         visible: false,
         title: '',
         save: () => {}
-      },
+      }
     }
   },
   computed: {

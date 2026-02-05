@@ -121,7 +121,6 @@ import EvalBar from './EvalBar'
 import ChessGround from './ChessGround'
 import EvalPlot from './EvalPlot'
 import Vue from 'vue'
-import PgnBrowser from './PgnBrowser.vue'
 import SettingsTab from './SettingsTab'
 import GameInfo from './GameInfo.vue'
 import { findBestOpeningForFen } from '../../shared/openingLookup'
@@ -135,7 +134,6 @@ export default {
     ChessGround,
     EvalPlot,
     GameInfo,
-    PgnBrowser,
     SettingsTab
   },
   data () {

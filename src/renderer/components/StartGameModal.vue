@@ -351,8 +351,8 @@ export default {
     },
 
     async startGame () {
-      if (this.selectedGameMode !== this.$store.getters.variant){
-        await this.$store.dispatch('variant', this.selectedGameMode) 
+      if (this.selectedGameMode !== this.$store.getters.variant) {
+        await this.$store.dispatch('variant', this.selectedGameMode)
       }
       const payload = {
         gameMode: this.selectedGameMode,
@@ -360,20 +360,28 @@ export default {
         black: this.blackChoice,
 
         // Engines are only relevant when a side is set to 'engine'. We emit names for simplicity
-        whiteEngine: this.whiteChoice === 'engine' && this.whiteEngineObj ? this.whiteEngineObj.name : null,
-        blackEngine: this.blackChoice === 'engine' && this.blackEngineObj ? this.blackEngineObj.name : null,
+        whiteEngine: (this.whiteChoice === 'engine' && this.whiteEngineObj)
+          ? this.whiteEngineObj.name
+          : null,
+        blackEngine: (this.blackChoice === 'engine' && this.blackEngineObj)
+          ? this.blackEngineObj.name
+          : null,
 
-        // Limiter configuration for PvE and EvE modes 
-        whiteLimiter: this.whiteChoice === 'engine' ? {
-          enabled: this.whiteLimiterEnabled,
-          type: this.whiteLimiterType,
-          value: this.whiteLimiterValue
-        } : null,
-        blackLimiter: this.blackChoice === 'engine' ? {
-          enabled: this.blackLimiterEnabled,
-          type: this.blackLimiterType,
-          value: this.blackLimiterValue
-        } : null
+        // Limiter configuration for PvE and EvE modes
+        whiteLimiter: this.whiteChoice === 'engine'
+          ? {
+              enabled: this.whiteLimiterEnabled,
+              type: this.whiteLimiterType,
+              value: this.whiteLimiterValue
+            }
+          : null,
+        blackLimiter: this.blackChoice === 'engine'
+          ? {
+              enabled: this.blackLimiterEnabled,
+              type: this.blackLimiterType,
+              value: this.blackLimiterValue
+            }
+          : null
       }
 
       // PvP: both are players
@@ -394,12 +402,16 @@ export default {
       const playerIsWhite = (this.whiteChoice === 'player')
       // Dispatch PvEtrue with information about which side is the player
       // (existing behavior; actual logic remains in the store)
-      this.$store.dispatch('PvEtrue', { 
+      this.$store.dispatch('PvEtrue', {
         playerIsWhite,
-        pveLimiter: playerIsWhite ? payload.blackLimiter : payload.whiteLimiter,
-        engine: playerIsWhite ? payload.blackEngine : payload.whiteEngine,
+        pveLimiter: playerIsWhite
+          ? payload.blackLimiter
+          : payload.whiteLimiter,
+        engine: playerIsWhite
+          ? payload.blackEngine
+          : payload.whiteEngine,
         gameMode: payload.gameMode
-       })
+      })
 
       // Emit a start event as well (UI layer hook), then close
       this.$emit('start', payload)
@@ -455,9 +467,7 @@ export default {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  
 }
-
 
 .side-select {
   display: flex;

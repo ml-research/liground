@@ -36,7 +36,7 @@ export default {
     }
   },
   computed: {
-        ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth', 'PvEPlayerIsWhite'])
+    ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth', 'PvEPlayerIsWhite'])
   },
   watch: {
     depth () {
@@ -50,7 +50,7 @@ export default {
       }
     },
     turn () {
-         if (this.PvE) {
+      if (this.PvE) {
         const engineToMoveNow = (this.turn && !this.PvEPlayerIsWhite) || (!this.turn && this.PvEPlayerIsWhite)
         if (!engineToMoveNow) { // player turn: reset engine timers/data.
           this.$store.dispatch('resetEngineData')
@@ -61,6 +61,7 @@ export default {
         }
       }
     },
+
     PvE () {
       // This watcher reacts to entering/exiting PvE mode.
       if (!this.active && !this.PvE && this.turn) {

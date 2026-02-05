@@ -13,7 +13,6 @@
           <div v-else class="win-loss-result">
             <p v-if="result === 'white-win'" class="win-text"><strong>{{ whiteLabel }}</strong> has won the game.</p>
             <p v-else class="win-text"><strong>{{ blackLabel }}</strong> has won the game.</p>
-            
             <p v-if="result === 'white-win'" class="loss-text"><strong>{{ blackLabel }}</strong> has lost the game.</p>
             <p v-else class="loss-text"><strong>{{ whiteLabel }}</strong> has lost the game.</p>
           </div>

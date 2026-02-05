@@ -124,7 +124,7 @@ export const store = new Vuex.Store({
     active: false,
     PvE: false,
     PvEPlayerIsWhite: true, // true when the human player controls White in PvE mode
-    PvEParam: 'go movetime 1000', 
+    PvEParam: 'go movetime 1000',
     PvEValue: 'time',
     PvEInput: 1000,
     PvELimiter: null, // stores the limiter config for the PvE engine
@@ -773,7 +773,7 @@ export const store = new Vuex.Store({
             else if (resultStr === '0-1') result = 'black-win'
             else if (resultStr === '1/2-1/2') result = 'draw'
             context.dispatch('endGame', { result })
-          } 
+          }
         }
       })
     },
@@ -864,19 +864,16 @@ export const store = new Vuex.Store({
       // Send PvE engine command using the stored PvE engine instance and limiter
       const pveEngine = context.state.PvEEngineInstance
       const pveLimiter = context.state.PvELimiter
-      
       if (!pveEngine) {
         console.error('[goEnginePvE] No PvE engine instance available')
         return
       }
-
       try {
         pveEngine.send(`position fen ${context.getters.fen}`)
         pveEngine.send(limiterToGo(pveLimiter))
       } catch (err) {
         console.error('[goEnginePvE] Failed to send position/go to PvE engine:', err)
       }
-      
       context.commit('setEngineClock')
       context.commit('active', true)
     },
@@ -888,9 +885,8 @@ export const store = new Vuex.Store({
       const engineIsWhite = !playerIsWhite
       const turnIsWhite = state.turn
       const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
-
       if (state.active && state.PvE && engineToMoveNow) {
-         // Dispatch push and handle failure (invalid uci for current position)
+        // Dispatch push and handle failure (invalid uci for current position)
         context.dispatch('push', { move: payload, prev: context.getters.currentMove[0] }).then(() => {
         }).catch((err) => {
           // If engine returned a move invalid for the current position, log and restart engine on the
@@ -924,7 +920,6 @@ export const store = new Vuex.Store({
     closeGameEndModal (context) {
       context.commit('showGameEndModal', false)
     },
-    
     async PvEtrue (context, payload = {}) {
       // Enable PvE mode and remember which side the human player controls.
       // payload.playerIsWhite = true means the human is White (legacy behavior).
@@ -1141,7 +1136,7 @@ export const store = new Vuex.Store({
       }
       context.commit('active', false)
       context.dispatch('resetEngineData')
-    }, 
+    },
     stopEnginePvE (context) {
       engine.send('stop')
     },
@@ -1177,7 +1172,7 @@ export const store = new Vuex.Store({
         context.dispatch('position')
         context.dispatch('goEngine')
       } else if (context.getters.active && context.getters.PvE) {
-         const playerIsWhite = context.getters.PvEPlayerIsWhite
+        const playerIsWhite = context.getters.PvEPlayerIsWhite
         const engineIsWhite = !playerIsWhite
         const turnIsWhite = context.getters.turn
         const engineToMoveNow = (turnIsWhite && engineIsWhite) || (!turnIsWhite && !engineIsWhite)
@@ -1724,9 +1719,6 @@ export const store = new Vuex.Store({
     },
     PvEInput (state) {
       return state.PvEInput
-    },
-    EvE (state) {
-      return state.EvE
     },
     dimNumber (state) {
       return state.dimNumber

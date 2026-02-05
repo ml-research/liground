@@ -93,7 +93,7 @@ import PgnBrowser from './PgnBrowser.vue'
 import PieceStyleSelector from './PieceStyleSelector.vue'
 import BoardStyleSelector from './BoardStyleSelector.vue'
 import EvalPlotButton from './EvalPlotButton.vue'
-import { mapGetters, mapState } from 'vuex' 
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
@@ -192,14 +192,11 @@ export default {
       // Stop any running PvE/EvE before starting new game to clean up old engine listeners
       this.$store.dispatch('PvEfalse')
       this.$store.dispatch('EvEfalse')
-      
       this.$store.dispatch('resetBoard', { is960: false })
       this.$store.dispatch('setGameConfig', payload)
-      
       const isPvP = payload.white === 'player' && payload.black === 'player'
       const isEvE = payload.white === 'engine' && payload.black === 'engine'
       const isPvE = !isPvP && !isEvE
-      
       if (isPvE) {
         const playerIsWhite = payload.white === 'player'
         this.$store.dispatch('PvEtrue', { playerIsWhite })
@@ -215,7 +212,6 @@ export default {
       } else {
         // PvP mode - no special setup needed
       }
-      
       this.$emit('startNewGame', payload)
       this.closeStartModal()
     },
@@ -319,13 +315,11 @@ export default {
     font-size: 12pt;
     padding: 0 5px;
   }
-  
   .startGame,
   .startGame-qt {
     padding: 4px 8px;
     font-size: 12px;
   }
-  
   .reset {
     padding-top: 3px;
     padding-bottom: 3px;
