@@ -144,9 +144,20 @@ export default {
       this.$emit('updateVariant')
       this.$store.dispatch('variant', this.variantOptions.get(payload))
     },
-    resetBoard () {
+    async resetBoard () {
       if (confirm('Do you really want to reset the board?')) {
         document.dispatchEvent(new Event('resetPlot'))
+        // Abort any running games/engines to ensure clean reset
+        try {
+          await this.$store.dispatch('PvEfalse')
+        } catch (e) {}
+        try {
+          await this.$store.dispatch('EvEfalse')
+        } catch (e) {}
+        try {
+          await this.$store.dispatch('stopEngine')
+        } catch (e) {}
+
         this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
         this.$emit('resetMultiEngine')
       }
