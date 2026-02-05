@@ -130,7 +130,6 @@ import Multiselect from 'vue-multiselect'
 export default {
   name: 'StartGameModal',
   props: {
-    // Controls visibility of the modal; parent toggles it.
     visible: {
       type: Boolean,
       default: false
@@ -139,7 +138,6 @@ export default {
   components: { Multiselect },
   data () {
     return {
-      // Limiter options per engine (UI-only)
       options: ['time', 'nodes', 'depth']
     }
   },
@@ -157,7 +155,7 @@ export default {
         .filter(e => e.variants && e.variants.includes(this.selectedGameMode))
     },
 
-    // Store-backed UI state (getters/setters sync with Vuex)
+    // Store-backed UI state
     selectedGameMode: {
       get () {
         const s = this.$store.state.startGameModal && this.$store.state.startGameModal.selectedGameMode
@@ -215,7 +213,10 @@ export default {
     },
 
     whiteLimiterValue: {
-      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterValue) || 1000 },
+      get () {
+        const s = this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterValue
+        return (typeof s !== 'undefined') ? s : 1000
+      },
       set (v) { this.$store.commit('startGameModal', { whiteLimiterValue: v }) }
     },
 
@@ -230,7 +231,10 @@ export default {
     },
 
     blackLimiterValue: {
-      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterValue) || 1000 },
+      get () {
+        const s = this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterValue
+        return (typeof s !== 'undefined') ? s : 1000
+      },
       set (v) { this.$store.commit('startGameModal', { blackLimiterValue: v }) }
     },
 
@@ -251,12 +255,21 @@ export default {
       if (this.blackChoice === 'engine' && !this.blackEngineObj) {
         return true
       }
+
+      // If limiter is enabled for an engine side, its value must be valid (non-empty, >0)
+      if (this.whiteChoice === 'engine' && this.whiteLimiterEnabled && !this.isValidLimiterValue(this.whiteLimiterValue)) {
+        return true
+      }
+      if (this.blackChoice === 'engine' && this.blackLimiterEnabled && !this.isValidLimiterValue(this.blackLimiterValue)) {
+        return true
+      }
+
       return false
     },
 
     disabledReason () {
-      if (this.whiteChoice === 'engine' && !this.whiteEngineObj &&
-        this.blackChoice === 'engine' && !this.blackEngineObj) {
+      // Engine selection reasons
+      if (this.whiteChoice === 'engine' && !this.whiteEngineObj && this.blackChoice === 'engine' && !this.blackEngineObj) {
         return 'White and Black engines not selected'
       }
       if (this.whiteChoice === 'engine' && !this.whiteEngineObj) {
@@ -265,6 +278,15 @@ export default {
       if (this.blackChoice === 'engine' && !this.blackEngineObj) {
         return 'Black engine not selected'
       }
+
+      // Limiter reasons
+      if (this.whiteChoice === 'engine' && this.whiteLimiterEnabled && !this.isValidLimiterValue(this.whiteLimiterValue)) {
+        return 'White limiter value invalid'
+      }
+      if (this.blackChoice === 'engine' && this.blackLimiterEnabled && !this.isValidLimiterValue(this.blackLimiterValue)) {
+        return 'Black limiter value invalid'
+      }
+
       return ''
     }
   },
@@ -319,6 +341,13 @@ export default {
         case 'depth': return 'ply'
         default: return ''
       }
+    },
+
+    // Consider empty/null/undefined as invalid; require positive finite number
+    isValidLimiterValue (value) {
+      if (value === null || value === '' || typeof value === 'undefined') return false
+      const num = Number(value)
+      return Number.isFinite(num) && num > 0
     },
 
     async startGame () {
