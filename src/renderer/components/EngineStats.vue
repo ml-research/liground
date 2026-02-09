@@ -58,7 +58,7 @@ export default {
         const { depth, seldepth, nps, nodes, enginetime, hashfull, tbhits } = this.$store.getters
         return {
           data: [
-            ['Depth / Sel. Depth', 'Nodes/s', 'Nodes', 'Time', 'Hash', 'TB Hits'],
+            ['Current / Sel. Depth', 'Nodes/s', 'Nodes', 'Time', 'Hash', 'TB Hits'],
             [depth + ' / ' + seldepth, this.parse(nps) + 'nps', this.parse(nodes), this.parseTime(enginetime), hashfull, this.parse(tbhits)]
           ],
           columnWidth: [{ column: 0, width: 150 }],
@@ -128,8 +128,8 @@ tbody {
 }
 
 .engine-stats__icon {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
 }
 </style>

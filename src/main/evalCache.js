@@ -13,7 +13,7 @@ export function createSchema () {
     engine_version TEXT NOT NULL,
     multipv INTEGER NOT NULL,
     depth INTEGER NOT NULL,
-    cp_eval REAL,
+    cp_eval REAL, 
     wdl_eval TEXT,
     pv_line TEXT,
     updated_at INTEGER NOT NULL,
