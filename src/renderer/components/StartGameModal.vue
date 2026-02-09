@@ -110,6 +110,12 @@
           </div>
         </div>
 
+        <div class="modal-options">
+          <label class="checkbox-label">
+            <input type="checkbox" v-model="showEndGameModal" /> Show game result modal at game end
+          </label>
+        </div>
+
         <p class="hint">Choose whether each side should be controlled by a human player or an engine (PvP, PvE, EvE supported). Only engines that support the selected Game Mode are listed.</p>
       </div>
 
@@ -246,6 +252,11 @@ export default {
       return this.blackEngineObj ? `url(${this.blackEngineObj.logo || ''})` : ''
     },
 
+    showEndGameModal: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.showEndGameModal) !== false },
+      set (v) { this.$store.commit('startGameModal', { showEndGameModal: !!v }) }
+    },
+
     startDisabled () {
       // Disable if white is engine but no engine selected
       if (this.whiteChoice === 'engine' && !this.whiteEngineObj) {
@@ -358,6 +369,7 @@ export default {
         gameMode: this.selectedGameMode,
         white: this.whiteChoice,
         black: this.blackChoice,
+        showEndGameModal: this.showEndGameModal,
 
         // Engines are only relevant when a side is set to 'engine'. We emit names for simplicity
         whiteEngine: (this.whiteChoice === 'engine' && this.whiteEngineObj)
@@ -550,6 +562,27 @@ export default {
   font-size: 12px;
   color: var(--main-text-color);
   opacity: 0.7;
+}
+
+.modal-options {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--main-text-color);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  cursor: pointer;
 }
 
 .modal-footer {

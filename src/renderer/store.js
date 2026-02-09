@@ -157,7 +157,8 @@ export const store = new Vuex.Store({
       whiteLimiterValue: 1000,
       blackLimiterEnabled: true,
       blackLimiterType: 'time',
-      blackLimiterValue: 1000
+      blackLimiterValue: 1000,
+      showEndGameModal: true
     },
     showGameEndModal: false,
     gameResult: null,
@@ -665,7 +666,8 @@ export const store = new Vuex.Store({
           whiteLimiterValue: 1000,
           blackLimiterEnabled: true,
           blackLimiterType: 'time',
-          blackLimiterValue: 1000
+          blackLimiterValue: 1000,
+          showEndGameModal: true
         },
         openedPGN: false,
         QuickTourIndex: 0,
@@ -914,7 +916,10 @@ export const store = new Vuex.Store({
 
     endGame (context, payload) {
       context.commit('gameResult', payload.result)
-      context.commit('showGameEndModal', true)
+      const shouldShowModal = context.state.startGameModal && context.state.startGameModal.showEndGameModal !== false
+      if (shouldShowModal) {
+        context.commit('showGameEndModal', true)
+      }
     },
 
     closeGameEndModal (context) {
