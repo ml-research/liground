@@ -85,7 +85,6 @@ export default {
       // Try IPC fallback: ask main process to show dialog (matches EngineModal pattern)
       let ipcRenderer
       try {
-        // eslint-disable-next-line
         ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
       } catch (e) {
         ipcRenderer = null
@@ -118,12 +117,10 @@ export default {
         if (err) {
           return console.log(err)
         }
-
         // convert CRLF to LF
         data = data.replace(/\r\n/g, '\n')
         this.convertAndStorePgn(data)
         this.close()
-
         // Add the file path to saved games
         let ipcRenderer
         try {

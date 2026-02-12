@@ -136,26 +136,18 @@ export default {
         alert('Please enter a game name')
         return
       }
-      // Create PGN string from current game state
       const pgn = this.generatePGN()
-      // Parse the PGN using ffish
       try {
         const game = ffish.readGamePGN(pgn)
-        // Get existing games
         let games = []
         if (this.$store.getters.loadedGames) {
           games = this.$store.getters.loadedGames
         }
-        // Assign new id to the game
         game.id = games.length
         game.supported = true
-        // Store the original PGN for comment extraction
         game.originalPGN = pgn
-        // Add the game to the list
         games.push(game)
-        // Update store
         this.$store.dispatch('loadedGames', games)
-        // Ask user if they want to save to file
         const saveToFile = confirm('Do you want to save this game to a file on your computer?')
         if (saveToFile) {
           await this.saveToFile(pgn)
@@ -202,7 +194,6 @@ export default {
       }
     },
     generatePGN () {
-      // Build the header section
       let pgn = ''
       // Add headers - use user input if provided, otherwise fall back to gameInfo or default
       pgn += `[Event "${this.eventName || this.gameInfo.Event || 'My Game'}"]\n`
@@ -212,47 +203,37 @@ export default {
       pgn += `[White "${this.whiteName || this.gameInfo.White || 'Player1'}"]\n`
       pgn += `[Black "${this.blackName || this.gameInfo.Black || 'Player2'}"]\n`
       pgn += `[Result "${this.gameInfo.Result || '*'}"]\n`
-      // Add custom title
       pgn += `[WhiteTitle "${this.gameName}"]\n`
-      // Add variant if not standard chess
       if (this.variant && this.variant !== 'chess') {
         pgn += `[Variant "${this.variant}"]\n`
       }
-      // Add FEN if it's not the starting position
       if (this.startFen && this.startFen !== 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
         pgn += `[FEN "${this.startFen}"]\n`
       }
       pgn += '\n'
-      // Add moves in SAN notation
       const movesText = this.generateMovesSAN()
       pgn += movesText
       return pgn
     },
     generateMovesSAN () {
-      // Convert moves to SAN notation with move numbers
       if (!this.moves || this.moves.length === 0) {
         return '*'
       }
       let san = ''
       let moveNumber = 1
-      // Start from the beginning
       for (let i = 0; i < this.moves.length; i++) {
         const move = this.moves[i]
-        // Add move number for white moves
         if (i % 2 === 0) {
           san += moveNumber + '. '
         }
-        // Add the move in SAN notation (name field contains SAN)
         if (move.name) {
           san += move.name + ' '
         } else if (move.uci) {
           san += move.uci + ' '
         }
-        // Add comment if it exists (in PGN format)
         if (move.comment) {
           san += `{${move.comment}} `
         }
-        // Increment move number after black's move
         if (i % 2 === 1) {
           moveNumber++
         }
