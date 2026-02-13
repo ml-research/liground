@@ -65,6 +65,35 @@ function cpToString (cp) {
 }
 
 /**
+ * Normalize WDL information into fractional values.
+ * Accepts either {wdlWin, wdlDraw, wdlLoss} or wdl array [w, d, l].
+ * @param {any} mv Multipv line or payload
+ * @returns {{win: number, draw: number, loss: number} | null}
+ */
+function normalizeWdl (mv) {
+  if (!mv) return null
+  const hasRatios = mv.wdlWin !== undefined || mv.wdlDraw !== undefined || mv.wdlLoss !== undefined
+  if (hasRatios) {
+    const win = Number(mv.wdlWin)
+    const draw = Number(mv.wdlDraw)
+    const loss = Number(mv.wdlLoss)
+    if (Number.isFinite(win) && Number.isFinite(draw) && Number.isFinite(loss)) {
+      return { win, draw, loss }
+    }
+  }
+  if (Array.isArray(mv.wdl) && mv.wdl.length >= 3) {
+    const win = Number(mv.wdl[0])
+    const draw = Number(mv.wdl[1])
+    const loss = Number(mv.wdl[2])
+    const sum = win + draw + loss
+    if (Number.isFinite(sum) && sum > 0) {
+      return { win: win / sum, draw: draw / sum, loss: loss / sum }
+    }
+  }
+  return null
+}
+
+/**
  * Strip halfmove/fullmove counters from a FEN string for caching.
  * @param {string} fen Full FEN string
  */
@@ -907,11 +936,26 @@ export const store = new Vuex.Store({
         // verify first move is legal
         if (!board.legalMoves().includes(ucimove)) continue
 
+        let cachedWdl = null
+        if (row.wdl_eval) {
+          try {
+            const parsed = JSON.parse(row.wdl_eval)
+            if (Array.isArray(parsed)) {
+              cachedWdl = parsed
+            }
+          } catch (err) {
+            // ignore invalid cache entry
+          }
+        }
+
         const pvline = {
           cp: row.cp_eval,
           mate: row.mate,
           pvUCI: row.pv_line,
           ucimove
+        }
+        if (cachedWdl) {
+          pvline.wdl = cachedWdl
         }
 
         try {
@@ -1228,6 +1272,9 @@ export const store = new Vuex.Store({
               mate: payload.mate,
               pvUCI: payload.pv,
               ucimove
+            }
+            if (Array.isArray(payload.wdl)) {
+              pvline.wdl = payload.wdl
             }
             // attach engine-provided WDL info when available (fractions 0..1)
             if ('wdlWin' in payload || 'wdlDraw' in payload || 'wdlLoss' in payload) {
@@ -1651,41 +1698,29 @@ export const store = new Vuex.Store({
       }
     },
     wdlForWhiteWin (state) {
-      const mv = state.multipv[0]
-      if (mv && typeof mv.wdlWin === 'number') {
-        let win = mv.wdlWin
-        if (!state.turn) { // black to move -> swap perspective
-          win = mv.wdlLoss
-        }
-        // cache the new value
+      const wdl = normalizeWdl(state.multipv[0])
+      if (wdl) {
+        const win = state.turn ? wdl.win : wdl.loss
         state.lastWdlWin = win
         return win
       }
-      // fallback to last known value
       return state.lastWdlWin
     },
     wdlForWhiteDraw (state) {
-      const mv = state.multipv[0]
-      if (mv && typeof mv.wdlDraw === 'number') {
-        // cache the new value
-        state.lastWdlDraw = mv.wdlDraw
-        return mv.wdlDraw
+      const wdl = normalizeWdl(state.multipv[0])
+      if (wdl) {
+        state.lastWdlDraw = wdl.draw
+        return wdl.draw
       }
-      // fallback to last known value
       return state.lastWdlDraw
     },
     wdlForWhiteLoss (state) {
-      const mv = state.multipv[0]
-      if (mv && typeof mv.wdlLoss === 'number') {
-        let loss = mv.wdlLoss
-        if (!state.turn) {
-          loss = mv.wdlWin
-        }
-        // cache the new value
+      const wdl = normalizeWdl(state.multipv[0])
+      if (wdl) {
+        const loss = state.turn ? wdl.loss : wdl.win
         state.lastWdlLoss = loss
         return loss
       }
-      // fallback to last known value
       return state.lastWdlLoss
     },
     wdlForWhiteWinPct (state, getters) {
