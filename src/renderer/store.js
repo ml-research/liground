@@ -878,17 +878,16 @@ export const store = new Vuex.Store({
       }
     },
     async position (context) {
-      const fen = context.getters.fen
       const normalizedFen = context.getters.normalizedFen
       const engineName = context.getters.engineName
 
       engine.send(`position fen ${context.getters.fen}`)
       const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
       document.dispatchEvent(eve)
-      if (!ipcRenderer){
+      if (!ipcRenderer) {
         console.log('ipcrenderer not available')
         return
-      } 
+      }
       const evaluation = await ipcRenderer.invoke('eval-cache-get', {
         positionKey: normalizedFen,
         engineName
@@ -911,7 +910,6 @@ export const store = new Vuex.Store({
       for (const key of Object.keys(stats)) {
         if (key in primary) stats[key] = primary[key]
       }
-      
       stats.isEvalCached = true
       stats.cachedDepth = stats.depth
       context.commit('engineStats', stats)
@@ -969,9 +967,7 @@ export const store = new Vuex.Store({
 
         multipv[idx] = pvline
       }
-
       context.commit('multipv', multipv)
-
     },
     sendEngineCommand (_, payload) {
       engine.send(payload)
@@ -1300,9 +1296,7 @@ export const store = new Vuex.Store({
       const depth = payload.depth
       const mate = payload.mate
 
-
       if (typeof depth !== 'number') return
-    
       if (depth < MIN_CACHE_DEPTH && typeof mate !== 'number') return
       const positionKey = context.getters.normalizedFen
       const engineName = context.getters.engineName
