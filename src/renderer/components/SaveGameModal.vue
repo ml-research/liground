@@ -163,7 +163,6 @@ export default {
     async saveToFile (pgn) {
       const { ipcRenderer } = require('electron')
       try {
-        // Show save dialog
         const result = await ipcRenderer.invoke('show-save-dialog', {
           title: 'Save Game',
           defaultPath: `${this.gameName}.pgn`,
@@ -173,15 +172,14 @@ export default {
           ]
         })
         if (result.canceled) {
-          // User canceled, just close the modal
+          //if user canceld -> close the modal
           this.$emit('close')
           alert(`Game "${this.gameName}" saved to library!`)
           return
         }
-        // Write the file
+        // this Writes the fiel
         const writeResult = await ipcRenderer.invoke('write-file', result.filePath, pgn)
         if (writeResult.success) {
-          // Add the file path to the saved games list
           await ipcRenderer.invoke('add-game-path', result.filePath)
           this.$emit('close')
           alert(`Game "${this.gameName}" saved successfully to:\n${result.filePath}`)
@@ -195,7 +193,6 @@ export default {
     },
     generatePGN () {
       let pgn = ''
-      // Add headers - use user input if provided, otherwise fall back to gameInfo or default
       pgn += `[Event "${this.eventName || this.gameInfo.Event || 'My Game'}"]\n`
       pgn += `[Site "${this.siteName || this.gameInfo.Site || '?'}"]\n`
       pgn += `[Date "${this.gameInfo.Date || new Date().toISOString().split('T')[0]}"]\n`

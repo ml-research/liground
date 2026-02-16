@@ -103,15 +103,8 @@ function checkOption (options, name, value) {
 
 const filteredSettings = ['UCI_Variant', 'UCI_Chess960']
 
-/**
- * Extract comments from PGN text
- * Parses PGN format comments like {this is a comment} and maps them to move indices
- * @param {string} pgnText The full PGN text
- * @returns {Object} Map of move index to comment text
- */
 function extractCommentsFromPGN (pgnText) {
   const commentMap = {}
-  // Skip header section and get moves section
   const headerEndIndex = pgnText.indexOf('\n\n')
   if (headerEndIndex === -1) {
     return commentMap
@@ -123,21 +116,16 @@ function extractCommentsFromPGN (pgnText) {
   let lastWasMove = false
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i]
-    // Skip move numbers and empty tokens
     if (token.match(/^\d+\.\.?$/) || !token.trim() || token === '*') {
       continue
     }
-    // Check if this is a comment
-    if (token.match(/^\{[^}]*\}$/)) {
-      // Extract comment text without braces
+    if (token.match(/^\{[^}]*\}$/)) {//this checks if it´s a comment
       const commentText = token.replace(/^\{/, '').replace(/\}$/, '')
-      // Associate comment with the current move (just played)
       if (lastWasMove) {
         commentMap[moveIndex - 1] = commentText
         lastWasMove = false
       }
     } else if (token.trim()) {
-      // This is a move
       moveIndex++
       lastWasMove = true
     }
