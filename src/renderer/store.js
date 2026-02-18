@@ -143,6 +143,7 @@ function extractCommentsFromPGN (pgnText) {
     }
   }
   return commentMap
+}
 /* Helper to produce a `go` command from limiter configuration
 ** @param {Object} limiter Limiter configuration
 */
