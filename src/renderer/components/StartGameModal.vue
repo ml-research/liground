@@ -1,6 +1,14 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click.self="close">
-    <div class="modal-content" role="dialog" aria-modal="true">
+  <div
+    v-if="visible"
+    class="modal-overlay"
+    @click.self="close"
+  >
+    <div
+      class="modal-content"
+      role="dialog"
+      aria-modal="true"
+    >
       <div class="modal-header">
         <h3>Start New Game</h3>
       </div>
@@ -9,24 +17,46 @@
       <div class="modal-body">
         <div class="game-mode">
           <label for="game-mode-select"><b>Game mode</b></label>
-          <select id="game-mode-select" v-model="selectedGameMode">
-            <option v-for="opt in gameModeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          <select
+            id="game-mode-select"
+            v-model="selectedGameMode"
+          >
+            <option
+              v-for="opt in gameModeOptions"
+              :key="opt.value"
+              :value="opt.value"
+            >
+              {{ opt.label }}
+            </option>
           </select>
         </div>
 
         <div class="side-select">
           <label for="white-select"><b>White</b></label>
-          <select id="white-select" v-model="whiteChoice">
-            <option value="player">Player</option>
-            <option value="engine">Engine</option>
+          <select
+            id="white-select"
+            v-model="whiteChoice"
+          >
+            <option value="player">
+              Player
+            </option>
+            <option value="engine">
+              Engine
+            </option>
           </select>
 
           <!-- Engine-specific controls for White -->
-          <div v-if="whiteChoice === 'engine'" class="engine-config">
+          <div
+            v-if="whiteChoice === 'engine'"
+            class="engine-config"
+          >
             <label><small><b>Engine</b></small></label>
 
             <div class="engine-select-row">
-              <div class="engine-logo" :style="{ backgroundImage: whiteEngineLogo }" />
+              <div
+                class="engine-logo"
+                :style="{ backgroundImage: whiteEngineLogo }"
+              />
               <Multiselect
                 v-model="whiteEngineObj"
                 class="engine-select"
@@ -41,10 +71,16 @@
             </div>
 
             <label class="engine-limiter">
-              <input type="checkbox" v-model="whiteLimiterEnabled" /> Engine limiter
+              <input
+                v-model="whiteLimiterEnabled"
+                type="checkbox"
+              > Engine limiter
             </label>
 
-            <div v-if="whiteLimiterEnabled" class="limiter-controls">
+            <div
+              v-if="whiteLimiterEnabled"
+              class="limiter-controls"
+            >
               <Multiselect
                 v-model="whiteLimiterType"
                 :options="options"
@@ -52,29 +88,44 @@
                 :show-labels="false"
               />
               <input
+                v-model.number="whiteLimiterValue"
                 type="number"
                 class="limiter-input"
-                v-model.number="whiteLimiterValue"
                 :min="minForType(whiteLimiterType)"
-              />
-              <div class="limiter-unit">{{ unitForType(whiteLimiterType) }}</div>
+              >
+              <div class="limiter-unit">
+                {{ unitForType(whiteLimiterType) }}
+              </div>
             </div>
           </div>
         </div>
 
         <div class="side-select">
           <label for="black-select"><b>Black</b></label>
-          <select id="black-select" v-model="blackChoice">
-            <option value="player">Player</option>
-            <option value="engine">Engine</option>
+          <select
+            id="black-select"
+            v-model="blackChoice"
+          >
+            <option value="player">
+              Player
+            </option>
+            <option value="engine">
+              Engine
+            </option>
           </select>
 
           <!-- Engine-specific controls for Black -->
-          <div v-if="blackChoice === 'engine'" class="engine-config">
+          <div
+            v-if="blackChoice === 'engine'"
+            class="engine-config"
+          >
             <label><small><b>Engine</b></small></label>
 
             <div class="engine-select-row">
-              <div class="engine-logo" :style="{ backgroundImage: blackEngineLogo }" />
+              <div
+                class="engine-logo"
+                :style="{ backgroundImage: blackEngineLogo }"
+              />
               <Multiselect
                 v-model="blackEngineObj"
                 class="engine-select"
@@ -89,10 +140,16 @@
             </div>
 
             <label class="engine-limiter">
-              <input type="checkbox" v-model="blackLimiterEnabled" /> Engine limiter
+              <input
+                v-model="blackLimiterEnabled"
+                type="checkbox"
+              > Engine limiter
             </label>
 
-            <div v-if="blackLimiterEnabled" class="limiter-controls">
+            <div
+              v-if="blackLimiterEnabled"
+              class="limiter-controls"
+            >
               <Multiselect
                 v-model="blackLimiterType"
                 :options="options"
@@ -100,31 +157,53 @@
                 :show-labels="false"
               />
               <input
+                v-model.number="blackLimiterValue"
                 type="number"
                 class="limiter-input"
-                v-model.number="blackLimiterValue"
                 :min="minForType(blackLimiterType)"
-              />
-              <div class="limiter-unit">{{ unitForType(blackLimiterType) }}</div>
+              >
+              <div class="limiter-unit">
+                {{ unitForType(blackLimiterType) }}
+              </div>
             </div>
           </div>
         </div>
 
         <div class="modal-options">
           <label class="checkbox-label">
-            <input type="checkbox" v-model="showEndGameModal" /> Show game result modal at game end
+            <input
+              v-model="showEndGameModal"
+              type="checkbox"
+            > Show game result modal at game end
           </label>
         </div>
 
-        <p class="hint">Choose whether each side should be controlled by a human player or an engine (PvP, PvE, EvE supported). Only engines that support the selected Game Mode are listed.</p>
+        <p class="hint">
+          Choose whether each side should be controlled by a human player or an engine (PvP, PvE, EvE supported). Only engines that support the selected Game Mode are listed.
+        </p>
       </div>
 
       <div class="modal-footer">
         <div class="footer-left">
-          <button class="start-button" :disabled="startDisabled" :title="disabledReason" @click="startGame"><b>Start Game</b></button>
-          <span v-if="disabledReason" class="disabled-hint">{{ disabledReason }}</span>
+          <button
+            class="start-button"
+            :disabled="startDisabled"
+            :title="disabledReason"
+            @click="startGame"
+          >
+            <b>Start Game</b>
+          </button>
+          <span
+            v-if="disabledReason"
+            class="disabled-hint"
+          >{{ disabledReason }}</span>
         </div>
-        <button class="close-button" @click="close"><b>Close</b></button>
+        <button
+          class="close-button"
+          @click="close"
+        >
+          <b>Close</b>
+        </button>
       </div>
     </div>
   </div>
@@ -135,13 +214,13 @@ import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'StartGameModal',
+  components: { Multiselect },
   props: {
     visible: {
       type: Boolean,
       default: false
     }
   },
-  components: { Multiselect },
   data () {
     return {
       options: ['time', 'nodes', 'depth']

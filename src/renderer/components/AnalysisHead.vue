@@ -1,6 +1,52 @@
 <template>
   <div class="ceval grid-parent">
     LiGround
+    <!-- Reset Button -->
+    <div class="resetButton">
+      <input
+        type="button"
+        value="Reset"
+        class="reset"
+        @click="resetBoard"
+      >
+    </div>
+
+    <!-- Start New Game button -->
+    <div class="button-group">
+      <div
+        v-if="QuickTourIndex !== 10"
+        id="StartGameButton"
+      >
+        <button
+          class="startGame"
+          @click="openStartModal"
+        >
+          Start New Game
+        </button>
+      </div>
+      <div
+        v-else
+        id="StartGameButton-qt"
+      >
+        <button
+          class="startGame-qt"
+          @click="openStartModal"
+        >
+          Start New Game
+        </button>
+      </div>
+
+      <!-- PGN Browser button -->
+      <button
+        class="pgnBrowserBtn"
+        title="Open PGN Browser"
+        @click="openPgnBrowser"
+      >
+        📋 PGN Browser
+      </button>
+    </div>
+
+    <!-- Mode Selection -->
     <Multiselect
       v-if="QuickTourIndex !== 7"
       class="multiselect"
@@ -34,37 +80,80 @@
     />
 
     <!-- Start New Game button  -->
-    <div v-if="QuickTourIndex !== 10" id="StartGameButton">
-      <button class="startGame" @click="openStartModal">Start New Game</button>
+    <div
+      v-if="QuickTourIndex !== 10"
+      id="StartGameButton"
+    >
+      <button
+        class="startGame"
+        @click="openStartModal"
+      >
+        Start New Game
+      </button>
     </div>
-    <div v-else id="StartGameButton-qt">
-      <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+    <div
+      v-else
+      id="StartGameButton-qt"
+    >
+      <button
+        class="startGame-qt"
+        @click="openStartModal"
+      >
+        Start New Game
+      </button>
     </div>
 
     <!-- Style Selectors -->
     <div class="style-selectors">
-      <PieceStyleSelector v-if="QuickTourIndex !== 5" id="piece-style-top" />
-      <PieceStyleSelector v-else id="piece-style-top-qt" />
-      <BoardStyleSelector v-if="QuickTourIndex !== 5" id="board-style-top" />
-      <BoardStyleSelector v-else id="board-style-top-qt" />
+      <PieceStyleSelector
+        v-if="QuickTourIndex !== 5"
+        id="piece-style-top"
+      />
+      <PieceStyleSelector
+        v-else
+        id="piece-style-top-qt"
+      />
+      <BoardStyleSelector
+        v-if="QuickTourIndex !== 5"
+        id="board-style-top"
+      />
+      <BoardStyleSelector
+        v-else
+        id="board-style-top-qt"
+      />
     </div>
 
-    <!-- Eval Plot Button -->
-    <EvalPlotButton v-if="QuickTourIndex !== 6" id="evalplot-button" />
-    <EvalPlotButton v-else id="evalplot-button-qt" />
-
     <!-- Flip Board Button -->
-    <button class="flipBoardBtn" @click="flipBoard" title="Flip Board">🔄 Flip</button>
+    <button
+      class="flipBoardBtn"
+      title="Flip Board"
+      @click="flipBoard"
+    >
+      🔄 Flip
+    </button>
 
-    <!-- PGN Browser button -->
-    <button class="pgnBrowserBtn" @click="openPgnBrowser" title="Open PGN Browser">📋 PGN Browser</button>
+    <!-- 960 Board -->
+    <Mode960 v-if="QuickTourIndex !== 8 && (variant === 'fischerandom' || variant === 'chess960')" />
+    <Mode960
+      v-else-if="QuickTourIndex === 8 && (variant === 'fischerandom' || variant === 'chess960')"
+      id="Mode960-qt"
+    />
 
     <!-- PGN Browser Modal -->
-    <div v-if="showPgnModal" class="pgn-modal-overlay" @click.self="showPgnModal = false">
+    <div
+      v-if="showPgnModal"
+      class="pgn-modal-overlay"
+      @click.self="showPgnModal = false"
+    >
       <div class="pgn-modal-content">
         <div class="pgn-modal-header">
           <h3>PGN Browser</h3>
-          <button class="pgn-modal-close" @click="showPgnModal = false">×</button>
+          <button
+            class="pgn-modal-close"
+            @click="showPgnModal = false"
+          >
+            ×
+          </button>
         </div>
         <div class="pgn-modal-body">
           <PgnBrowser />
@@ -73,11 +162,15 @@
     </div>
 
     <!-- Modal component for selecting roles for white/black (UI only) -->
-    <StartGameModal :visible="showStartModal" @close="closeStartModal" @start="handleStart" />
+    <StartGameModal
+      :visible="showStartModal"
+      @close="closeStartModal"
+      @start="handleStart"
+    />
     <!-- Game End Modal popup after a game ends that was started via new game modal -->
     <GameEndModal
       :visible="showGameEndModal"
-      :gameConfig="gameConfig"
+      :game-config="gameConfig"
       :stats="gameStats"
       @close="closeGameEndModal"
     />
@@ -92,13 +185,12 @@ import GameEndModal from './GameEndModal.vue' // Modal displayed when a game end
 import PgnBrowser from './PgnBrowser.vue'
 import PieceStyleSelector from './PieceStyleSelector.vue'
 import BoardStyleSelector from './BoardStyleSelector.vue'
-import EvalPlotButton from './EvalPlotButton.vue'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, StartGameModal, GameEndModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector, EvalPlotButton
+    Multiselect, Mode960, StartGameModal, GameEndModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector
   },
   data () {
     return {
@@ -229,13 +321,12 @@ export default {
   color: white;
   outline: none;
   border-radius: 5px;
-  box-shadow: 1px 1px 1px 1px black;
-  padding-bottom: 5px;
-  padding-top: 5px;
+  border: 2px solid darkred;
+  padding: 10px 16px;
+  font-size: 16px;
 }
 .resetButton {
-  display: grid;
-  padding-left: 4px;
+  display: flex;
 }
 .reset:hover {
   background-color: darkred;
@@ -248,8 +339,8 @@ export default {
   padding: 15px 0 15px 0;
   margin: 0;
   width: 100%;
-  background-color: var(--bg-color, #f5f5f5);
-  border-bottom: 2px solid #ddd;
+  background-color: var(--main-bg-color, #f5f5f5);
+  border-bottom: 2px solid var(--main-border-color, #ddd);
   position: relative;
   z-index: 10;
   overflow: visible;
@@ -264,20 +355,24 @@ export default {
 
 /* Start game button styles */
 #StartGameButton-qt{
-  margin-left: 8px;
   display: flex;
   border: 5px solid var(--quicktour-highlight);
 }
 #StartGameButton{
-  margin-top: 8px;
   display: flex;
+}
+.button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 .startGame {
   background-color: #2ecc71; /* green */
   color: white;
   border-radius: 5px;
-  padding: 6px 10px;
-  border: none;
+  padding: 10px 16px;
+  border: 2px solid #1a8e3a;
+  font-size: 16px;
 }
 .startGame:hover {
   background-color: #23c663;
@@ -335,9 +430,9 @@ export default {
   background-color: #6c757d;
   color: white;
   border-radius: 5px;
-  padding: 6px 10px;
-  border: none;
-  font-size: 14px;
+  padding: 10px 16px;
+  border: 2px solid #5a6268;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -350,7 +445,7 @@ export default {
   color: white;
   border-radius: 5px;
   padding: 6px 10px;
-  border: none;
+  border: 2px solid #5a6268;
   font-size: 14px;
   cursor: pointer;
 }
@@ -469,6 +564,17 @@ export default {
   background-color: var(--second-bg-color, #f5f5f5);
   border: 5px solid var(--quicktour-highlight);
   border-radius: 5px;
+}
+
+.multiselect :deep(.multiselect__content-wrapper),
+.multiselect-qt :deep(.multiselect__content-wrapper) {
+  z-index: 3000 !important;
+}
+
+.multiselect,
+.multiselect-qt {
+  position: relative;
+  z-index: 101;
 }
 
 #piece-style-top :deep(.multiselect__content-wrapper),

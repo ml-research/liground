@@ -130,7 +130,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 10000;
 }
 .backdrop {
   position: absolute;
@@ -147,6 +147,9 @@ export default {
   background: var(--second-bg-color);
   box-shadow: 2px 2px 20px 1px var(--second-bg-color);
   overflow-x: 10px;
+  width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 .item {
   margin: 5px 0;

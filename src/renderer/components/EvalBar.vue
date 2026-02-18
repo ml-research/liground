@@ -9,7 +9,10 @@
         :style="{ height: `${100 - cpForWhitePerc * 100}%` }"
       />
     </div>
-    <div v-if="hasWdlData" class="wdl">
+    <div
+      v-if="hasWdlData"
+      class="wdl"
+    >
       <div
         class="wdl-seg wdl-win"
         :style="{ height: `${wdlWinPct}%` }"

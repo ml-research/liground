@@ -1,24 +1,63 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click.self="close">
-    <div class="modal-content" role="dialog" aria-modal="true">
+  <div
+    v-if="visible"
+    class="modal-overlay"
+    @click.self="close"
+  >
+    <div
+      class="modal-content"
+      role="dialog"
+      aria-modal="true"
+    >
       <div class="modal-header">
         <h3>Game Over</h3>
       </div>
 
       <div class="modal-body">
         <div class="result-messages">
-          <div v-if="result === 'draw'" class="draw-result">
-            <p class="draw-text">The game ended in a draw between <strong>{{ whiteLabel }}</strong> and <strong>{{ blackLabel }}</strong>.</p>
+          <div
+            v-if="result === 'draw'"
+            class="draw-result"
+          >
+            <p class="draw-text">
+              The game ended in a draw between <strong>{{ whiteLabel }}</strong> and <strong>{{ blackLabel }}</strong>.
+            </p>
           </div>
-          <div v-else class="win-loss-result">
-            <p v-if="result === 'white-win'" class="win-text"><strong>{{ whiteLabel }}</strong> has won the game.</p>
-            <p v-else class="win-text"><strong>{{ blackLabel }}</strong> has won the game.</p>
-            <p v-if="result === 'white-win'" class="loss-text"><strong>{{ blackLabel }}</strong> has lost the game.</p>
-            <p v-else class="loss-text"><strong>{{ whiteLabel }}</strong> has lost the game.</p>
+          <div
+            v-else
+            class="win-loss-result"
+          >
+            <p
+              v-if="result === 'white-win'"
+              class="win-text"
+            >
+              <strong>{{ whiteLabel }}</strong> has won the game.
+            </p>
+            <p
+              v-else
+              class="win-text"
+            >
+              <strong>{{ blackLabel }}</strong> has won the game.
+            </p>
+            <p
+              v-if="result === 'white-win'"
+              class="loss-text"
+            >
+              <strong>{{ blackLabel }}</strong> has lost the game.
+            </p>
+            <p
+              v-else
+              class="loss-text"
+            >
+              <strong>{{ whiteLabel }}</strong> has lost the game.
+            </p>
           </div>
         </div>
 
-        <div v-if="hasStats" class="game-stats">
+        <div
+          v-if="hasStats"
+          class="game-stats"
+        >
           <h4>Game Statistics</h4>
           <table class="stats-table">
             <tr v-if="stats.whiteAccuracy !== null">
@@ -42,7 +81,12 @@
       </div>
 
       <div class="modal-footer">
-        <button class="close-button" @click="close"><b>Close</b></button>
+        <button
+          class="close-button"
+          @click="close"
+        >
+          <b>Close</b>
+        </button>
       </div>
     </div>
   </div>

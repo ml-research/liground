@@ -114,9 +114,9 @@ export default {
       engineName: null,
       localStorageSettings: null,
       currentlySwitchingVariant: false,
-      showConsole: true, // Flag to show Console
-      showExpandIcon: false, // Flag to show expand-down icon
-      showMinimizeIcon: true // Flag to show expand-up icon
+      showConsole: false, // Flag to show Console (default collapsed)
+      showExpandIcon: true, // Flag to show expand-down icon (default collapsed)
+      showMinimizeIcon: false // Flag to show expand-up icon
     }
   },
   computed: {
