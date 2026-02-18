@@ -1,5 +1,5 @@
 <template>
-  <div class="addCommentModal" 
+  <div class="addCommentModal"
   @keydown.stop
   @keyup.stop>
     <div

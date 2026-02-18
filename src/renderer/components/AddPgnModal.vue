@@ -148,7 +148,7 @@ export default {
       }
     },
     convertAndStorePgn (data) {
-      const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
+      const regex = /((?:\[[^\]]+\][\r\n]+)+[\r\n]+(?:[^[][\s\S]*)?(?=(?:\[[^\]]+\][\r\n]+)|$))/g
       let games = []
       if (this.$store.getters.loadedGames) { // keep already loaded pgns
         games = this.$store.getters.loadedGames
@@ -161,19 +161,17 @@ export default {
         if (m.index === regex.lastIndex) {
           regex.lastIndex++
         }
-        m.forEach((match, groupIndex) => {
-          let game
-          try {
-            game = ffish.readGamePGN(match)
-          } catch (error) {
-            numOfUnparseableGames = numOfUnparseableGames + 1
-            return
-          }
-          currentGameCount++
-          // Store the original PGN text for comment extraction
-          game.originalPGN = match
-          games.push(game)
-        })
+        let game
+        try {
+          game = ffish.readGamePGN(m[0])
+        } catch (error) {
+          numOfUnparseableGames = numOfUnparseableGames + 1
+          continue
+        }
+        currentGameCount++
+        // Store the original PGN text for comment extraction
+        game.originalPGN = m[0]
+        games.push(game)
       }
 
       if (numOfUnparseableGames !== 0) {

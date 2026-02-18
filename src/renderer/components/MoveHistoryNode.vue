@@ -329,13 +329,17 @@ export default {
       this.showCommentModal = true
     },
     saveComment (commentText) {
-      this.move.comment = commentText
+      // Prop darf nicht direkt mutiert werden
+      const updatedMove = { ...this.move, comment: commentText }
+      this.$emit('update-move', updatedMove)
       this.showCommentModal = false
       this.$store.dispatch('displayMenu', true)
       this.$store.dispatch('menuAtMove', null)
     },
     deleteCommentFromMove () {
-      this.move.comment = undefined
+      // Prop darf nicht direkt mutiert werden
+      const updatedMove = { ...this.move, comment: undefined }
+      this.$emit('update-move', updatedMove)
       this.showCommentModal = false
       this.$store.dispatch('displayMenu', true)
       this.$store.dispatch('menuAtMove', null)

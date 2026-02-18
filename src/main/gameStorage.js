@@ -2,6 +2,15 @@ import fs from 'fs'
 import path from 'path'
 import { app } from 'electron'
 
+export function clearAllGamePaths () {
+  try {
+    fs.writeFileSync(savedGamesPath, JSON.stringify({ games: [] }, null, 2), 'utf8')
+    return true
+  } catch (error) {
+    console.error('Error clearing all game paths:', error)
+    return false
+  }
+}
 const appDataPath = app.getPath('userData')
 const savedGamesPath = path.join(appDataPath, 'savedGames.json')
 
