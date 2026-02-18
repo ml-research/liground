@@ -170,7 +170,7 @@ async function downloadBinary (fileName, urlMap) {
 downloadBinary('stockfish', {
   linux: { url: 'https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-ubuntu-x86-64-avx2.tar', kind: 'tar', entry: 'stockfish/stockfish-ubuntu-x86-64-avx2' },
   win: { url: 'https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-windows-x86-64-avx2.zip', kind: 'zip', entry: 'stockfish/stockfish-windows-x86-64-avx2.exe' },
-  mac: { url: 'https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-macos-universal.zip', kind: 'zip', entry: 'stockfish/stockfish-macos-universal' }
+  mac: { url: 'https://github.com/official-stockfish/Stockfish/releases/download/sf_17/stockfish-macos-x86-64-avx2.tar', kind: 'zip', entry: 'stockfish/stockfish-macos-universal' }
 })
 
 downloadBinary('multi-variant-stockfish', {
@@ -180,6 +180,6 @@ downloadBinary('multi-variant-stockfish', {
 })
 
 downloadBinary('fairy-stockfish', {
-  linux: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_14/fairy-stockfish-largeboard_x86-64',
-  win: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_14/fairy-stockfish-largeboard_x86-64.exe'
+  linux: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_14_0_1_xq/fairy-stockfish-largeboard_x86-64',
+  win: 'https://github.com/fairy-stockfish/Fairy-Stockfish/releases/download/fairy_sf_14_0_1_xq/fairy-stockfish-largeboard_x86-64.exe'
 })

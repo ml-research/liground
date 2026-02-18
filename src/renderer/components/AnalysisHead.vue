@@ -43,8 +43,29 @@
       :show-labels="false"
       @input="updateVariant"
     />
+    <div class="resetButton">
+      <input
+        type="button"
+        value="Reset"
+        class="reset"
+        @click="resetBoard"
+      >
+    </div>
+    <Mode960 v-if="QuickTourIndex !== 8" />
+    <Mode960
+      v-else
+      id="Mode960-qt"
+    />
 
-    <!-- Style Selectors (Piece and Board) -->
+    <!-- Start New Game button  -->
+    <div v-if="QuickTourIndex !== 10" id="StartGameButton">
+      <button class="startGame" @click="openStartModal">Start New Game</button>
+    </div>
+    <div v-else id="StartGameButton-qt">
+      <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+    </div>
+
+    <!-- Style Selectors -->
     <div class="style-selectors">
       <PieceStyleSelector v-if="QuickTourIndex !== 5" id="piece-style-top" />
       <PieceStyleSelector v-else id="piece-style-top-qt" />
@@ -77,6 +98,13 @@
 
     <!-- Modal component for selecting roles for white/black (UI only) -->
     <StartGameModal :visible="showStartModal" @close="closeStartModal" @start="handleStart" />
+    <!-- Game End Modal popup after a game ends that was started via new game modal -->
+    <GameEndModal
+      :visible="showGameEndModal"
+      :gameConfig="gameConfig"
+      :stats="gameStats"
+      @close="closeGameEndModal"
+    />
   </div>
 </template>
 
@@ -84,15 +112,17 @@
 import Multiselect from 'vue-multiselect'
 import Mode960 from './Mode960'
 import StartGameModal from './StartGameModal.vue' // Modal to select Player/Engine for White & Black
+import GameEndModal from './GameEndModal.vue' // Modal displayed when a game ends
 import PgnBrowser from './PgnBrowser.vue'
 import PieceStyleSelector from './PieceStyleSelector.vue'
 import BoardStyleSelector from './BoardStyleSelector.vue'
-import { mapGetters, mapState } from 'vuex' 
+import EvalPlotButton from './EvalPlotButton.vue'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, StartGameModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector
+    Multiselect, Mode960, StartGameModal, GameEndModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector, EvalPlotButton
   },
   data () {
     return {
@@ -116,27 +146,51 @@ export default {
     displayVariant () { // retuns the "nice" name of the current variant
       return this.variantOptions.revGet(this.variant)
     },
-    ...mapGetters(['QuickTourIndex'])
+    ...mapGetters(['QuickTourIndex', 'gameConfig', 'showGameEndModal']),
+    showGameEndModal () {
+      return this.$store.getters.showGameEndModal
+    },
+    gameConfig () {
+      return this.$store.getters.gameConfig
+    },
+    gameStats () {
+      // TODO: compute stats from board state (accuracy, move count, etc.)
+      return {
+        whiteAccuracy: null,
+        blackAccuracy: null,
+        moveCount: this.$store.getters.moves.length,
+        gameLength: null
+      }
+    }
   },
   methods: {
     updateVariant (payload) {
       this.$emit('updateVariant')
       this.$store.dispatch('variant', this.variantOptions.get(payload))
     },
-    resetBoard () {
+    async resetBoard () {
       if (confirm('Do you really want to reset the board?')) {
         document.dispatchEvent(new Event('resetPlot'))
+        // Abort any running games/engines to ensure clean reset
+        try {
+          await this.$store.dispatch('PvEfalse')
+        } catch (e) {}
+        try {
+          await this.$store.dispatch('EvEfalse')
+        } catch (e) {}
+        try {
+          await this.$store.dispatch('stopEngine')
+        } catch (e) {}
+
         this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
         this.$emit('resetMultiEngine')
       }
     },
 
-    // Open the Start Game modal
     openStartModal () {
       this.showStartModal = true
     },
 
-    // Close the Start Game modal
     closeStartModal () {
       this.showStartModal = false
     },
@@ -159,10 +213,35 @@ export default {
     // Handle start request from modal; this is a UI-only stub for now
     // Payload example: { white: 'player'|'engine', black: 'player'|'engine' }
     handleStart (payload) {
-      // TODO: wire-up actual game start logic in future
-      console.log('[StartGame] Requested start with', payload)
-      this.$emit('startNewGame', payload) // notify parent (if needed)
+      // Stop any running PvE/EvE before starting new game to clean up old engine listeners
+      this.$store.dispatch('PvEfalse')
+      this.$store.dispatch('EvEfalse')
+      this.$store.dispatch('resetBoard', { is960: false })
+      this.$store.dispatch('setGameConfig', payload)
+      const isPvP = payload.white === 'player' && payload.black === 'player'
+      const isEvE = payload.white === 'engine' && payload.black === 'engine'
+      const isPvE = !isPvP && !isEvE
+      if (isPvE) {
+        const playerIsWhite = payload.white === 'player'
+        this.$store.dispatch('PvEtrue', { playerIsWhite })
+      } else if (isEvE) {
+        // start Engine vs Engine with provided engine names and limiter settings
+        this.$store.dispatch('EvEtrue', {
+          gameMode: payload.gameMode,
+          whiteEngine: payload.whiteEngine,
+          blackEngine: payload.blackEngine,
+          whiteLimiter: payload.whiteLimiter,
+          blackLimiter: payload.blackLimiter
+        })
+      } else {
+        // PvP mode - no special setup needed
+      }
+      this.$emit('startNewGame', payload)
       this.closeStartModal()
+    },
+
+    closeGameEndModal () {
+      this.$store.dispatch('closeGameEndModal')
     }
   }
 }
@@ -263,13 +342,11 @@ export default {
     font-size: 12pt;
     padding: 0 5px;
   }
-  
   .startGame,
   .startGame-qt {
     padding: 4px 8px;
     font-size: 12px;
   }
-  
   .reset {
     padding-top: 3px;
     padding-bottom: 3px;

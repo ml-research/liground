@@ -1,12 +1,28 @@
 <template>
   <div
-    class="progress"
-    :class="{ flip : orientation === 'black' }"
+    class="eval-bars"
+    :class="{ flip: orientation === 'black' }"
   >
-    <div
-      class="progress-value"
-      :style="{ height: `${100 - cpForWhitePerc * 100}%` }"
-    />
+    <div class="progress">
+      <div
+        class="progress-value"
+        :style="{ height: `${100 - cpForWhitePerc * 100}%` }"
+      />
+    </div>
+    <div v-if="hasWdlData" class="wdl">
+      <div
+        class="wdl-seg wdl-win"
+        :style="{ height: `${wdlWinPct}%` }"
+      />
+      <div
+        class="wdl-seg wdl-draw"
+        :style="{ height: `${wdlDrawPct}%` }"
+      />
+      <div
+        class="wdl-seg wdl-loss"
+        :style="{ height: `${wdlLossPct}%` }"
+      />
+    </div>
   </div>
 </template>
 
@@ -16,12 +32,33 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'EvalBar',
   computed: {
-    ...mapGetters(['orientation', 'cpForWhitePerc'])
+    ...mapGetters(['orientation', 'cpForWhitePerc', 'cpForWhite', 'wdlForWhiteWinPct', 'wdlForWhiteDrawPct', 'wdlForWhiteLossPct', 'currentMove']),
+    wdlWinPct () {
+      return this.wdlForWhiteWinPct ?? 0
+    },
+    wdlDrawPct () {
+      return this.wdlForWhiteDrawPct ?? 0
+    },
+    wdlLossPct () {
+      return this.wdlForWhiteLossPct ?? 0
+    },
+    hasWdlData () {
+      const uciShowWdl = this.$store.state.engineSettings.UCI_ShowWDL
+      return uciShowWdl === true &&
+        this.wdlForWhiteWinPct !== null &&
+        this.wdlForWhiteDrawPct !== null &&
+        this.wdlForWhiteLossPct !== null
+    }
   }
 }
 </script>
 
 <style scoped>
+.eval-bars {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
 .progress {
   position: relative;
   width: 22px;
@@ -52,4 +89,23 @@ export default {
   background: var(--main-text-color);
   transition: height .25s ease;
 }
+
+.wdl {
+  width: 22px;
+  height: 600px;
+  border: 1px solid var(--main-border-color);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--second-bg-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.wdl-seg {
+  width: 100%;
+  transition: height .25s ease;
+}
+.wdl-win { background: #4caf50; }
+.wdl-draw { background: #f4c542; }
+.wdl-loss { background: #e84c3d; }
 </style>

@@ -1,7 +1,6 @@
 <template>
   <div v-if="visible" class="modal-overlay" @click.self="close">
     <div class="modal-content" role="dialog" aria-modal="true">
-      <!-- Modal header -->
       <div class="modal-header">
         <h3>Start New Game</h3>
       </div>
@@ -111,12 +110,20 @@
           </div>
         </div>
 
+        <div class="modal-options">
+          <label class="checkbox-label">
+            <input type="checkbox" v-model="showEndGameModal" /> Show game result modal at game end
+          </label>
+        </div>
+
         <p class="hint">Choose whether each side should be controlled by a human player or an engine (PvP, PvE, EvE supported). Only engines that support the selected Game Mode are listed.</p>
       </div>
 
-      <!-- Modal footer: Start (left) and Close (right) -->
       <div class="modal-footer">
-        <button class="start-button" @click="startGame"><b>Start Game</b></button>
+        <div class="footer-left">
+          <button class="start-button" :disabled="startDisabled" :title="disabledReason" @click="startGame"><b>Start Game</b></button>
+          <span v-if="disabledReason" class="disabled-hint">{{ disabledReason }}</span>
+        </div>
         <button class="close-button" @click="close"><b>Close</b></button>
       </div>
     </div>
@@ -129,7 +136,6 @@ import Multiselect from 'vue-multiselect'
 export default {
   name: 'StartGameModal',
   props: {
-    // Controls visibility of the modal; parent toggles it.
     visible: {
       type: Boolean,
       default: false
@@ -138,27 +144,7 @@ export default {
   components: { Multiselect },
   data () {
     return {
-      // Default selections
-      whiteChoice: 'player',
-      blackChoice: 'engine',
-
-      // Game mode (local to modal) — default to current app variant
-      selectedGameMode: this.$store.getters.variant,
-
-      // Engine selections (UI-only, store objects)
-      whiteEngineObj: null,
-      blackEngineObj: null,
-
-      // Limiter options per engine (UI-only)
-      options: ['time', 'nodes', 'depth'],
-
-      whiteLimiterEnabled: true,
-      whiteLimiterType: 'time',
-      whiteLimiterValue: 1000, // ms default
-
-      blackLimiterEnabled: true,
-      blackLimiterType: 'time',
-      blackLimiterValue: 1000 // ms default
+      options: ['time', 'nodes', 'depth']
     }
   },
   computed: {
@@ -175,34 +161,165 @@ export default {
         .filter(e => e.variants && e.variants.includes(this.selectedGameMode))
     },
 
+    // Store-backed UI state
+    selectedGameMode: {
+      get () {
+        const s = this.$store.state.startGameModal && this.$store.state.startGameModal.selectedGameMode
+        return s || this.$store.getters.variant
+      },
+      set (v) {
+        this.$store.commit('startGameModal', { selectedGameMode: v })
+      }
+    },
+
+    whiteChoice: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.whiteChoice) || 'player' },
+      set (v) { this.$store.commit('startGameModal', { whiteChoice: v }) }
+    },
+
+    blackChoice: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.blackChoice) || 'engine' },
+      set (v) { this.$store.commit('startGameModal', { blackChoice: v }) }
+    },
+
+    whiteEngineObj: {
+      get () {
+        const name = this.$store.state.startGameModal && this.$store.state.startGameModal.whiteEngineName
+        if (!name) return null
+        const info = this.$store.state.allEngines && this.$store.state.allEngines[name]
+        return Object.assign({ name }, info || {})
+      },
+      set (v) {
+        const name = v && v.name ? v.name : v
+        this.$store.commit('startGameModal', { whiteEngineName: name })
+      }
+    },
+
+    blackEngineObj: {
+      get () {
+        const name = this.$store.state.startGameModal && this.$store.state.startGameModal.blackEngineName
+        if (!name) return null
+        const info = this.$store.state.allEngines && this.$store.state.allEngines[name]
+        return Object.assign({ name }, info || {})
+      },
+      set (v) {
+        const name = v && v.name ? v.name : v
+        this.$store.commit('startGameModal', { blackEngineName: name })
+      }
+    },
+
+    whiteLimiterEnabled: {
+      get () { return !!(this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterEnabled) },
+      set (v) { this.$store.commit('startGameModal', { whiteLimiterEnabled: !!v }) }
+    },
+
+    whiteLimiterType: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterType) || 'time' },
+      set (v) { this.$store.commit('startGameModal', { whiteLimiterType: v }) }
+    },
+
+    whiteLimiterValue: {
+      get () {
+        const s = this.$store.state.startGameModal && this.$store.state.startGameModal.whiteLimiterValue
+        return (typeof s !== 'undefined') ? s : 1000
+      },
+      set (v) { this.$store.commit('startGameModal', { whiteLimiterValue: v }) }
+    },
+
+    blackLimiterEnabled: {
+      get () { return !!(this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterEnabled) },
+      set (v) { this.$store.commit('startGameModal', { blackLimiterEnabled: !!v }) }
+    },
+
+    blackLimiterType: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterType) || 'time' },
+      set (v) { this.$store.commit('startGameModal', { blackLimiterType: v }) }
+    },
+
+    blackLimiterValue: {
+      get () {
+        const s = this.$store.state.startGameModal && this.$store.state.startGameModal.blackLimiterValue
+        return (typeof s !== 'undefined') ? s : 1000
+      },
+      set (v) { this.$store.commit('startGameModal', { blackLimiterValue: v }) }
+    },
+
     whiteEngineLogo () {
       return this.whiteEngineObj ? `url(${this.whiteEngineObj.logo || ''})` : ''
     },
 
     blackEngineLogo () {
       return this.blackEngineObj ? `url(${this.blackEngineObj.logo || ''})` : ''
+    },
+
+    showEndGameModal: {
+      get () { return (this.$store.state.startGameModal && this.$store.state.startGameModal.showEndGameModal) !== false },
+      set (v) { this.$store.commit('startGameModal', { showEndGameModal: !!v }) }
+    },
+
+    startDisabled () {
+      // Disable if white is engine but no engine selected
+      if (this.whiteChoice === 'engine' && !this.whiteEngineObj) {
+        return true
+      }
+      // Disable if black is engine but no engine selected
+      if (this.blackChoice === 'engine' && !this.blackEngineObj) {
+        return true
+      }
+
+      // If limiter is enabled for an engine side, its value must be valid (non-empty, >0)
+      if (this.whiteChoice === 'engine' && this.whiteLimiterEnabled && !this.isValidLimiterValue(this.whiteLimiterValue)) {
+        return true
+      }
+      if (this.blackChoice === 'engine' && this.blackLimiterEnabled && !this.isValidLimiterValue(this.blackLimiterValue)) {
+        return true
+      }
+
+      return false
+    },
+
+    disabledReason () {
+      // Engine selection reasons
+      if (this.whiteChoice === 'engine' && !this.whiteEngineObj && this.blackChoice === 'engine' && !this.blackEngineObj) {
+        return 'White and Black engines not selected'
+      }
+      if (this.whiteChoice === 'engine' && !this.whiteEngineObj) {
+        return 'White engine not selected'
+      }
+      if (this.blackChoice === 'engine' && !this.blackEngineObj) {
+        return 'Black engine not selected'
+      }
+
+      // Limiter reasons
+      if (this.whiteChoice === 'engine' && this.whiteLimiterEnabled && !this.isValidLimiterValue(this.whiteLimiterValue)) {
+        return 'White limiter value invalid'
+      }
+      if (this.blackChoice === 'engine' && this.blackLimiterEnabled && !this.isValidLimiterValue(this.blackLimiterValue)) {
+        return 'Black limiter value invalid'
+      }
+
+      return ''
     }
   },
   watch: {
     // If game mode changes, ensure selected engines still compatible
     selectedGameMode (newMode) {
-      if (this.whiteEngineObj && !this.whiteEngineObj.variants.includes(newMode)) {
-        this.whiteEngineObj = null
+      if (this.whiteEngineObj && !(this.whiteEngineObj.variants && this.whiteEngineObj.variants.includes(newMode))) {
+        this.$store.commit('startGameModal', { whiteEngineName: null })
       }
-      if (this.blackEngineObj && !this.blackEngineObj.variants.includes(newMode)) {
-        this.blackEngineObj = null
+      if (this.blackEngineObj && !(this.blackEngineObj.variants && this.blackEngineObj.variants.includes(newMode))) {
+        this.$store.commit('startGameModal', { blackEngineName: null })
       }
     },
     // When limiter type changes, apply sensible default values
     whiteLimiterType (type) {
-      this.whiteLimiterValue = this.defaultValueForType(type)
+      this.$store.commit('startGameModal', { whiteLimiterValue: this.defaultValueForType(type) })
     },
     blackLimiterType (type) {
-      this.blackLimiterValue = this.defaultValueForType(type)
+      this.$store.commit('startGameModal', { blackLimiterValue: this.defaultValueForType(type) })
     }
   },
   methods: {
-    // Close the modal and emit a close event so parent can update visibility.
     close () {
       this.$emit('close')
     },
@@ -237,35 +354,50 @@ export default {
       }
     },
 
-    // Emit a start event with the selected roles and close the modal.
-    // UI-only: We include engine and limiter selections in the emitted payload
-    // so the caller may wire functionality later.
-    startGame () {
+    // Consider empty/null/undefined as invalid; require positive finite number
+    isValidLimiterValue (value) {
+      if (value === null || value === '' || typeof value === 'undefined') return false
+      const num = Number(value)
+      return Number.isFinite(num) && num > 0
+    },
+
+    async startGame () {
+      if (this.selectedGameMode !== this.$store.getters.variant) {
+        await this.$store.dispatch('variant', this.selectedGameMode)
+      }
       const payload = {
         gameMode: this.selectedGameMode,
         white: this.whiteChoice,
         black: this.blackChoice,
+        showEndGameModal: this.showEndGameModal,
 
         // Engines are only relevant when a side is set to 'engine'. We emit names for simplicity
-        whiteEngine: this.whiteChoice === 'engine' && this.whiteEngineObj ? this.whiteEngineObj.name : null,
-        blackEngine: this.blackChoice === 'engine' && this.blackEngineObj ? this.blackEngineObj.name : null,
+        whiteEngine: (this.whiteChoice === 'engine' && this.whiteEngineObj)
+          ? this.whiteEngineObj.name
+          : null,
+        blackEngine: (this.blackChoice === 'engine' && this.blackEngineObj)
+          ? this.blackEngineObj.name
+          : null,
 
-        // Limiter configuration (UI-only)
-        whiteLimiter: this.whiteChoice === 'engine' ? {
-          enabled: this.whiteLimiterEnabled,
-          type: this.whiteLimiterType,
-          value: this.whiteLimiterValue
-        } : null,
-        blackLimiter: this.blackChoice === 'engine' ? {
-          enabled: this.blackLimiterEnabled,
-          type: this.blackLimiterType,
-          value: this.blackLimiterValue
-        } : null
+        // Limiter configuration for PvE and EvE modes
+        whiteLimiter: this.whiteChoice === 'engine'
+          ? {
+              enabled: this.whiteLimiterEnabled,
+              type: this.whiteLimiterType,
+              value: this.whiteLimiterValue
+            }
+          : null,
+        blackLimiter: this.blackChoice === 'engine'
+          ? {
+              enabled: this.blackLimiterEnabled,
+              type: this.blackLimiterType,
+              value: this.blackLimiterValue
+            }
+          : null
       }
 
       // PvP: both are players
       if (this.whiteChoice === 'player' && this.blackChoice === 'player') {
-        // TODO: implement player vs player setup
         this.$emit('start', payload)
         this.close()
         return
@@ -273,15 +405,6 @@ export default {
 
       // EvE: both are engines
       if (this.whiteChoice === 'engine' && this.blackChoice === 'engine') {
-        // Dispatch EvEtrue with engine names and limiter configs 
-        this.$store.dispatch('EvEtrue', {
-          whiteEngine: payload.whiteEngine,
-          blackEngine: payload.blackEngine,
-          whiteLimiter: payload.whiteLimiter,
-          blackLimiter: payload.blackLimiter
-        })
-
-        // Emit a start event as well (UI layer hook), then close
         this.$emit('start', payload)
         this.close()
         return
@@ -289,16 +412,18 @@ export default {
 
       // PvE: one side player, other engine
       const playerIsWhite = (this.whiteChoice === 'player')
-      if (playerIsWhite) {
-        const limiter = payload.blackLimiter
-      }
-      else {
-        const limiter = payload.whiteLimiter
-      }
-
       // Dispatch PvEtrue with information about which side is the player
       // (existing behavior; actual logic remains in the store)
-      this.$store.dispatch('PvEtrue', { playerIsWhite, limiter })
+      this.$store.dispatch('PvEtrue', {
+        playerIsWhite,
+        pveLimiter: playerIsWhite
+          ? payload.blackLimiter
+          : payload.whiteLimiter,
+        engine: playerIsWhite
+          ? payload.blackEngine
+          : payload.whiteEngine,
+        gameMode: payload.gameMode
+      })
 
       // Emit a start event as well (UI layer hook), then close
       this.$emit('start', payload)
@@ -323,8 +448,8 @@ export default {
 }
 
 .modal-content {
-  background: var(--card-background, #fff);
-  color: var(--text-color, #111);
+  background: var(--main-bg-color);
+  color: var(--main-text-color);
   width: 820px;
   max-width: calc(100% - 40px);
   height: 80vh;
@@ -338,7 +463,7 @@ export default {
 
 .modal-header {
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid var(--main-border-color);
 }
 
 .modal-body {
@@ -346,8 +471,8 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 12px;
-  overflow: auto; /* keep body scrollable while footer stays put */
-  flex: 1 1 auto; /* ensure body grows and footer remains fixed */
+  overflow: auto;
+  flex: 1 1 auto;
 }
 
 .game-mode {
@@ -359,21 +484,25 @@ export default {
 .side-select {
   display: flex;
   flex-direction: column;
-  min-height: 180px; /* reserve vertical space so footer doesn't jump */
+  min-height: 180px;
 }
 
-.side-select select {
+.side-select select,
+.game-mode select {
   margin-top: 6px;
   padding: 6px 8px;
   border-radius: 4px;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
+  border: 1px solid var(--main-border-color);
 }
 
 .engine-config {
   margin-top: 8px;
   padding: 8px;
-  border: 1px solid rgba(0,0,0,0.04);
+  border: 1px solid var(--main-border-color);
   border-radius: 6px;
-  background: var(--second-bg-color, #fafafa);
+  background: var(--second-bg-color);
 }
 
 .engine-select-row {
@@ -389,7 +518,7 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
-  background-color: var(--light-text-color);
+  background-color: var(--button-color);
   flex-shrink: 0;
 }
 
@@ -416,18 +545,44 @@ export default {
   width: 120px;
   padding: 6px 8px;
   border-radius: 4px;
+  background-color: var(--second-bg-color);
+  color: var(--main-text-color);
+  border: 1px solid var(--main-border-color);
 }
 
 .limiter-unit {
   font-size: 12px;
-  color: var(--muted-text, #666);
+  color: var(--main-text-color);
+  opacity: 0.7;
 }
 
 .hint {
   grid-column: 1 / -1;
   margin-top: 6px;
   font-size: 12px;
-  color: var(--muted-text, #666);
+  color: var(--main-text-color);
+  opacity: 0.7;
+}
+
+.modal-options {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--main-text-color);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  cursor: pointer;
 }
 
 .modal-footer {
@@ -435,28 +590,47 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(0,0,0,0.06);
-  /* keep footer fixed at bottom */
+  border-top: 1px solid var(--main-border-color);
   flex: 0 0 auto;
+  gap: 12px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.disabled-hint {
+  font-size: 12px;
+  color: var(--main-text-color);
+  opacity: 0.6;
+  font-style: italic;
 }
 
 .start-button {
-  background-color: #28a745; /* green */
+  background-color: var(--save-btn-color);
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
 }
 
-.start-button:hover { background-color: #1f8f3b; cursor: pointer; }
+.start-button:hover { background-color: var(--save-btn-hover); cursor: pointer; }
+
+.start-button:disabled {
+  background-color: var(--save-btn-color);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 
 .close-button {
-  background-color: #c72634; /* red */
+  background-color: var(--cancel-btn-color);
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
 }
 
-.close-button:hover { background-color: #8b1919; cursor: pointer; }
+.close-button:hover { background-color: var(--cancel-btn-hover); cursor: pointer; }
 </style>
