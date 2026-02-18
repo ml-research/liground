@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <!-- simple "cache hit" icon: database + check -->
+  <g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- database cylinder -->
+    <ellipse cx="10" cy="6" rx="6" ry="2.5"/>
+    <path d="M4 6v8c0 1.4 2.7 2.5 6 2.5"/>
+    <path d="M16 6v2"/>
+    <path d="M4 10c0 1.4 2.7 2.5 6 2.5"/>
+    <!-- checkmark (hit) -->
+    <path d="M15.2 16.5l2 2 3.8-4.2"/>
+  </g>
+</svg>

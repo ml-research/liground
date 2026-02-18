@@ -110,10 +110,11 @@ export default class EngineDriver {
         // extract wdl separately since it has format "wdl wins draws losses" (3 numbers)
         const wdlMatch = line.match(/\s+wdl\s+(\d+)\s+(\d+)\s+(\d+)/)
         if (wdlMatch) {
-          const wins = parseInt(wdlMatch[1])
-          const draws = parseInt(wdlMatch[2])
-          const losses = parseInt(wdlMatch[3])
+          const wins = parseInt(wdlMatch[1], 10)
+          const draws = parseInt(wdlMatch[2], 10)
+          const losses = parseInt(wdlMatch[3], 10)
           const sum = wins + draws + losses
+          info.wdl = [wins, draws, losses]
           if (sum > 0) {
             info.wdlWin = wins / sum
             info.wdlDraw = draws / sum
@@ -121,9 +122,9 @@ export default class EngineDriver {
           }
         }
         // parse other info fields (without wdl)
-        const regexp = /\s+(depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time|pv)\s+(.+?)(?=\s+(?:depth|seldepth|time|nodes|pv|multipv|score|currmove|currmovenumber|hashfull|nps|tbhits|cpuload|string|refutation|currline)|\s*$)/g
+        const regexp = /\s+(depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time|pv)\s+(.+?)(?=\s+(?:depth|seldepth|time|nodes|pv|multipv|score|currmove|currmovenumber|hashfull|nps|tbhits|cpuload|string|refutation|currline|wdl)|\s*$)/g
         for (const [, type, value] of line.matchAll(regexp)) {
-          info[type] = type.match(/depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time/) ? parseInt(value) : value
+          info[type] = type.match(/depth|seldepth|multipv|cp|mate|nodes|nps|hashfull|tbhits|time/) ? parseInt(value, 10) : value
         }
         this.events.emit('info', info)
         break
