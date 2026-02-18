@@ -119,7 +119,7 @@ function extractCommentsFromPGN (pgnText) {
     if (token.match(/^\d+\.\.?$/) || !token.trim() || token === '*') {
       continue
     }
-    if (token.match(/^\{[^}]*\}$/)) {//this checks if it´s a comment
+    if (token.match(/^\{[^}]*\}$/)) { // this checks if it´s a comment
       const commentText = token.replace(/^\{/, '').replace(/\}$/, '')
       if (lastWasMove) {
         commentMap[moveIndex - 1] = commentText

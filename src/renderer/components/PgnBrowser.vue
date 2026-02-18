@@ -277,16 +277,12 @@ export default {
       if (confirm('Do you really want to remove the safed PGNs and reset the board?')) {
         document.dispatchEvent(new Event('resetPlot'))
         this.$store.dispatch('resetBoard', { is960: false }) // used to exit 960 Mode
-      }
-      if (this.$store.getters.loadedGames) {
-        // Remove all saved game paths from storage
-        for (const game of this.$store.getters.loadedGames) {
-          if (game.filePath && ipcRenderer) {
-            ipcRenderer.invoke('remove-game-path', game.filePath)
-          }
+        if (ipcRenderer) {
+          ipcRenderer.invoke('clear-all-game-paths')
         }
         const games = []
         this.$store.dispatch('loadedGames', games)
+        localStorage.removeItem('PGNPath')
       }
     }
   }

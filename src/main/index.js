@@ -1,7 +1,16 @@
 'use strict'
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
-import { addGamePath, removeGamePath, getAllSavedGamePaths } from './gameStorage'
+import { addGamePath, removeGamePath, getAllSavedGamePaths, clearAllGamePaths } from './gameStorage'
+// IPC handler to clear all saved game paths
+ipcMain.handle('clear-all-game-paths', async () => {
+  try {
+    const success = clearAllGamePaths()
+    return { success }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
 
 /**
  * Set `__static` path to static files in production

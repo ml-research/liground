@@ -148,7 +148,8 @@ export default {
       }
     },
     convertAndStorePgn (data) {
-      const regex = /((?:\[[^\]]+\][\r\n]+)+[\r\n]+(?:[^\[]([\s\S]*?))(?=(?:\[[^\]]+\][\r\n]+)|$))/g //liest jetzt auch kommentare
+      // Liest jetzt auch Kommentare
+      const regex = /((?:\[[^\]]+\][\r\n]+)+[\r\n]+(?:[^[]([\s\S]*?))(?=(?:\[[^\]]+\][\r\n]+)|$))/g
       let games = []
       if (this.$store.getters.loadedGames) { // keep already loaded pgns
         games = this.$store.getters.loadedGames

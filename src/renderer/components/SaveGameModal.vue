@@ -172,7 +172,7 @@ export default {
           ]
         })
         if (result.canceled) {
-          //if user canceld -> close the modal
+          // if user canceld -> close the modal
           this.$emit('close')
           alert(`Game "${this.gameName}" saved to library!`)
           return

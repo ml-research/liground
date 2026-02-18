@@ -2,12 +2,17 @@ import fs from 'fs'
 import path from 'path'
 import { app } from 'electron'
 
+export function clearAllGamePaths () {
+  try {
+    fs.writeFileSync(savedGamesPath, JSON.stringify({ games: [] }, null, 2), 'utf8')
+    return true
+  } catch (error) {
+    console.error('Error clearing all game paths:', error)
+    return false
+  }
+}
 const appDataPath = app.getPath('userData')
 const savedGamesPath = path.join(appDataPath, 'savedGames.json')
-
-/**
- * Load all saved game file paths
- */
 export function loadSavedGamePaths () {
   try {
     if (fs.existsSync(savedGamesPath)) {
@@ -19,9 +24,6 @@ export function loadSavedGamePaths () {
   }
   return { games: [] }
 }
-/**
- * Save a game file path to the registry
- */
 export function addGamePath (filePath) {
   try {
     const data = loadSavedGamePaths()
@@ -36,9 +38,6 @@ export function addGamePath (filePath) {
     return false
   }
 }
-/**
- * Remove a game file path from the registry
- */
 export function removeGamePath (filePath) {
   try {
     const data = loadSavedGamePaths()
@@ -50,9 +49,6 @@ export function removeGamePath (filePath) {
     return false
   }
 }
-/**
- * Get all saved game file paths
- */
 export function getAllSavedGamePaths () {
   const data = loadSavedGamePaths()
   const existingPaths = []
@@ -61,7 +57,6 @@ export function getAllSavedGamePaths () {
       if (fs.existsSync(filePath)) {
         existingPaths.push(filePath)
       } else {
-        // File no longer exists, remove it from the list
         removeGamePath(filePath)
       }
     } catch (error) {
