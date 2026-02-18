@@ -1,6 +1,7 @@
 <template>
   <div class="settings">
-    <div class="panel"> <!-- LiGround Settings -->
+    <div class="panel">
+      <!-- LiGround Settings -->
       <span class="title">LiGround Settings</span>
       <div class="switch-container">
         <span>Dark Mode</span>
@@ -21,7 +22,8 @@
         Reset to defaults
       </a>
     </div>
-    <div class="panel"> <!-- Engine Settings -->
+    <div class="panel">
+      <!-- Engine Settings -->
       <span class="title">Engine Settings</span>
       <div class="bar">
         <EngineSelect

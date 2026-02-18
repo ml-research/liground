@@ -76,16 +76,16 @@ export default {
       }
     },
     handleEnter () {
-      let value = this.inputValue.trim()
-      
+      const value = this.inputValue.trim()
+
       // Allow empty input
       if (value === '' || value === null) {
         this.curVar = ''
         return
       }
-      
-      let num = parseInt(value, 10)
-      
+
+      const num = parseInt(value, 10)
+
       // Check if input is a valid number
       if (isNaN(num)) {
         alert('Please enter a valid number')
@@ -95,7 +95,7 @@ export default {
         }, 0)
         return
       }
-      
+
       // Validate range (0-960)
       if (num < 0 || num > 960) {
         alert('Please enter a number between 0 and 960')
@@ -105,33 +105,33 @@ export default {
         }, 0)
         return
       }
-      
+
       // Update on success
       this.updateBoard(num)
     },
     validateInput () {
-      let value = this.inputValue.trim()
-      
+      const value = this.inputValue.trim()
+
       // Allow empty input
       if (value === '' || value === null) {
         this.curVar = ''
         return false
       }
-      
-      let num = parseInt(value, 10)
-      
+
+      const num = parseInt(value, 10)
+
       // Check if input is a valid number
       if (isNaN(num)) {
         alert('Please enter a valid number')
         return false
       }
-      
+
       // Validate range (0-960)
       if (num < 0 || num > 960) {
         alert('Please enter a number between 0 and 960')
         return false
       }
-      
+
       return true
     },
     updateBoard (num = null) {
@@ -140,7 +140,7 @@ export default {
         if (num === null) {
           num = parseInt(this.inputValue.trim(), 10)
         }
-        
+
         this.curVar = num
         this.inputValue = num.toString()
         if (this.variant === 'horde') {

@@ -13,15 +13,37 @@
 
     <!-- Start New Game button -->
     <div class="button-group">
-      <div v-if="QuickTourIndex !== 10" id="StartGameButton">
-        <button class="startGame" @click="openStartModal">Start New Game</button>
+      <div
+        v-if="QuickTourIndex !== 10"
+        id="StartGameButton"
+      >
+        <button
+          class="startGame"
+          @click="openStartModal"
+        >
+          Start New Game
+        </button>
       </div>
-      <div v-else id="StartGameButton-qt">
-        <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+      <div
+        v-else
+        id="StartGameButton-qt"
+      >
+        <button
+          class="startGame-qt"
+          @click="openStartModal"
+        >
+          Start New Game
+        </button>
       </div>
 
       <!-- PGN Browser button -->
-      <button class="pgnBrowserBtn" @click="openPgnBrowser" title="Open PGN Browser">📋 PGN Browser</button>
+      <button
+        class="pgnBrowserBtn"
+        title="Open PGN Browser"
+        @click="openPgnBrowser"
+      >
+        📋 PGN Browser
+      </button>
     </div>
 
     <!-- Mode Selection -->
@@ -58,23 +80,57 @@
     />
 
     <!-- Start New Game button  -->
-    <div v-if="QuickTourIndex !== 10" id="StartGameButton">
-      <button class="startGame" @click="openStartModal">Start New Game</button>
+    <div
+      v-if="QuickTourIndex !== 10"
+      id="StartGameButton"
+    >
+      <button
+        class="startGame"
+        @click="openStartModal"
+      >
+        Start New Game
+      </button>
     </div>
-    <div v-else id="StartGameButton-qt">
-      <button class="startGame-qt" @click="openStartModal">Start New Game</button>
+    <div
+      v-else
+      id="StartGameButton-qt"
+    >
+      <button
+        class="startGame-qt"
+        @click="openStartModal"
+      >
+        Start New Game
+      </button>
     </div>
 
     <!-- Style Selectors -->
     <div class="style-selectors">
-      <PieceStyleSelector v-if="QuickTourIndex !== 5" id="piece-style-top" />
-      <PieceStyleSelector v-else id="piece-style-top-qt" />
-      <BoardStyleSelector v-if="QuickTourIndex !== 5" id="board-style-top" />
-      <BoardStyleSelector v-else id="board-style-top-qt" />
+      <PieceStyleSelector
+        v-if="QuickTourIndex !== 5"
+        id="piece-style-top"
+      />
+      <PieceStyleSelector
+        v-else
+        id="piece-style-top-qt"
+      />
+      <BoardStyleSelector
+        v-if="QuickTourIndex !== 5"
+        id="board-style-top"
+      />
+      <BoardStyleSelector
+        v-else
+        id="board-style-top-qt"
+      />
     </div>
 
     <!-- Flip Board Button -->
-    <button class="flipBoardBtn" @click="flipBoard" title="Flip Board">🔄 Flip</button>
+    <button
+      class="flipBoardBtn"
+      title="Flip Board"
+      @click="flipBoard"
+    >
+      🔄 Flip
+    </button>
 
     <!-- 960 Board -->
     <Mode960 v-if="QuickTourIndex !== 8 && (variant === 'fischerandom' || variant === 'chess960')" />
@@ -84,11 +140,20 @@
     />
 
     <!-- PGN Browser Modal -->
-    <div v-if="showPgnModal" class="pgn-modal-overlay" @click.self="showPgnModal = false">
+    <div
+      v-if="showPgnModal"
+      class="pgn-modal-overlay"
+      @click.self="showPgnModal = false"
+    >
       <div class="pgn-modal-content">
         <div class="pgn-modal-header">
           <h3>PGN Browser</h3>
-          <button class="pgn-modal-close" @click="showPgnModal = false">×</button>
+          <button
+            class="pgn-modal-close"
+            @click="showPgnModal = false"
+          >
+            ×
+          </button>
         </div>
         <div class="pgn-modal-body">
           <PgnBrowser />
@@ -97,11 +162,15 @@
     </div>
 
     <!-- Modal component for selecting roles for white/black (UI only) -->
-    <StartGameModal :visible="showStartModal" @close="closeStartModal" @start="handleStart" />
+    <StartGameModal
+      :visible="showStartModal"
+      @close="closeStartModal"
+      @start="handleStart"
+    />
     <!-- Game End Modal popup after a game ends that was started via new game modal -->
     <GameEndModal
       :visible="showGameEndModal"
-      :gameConfig="gameConfig"
+      :game-config="gameConfig"
       :stats="gameStats"
       @close="closeGameEndModal"
     />
@@ -116,13 +185,12 @@ import GameEndModal from './GameEndModal.vue' // Modal displayed when a game end
 import PgnBrowser from './PgnBrowser.vue'
 import PieceStyleSelector from './PieceStyleSelector.vue'
 import BoardStyleSelector from './BoardStyleSelector.vue'
-import EvalPlotButton from './EvalPlotButton.vue'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'AnalysisHead',
   components: {
-    Multiselect, Mode960, StartGameModal, GameEndModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector, EvalPlotButton
+    Multiselect, Mode960, StartGameModal, GameEndModal, PgnBrowser, PieceStyleSelector, BoardStyleSelector
   },
   data () {
     return {

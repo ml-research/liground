@@ -1,11 +1,22 @@
 <template>
   <div class="base-demo">
     <VueTableDynamic :params="params">
-      <template v-slot:column-0="{ props }">
+      <template #column-0="{ props }">
         <span v-if="props.row === 0">{{ props.cellData }}</span>
-        <span v-else class="engine-stats__depth-cell">
-          <img v-if="isEvalCached" :src="cacheHitIcon" alt="Cache hit" class="engine-stats__icon">
-          <span v-if="isEvalCached" class = "engine-stats__eval-depth">d = {{ evalCacheDepth }}</span>
+        <span
+          v-else
+          class="engine-stats__depth-cell"
+        >
+          <img
+            v-if="isEvalCached"
+            :src="cacheHitIcon"
+            alt="Cache hit"
+            class="engine-stats__icon"
+          >
+          <span
+            v-if="isEvalCached"
+            class="engine-stats__eval-depth"
+          >d = {{ evalCacheDepth }}</span>
           <span>{{ props.cellData }}</span>
         </span>
       </template>
