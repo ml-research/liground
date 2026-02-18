@@ -20,7 +20,7 @@
 }
 .dim9x9 .cg-wrap piece {
     width: calc( 100% / 9);
-    height: calc( 100% / 9);
+    height: calc( 100% / 9); 
 }
 .dim9x9 cg-board square {
     width: calc( 100% / 9);

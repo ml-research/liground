@@ -1,6 +1,4 @@
-
 <template>
-  <!-- PvE Switch is a Legacy Component replaced by NewGameButton -->
   <div class="panel">
     <label class="switch">
       <input
@@ -36,63 +34,41 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth', 'PvEPlayerIsWhite'])
+    ...mapGetters(['PvE', 'active', 'turn', 'multipv', 'depth'])
   },
   watch: {
     depth () {
-      // If the analysis depth changes while in PvE during the player's turn, reset engine data.
-      if (this.active && this.PvE && this.depth > 0) {
-        const engineToMoveNow = (this.turn && !this.PvEPlayerIsWhite) || (!this.turn && this.PvEPlayerIsWhite)
-        if (!engineToMoveNow) {
-          this.$store.dispatch('resetEngineData')
-          this.$store.commit('resetEngineTime')
-        }
+      if (this.active && this.PvE && this.turn && this.depth > 0) {
+        this.$store.dispatch('resetEngineData')
+        this.$store.commit('resetEngineTime')
       }
     },
     turn () {
-      if (this.PvE) {
-        const engineToMoveNow = (this.turn && !this.PvEPlayerIsWhite) || (!this.turn && this.PvEPlayerIsWhite)
-        if (!engineToMoveNow) { // player turn: reset engine timers/data.
-          this.$store.dispatch('resetEngineData')
-          this.$store.commit('resetEngineTime')
-        } else { // engine turn: start engine for PvE.
-          engine.send('stop')
-          this.$store.dispatch('goEnginePvE')
-        }
+      if (this.turn && this.PvE) {
+        this.$store.dispatch('resetEngineData')
+        this.$store.commit('resetEngineTime')
       }
     },
-
     PvE () {
-      // This watcher reacts to entering/exiting PvE mode.
       if (!this.active && !this.PvE && this.turn) {
         this.$store.dispatch('position')
       }
-
-      if (this.active && this.PvE) {
-        const engineToMoveNow = (this.turn && !this.PvEPlayerIsWhite) || (!this.turn && this.PvEPlayerIsWhite)
-        if (!engineToMoveNow) {
-          // player turn: reset engine state and stop any running PvE engine task.
-          this.$store.dispatch('resetEngineData')
-          this.$store.commit('resetEngineTime')
-          this.$store.dispatch('stopEnginePvE')
-        } else {
-          // engine turn: start engine for PvE.
-          engine.send('stop')
-          this.$store.dispatch('goEnginePvE')
-        }
+      if (this.active && this.PvE && this.turn) {
+        this.$store.dispatch('resetEngineData')
+        this.$store.commit('resetEngineTime')
+        this.$store.dispatch('stopEnginePvE')
       }
-
-      // Note: starting PvE via the switch intentionally sets playerIsWhite: true (human = White).
-      // The actual behavior for "player is Black" is handled in the store 'PvEtrue' action which
-      // will kick off the engine immediately if the engine must move on enable.
+      if (this.active && this.PvE && !this.turn) {
+        // may lead to an inconsistent engine
+        engine.send('stop')
+        this.$store.dispatch('goEnginePvE')
+      }
     }
   },
   methods: {
     onClick () {
       if (!this.PvE) {
-        // PvESwitch historically starts PvE with the human as White.
-        // Pass playerIsWhite: true to preserve legacy behavior.
-        this.$store.dispatch('PvEtrue', { playerIsWhite: true })
+        this.$store.dispatch('PvEtrue')
         if (confirm('Do you want to start with opening suit?')) {
           this.openingSuit()
         }

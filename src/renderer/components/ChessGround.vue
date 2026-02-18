@@ -23,7 +23,6 @@
       <div
         id="chessboard"
         :class="{ koth: variant==='kingofthehill', rk: variant==='racingkings', dim8x8: dimensionNumber===0, dim9x10: dimensionNumber === 3 , dim9x9: dimensionNumber === 1 }"
-        :style="{ pointerEvents: boardPointerEvents }"
         @mousewheel.ctrl.prevent="resize($event)"
       >
         <div
@@ -214,24 +213,7 @@ export default {
         return undefined
       }
     },
-    isPlayerTurn () {
-      // In PvE: allow moves only when it's the player's turn
-      if (this.PvE) {
-        const playerCanMove = (this.turn === 'white') === this.PvEPlayerIsWhite
-        return playerCanMove
-      }
-      // In EvE: never allow player moves (both sides are engines)
-      if (this.EvE) {
-        return false
-      }
-      // In PvP or analysis mode: always allow moves
-      return true
-    },
-    boardPointerEvents () {
-      // Block mouse input completely when not player's turn
-      return this.isPlayerTurn ? 'auto' : 'none'
-    },
-    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'PvEPlayerIsWhite', 'EvE', 'enginetime', 'resized', 'resized9x9width', 'resized9x9height', 'resized9x10width', 'resized9x10height', 'dimNumber'])
+    ...mapGetters(['initialized', 'variant', 'multipv', 'hoveredpv', 'redraw', 'pieceStyle', 'boardStyle', 'fen', 'lastFen', 'orientation', 'moves', 'isPast', 'dimensionNumber', 'analysisMode', 'active', 'PvE', 'enginetime', 'resized', 'resized9x9width', 'resized9x9height', 'resized9x10width', 'resized9x10height', 'dimNumber'])
   },
   watch: {
     dimensionNumber () {
@@ -283,14 +265,6 @@ export default {
       this.updateBoardCSS(boardStyle)
     },
     multipv () {
-      // Don't draw engine arrows during PvE or EvE modes
-      if (this.PvE || this.EvE) {
-        this.shapes = []
-        this.pieceShapes = []
-        this.drawShapes()
-        return
-      }
-
       const multipv = this.multipv
       const shapes = []
       const pieceShapes = []
@@ -933,8 +907,8 @@ export default {
           lastMove: true,
           check: true
         },
-        movable: (this.fen === this.lastFen || this.analysisMode)
-          ? {
+        movable: this.fen === this.lastFen || this.analysisMode
+          ? { // moving is possible at the end of the line and in analysis mode
               dests: this.possibleMoves(),
               color: this.turn
             }
@@ -969,8 +943,8 @@ export default {
 @import '../assets/dim9x10.css';
 
 .resizer{
-  padding-left: 5px;
-  padding-top: 5px;
+  padding-left: 15px;
+  padding-top: 15px;
   position: absolute;
   width: 10px;
   height: 10px;
