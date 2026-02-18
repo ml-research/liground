@@ -2,6 +2,7 @@
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
 import { addGamePath, removeGamePath, getAllSavedGamePaths, clearAllGamePaths } from './gameStorage'
+import { createSchema, insertEval, getEvals } from './evalCache'
 // IPC handler to clear all saved game paths
 ipcMain.handle('clear-all-game-paths', async () => {
   try {
@@ -11,7 +12,6 @@ ipcMain.handle('clear-all-game-paths', async () => {
     return { success: false, error: err.message }
   }
 })
-import { createSchema, insertEval, getEvals } from './evalCache'
 
 /**
  * Set `__static` path to static files in production
