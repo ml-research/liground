@@ -85,7 +85,6 @@ export default {
       // Try IPC fallback: ask main process to show dialog (matches EngineModal pattern)
       let ipcRenderer
       try {
-        // eslint-disable-next-line
         ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
       } catch (e) {
         ipcRenderer = null
@@ -113,16 +112,29 @@ export default {
         console.log(err)
       }
     },
-    openPGNFromPath (path) {
-      fs.readFile(path, 'utf8', (err, data) => {
+    async openPGNFromPath (path) {
+      fs.readFile(path, 'utf8', async (err, data) => {
         if (err) {
           return console.log(err)
         }
-
         // convert CRLF to LF
         data = data.replace(/\r\n/g, '\n')
         this.convertAndStorePgn(data)
         this.close()
+        // Add the file path to saved games
+        let ipcRenderer
+        try {
+          ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+        } catch (e) {
+          ipcRenderer = null
+        }
+        if (ipcRenderer) {
+          try {
+            await ipcRenderer.invoke('add-game-path', path)
+          } catch (error) {
+            console.error('Error adding game path:', error)
+          }
+        }
       })
     },
     openPGNFromString () {
@@ -136,7 +148,7 @@ export default {
       }
     },
     convertAndStorePgn (data) {
-      const regex = /(?:\[.+ ".*"\]\r?\n)+\r?\n+(?:.+\r?\n)*/gm
+      const regex = /((?:\[[^\]]+\][\r\n]+)+[\r\n]+(?:[^[][\s\S]*)?(?=(?:\[[^\]]+\][\r\n]+)|$))/g
       let games = []
       if (this.$store.getters.loadedGames) { // keep already loaded pgns
         games = this.$store.getters.loadedGames
@@ -149,17 +161,17 @@ export default {
         if (m.index === regex.lastIndex) {
           regex.lastIndex++
         }
-        m.forEach((match, groupIndex) => {
-          let game
-          try {
-            game = ffish.readGamePGN(match)
-          } catch (error) {
-            numOfUnparseableGames = numOfUnparseableGames + 1
-            return
-          }
-          currentGameCount++
-          games.push(game)
-        })
+        let game
+        try {
+          game = ffish.readGamePGN(m[0])
+        } catch (error) {
+          numOfUnparseableGames = numOfUnparseableGames + 1
+          continue
+        }
+        currentGameCount++
+        // Store the original PGN text for comment extraction
+        game.originalPGN = m[0]
+        games.push(game)
       }
 
       if (numOfUnparseableGames !== 0) {

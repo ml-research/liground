@@ -137,6 +137,8 @@ export default {
             return
           }
           currentGameCount++
+          // Store the original PGN text for comment extraction
+          game.originalPGN = match
           games.push(game)
         })
       }
