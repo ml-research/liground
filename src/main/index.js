@@ -11,6 +11,7 @@ ipcMain.handle('clear-all-game-paths', async () => {
     return { success: false, error: err.message }
   }
 })
+import { createSchema, insertEval, getEvals } from './evalCache'
 
 /**
  * Set `__static` path to static files in production
@@ -51,7 +52,10 @@ function createWindow () {
     mainWindow = null
   })
 }
-app.on('ready', createWindow)
+app.whenReady().then(() => {
+  createSchema()
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -65,7 +69,27 @@ app.on('activate', () => {
   }
 })
 
-// IPC handler so renderer can request native dialogs when `remote` is not available
+ipcMain.handle('eval-cache-get', async (event, payload) => {
+  try {
+    const { positionKey, engineName } = payload || {}
+    if (!positionKey || !engineName) return null
+    const [name, version] = engineName.split(' ')
+    const evaluation = getEvals(positionKey, name, version)
+    console.log(JSON.stringify(evaluation))
+    return evaluation
+  } catch (err) {
+    console.error('[eval-cache-get] failed', err)
+  }
+})
+
+ipcMain.on('eval-cache-put', (_event, payload) => {
+  try {
+    insertEval(payload)
+  } catch (err) {
+    console.error('[eval-cache-put] failed', err)
+  }
+})
+
 ipcMain.handle('show-open-dialog', async (event, options) => {
   const browserWindow = mainWindow || null
   try {

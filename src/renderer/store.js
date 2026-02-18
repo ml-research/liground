@@ -9,6 +9,16 @@ import captureAudio from './assets/audio/Capture.mp3'
 
 Vue.use(Vuex)
 
+let ipcRenderer
+try {
+  ipcRenderer = (typeof window !== 'undefined' && window.require) ? window.require('electron').ipcRenderer : require('electron').ipcRenderer
+} catch (err) {
+  ipcRenderer = null
+}
+
+const MIN_CACHE_DEPTH = 20
+let lastCacheKey = null
+
 class TwoWayMap {
   constructor (map) {
     this.map = map
@@ -52,6 +62,50 @@ function cpToString (cp) {
   } else {
     return normalizedEval
   }
+}
+
+/**
+ * Normalize WDL information into fractional values.
+ * Accepts either {wdlWin, wdlDraw, wdlLoss} or wdl array [w, d, l].
+ * @param {any} mv Multipv line or payload
+ * @returns {{win: number, draw: number, loss: number} | null}
+ */
+function normalizeWdl (mv) {
+  if (!mv) return null
+  const hasRatios = mv.wdlWin !== undefined || mv.wdlDraw !== undefined || mv.wdlLoss !== undefined
+  if (hasRatios) {
+    const win = Number(mv.wdlWin)
+    const draw = Number(mv.wdlDraw)
+    const loss = Number(mv.wdlLoss)
+    if (Number.isFinite(win) && Number.isFinite(draw) && Number.isFinite(loss)) {
+      return { win, draw, loss }
+    }
+  }
+  if (Array.isArray(mv.wdl) && mv.wdl.length >= 3) {
+    const win = Number(mv.wdl[0])
+    const draw = Number(mv.wdl[1])
+    const loss = Number(mv.wdl[2])
+    const sum = win + draw + loss
+    if (Number.isFinite(sum) && sum > 0) {
+      return { win: win / sum, draw: draw / sum, loss: loss / sum }
+    }
+  }
+  return null
+}
+
+/**
+ * Strip halfmove/fullmove counters from a FEN string for caching.
+ * @param {string} fen Full FEN string
+ */
+function normalizeFen (fen) {
+  if (typeof fen !== 'string') {
+    return ''
+  }
+  const parts = fen.trim().split(/\s+/)
+  if (parts.length >= 6) {
+    return parts.slice(0, parts.length - 2).join(' ')
+  }
+  return parts.join(' ')
 }
 
 /**
@@ -178,6 +232,7 @@ export const store = new Vuex.Store({
     dimNumber: 0,
     turn: true,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    normalizedFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -',
     lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // to track the end of the current line
     startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
@@ -241,6 +296,8 @@ export const store = new Vuex.Store({
     listOfEngineStats: [],
     engineStats: {
       depth: 0,
+      isEvalCached: false,
+      cachedDepth: -1,
       seldepth: 0,
       nodes: 0,
       nps: 0,
@@ -312,6 +369,7 @@ export const store = new Vuex.Store({
     },
     fen (state, payload) {
       state.fen = payload
+      state.normalizedFen = normalizeFen(payload)
     },
     engineIndex (state, payload) {
       state.engineIndex = payload
@@ -476,7 +534,9 @@ export const store = new Vuex.Store({
         nps: 0,
         hashfull: 0,
         tbhits: 0,
-        time: 0
+        time: 0,
+        isEvalCached: false,
+        cachedDepth: -1
       }
     },
     resetWdlCache (state) {
@@ -541,6 +601,7 @@ export const store = new Vuex.Store({
       state.selectedGame = null
       state.fenply = 1
       this.commit('resetEngineStats')
+      state.normalizedFen = normalizeFen(state.fen)
     },
     resetBoard (state, payload) {
       if (!payload.is960) {
@@ -686,6 +747,7 @@ export const store = new Vuex.Store({
         dimNumber: 0,
         turn: true,
         fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        normalizedFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -',
         lastFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         startFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         moves: [],
@@ -1233,11 +1295,97 @@ export const store = new Vuex.Store({
         }
       }
     },
+    async position (context) {
+      const normalizedFen = context.getters.normalizedFen
+      const engineName = context.getters.engineName
 
-    position (context) {
       engine.send(`position fen ${context.getters.fen}`)
       const eve = new CustomEvent('position', { detail: { fen: context.getters.fen } })
       document.dispatchEvent(eve)
+      if (!ipcRenderer) {
+        console.log('ipcrenderer not available')
+        return
+      }
+      const evaluation = await ipcRenderer.invoke('eval-cache-get', {
+        positionKey: normalizedFen,
+        engineName
+      })
+      // expect array
+      if (!Array.isArray(evaluation) || evaluation.length === 0) return
+
+      // make sure result is not stale
+      if (!evaluation) return
+      if (context.getters.normalizedFen !== normalizedFen) return
+      if (context.getters.engineName !== engineName) return
+
+      // ignore pv updates when engine is expected to be inactive
+      if (!context.state.active) {
+        return
+      }
+      const primary = evaluation[0]
+      // update engine stats
+      const stats = { ...context.state.engineStats }
+      for (const key of Object.keys(stats)) {
+        if (key in primary) stats[key] = primary[key]
+      }
+      stats.isEvalCached = true
+      stats.cachedDepth = stats.depth
+      context.commit('engineStats', stats)
+
+      // update multipv array
+      const multipv = context.getters.multipv.slice(0)
+      for (const row of evaluation) {
+        const idx = (row.multipv || 1) - 1
+        if (idx < 0) continue
+
+        // handle mate-only rows (if you store mate)
+        if (row.mate === 0) {
+          multipv[idx] = { mate: row.mate }
+          continue
+        }
+
+        if (!row.pv_line) continue
+
+        const { board } = context.state
+        const ucimove = row.pv_line.split(/\s/)[0]
+
+        // verify first move is legal
+        if (!board.legalMoves().includes(ucimove)) continue
+
+        let cachedWdl = null
+        if (row.wdl_eval) {
+          try {
+            const parsed = JSON.parse(row.wdl_eval)
+            if (Array.isArray(parsed)) {
+              cachedWdl = parsed
+            }
+          } catch (err) {
+            // ignore invalid cache entry
+          }
+        }
+
+        const pvline = {
+          cp: row.cp_eval,
+          mate: row.mate,
+          pvUCI: row.pv_line,
+          ucimove
+        }
+        if (cachedWdl) {
+          pvline.wdl = cachedWdl
+        }
+
+        try {
+          pvline.pv = board.variationSan(row.pv_line)
+        } catch (err) {
+          // reset board to avoid being stuck
+          board.setFen(context.state.fen)
+          console.warn('Invalid cached pv move.\nFEN:', board.fen(), '\nPV:', row.pv_line)
+          continue
+        }
+
+        multipv[idx] = pvline
+      }
+      context.commit('multipv', multipv)
     },
     sendEngineCommand (_, payload) {
       engine.send(payload)
@@ -1517,6 +1665,9 @@ export const store = new Vuex.Store({
       }
       context.commit('engineStats', stats)
 
+      // only update multipv if depth is higher than cached depth
+      if (stats.isEvalCached && stats.depth <= stats.cachedDepth) return
+
       // update pvline
       if ('pv' in payload) {
         const multipv = context.getters.multipv.slice(0)
@@ -1536,6 +1687,9 @@ export const store = new Vuex.Store({
               pvUCI: payload.pv,
               ucimove
             }
+            if (Array.isArray(payload.wdl)) {
+              pvline.wdl = payload.wdl
+            }
             // attach engine-provided WDL info when available (fractions 0..1)
             if ('wdlWin' in payload || 'wdlDraw' in payload || 'wdlLoss' in payload) {
               pvline.wdlWin = typeof payload.wdlWin === 'number' ? payload.wdlWin : parseFloat(payload.wdlWin)
@@ -1554,6 +1708,32 @@ export const store = new Vuex.Store({
           }
         }
         context.commit('multipv', multipv)
+        stats.isEvalCached = false
+      }
+      if (!('pv' in payload)) return
+      const depth = payload.depth
+      const mate = payload.mate
+
+      if (typeof depth !== 'number') return
+      if (depth < MIN_CACHE_DEPTH && typeof mate !== 'number') return
+      const positionKey = context.getters.normalizedFen
+      const engineName = context.getters.engineName
+      const cacheKey = `${positionKey}|${engineName}|${depth}|${payload.multipv}`
+      if (cacheKey === lastCacheKey) return
+      lastCacheKey = cacheKey
+      console.log(JSON.stringify(payload.multipv))
+      if (ipcRenderer && ipcRenderer.send) {
+        ipcRenderer.send('eval-cache-put', {
+          positionKey,
+          engineName,
+          depth,
+          cp: payload.cp,
+          wdl: payload.wdl,
+          mate,
+          pv: payload.pv,
+          multipv: payload.multipv,
+          updatedAt: Date.now()
+        })
       }
     },
     loadedGames (context, payload) {
@@ -1802,6 +1982,9 @@ export const store = new Vuex.Store({
     fen (state) {
       return state.fen
     },
+    normalizedFen (state) {
+      return state.normalizedFen
+    },
     lastFen (state) {
       return state.lastFen
     },
@@ -1855,6 +2038,9 @@ export const store = new Vuex.Store({
     cp (state) {
       return state.multipv[0].cp
     },
+    wdl (state) {
+      return state.multipv[0].wdl
+    },
     depth (state) {
       return state.engineStats.depth
     },
@@ -1872,6 +2058,12 @@ export const store = new Vuex.Store({
     },
     tbhits (state) {
       return state.engineStats.tbhits
+    },
+    isEvalCached (state) {
+      return state.engineStats.isEvalCached
+    },
+    cachedDepth (state) {
+      return state.engineStats.cachedDepth
     },
     time (state) {
       return state.engineStats.time
@@ -1928,41 +2120,29 @@ export const store = new Vuex.Store({
       }
     },
     wdlForWhiteWin (state) {
-      const mv = state.multipv[0]
-      if (mv && typeof mv.wdlWin === 'number') {
-        let win = mv.wdlWin
-        if (!state.turn) { // black to move -> swap perspective
-          win = mv.wdlLoss
-        }
-        // cache the new value
+      const wdl = normalizeWdl(state.multipv[0])
+      if (wdl) {
+        const win = state.turn ? wdl.win : wdl.loss
         state.lastWdlWin = win
         return win
       }
-      // fallback to last known value
       return state.lastWdlWin
     },
     wdlForWhiteDraw (state) {
-      const mv = state.multipv[0]
-      if (mv && typeof mv.wdlDraw === 'number') {
-        // cache the new value
-        state.lastWdlDraw = mv.wdlDraw
-        return mv.wdlDraw
+      const wdl = normalizeWdl(state.multipv[0])
+      if (wdl) {
+        state.lastWdlDraw = wdl.draw
+        return wdl.draw
       }
-      // fallback to last known value
       return state.lastWdlDraw
     },
     wdlForWhiteLoss (state) {
-      const mv = state.multipv[0]
-      if (mv && typeof mv.wdlLoss === 'number') {
-        let loss = mv.wdlLoss
-        if (!state.turn) {
-          loss = mv.wdlWin
-        }
-        // cache the new value
+      const wdl = normalizeWdl(state.multipv[0])
+      if (wdl) {
+        const loss = state.turn ? wdl.loss : wdl.win
         state.lastWdlLoss = loss
         return loss
       }
-      // fallback to last known value
       return state.lastWdlLoss
     },
     wdlForWhiteWinPct (state, getters) {

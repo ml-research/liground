@@ -43,9 +43,11 @@ export default {
       return this.wdlForWhiteLossPct ?? 0
     },
     hasWdlData () {
-      const mv = this.$store.state.multipv[0]
       const uciShowWdl = this.$store.state.engineSettings.UCI_ShowWDL
-      return mv && typeof mv.wdlWin === 'number' && typeof mv.wdlDraw === 'number' && typeof mv.wdlLoss === 'number' && uciShowWdl === true
+      return uciShowWdl === true &&
+        this.wdlForWhiteWinPct !== null &&
+        this.wdlForWhiteDrawPct !== null &&
+        this.wdlForWhiteLossPct !== null
     }
   }
 }
