@@ -329,12 +329,14 @@ export default {
       this.showCommentModal = true
     },
     saveComment (commentText) {
+      // eslint-disable-next-line
       this.move.comment = commentText
       this.showCommentModal = false
       this.$store.dispatch('displayMenu', true)
       this.$store.dispatch('menuAtMove', null)
     },
     deleteCommentFromMove () {
+      // eslint-disable-next-line
       this.move.comment = undefined
       this.showCommentModal = false
       this.$store.dispatch('displayMenu', true)
