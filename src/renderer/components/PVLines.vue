@@ -142,10 +142,9 @@ export default {
       currentEngine: 1,
       pvcount: 0,
       originalMultiPV: 1,
-      showOnlyOnePvLine: false, // Flag to show only one PvLine
-      showExpandIcon: false, // Flag to show expand-down icon
-      showMinimizeIcon: true, // Flag to show expand-up icon
-      board: null
+      showOnlyOnePvLine: true, // Flag to show only one PvLine (default collapsed)
+      showExpandIcon: true, // Flag to show expand-down icon (default collapsed)
+      showMinimizeIcon: false // Flag to show expand-up icon
     }
   },
   computed: {

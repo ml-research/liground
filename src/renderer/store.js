@@ -242,7 +242,7 @@ export const store = new Vuex.Store({
     muteButton: false,
     fenply: 1,
     internationalVariants: [
-      '+ Add Custom', 'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic'
+      '+ Add Custom', 'chess', 'crazyhouse', 'horde', 'kingofthehill', '3check', 'racingkings', 'antichess', 'atomic', 'fischerandom'
     ],
     seaVariants: [
       '+ Add Custom', 'makruk'
