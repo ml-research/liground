@@ -104,6 +104,6 @@ export default {
   transition: height .25s ease;
 }
 .wdl-win { background: #4caf50; }
-.wdl-draw { background: #f4c542; }
+.wdl-draw { background: #5f5e5c; }
 .wdl-loss { background: #e84c3d; }
 </style>
