@@ -27,7 +27,6 @@
   height: 10%;
   background-size: cover;
   z-index: 2;
-  
   pointer-events: none;
 }
 .dim9x10 cg-board square {
