@@ -1,0 +1,7 @@
+.cg-board-wrap {
+  background-image: url('../../../board/svg/JanggiCoords.svg');
+  width: 100%;
+  background-size: cover;
+  height: 100%;
+  padding:0;
+}
