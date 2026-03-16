@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
+import path from 'path'
 import { addGamePath, removeGamePath, getAllSavedGamePaths, clearAllGamePaths } from './gameStorage'
 import { createSchema, insertEval, getEvals } from './evalCache'
 // IPC handler to clear all saved game paths
@@ -18,13 +19,16 @@ ipcMain.handle('clear-all-game-paths', async () => {
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+  global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
 let mainWindow
+const isDevelopment = process.env.NODE_ENV === 'development'
+const isPackagedLinux = process.platform === 'linux' && app.isPackaged
 
-// eslint-disable-next-line node/no-path-concat
-const winURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080' : `file://${__dirname}/index.html`
+if (isPackagedLinux) {
+  app.commandLine.appendSwitch('no-sandbox')
+}
 
 function createWindow () {
   /**
@@ -39,14 +43,33 @@ function createWindow () {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
       enableRemoteModule: true,
+      sandbox: false,
       // allow access to Node globals
       contextIsolation: false
     }
   })
 
   mainWindow.maximize()
-  mainWindow.loadURL(winURL)
+  if (isDevelopment) {
+    mainWindow.loadURL('http://localhost:9080')
+  } else {
+    mainWindow.loadFile(path.join(__dirname, 'index.html'))
+  }
   mainWindow.removeMenu()
+
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    console.error('[main] failed to load renderer', { errorCode, errorDescription, validatedURL })
+  })
+
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('[main] renderer process gone', details)
+  })
+
+  mainWindow.webContents.on('console-message', (_event, level, message, line, sourceId) => {
+    if (level >= 2) {
+      console.error('[renderer]', { level, message, line, sourceId })
+    }
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null

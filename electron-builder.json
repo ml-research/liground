@@ -34,8 +34,8 @@
         "x": 130,
         "y": 150,
         "type": "file"
-      },
-    ],
+      }
+    ]
   },
   "mac": {
     "icon": "build/icons/icon.icns",
@@ -46,5 +46,10 @@
   },
   "linux": {
     "icon": "build/icons"
+  },
+  "appImage": {
+    "executableArgs": [
+      "--no-sandbox"
+    ]
   }
 }
