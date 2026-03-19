@@ -13,9 +13,9 @@ We provide binary releases for the following plattforms:
 
 Operating System | Version
 ---              | ---
-Linux            | [**liground-0.5.1-linux.AppImage**](https://github.com/ml-research/liground/releases/download/0.5.1/liground-0.5.1.AppImage)
-Windows          | [**liground-Setup-0.5.1-win.exe**](https://github.com/ml-research/liground/releases/download/0.5.1/liground.Setup.0.5.1.win.exe)                              
-Mac              | [**liground-0.5.1-mac.zip**](https://github.com/ml-research/liground/releases/download/0.5.1/liground-0.5.1-mac.zip)
+Linux            | [**liground-0.6.0-linux.AppImage**](https://github.com/ml-research/liground/releases/download/0.6.0/liground-0.6.0.AppImage)
+Windows          | [**liground-Setup-0.6.0-win.exe**](https://github.com/ml-research/liground/releases/download/0.6.0/liground.Setup.0.6.0.exe)                              
+Mac              | [**liground-0.6.0-mac.zip**](https://github.com/ml-research/liground/releases/download/0.6.0/liground-0.6.0-mac.zip)
 
 The current _LiGround_ release and all its previous versions can also be found at [releases](https://github.com/ml-research/liground/releases).
 
