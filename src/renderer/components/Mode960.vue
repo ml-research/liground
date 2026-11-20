@@ -223,7 +223,10 @@ export default {
 
       castlingRights += castlingRights.toLowerCase()
 
-      return `${s} w ${castlingRights} - 0 1`
+      // 3check positions need the remaining-checks counter, otherwise the engine assumes 1-check
+      const checks = this.variant === '3check' ? '3+3 ' : ''
+
+      return `${s} w ${castlingRights} - ${checks}0 1`
     }
   }
 }
